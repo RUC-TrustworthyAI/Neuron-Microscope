@@ -1,0 +1,4 @@
+# Saved-data analysis, HTML construction and software fixtures. No CUDA or API required.
+numpy==2.2.6
+pyarrow==21.0.0
+tokenizers==0.22.2

@@ -1,0 +1,36 @@
+
+#token-selectivity{scroll-margin-top:105px}
+#token-selectivity .ts-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+#token-selectivity .ts-panel{min-width:0;border:1px solid var(--rule);border-radius:8px;overflow:hidden;background:var(--bg)}
+#token-selectivity .ts-heading{padding:18px 18px 14px;border-bottom:1px solid var(--rule)}
+#token-selectivity .ts-topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:13px}
+#token-selectivity .ts-pole{font:600 12px/1.4 var(--sans);text-transform:uppercase;letter-spacing:.09em;display:flex;gap:8px;align-items:center}
+#token-selectivity .ts-pole:before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+#token-selectivity .ts-positive .ts-pole{color:var(--pos)}
+#token-selectivity .ts-negative .ts-pole{color:var(--neg)}
+#token-selectivity .ts-threshold{font:12px/1.4 var(--mono);color:var(--ink2);font-variant-numeric:tabular-nums;white-space:nowrap}
+#token-selectivity .ts-controls{display:flex;justify-content:space-between;align-items:center;gap:10px}
+#token-selectivity .ts-controls .quiet{font-size:12px;white-space:nowrap}
+#token-selectivity .ts-positive .seg button.on{background:var(--pos);border-color:var(--pos)}
+#token-selectivity .ts-negative .seg button.on{background:var(--neg);border-color:var(--neg)}
+#token-selectivity .ts-scroll{max-height:465px;overflow:auto;scrollbar-width:thin;overscroll-behavior:contain}
+#token-selectivity table{width:100%;border-collapse:collapse;border-spacing:0;margin:0;font-size:12.5px;table-layout:fixed;font-variant-numeric:tabular-nums}
+#token-selectivity th{position:sticky;top:0;z-index:1;background:#f7f7f8;padding:10px 7px;font:11px/1.4 var(--sans);letter-spacing:.04em;color:var(--ink3);text-transform:uppercase;white-space:nowrap;border-bottom:1px solid var(--rule)}
+#token-selectivity td{padding:8px 7px;border-bottom:1px solid #f0f0f2;vertical-align:middle;line-height:1.35;white-space:nowrap}
+#token-selectivity tr:last-child td{border-bottom:0}
+#token-selectivity tbody tr:hover{background:#fafafa}
+#token-selectivity .ts-rank{width:30px;text-align:right;color:var(--ink3);padding-left:10px}
+#token-selectivity .ts-token{overflow:hidden;text-overflow:ellipsis}
+#token-selectivity .ts-token code{font:12.5px/1.35 var(--mono);white-space:pre}
+#token-selectivity .ts-num{text-align:right}
+#token-selectivity .ts-count{width:65px}
+#token-selectivity .ts-mean{width:60px;color:var(--ink2)}
+#token-selectivity .ts-hits{width:65px}
+#token-selectivity .ts-share{width:88px;padding-right:12px}
+#token-selectivity .ts-rate{position:relative;min-width:62px;text-align:right;isolation:isolate;padding:3px 4px;border-radius:3px;overflow:hidden}
+#token-selectivity .ts-rate i{position:absolute;left:0;top:0;bottom:0;z-index:-1;background:var(--pos);opacity:.12}
+#token-selectivity .ts-negative .ts-rate i{background:var(--neg)}
+#token-selectivity .ts-method{font-size:12.5px;line-height:1.5;color:var(--ink3);margin:12px 0 0}
+@media(max-width:880px){#token-selectivity .ts-grid{grid-template-columns:1fr;gap:20px}}
+@media(max-width:480px){#token-selectivity .ts-scroll{overflow-x:auto}#token-selectivity table{min-width:440px}#token-selectivity .ts-topline{align-items:flex-start;flex-direction:column;gap:6px}}
+@media print{#token-selectivity .ts-scroll{max-height:none;overflow:visible}#token-selectivity .ts-grid{display:block}#token-selectivity .ts-panel{margin-bottom:20px}#token-selectivity th{position:static}}

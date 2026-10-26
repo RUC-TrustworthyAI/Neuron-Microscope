@@ -1,0 +1,3 @@
+-r gpu.txt
+# CPU wheels suffice for tiny randomly initialized Qwen3 tests.
+torch==2.7.1

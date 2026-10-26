@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Neuron report</title>
+<style>
+:root{--ink:#1d1d1f;--ink2:#4a4a4f;--ink3:#8a8a90;--rule:#e4e4e7;--rule2:#c9c9ce;--tile:#efeff1;--bg:#fff;
+--pos:#d9480f;--neg:#1c6fb5;--sans:-apple-system,BlinkMacSystemFont,Inter,"Segoe UI",Helvetica,Arial,sans-serif;
+--mono:ui-monospace,Menlo,Consolas,monospace}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:17.5px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:var(--ink2)}
+.topnav{position:sticky;top:0;z-index:5;background:rgba(255,255,255,.96);border-bottom:1px solid var(--rule);font-size:12px;
+letter-spacing:.06em;text-transform:uppercase;padding:10px 24px;display:flex;gap:22px;flex-wrap:wrap;justify-content:center}
+.topnav a{white-space:nowrap}
+.topnav a{color:var(--ink3);text-decoration:none}.topnav a:hover{color:var(--ink)}
+.wrap{max-width:1100px;margin:0 auto;padding:48px 24px 96px}
+.text{max-width:720px;margin:0 auto}
+header{margin:0 0 56px}
+.eyebrow{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin:0 0 18px}
+h1{font:600 38px/1.18 var(--sans);letter-spacing:-.015em;margin:0 0 18px}
+.lede{font-size:20px;line-height:1.5;color:var(--ink);margin:0 0 28px}
+.quiet{font-size:14px;color:var(--ink3);line-height:1.5}
+.quiet b{color:var(--ink2);font-weight:500}
+.metarow{display:flex;gap:8px 22px;flex-wrap:wrap;font-size:13.5px;color:var(--ink3);margin:26px auto 0;align-items:center}
+.metarow b{color:var(--ink2);font-weight:500}
+.pill{display:inline-block;border:1px solid var(--rule2);border-radius:4px;padding:0 7px;font-size:12px;letter-spacing:.04em;
+text-transform:uppercase;color:var(--ink2);line-height:20px;vertical-align:1px;white-space:nowrap}
+.pill.high{border-color:var(--ink)}.pill.low{color:var(--ink3)}
+.pill.rejected{color:var(--neg);border-color:var(--neg)}.pill.survived{color:var(--ink);border-color:var(--ink)}
+.sec{margin:0 0 64px}
+.lab{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink);font-weight:600;padding:0 0 8px;border-bottom:1px solid var(--rule2);margin:0 0 16px}
+.why{font-size:16px;line-height:1.55;color:var(--ink2);margin:0 0 22px}.why p{margin:0 0 10px}
+.why b{color:var(--ink);font-weight:600}
+.figs{max-width:720px;margin:0 auto}.figs.wide{max-width:1100px}
+.detail p{margin:0 0 14px;font-size:17px;line-height:1.6;color:var(--ink)}.detail p b{font-weight:600}
+figure{margin:0;min-width:0}
+figure+figure{margin-top:32px}
+.cap{font-size:13px;color:var(--ink3);line-height:1.45;margin:6px 0 0}
+.sub{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin:0 0 10px}
+.tile{display:inline-block;min-width:52px;text-align:center;padding:2px 8px;border-radius:5px;background:var(--tile);
+font-variant-numeric:tabular-nums;font-size:14px;line-height:22px;color:var(--ink);white-space:nowrap}
+.tile.big{font-size:22px;line-height:30px;padding:8px 14px;min-width:96px}
+.tiles{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end}
+.tiles .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);display:block;margin:0 0 3px}
+.toks{font-size:14.5px;line-height:1.85;color:var(--ink);word-break:break-word}
+.toks .t{border-radius:3px;padding:1px 0;white-space:pre-wrap}
+.toks .t.peak{outline:1.5px solid var(--pos);outline-offset:1px}
+.toks .t.peak.n{outline-color:var(--neg)}
+.cut{color:var(--ink3);padding:0 3px}
+.ex{display:grid;grid-template-columns:72px minmax(0,1fr);gap:0 16px;padding:10px 0;border-top:1px solid var(--rule);align-items:start}
+.ex:first-child{border-top:0}
+.ex .tile{margin-top:3px}
+.bands{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+.bands button,.more{font:12px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--rule2);background:#fff;color:var(--ink2);border-radius:4px;padding:6px 10px;cursor:pointer}
+.bands button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.more{margin:10px 0 0}
+.pane{display:none}.pane.on{display:block}
+.regions{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:26px 32px}
+.region h4{font:600 15px/1.3 var(--sans);margin:0 0 4px}
+.region .best{color:var(--ink3);font-size:12.5px;margin:0 0 6px}
+.region .ex{grid-template-columns:60px minmax(0,1fr);padding:7px 0;font-size:13.5px}
+.region .toks{font-size:13.5px;line-height:1.7}
+.sharebar{display:flex;height:22px;border-radius:5px;overflow:hidden;border:1px solid var(--rule2);margin:0 0 6px}
+.sharebar div{border-right:1px solid #fff;display:block;text-align:center;line-height:20px;padding:0 6px;font-size:11px;color:#fff;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sharebar div:last-child{border-right:0}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0 12px}
+.chip{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--rule);border-radius:5px;padding:2px 4px 2px 9px;font-size:13px;line-height:20px;max-width:100%}
+.chip .id{font-family:var(--mono);font-size:11.5px;color:var(--ink3);white-space:nowrap}
+.chip .lbl{color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px}
+.chip .tile{min-width:44px;font-size:12.5px;line-height:18px;padding:1px 6px}
+.chip .sg{font-size:12px;line-height:18px;min-width:18px;text-align:center;border-radius:4px;color:#fff;background:var(--neg);margin-left:-4px}
+.card{border-top:1px solid var(--rule);padding:18px 0 14px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.4fr);gap:0 36px}
+.card .name{font-weight:600;font-size:17px;line-height:1.35;margin:0 0 6px;display:flex;align-items:center;gap:10px}
+.card .name .sw{width:12px;height:12px;border-radius:2px;flex:none}
+.card .story{font-size:17px;line-height:1.5;color:var(--ink);margin:0 0 12px}
+.card .ex{grid-template-columns:60px minmax(0,1fr);padding:6px 0;border-top:1px dashed var(--rule)}
+.card .toks{font-size:13.5px;line-height:1.7}
+.card .members{font-size:12.5px;color:var(--ink3);margin:6px 0 0;grid-column:1/-1}
+.route{border-top:1px solid var(--rule);padding:14px 0;display:grid;grid-template-columns:200px minmax(0,1fr);gap:0 24px;font-size:14px}
+.route .name{font-weight:600;font-size:15px;margin:0 0 4px}.route .desc{color:var(--ink2);font-size:13.5px}
+.route .ex{grid-template-columns:60px minmax(0,1fr);padding:5px 0;border-top:1px dashed var(--rule)}.route .toks{font-size:13.5px;line-height:1.7}
+table{border-collapse:separate;border-spacing:0 4px;width:100%;font-size:14px}
+th{font-weight:400;color:var(--ink3);font-size:12px;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:0 8px 4px 0;vertical-align:bottom}
+td{padding:3px 12px 3px 0;vertical-align:top;line-height:1.45}
+td.num{text-align:right;white-space:nowrap;width:1%}td .tile{min-width:64px}
+td.id{font-family:var(--mono);font-size:12.5px;color:var(--ink3);white-space:nowrap}
+td.dim{color:var(--ink3);font-size:13px}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px 40px}
+.pair{display:grid;grid-template-columns:120px minmax(0,1fr);gap:0 18px;align-items:start;padding:14px 0;border-top:1px solid var(--rule)}
+.pair:first-child{border-top:0}
+.pair .tiles{flex-direction:column;align-items:stretch;gap:6px}
+.crow{border-top:1px solid var(--rule);padding:0}
+.crow summary{list-style:none;display:grid;grid-template-columns:36px 100px minmax(0,1fr);gap:0 14px;align-items:center;padding:10px 0;cursor:pointer;font-size:15px}
+.crow summary::-webkit-details-marker{display:none}
+.crow summary .n{color:var(--ink3);font-variant-numeric:tabular-nums}
+.crow summary .att{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}
+.crow[open] summary .att{white-space:normal;font-weight:600}
+.crow .bodyc{padding:0 0 14px 150px;font-size:15px;line-height:1.5;color:var(--ink2)}
+.crow .bodyc .ev{margin:10px 0 0;display:grid;gap:4px}
+.crow .bodyc .ev div{display:grid;grid-template-columns:64px minmax(0,1fr);gap:0 12px;font-size:13.5px;align-items:start}
+details{border-top:1px solid var(--rule);padding:12px 0}
+summary{cursor:pointer;font-size:14px;color:var(--ink2);letter-spacing:.04em}
+details ul{font-size:14px;color:var(--ink2);line-height:1.55;padding-left:20px}
+details li{margin:0 0 6px}
+svg text{font-family:var(--sans)}
+.empty{color:var(--ink3);font-size:14px;font-style:italic}
+.seg{display:inline-flex;border:1px solid var(--rule2);border-radius:5px;overflow:hidden;vertical-align:middle}
+.seg button{font:12px/1 var(--sans);letter-spacing:.06em;text-transform:uppercase;border:0;border-right:1px solid var(--rule2);background:#fff;color:var(--ink2);padding:6px 10px;cursor:pointer}
+.seg button:last-child{border-right:0}.seg button.on{background:var(--ink);color:#fff}
+.ctlrow{display:flex;gap:18px;align-items:center;flex-wrap:wrap;font-size:13px;color:var(--ink2);margin:0 0 10px}
+.ctlrow .filt{color:var(--ink3)}.ctlrow .filt b{color:var(--ink);font-weight:500}.ctlrow a{cursor:pointer;color:var(--ink2);text-decoration:underline;margin-left:8px}
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:4px 18px;margin:10px 0 0;font-size:13.5px}
+.legend div{display:flex;align-items:center;gap:8px;cursor:pointer;padding:2px 4px;border-radius:4px;color:var(--ink2)}
+.legend div:hover{background:var(--tile)}.legend div.on{background:var(--tile);color:var(--ink)}.legend.dim div:not(.on){opacity:.45}
+.legend .sw{width:12px;height:12px;border-radius:2px;flex:none}.legend .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.legend .n{color:var(--ink3);font-variant-numeric:tabular-nums;font-size:12px}
+.spec rect.segm{cursor:pointer}.spec rect.col{cursor:pointer;fill:transparent}.spec rect.col:hover{fill:rgba(0,0,0,.03)}
+.pts{margin:18px 0 0}.pts .hd{display:flex;justify-content:space-between;align-items:baseline;margin:0 0 6px}
+#tip{position:fixed;pointer-events:none;background:#fff;border:1px solid var(--rule2);padding:6px 9px;font-size:12.5px;line-height:1.4;color:var(--ink2);display:none;z-index:9;max-width:320px;border-radius:5px}
+#tip b{color:var(--ink);font-weight:600}
+.cols2{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:0 36px;align-items:start}
+.qtab td .tile{min-width:44px}.csw{display:inline-block;width:9px;height:9px;border-radius:2px;vertical-align:1px;flex:none}
+.bars3{display:flex;gap:10px;overflow-x:auto;padding:4px 0}.bars3 .lbls{display:flex;flex-direction:column;font-size:11px;color:var(--ink3);text-transform:uppercase;letter-spacing:.06em;flex:none}
+.bars3 .lbls div{height:48px;display:flex;align-items:center}.bars3 .lbls div:last-child{height:24px}
+.cols3{display:flex;align-items:flex-start}.tc{display:flex;flex-direction:column;min-width:26px}
+.bb{position:relative;height:48px;border-bottom:1px solid var(--rule)}.bb::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rule2)}
+.bb i{position:absolute;left:22%;right:22%;display:block;border-radius:1px}
+.tc .tk{font-size:12px;white-space:pre;text-align:center;height:24px;line-height:24px;padding:0 3px;color:var(--ink2)}
+.tokchip{font-family:var(--mono);font-size:12px;border:1px solid var(--rule);border-radius:4px;padding:0 5px;margin:0 2px;white-space:nowrap;color:var(--ink2)}
+.tokchip.loss{border-color:transparent;background:var(--tile)}.tail{font-size:13.5px;color:var(--ink2)}
+.sel{font:13px var(--sans);border:1px solid var(--rule2);border-radius:5px;padding:5px 8px;background:#fff;color:var(--ink);max-width:560px}
+.neighwrap{position:relative}.wires{position:absolute;inset:0;pointer-events:none}
+.neigh{display:grid;grid-template-columns:minmax(0,1fr) 220px minmax(0,1fr);gap:0 44px;align-items:center;position:relative}
+.ncol{display:flex;flex-direction:column;gap:6px;align-items:flex-start}.ncol .chip{background:#fff;position:relative}
+.ncentre{border:1px solid var(--ink);border-radius:6px;padding:14px 16px;background:#fff;text-align:center;position:relative}
+.nid{font-family:var(--mono);font-size:12px;color:var(--ink3)}.ntitle{font-size:14px;font-weight:600;line-height:1.35;margin-top:4px}
+.census{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 32px;align-items:start;margin-top:8px}
+.kbars{display:grid;gap:4px}.kb{display:grid;grid-template-columns:130px minmax(0,1fr) 34px;gap:0 8px;align-items:center;font-size:13px;color:var(--ink2)}
+.kb .kl{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.kb .kt{display:block;height:12px;background:var(--tile);border-radius:3px;overflow:hidden}.kb .kt i{display:block;height:100%;background:var(--ink2);border-radius:3px}
+.kb .kn{text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+.census .tokchip{margin:0 4px 5px 0;display:inline-block}
+.cfig{margin:0 0 40px}.cfig h3,.gtop h3{font:600 17px/1.35 var(--sans);margin:0 0 6px}
+.usmap path{transition:fill .1s}.usmap path:hover{stroke:#1d1d1f;stroke-width:1.2}
+.gwrap{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:0 20px;align-items:start}
+.gpanel{font-size:13px;line-height:1.45;color:var(--ink);border-left:1px solid var(--rule);padding:0 0 0 16px;min-height:120px}
+.gpanel .dim{color:var(--ink3);font-size:12.5px}.gpanel .id{font-family:var(--mono);font-size:11.5px;color:var(--ink3)}
+.grow{display:grid;grid-template-columns:56px minmax(0,1fr);gap:0 8px;align-items:start;margin:0 0 5px;font-size:12.5px}.grow .tile{min-width:48px;font-size:12px;line-height:18px;padding:1px 5px}
+.gslider{width:220px;accent-color:#1d1d1f}
+.look{font-size:14.5px;color:var(--ink2);margin:0 0 8px;padding-left:20px;line-height:1.5}.look li{margin:0 0 3px}
+.headline{display:grid;grid-template-columns:1fr 1fr;gap:0 40px;margin:0 auto;max-width:1100px}.headline.single{grid-template-columns:1fr;max-width:720px}
+.tmpl{font-size:14px;color:var(--ink2);margin:8px 0 0;line-height:1.6;max-width:720px}.tmpl .slot{border:1px dashed var(--rule2);border-radius:4px;padding:0 6px;color:var(--ink3);font-size:12.5px;letter-spacing:.04em}
+.panel .hover{min-height:52px;margin:10px 0 0;font-size:13.5px}.panel .hover .toks{font-size:13.5px;line-height:1.7}.panel .hover .k{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink3);display:block;margin:0 0 2px}
+.ladder g.row{cursor:default}.ladder g.row:hover rect.bg{fill:rgba(0,0,0,.04)}
+.strip{display:flex;flex-wrap:wrap;align-items:flex-end;gap:0 1px;padding:6px 0 0}
+.stk{display:flex;flex-direction:column;align-items:center}
+.stk .bars{position:relative;height:60px;width:100%}.stk .bars i{position:absolute;left:15%;right:15%;border-radius:2px 2px 0 0;display:block}
+.stk .bars .base{position:absolute;left:0;right:0;top:44px;height:1px;background:var(--rule2)}
+.stk .tk{font-size:13.5px;line-height:1.5;padding:1px 3px;white-space:pre;border-radius:3px}.stk .tk.peak{outline:1.5px solid var(--pos);outline-offset:1px}.stk .tk.peak.n{outline-color:var(--neg)}
+@media (max-width:820px){.headline,.card,.route,.cols2,.neigh,.census,.gwrap{grid-template-columns:1fr}.headline .panel+.panel{margin-top:28px}.crow .bodyc{padding-left:0}}
+@media (max-width:1280px){.topnav{gap:16px}.topnav a[href='#custom'],.topnav a[href='#graphs'],.topnav a[href='#circuit'],.topnav a[href='#appendix']{display:none}}
+@media (max-width:1000px){.topnav a[href='#anatomy'],.topnav a[href='#family'],.topnav a[href='#criticism']{display:none}}
+@media print{.topnav{display:none}.wrap{padding:0}.sec{break-inside:avoid-page}details{display:block}details>*{display:block}.bands{display:none}.pane{display:block!important;margin:0 0 18px}.more{display:none}}
+</style></head>
+<body>
+<nav class="topnav" id="nav"></nav>
+<div class="wrap"><header id="head"></header><main id="main"></main></div>
+<script id="bundle" type="application/json">__PAPER_DATA_bundle__</script>
+<script>
+
+const B = (() => {
+  const saved = JSON.parse(document.getElementById('bundle').textContent);
+  const tokens = saved.distribution.n_tokens;
+  const documents = saved.bigscan?.n_docs ?? saved.local_metadata?.population_documents;
+  const title = saved.neuron.id + ' · ' + tokens + ' saved tokens';
+  const lede = Number(tokens).toLocaleString() + ' tokens · ' +
+    Number(documents).toLocaleString() + ' documents · saved native gate/value/product.';
+  return {
+    ...saved,
+    neuron: {...saved.neuron, autointerp_label: null, autointerp_description: null},
+    claim: {title, lede, one_paragraph: '—', negative_pole: null,
+      what_would_change_my_mind: null, confidence: null},
+    version: {...saved.version, n: null, ts: null, history: []},
+    criticism: [],
+    appendix: {...saved.appendix, notes: [], provenance: []},
+    headline: saved.headline ? {...saved.headline,
+      strip: saved.headline.strip ? {...saved.headline.strip,
+        caption: 'Natural-corpus context at the strongest saved document peak.'} : null} : null
+  };
+})();
+
+const POS = '#d9480f', NEG = '#1c6fb5';
+const $ = (tag, attrs, ...kids) => { const e = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) { if (v == null) continue; if (k === 'class') e.className = v; else if (k === 'html') e.innerHTML = v; else if (k === 'style') e.style.cssText = v; else e.setAttribute(k, v); }
+  for (const k of kids.flat(Infinity)) if (k != null) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e; };
+const svgEl = (tag, attrs, ...kids) => { const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs || {})) e.setAttribute(k, v);
+  for (const k of kids.flat(Infinity)) if (k != null) e.append(k.nodeType ? k : document.createTextNode(String(k)));
+  return e; };
+const has = x => x != null && (Array.isArray(x) ? x.length > 0 : typeof x !== 'object' || Object.keys(x).length > 0);
+const fmt = (v, d) => { if (v == null || Number.isNaN(+v)) return '–'; v = +v; if (d != null) return v.toFixed(d); if (Number.isInteger(v)) return String(v);
+  const a = Math.abs(v); if (a >= 100) return v.toFixed(0); if (a >= 10) return v.toFixed(1); if (a >= 1) return v.toFixed(2); if (a === 0) return '0'; return String(parseFloat(v.toPrecision(2))); };
+const pct = v => v == null ? '–' : v >= 0.995 ? '100%' : (100 * v).toFixed(v < 0.1 ? 1 : 0) + '%';
+const hexA = (hex, a) => hex + Math.round(Math.max(0, Math.min(1, a)) * 255).toString(16).padStart(2, '0');
+const mixHex = (hex, t) => '#' + [1, 3, 5].map(i => Math.round(parseInt(hex.slice(i, i + 2), 16) * (1 - t) + 255 * t).toString(16).padStart(2, '0')).join('');
+const mag = (v, scale) => scale > 0 ? Math.sqrt(Math.min(1, Math.abs(v) / scale)) : 0;
+const poleOf = g => typeof g.pole === 'number' ? (g.pole > 0 ? 'positive' : g.pole < 0 ? 'negative' : 'either') : (g.pole || 'either');
+const isOther = g => /^other$/i.test(String(g.id || '')) || /^other$/i.test(g.name || '');
+// Pole-and-order palette shared by the spectrum and the clusters: warm ramp for positive-pole items, cool ramp for negative, greys between. "other" gets null (hatched by the caller).
+const polePalette = items => { const col = {}; const pos = items.filter(g => poleOf(g) === 'positive'), neg = items.filter(g => poleOf(g) === 'negative'), mid = items.filter(g => poleOf(g) === 'either' && !isOther(g));
+  pos.forEach((g, i) => col[g.id] = mixHex(POS, pos.length > 1 ? 0.6 * i / (pos.length - 1) : 0));
+  neg.forEach((g, i) => col[g.id] = mixHex(NEG, neg.length > 1 ? 0.6 * (neg.length - 1 - i) / (neg.length - 1) : 0));
+  mid.forEach((g, i) => col[g.id] = mixHex('#5c5c62', mid.length > 1 ? 0.5 * i / (mid.length - 1) : 0.25));
+  items.filter(isOther).forEach(g => col[g.id] = null); return col; };
+const HATCH_CSS = 'repeating-linear-gradient(135deg,#9a9aa0 0 1px,#e6e6e9 1px 4px)';
+// A number in a shaded tile. signed=true tints by sign and magnitude relative to scale.
+const tile = (v, o = {}) => { const t = $('span', { class: 'tile' + (o.big ? ' big' : '') }, o.text ?? fmt(v, o.d));
+  if (o.signed && v != null && o.scale) { const a = 0.08 + 0.75 * mag(v, o.scale); t.style.background = hexA(v >= 0 ? POS : NEG, a); if (a > 0.5) t.style.color = '#fff'; }
+  return t; };
+const kTile = (k, v, o) => $('span', null, $('span', { class: 'k' }, k), tile(v, o));
+// Per-token shading: warm for positive, cool for negative. Shade only tokens carrying at least 10% of the list's peak magnitude (and at least 2 units).
+const toks = (arr, peakIndex, scale, negPeak, cut) => { const w = $('span', { class: 'toks' });
+  if (!has(arr)) return w; const s = scale || Math.max(...arr.map(t => Math.abs(t.activation || 0)), 1e-9);
+  if (cut && cut.left) w.append($('span', { class: 'cut' }, '…'));
+  arr.forEach((t, i) => { const a = t.activation || 0, f = Math.abs(a) / s; const e = $('span', { class: 't' + (i === peakIndex ? ' peak' + (negPeak ? ' n' : '') : ''), title: fmt(a) }, t.token);
+    if (f >= 0.10 && Math.abs(a) >= 2) { const al = 0.10 + 0.70 * Math.sqrt((f - 0.10) / 0.90); e.style.background = hexA(a >= 0 ? POS : NEG, al); if (al > 0.62) e.style.color = '#fff'; }
+    w.append(e); });
+  if (cut && cut.right) w.append($('span', { class: 'cut' }, '…'));
+  return w; };
+const zipToks = (tokens, values) => (tokens || []).map((t, i) => ({ token: t, activation: (values || [])[i] || 0 }));
+const argmaxAbs = vals => (vals || []).reduce((b, v, i, a) => Math.abs(v) > Math.abs(a[b]) ? i : b, 0);
+const exRow = (e, tokScale, negPeak, tileScale) => $('div', { class: 'ex' }, tile(e.activation, { signed: true, scale: tileScale || tokScale }), has(e.token_activations) ? toks(e.token_activations, e.peak_index, tokScale, negPeak, { left: e.cut_left, right: e.cut_right }) : $('span', { class: 'toks' }, e.text || ''));
+// Token shading is scaled within the list; tiles are scaled against tileScale (the section's extreme) so lists compare.
+const exList = (items, negPeak, tileScale) => { const s = Math.max(...items.flatMap(e => (e.token_activations || []).map(t => Math.abs(t.activation || 0))), ...items.map(e => Math.abs(e.activation || 0)), 1e-9);
+  return $('div', null, items.map(e => exRow(e, s, negPeak, tileScale))); };
+// Render the first n items now and the rest behind a "show more" button, step at a time.
+const moreList = (items, n, render, step) => { const box = $('div'), inner = $('div'); let shown = Math.min(n, items.length); box.append(inner); items.slice(0, shown).forEach(x => inner.append(render(x)));
+  if (items.length > shown) { const b = $('button', { class: 'more' }); const upd = () => b.textContent = `Show ${Math.min(step || n, items.length - shown)} more of ${items.length}`; upd();
+    b.onclick = () => { const next = Math.min(shown + (step || n), items.length); items.slice(shown, next).forEach(x => inner.append(render(x))); shown = next; if (shown >= items.length) b.remove(); else upd(); }; box.append(b); }
+  return box; };
+const extreme = (...lists) => Math.max(...lists.flat().map(e => Math.abs((e && e.activation) || 0)), 1e-9);
+const unitId = u => `L${u.layer}/N${u.neuron}`;
+const chip = (u, scale) => $('span', { class: 'chip', title: (u.label || '') + (u.sign != null && u.sign < 0 ? ' (feeds through its negative pole)' : '') }, $('span', { class: 'id' }, unitId(u)), u.label ? $('span', { class: 'lbl' }, u.label) : null,
+  u.weight != null ? tile(u.weight, { signed: true, scale, d: 2 }) : null, u.sign != null && u.sign < 0 ? $('span', { class: 'sg', title: 'negative pole' }, '−') : null);
+// sec(id | {id, wide}, label, why, ...figs): label and prose in the centred text column, figures below at 720px or 1100px.
+const NAV = { custom: 'Figures', graphs: 'Graphs', claim: 'Claim', distribution: 'Distribution', spectrum: 'Spectrum', exemplars: 'Exemplars', search: 'Search', clusters: 'Clusters', anatomy: 'Anatomy', ablation: 'Effect', family: 'Family', circuit: 'Circuit', tests: 'Tests', criticism: 'Criticism', appendix: 'Appendix' };
+const sec = (id, label, why, ...figs) => { const wide = typeof id === 'object' && id.wide; if (typeof id === 'object') id = id.id;
+  const s = $('section', { class: 'sec', id }, $('div', { class: 'text' }, $('div', { class: 'lab' }, label), has(why) ? $('div', { class: 'why' }, why) : null), $('div', { class: 'figs' + (wide ? ' wide' : '') }, figs));
+  document.getElementById('main').append(s); document.getElementById('nav').append($('a', { href: '#' + id }, NAV[id] || label)); };
+const fig = (node, cap) => $('figure', null, node, cap ? $('figcaption', { class: 'cap' }, cap) : null);
+const P = (...k) => $('p', null, ...k);
+const N = B.neuron || {}, C = B.claim || {}, V = B.version || {};
+// Cluster colours shared by the clusters, anatomy and family sections. Filled by the clusters section; unknown ids get a grey step.
+const CLUSTER_COLOUR = {}; const clusterName = id => ((B.clusters || []).find(k => k.id === id) || {}).name || String(id);
+const clusterColour = id => { if (!CLUSTER_COLOUR[id]) CLUSTER_COLOUR[id] = mixHex('#5c5c62', Math.min(0.6, 0.15 * Object.keys(CLUSTER_COLOUR).length)); return CLUSTER_COLOUR[id]; };
+const tipEl = () => document.getElementById('tip') || document.body.appendChild($('div', { id: 'tip' }));
+const showTip = (ev, html) => { const t = tipEl(); t.innerHTML = html; t.style.display = 'block'; t.style.left = Math.min(ev.clientX + 14, window.innerWidth - 340) + 'px'; t.style.top = (ev.clientY + 14) + 'px'; };
+const hideTip = () => tipEl().style.display = 'none';
+// The lede is claim.lede if given, else the opening sentences of one_paragraph up to about 80 words.
+const ledeText = () => { if (C.lede) return C.lede; const s = C.one_paragraph || ''; if (s.split(/\s+/).length <= 80) return s;
+  let out = ''; for (const sent of s.match(/[^.!?]+[.!?]+(\s|$)/g) || [s]) { if ((out + sent).split(/\s+/).length > 80 && out) break; out += sent; } return out.trim() || s; };
+
+// Headline figure: (a) filler ladder, (b) token strip with per-token bars.
+const headlineFigure = () => { const Hd = B.headline; if (!has(Hd)) return null; const wrap = $('div', { class: 'headline' });
+  const L = Hd.ladder; if (has(L) && has(L.fillers)) { const F = [...L.fillers].sort((a, b) => (b.activation || 0) - (a.activation || 0)); const lo = Math.min(0, ...F.map(f => f.activation || 0)), hi = Math.max(0, ...F.map(f => f.activation || 0));
+    const LB = Math.min(210, Math.max(90, 8 + 6.8 * Math.max(...F.map(f => (f.tag || '').length)))), W = 520, RB = 56, rh = 24, H = rh * F.length + 8, X = v => LB + (v - lo) / ((hi - lo) || 1) * (W - LB - RB); const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', class: 'ladder', style: 'display:block' });
+    const hover = $('div', { class: 'hover' }); const show = f => { const ta = has(f.tokens) ? zipToks(f.tokens, f.values) : null; const pk = ta ? (f.peak_token ? Math.max(0, f.tokens.lastIndexOf(f.peak_token)) : argmaxAbs(f.values)) : 0;
+      hover.replaceChildren($('span', { class: 'k' }, f.tag), ta ? toks(ta, pk, null, (f.activation || 0) < 0) : $('span', { class: 'toks' }, f.full_text || f.text || '')); };
+    svg.append(svgEl('line', { x1: X(0), x2: X(0), y1: 2, y2: H - 4, stroke: '#c9c9ce' }));
+    F.forEach((f, i) => { const y = 4 + i * rh, v = f.activation || 0, g = svgEl('g', { class: 'row' }); g.append(svgEl('rect', { class: 'bg', x: 0, y, width: W, height: rh, fill: 'transparent' }));
+      g.append(svgEl('text', { x: LB - 8, y: y + rh / 2 + 4, 'text-anchor': 'end', 'font-size': 12.5, fill: '#1d1d1f' }, f.tag || ''));
+      g.append(svgEl('rect', { x: Math.min(X(0), X(v)), y: y + 5, width: Math.max(1, Math.abs(X(v) - X(0))), height: rh - 10, rx: 2, fill: v >= 0 ? POS : NEG }));
+      g.append(svgEl('text', { x: v >= 0 ? X(v) + 6 : X(0) + 6, y: y + rh / 2 + 4, 'text-anchor': 'start', 'font-size': 12, fill: '#4a4a4f' }, fmt(v))); // negative values are written right of the zero line, clear of the bar and the tag column
+      g.onmouseenter = () => show(f); svg.append(g); });
+    if (F.length) show(F[0]);
+    let tmpl = null; if (L.template) { tmpl = $('div', { class: 'tmpl' }); L.template.split(/(\{[A-Za-z_]+\})/).forEach(part => tmpl.append(/^\{[A-Za-z_]+\}$/.test(part) ? $('span', { class: 'slot' }, part.slice(1, -1)) : part)); }
+    wrap.append($('div', { class: 'panel' }, fig($('div', null, svg, tmpl, hover), L.caption || null))); }
+  const S = Hd.strip; if (has(S) && has(S.tokens)) { const vals = S.values || [], mx = Math.max(...vals.map(Math.abs), 1e-9), pk = argmaxAbs(vals); const row = $('div', { class: 'strip' });
+    S.tokens.forEach((t, i) => { const v = vals[i] || 0, h = 40 * Math.abs(v) / mx; const bar = $('i', { style: v >= 0 ? `bottom:16px;height:${h}px;background:${POS}` : `top:44px;height:${Math.min(h, 14)}px;background:${NEG};border-radius:0 0 2px 2px` , title: fmt(v) });
+      row.append($('span', { class: 'stk' }, $('span', { class: 'bars' }, $('i', { class: 'base' }), Math.abs(v) / mx > 0.02 ? bar : null), $('span', { class: 'tk' + (i === pk ? ' peak' + (v < 0 ? ' n' : '') : ''), title: fmt(v) }, t))); });
+    wrap.append($('div', { class: 'panel' }, fig(row, S.caption || null))); }
+  if (wrap.children.length === 1) wrap.classList.add('single'); return wrap.children.length ? wrap : null; };
+
+// Header: eyebrow, title, short lede, headline figure, quiet meta row.
+(() => { const h = document.getElementById('head');
+  const eyebrow = ['Neuron paper', N.model, N.layer != null ? `L${N.layer}/N${N.neuron}` : null, V.n != null ? `v${V.n}` : null].filter(Boolean).join(' · ');
+  const text = $('div', { class: 'text' }, $('div', { class: 'eyebrow' }, eyebrow), $('h1', null, C.title || N.autointerp_label || N.id || 'Neuron')); const lede = ledeText(); if (lede) text.append($('p', { class: 'lede' }, lede)); h.append(text);
+  const hf = headlineFigure(); if (hf) h.append(hf);
+  const meta = $('div', { class: 'metarow text' }); if (C.confidence) meta.append($('span', null, 'Confidence ', $('span', { class: 'pill ' + C.confidence }, String(C.confidence))));
+  if (V.n != null) meta.append($('span', null, `Version ${V.n}` + (V.ts ? ` · ${V.ts.slice(0, 16).replace('T', ' ')}` : '')));
+  if (N.autointerp_label) meta.append($('span', null, 'Original autointerp label: ', $('b', null, N.autointerp_label))); if (meta.children.length) h.append(meta); })();
+
+// 0. The claim in detail.
+(() => { const parts = []; if (C.one_paragraph) parts.push(P(C.one_paragraph)); if (C.negative_pole) parts.push(P($('b', null, 'Negative pole. '), C.negative_pole)); if (C.what_would_change_my_mind) parts.push(P($('b', null, 'What would change my mind. '), C.what_would_change_my_mind));
+  // Peak census: which token carries the peak in the strongest corpus firings. Compact two-column figure.
+  let census = null; const PC = B.peak_census; if (has(PC) && (has(PC.kinds) || has(PC.tokens))) { const kinds = [...(PC.kinds || [])].sort((x, y) => (y.n || 0) - (x.n || 0)), km = Math.max(...kinds.map(k => k.n || 0), 1);
+    const bars = $('div', { class: 'kbars' }, kinds.slice(0, 7).map(k => $('div', { class: 'kb' }, $('span', { class: 'kl' }, k.kind), $('span', { class: 'kt' }, $('i', { style: `width:${100 * (k.n || 0) / km}%` })), $('span', { class: 'kn' }, k.n))));
+    const toksC = [...(PC.tokens || [])].sort((x, y) => (y.n || 0) - (x.n || 0)).slice(0, 14);
+    const chips = $('div', { class: 'chips', style: 'margin:0' }, toksC.map(t => $('span', { class: 'tokchip' }, JSON.stringify(t.token), ' ', $('b', { style: 'color:var(--ink);font-weight:500' }, t.n))));
+    census = fig($('div', { class: 'census' }, has(kinds) ? $('div', null, $('div', { class: 'sub' }, 'Token kind at the peak'), bars) : null, has(toksC) ? $('div', null, $('div', { class: 'sub' }, 'Most common peak tokens'), chips) : null),
+      `Which token carries the peak in the ${PC.n != null ? PC.n : ''} strongest corpus firings.`); if (PC.note) census.title = PC.note; }
+  if (!parts.length && !census) return; sec('claim', 'The claim in detail', null, parts.length ? $('div', { class: 'detail' }, parts) : null, census); })();
+
+// 0b. Figures for this neuron: Fable-proposed figures rendered by kind (choropleth_us, sweep, ladder, choropleth_world).
+(() => { const CU = B.custom; const figsIn = Array.isArray(CU) ? CU : (CU || {}).figures; if (!has(figsIn)) return; const assets = (CU || {}).assets || {}; const blocks = [];
+  const slotText = (tmpl, cls) => { const d = $('div', { class: 'tmpl' }); String(tmpl).split(/(\{[A-Za-z_]+\})/).forEach(part => d.append(/^\{[A-Za-z_]+\}$/.test(part) ? $('span', { class: 'slot' }, part.slice(1, -1)) : part)); return d; };
+  // Horizontal bar list: rows = [{label, sub, value, hover}], bars from a shared zero line, values at the end.
+  const hbars = rows => { const vals = rows.map(r => r.value || 0), lo = Math.min(0, ...vals), hi = Math.max(0, ...vals); const LB = Math.min(230, Math.max(90, 8 + 6.6 * Math.max(...rows.map(r => (r.label || '').length + (r.sub ? r.sub.length + 1 : 0))))), W = 640, RB = 56, rh = 22, H = rh * rows.length + 8;
+    const X = v => LB + (v - lo) / ((hi - lo) || 1) * (W - LB - RB); const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', class: 'ladder', style: `display:block;max-width:${W}px` }); svg.append(svgEl('line', { x1: X(0), x2: X(0), y1: 2, y2: H - 4, stroke: '#c9c9ce' }));
+    rows.forEach((r, i) => { const y = 4 + i * rh, v = r.value || 0, g = svgEl('g', { class: 'row' }); g.append(svgEl('rect', { class: 'bg', x: 0, y, width: W, height: rh, fill: 'transparent' }));
+      const t = svgEl('text', { x: LB - 8, y: y + rh / 2 + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#1d1d1f' }, r.label || ''); if (r.sub) t.append(svgEl('tspan', { fill: '#8a8a90' }, ' ' + r.sub)); g.append(t);
+      g.append(svgEl('rect', { x: Math.min(X(0), X(v)), y: y + 5, width: Math.max(1, Math.abs(X(v) - X(0))), height: rh - 10, rx: 2, fill: v >= 0 ? POS : NEG }));
+      g.append(svgEl('text', { x: v >= 0 ? X(v) + 6 : X(0) + 6, y: y + rh / 2 + 4, 'font-size': 11.5, fill: '#4a4a4f' }, fmt(v)));
+      if (r.hover) { g.onmousemove = ev => showTip(ev, r.hover); g.onmouseleave = hideTip; } svg.append(g); });
+    return svg; };
+  const hoverText = r => `<b>${fmt(r.activation)}</b>${r.peak_token != null ? ' at ' + JSON.stringify(r.peak_token) : ''}<br>${(r.text || '').slice(0, 260)}`;
+  const choroUS = (f, asset) => { const variants = f.results || []; if (!variants.length || !has(asset) || !has(asset.states)) return $('div', { class: 'empty' }, 'No state results or map asset.');
+    const centroid = d => { const nums = (d.match(/-?\d+(\.\d+)?/g) || []).map(Number); let sx = 0, sy = 0, n = 0; for (let i = 0; i + 1 < nums.length; i += 2) { sx += nums[i]; sy += nums[i + 1]; n++; } return n ? [sx / n, sy / n] : [0, 0]; };
+    const cents = {}; for (const [name, st] of Object.entries(asset.states)) cents[name] = centroid(st.d || '');
+    const shade = (v, mx) => v === 0 ? '#fff' : hexA(v >= 0 ? POS : NEG, 0.04 + 0.9 * Math.sqrt(Math.min(1, Math.abs(v) / mx)));
+    const drawMap = variant => { const byName = {}; (variant.states || []).forEach(s => byName[s.state] = s); const mx = Math.max(...(variant.states || []).map(s => Math.abs(s.activation || 0)), 1e-9);
+      const svg = svgEl('svg', { viewBox: asset.viewBox || '0 0 975 610', width: '100%', class: 'usmap', style: 'display:block;max-width:900px;margin:0 auto' });
+      for (const [name, st] of Object.entries(asset.states)) { const s = byName[name]; const v = s ? (s.activation || 0) : null; const p = svgEl('path', { d: st.d, fill: v == null ? '#f4f4f6' : shade(v, mx), stroke: '#c9c9ce', 'stroke-width': .7, 'stroke-linejoin': 'round' });
+        if (s) { p.onmousemove = ev => showTip(ev, `<b>${name}</b> · ${fmt(v)}${s.peak_token != null ? ' at ' + JSON.stringify(s.peak_token) : ''}<br>${(s.text || '').slice(0, 260)}`); p.onmouseleave = hideTip; } svg.append(p); }
+      for (const [name, st] of Object.entries(asset.states)) { const s = byName[name]; if (!s || Math.abs(s.activation || 0) < 0.15 * mx) continue; const [cx, cy] = cents[name]; const dark = Math.abs(s.activation) / mx > 0.45;
+        svg.append(svgEl('text', { x: cx, y: cy + 4, 'text-anchor': 'middle', 'font-size': 11, 'font-weight': 600, fill: dark ? '#fff' : '#1d1d1f', 'pointer-events': 'none' }, s.abbr || name)); }
+      // legend: the same shading function sampled from -max to +max
+      const lg = svgEl('svg', { viewBox: '0 0 300 30', width: 300, style: 'display:block;margin:6px auto 0' }); for (let i = 0; i < 60; i++) { const v = -mx + (2 * mx) * (i + 0.5) / 60; lg.append(svgEl('rect', { x: 20 + i * (260 / 60), y: 4, width: 260 / 60 + 0.5, height: 10, fill: shade(v, mx) })); }
+      lg.append(svgEl('rect', { x: 20, y: 4, width: 260, height: 10, fill: 'none', stroke: '#c9c9ce', 'stroke-width': .7 })); [[-mx, 20, 'start'], [0, 150, 'middle'], [mx, 280, 'end']].forEach(([v, x, a]) => lg.append(svgEl('text', { x, y: 26, 'text-anchor': a, 'font-size': 10, fill: '#8a8a90' }, fmt(v))));
+      return $('div', null, svg, variant.template ? slotText(variant.template) : null, lg); };
+    if (variants.length === 1) return drawMap(variants[0]);
+    const bar = $('div', { class: 'bands' }), panes = $('div'); variants.forEach((v, i) => { const b = $('button', { class: i ? '' : 'on' }, v.name || `variant ${i + 1}`); const pane = $('div', { class: 'pane' + (i ? '' : ' on') }, drawMap(v));
+      bar.append(b); panes.append(pane); });
+    panes.querySelectorAll('.pane').forEach((pn, i) => bar.children[i].onclick = () => { bar.querySelectorAll('button').forEach(x => x.classList.remove('on')); panes.querySelectorAll('.pane').forEach(x => x.classList.remove('on')); bar.children[i].classList.add('on'); pn.classList.add('on'); });
+    return $('div', null, bar, panes); };
+  figsIn.forEach(f => { let body = null; const R = f.results || [];
+    if (f.kind === 'choropleth_us') body = choroUS(f, assets.us_states);
+    else if (f.kind === 'sweep') body = hbars(R.map(r => ({ label: r.tag, value: r.activation, hover: hoverText(r) })));
+    else if (f.kind === 'ladder') { const rows = [...R].sort((a, b) => (b.activation || 0) - (a.activation || 0)); body = $('div', null, hbars(rows.map(r => ({ label: r.tag, sub: r.filler && r.filler !== r.tag ? r.filler : null, value: r.activation, hover: hoverText(r) }))), f.template ? slotText(f.template) : null); }
+    else if (f.kind === 'choropleth_world') { const rows = [...R].sort((a, b) => (b.activation || 0) - (a.activation || 0)); body = $('div', null, hbars(rows.map(r => ({ label: r.country || r.tag, value: r.activation, hover: hoverText(r) }))), $('div', { class: 'quiet', style: 'margin-top:6px' }, 'No world map asset yet; shown as a sorted list.')); }
+    else body = $('div', { class: 'empty' }, `No renderer for kind "${f.kind}".`);
+    blocks.push($('div', { class: 'cfig', id: 'custom-' + (f.id || '') }, $('h3', null, f.title || f.id || 'Figure'), f.rationale ? $('p', { class: 'why', style: 'max-width:720px' }, f.rationale) : null, fig(body, f.caption || null))); });
+  sec({ id: 'custom', wide: true }, 'Figures for this neuron', [P('Figures proposed for this neuron in particular, each with the reason it was worth drawing.')], blocks); })();
+
+// 0c. Three graphs: an attribution-graph explorer over curated picks.
+(() => { const GC = B.graphs_curated; if (!has(GC) || !has(GC.picks)) return; const picks = GC.picks; let cur = 0;
+  const host = $('div'), tabs = $('div', { class: 'bands' }); picks.forEach((p, i) => { const b = $('button', { class: i ? '' : 'on' }, p.title || `graph ${i + 1}`); b.onclick = () => { tabs.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); cur = i; drawPick(); }; tabs.append(b); });
+  const layerKey = n => n.feature_type === 'logit' || n.layer === 'logit' || n.layer === 'logits' ? 'logit' : (n.layer === 'embedding' || n.feature_type === 'embedding' ? 'emb' : +n.layer);
+  const labelOf = n => n.label || n.clerp || ''; // clerp is the atlas's own description field
+  const nodeUnit = n => layerKey(n) === 'logit' ? (n.token != null ? `logit ${JSON.stringify(n.token)}` : (n.clerp || `logit ${n.label || n.feature || ''}`)) : layerKey(n) === 'emb' ? `emb ${n.token != null ? JSON.stringify(n.token) : (n.label || n.feature || '')}` : `L${n.layer}/N${n.feature}`;
+  const drawPick = () => { host.replaceChildren(); const p = picks[cur], g = p.graph || {}; const all = [...(g.nodes || []), ...(g.logit_nodes || []), ...(g.neuron_nodes || [])]; const seen = new Set(); const nodesAll = all.filter(n => n && !seen.has(n.node_id) && seen.add(n.node_id)).sort((a, b) => Math.abs(b.influence || 0) - Math.abs(a.influence || 0));
+    const T = g.tokens || [], nT = Math.max(T.length, 1), maxL = Math.max(0, ...nodesAll.map(n => typeof layerKey(n) === 'number' ? layerKey(n) : 0)), links = g.links || [];
+    let shown = 120, pinned = null, hovered = null, nEdges = null;
+    const W = 1100, H = 520, L = 46, R = 12, TOP = 18, BOT = 64, plotW = W - L - R, plotH = H - TOP - BOT, colW = plotW / nT;
+    // Piecewise-linear layer axis: embeddings and layers below the break share the lower half, layers from the break up share the upper half, logits sit on top.
+    const BRK = Math.min(48, Math.max(1, maxL - 15)); const lay = idx => { const lowEnd = 0.47, hiEnd = 0.93; if (idx < BRK) return (idx + 1.5) / (BRK + 1.5) * lowEnd; if (idx <= maxL) return lowEnd + (idx - BRK + 0.5) / (maxL - BRK + 1) * (hiEnd - lowEnd); return 0.985; };
+    const yIdx = idx => TOP + plotH - lay(idx) * plotH; const yOf = n => { const k = layerKey(n); return yIdx(k === 'emb' ? -1 : k === 'logit' ? maxL + 1 : k); };
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', class: 'gx', style: 'display:block' }); const aL = svgEl('g', { 'pointer-events': 'none' }), eL = svgEl('g'), nL = svgEl('g'); svg.append(aL, eL, nL);
+    const panel = $('div', { class: 'gpanel' }), ctl = $('div', { class: 'ctlrow' }), slider = $('input', { type: 'range', min: 0, max: 100, value: 100, class: 'gslider' }), sliderLab = $('span', { class: 'filt' }), moreBtn = $('button', { class: 'more', style: 'margin:0' });
+    // axes: layer ticks on the left, tokens along the bottom (target token bold)
+    const ticks = [['emb', -1], ...[16, 32].filter(v => v < BRK - 4).map(v => [String(v), v]), [String(BRK), BRK], [String(Math.round((BRK + maxL) / 2)), Math.round((BRK + maxL) / 2)], [String(maxL), maxL], ['logits', maxL + 1]];
+    { const yb = yIdx(BRK) + 6; aL.append(svgEl('line', { x1: L, x2: W - R, y1: yb, y2: yb, stroke: '#c9c9ce', 'stroke-dasharray': '2 3' }), svgEl('text', { x: L - 6, y: yb + 3, 'text-anchor': 'end', 'font-size': 9, fill: '#8a8a90' }, '≈')); } // axis break: the scale changes here
+    ticks.forEach(([lab, idx]) => { const y = yIdx(idx); aL.append(svgEl('line', { x1: L, x2: W - R, y1: y, y2: y, stroke: '#f0f0f2' }), svgEl('text', { x: L - 6, y: y + 4, 'text-anchor': 'end', 'font-size': 10.5, fill: '#8a8a90' }, lab)); });
+    const step = Math.ceil(nT / 40); T.forEach((t, i) => { if (i % step && i !== g.position) return; if (i !== g.position && g.position != null && Math.abs(i - g.position) * colW < 18) return; const x = L + (i + 0.5) * colW; aL.append(svgEl('text', { x, y: H - BOT + 12, 'font-size': 10.5, 'font-weight': i === g.position ? 700 : 400, fill: i === g.position ? '#1d1d1f' : '#4a4a4f', transform: `rotate(-55 ${x} ${H - BOT + 12})`, 'text-anchor': 'end' }, (t || '').replace(/\n/g, '⏎').trim() || '␣')); });
+    if (g.position != null) aL.append(svgEl('line', { x1: L + (g.position + 0.5) * colW, x2: L + (g.position + 0.5) * colW, y1: TOP, y2: H - BOT, stroke: '#1d1d1f', 'stroke-dasharray': '2 4', 'stroke-opacity': .5 }));
+    const pos = {}; let edgeEls = [], nodeEls = [];
+    // Hover and pin only change opacities in place; render() rebuilds when the node or edge budget changes.
+    const applyFocus = () => { const focus = pinned || hovered; const inc = new Set(); if (focus) edgeEls.forEach(({ l }) => { if (l.source === focus || l.target === focus) inc.add(l); });
+      edgeEls.forEach(({ el, l }) => el.setAttribute('stroke-opacity', !focus ? .35 : inc.has(l) ? .85 : .05));
+      nodeEls.forEach(({ el, n }) => el.setAttribute('opacity', focus && focus !== n.node_id && ![...inc].some(l => l.source === n.node_id || l.target === n.node_id) ? .25 : 1)); };
+    const render = () => { eL.replaceChildren(); nL.replaceChildren(); edgeEls = []; nodeEls = []; const vis = nodesAll.slice(0, shown), visId = new Set(vis.map(n => n.node_id)); const maxInf = Math.max(...vis.map(n => Math.abs(n.influence || 0)), 1e-9);
+      const cell = {}; vis.forEach(n => { const k = `${n.ctx_idx}|${layerKey(n)}`; (cell[k] = cell[k] || []).push(n); }); const J = Math.min(14, colW / 2 - 2); Object.values(cell).forEach(arr => arr.forEach((n, i) => { const t = arr.length === 1 ? 0.5 : (i * 0.6180339887) % 1; pos[n.node_id] = [L + ((n.ctx_idx || 0) + 0.5) * colW + (t * 2 - 1) * J, yOf(n)]; })); // arr is in |influence| order, so the jitter is deterministic by rank
+      const el = links.filter(l => visId.has(l.source) && visId.has(l.target)).sort((a, b) => Math.abs(b.weight || 0) - Math.abs(a.weight || 0)); if (nEdges == null) nEdges = Math.min(150, el.length); const cut = el.slice(0, Math.min(nEdges, el.length)), wmax = Math.max(...cut.map(l => Math.abs(l.weight || 0)), 1e-9);
+      sliderLab.textContent = `${cut.length} of ${el.length} edges${cut.length ? ` (|w| ≥ ${fmt(Math.abs(cut[cut.length - 1].weight || 0))})` : ''}`; slider.max = el.length; slider.value = cut.length;
+      cut.forEach(l => { const a = pos[l.source], b = pos[l.target]; if (!a || !b) return; const my = (a[1] + b[1]) / 2;
+        const e = svgEl('path', { d: `M${a[0]},${a[1]} C${a[0]},${my} ${b[0]},${my} ${b[0]},${b[1]}`, fill: 'none', stroke: (l.weight || 0) >= 0 ? POS : NEG, 'stroke-width': 0.4 + 2.6 * Math.abs(l.weight || 0) / wmax, 'stroke-opacity': .35 }); eL.append(e); edgeEls.push({ el: e, l }); });
+      vis.forEach(n => { const [x, y] = pos[n.node_id]; const r = 2 + 8 * Math.sqrt(Math.abs(n.influence || 0) / maxInf); const self = +n.layer === N.layer && +n.feature === N.neuron; const col = n.cluster ? clusterColour(n.cluster) : ((n.activation || 0) >= 0 ? POS : NEG);
+        const c = svgEl('circle', { cx: x, cy: y, r, fill: hexA(col, n.cluster ? .75 : .35), stroke: self ? '#1d1d1f' : col, 'stroke-width': self ? 2.5 : 0.8, style: 'cursor:pointer' });
+        c.onmousemove = ev => { hovered = n.node_id; showTip(ev, `<b>${nodeUnit(n)}</b>${labelOf(n) && layerKey(n) !== 'logit' ? ' · ' + labelOf(n) : ''}<br>activation ${fmt(n.activation)} · influence ${fmt(n.influence)}<br>token ${JSON.stringify(T[n.ctx_idx] ?? '')} (position ${n.ctx_idx})`); if (!pinned) applyFocus(); };
+        c.onmouseleave = () => { hovered = null; hideTip(); if (!pinned) applyFocus(); }; c.onclick = ev => { ev.stopPropagation(); pinned = pinned === n.node_id ? null : n.node_id; applyFocus(); showPanel(); }; nL.append(c); nodeEls.push({ el: c, n }); });
+      applyFocus(); moreBtn.textContent = shown < nodesAll.length ? `More nodes (${shown} of ${nodesAll.length})` : `All ${nodesAll.length} nodes shown`; };
+    const byId = {}; nodesAll.forEach(n => byId[n.node_id] = n);
+    const showPanel = () => { panel.replaceChildren(); if (!pinned) { panel.append($('div', { class: 'empty' }, 'Click a node to pin it and list its strongest inputs and outputs.')); return; } const n = byId[pinned]; if (!n) return;
+      const list = (ls, key, title) => { const rows = ls.sort((a, b) => Math.abs(b.weight || 0) - Math.abs(a.weight || 0)).slice(0, 8), s = Math.max(...rows.map(l => Math.abs(l.weight || 0)), 1e-9);
+        return $('div', null, $('div', { class: 'sub', style: 'margin:12px 0 6px' }, title), rows.length ? rows.map(l => { const m = byId[l[key]] || {}; return $('div', { class: 'grow' }, tile(l.weight, { signed: true, scale: s, d: 2 }), $('span', null, $('span', { class: 'id' }, nodeUnit(m)), labelOf(m) && layerKey(m) !== 'logit' ? ' ' + labelOf(m) : '', m.ctx_idx != null ? $('span', { class: 'dim' }, ` · ${JSON.stringify(T[m.ctx_idx] ?? '')}`) : '')); }) : $('div', { class: 'empty' }, 'none among visible edges')); };
+      const clear = $('a', { style: 'cursor:pointer;text-decoration:underline;font-size:12.5px;margin-left:8px' }, 'unpin'); clear.onclick = () => { pinned = null; applyFocus(); showPanel(); };
+      panel.append($('div', null, $('b', null, nodeUnit(n)), clear), labelOf(n) && layerKey(n) !== 'logit' ? $('div', { class: 'dim' }, labelOf(n)) : null, $('div', { class: 'dim' }, `activation ${fmt(n.activation)} · influence ${fmt(n.influence)} · token ${JSON.stringify(T[n.ctx_idx] ?? '')}`),
+        list(links.filter(l => l.target === pinned), 'source', 'Top inputs'), list(links.filter(l => l.source === pinned), 'target', 'Top outputs')); };
+    slider.oninput = () => { nEdges = +slider.value; render(); }; moreBtn.onclick = () => { shown = Math.min(nodesAll.length, shown + 120); render(); }; svg.onclick = () => { if (pinned) { pinned = null; applyFocus(); showPanel(); } };
+    ctl.append($('span', { class: 'filt' }, 'Edges '), slider, sliderLab, moreBtn); render(); showPanel();
+    host.append($('div', { class: 'gtop' }, $('h3', null, p.title || ''), p.why ? $('p', { class: 'why', style: 'margin:0 0 8px' }, p.why) : null, has(p.look_at) ? $('ul', { class: 'look' }, p.look_at.slice(0, 4).map(s => $('li', null, s))) : null, g.text ? $('div', { class: 'quiet', style: 'margin:4px 0 10px' }, 'Prompt: ', $('span', { style: 'color:var(--ink2)' }, g.text.length > 300 ? '…' + g.text.slice(-300) : g.text)) : null),
+      ctl, $('div', { class: 'gwrap' }, svg, panel)); };
+  drawPick();
+  sec({ id: 'graphs', wide: true }, 'Three graphs', [P('Attribution graphs for hand-picked prompts. Columns are token positions and rows are layers, with embeddings at the bottom and logits at the top. Node size follows influence on the target; the thick black ring marks this neuron. Hover a node to see its edges, click to pin it and read its strongest inputs and outputs.')], fig($('div', null, tabs, host), 'Edges are the strongest attribution links among the visible nodes; the slider sets how many are drawn.')); })();
+
+// 1. Distribution: signed log axis with quantile ticks and exemplar bands.
+(() => { const D = B.distribution; if (!has(D) || !has(D.quantiles)) return;
+  const q = D.quantiles.filter(x => x.value != null); const bandKeys = Object.keys((B.exemplars || {}).bands || {});
+  const bandQ = new Set(bandKeys.map(k => k.replace('_', '.'))); const extra = [B.search?.corpus_max, B.search?.corpus_min, B.tests?.blind_max?.target].filter(x => x != null);
+  const vals = q.map(x => x.value).concat(extra); const c = 0.01, T = v => Math.sign(v) * Math.log10(1 + Math.abs(v) / c);
+  const lo = Math.min(0, ...vals.map(T)) - 0.3, hi = Math.max(...vals.map(T)) + 0.3; const W = 1000, L = 24, R = 24, H = 150, y = 84;
+  const X = v => L + (T(v) - lo) / (hi - lo) * (W - L - R); const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', style: 'display:block' });
+  svg.append(svgEl('line', { x1: L, x2: W - R, y1: y, y2: y, stroke: '#c9c9ce' }));
+  for (const p of [-100, -10, -1, -0.1, 0, 0.1, 1, 10, 100]) { if (T(p) < lo || T(p) > hi) continue;
+    svg.append(svgEl('line', { x1: X(p), x2: X(p), y1: y - 4, y2: y + 4, stroke: '#c9c9ce' }), svgEl('text', { x: X(p), y: y + 20, 'text-anchor': 'middle', 'font-size': 11, fill: '#8a8a90' }, p)); }
+  if (D.mean != null) svg.append(svgEl('line', { x1: X(D.mean), x2: X(D.mean), y1: y - 14, y2: y + 6, stroke: '#8a8a90', 'stroke-dasharray': '2 2' }), svgEl('text', { x: X(D.mean), y: y + 34, 'text-anchor': 'middle', 'font-size': 11, fill: '#8a8a90' }, 'mean'));
+  let lastX = -1e9, lastUp = true; // labels sit low unless they would crowd the previous one, then move up a row
+  [...q].sort((a, b) => a.value - b.value).forEach(x => { const px = X(x.value), col = x.value >= 0 ? POS : NEG, inBand = bandQ.has(x.quantile);
+    const up = (px - lastX < 64) ? !lastUp : false; lastX = px; lastUp = up;
+    svg.append(svgEl('line', { x1: px, x2: px, y1: y - (up ? 36 : 14), y2: y, stroke: col, 'stroke-width': inBand ? 2.5 : 1.25 }), svgEl('circle', { cx: px, cy: y, r: inBand ? 4 : 2.5, fill: col }));
+    svg.append(svgEl('text', { x: px, y: up ? y - 54 : y - 32, 'text-anchor': 'middle', 'font-size': 12, 'font-weight': inBand ? 600 : 400, fill: '#1d1d1f' }, x.quantile));
+    svg.append(svgEl('text', { x: px, y: up ? y - 42 : y - 20, 'text-anchor': 'middle', 'font-size': 11, fill: '#8a8a90' }, fmt(x.value))); });
+  for (const [k, v] of [['corpus max', B.search?.corpus_max], ['corpus min', B.search?.corpus_min]]) if (v != null) svg.append(svgEl('line', { x1: X(v), x2: X(v), y1: y - 8, y2: y + 8, stroke: '#1d1d1f' }), svgEl('text', { x: X(v), y: y + 34, 'text-anchor': 'middle', 'font-size': 11, fill: '#4a4a4f' }, k));
+  if (bandKeys.length) svg.append(svgEl('text', { x: W - R, y: H - 6, 'text-anchor': 'end', 'font-size': 11, fill: '#8a8a90' }, 'bold ticks = exemplar bands shown below'));
+  const tiles = $('div', { class: 'tiles', style: 'margin-top:14px' }); if (D.n_tokens != null) tiles.append(kTile('tokens', null, { text: (+D.n_tokens).toLocaleString() }));
+  if (D.mean != null) tiles.append(kTile('mean', D.mean)); if (D.std != null) tiles.append(kTile('std', D.std));
+  // Larger scan: full-token histogram from a big-corpus pass, with harvest and scan extremes marked, summary tiles and the extreme windows.
+  const big = []; const BS = B.bigscan; if (has(BS) && has(BS.hist) && has(BS.hist_centers)) { const hc = BS.hist_centers, hh = BS.hist, n = Math.min(hc.length, hh.length);
+    const marks = [['harvest max', BS.harvest_max, '#8a8a90'], ['harvest min', BS.harvest_min, '#8a8a90'], ['scan max', BS.max, '#1d1d1f'], ['scan min', BS.min, '#1d1d1f']].filter(m => m[1] != null);
+    const xs = hc.slice(0, n).concat(marks.map(m => m[1])).map(T); const blo = Math.min(...xs) - 0.15, bhi = Math.max(...xs) + 0.15; const W2 = 1000, L2 = 52, R2 = 24, H2 = 240, T2 = 16, B2 = 58, base = H2 - B2, ph = base - T2;
+    const X2 = v => L2 + (T(v) - blo) / (bhi - blo) * (W2 - L2 - R2); const maxC = Math.max(...hh.slice(0, n), 1), lmax = Math.log10(maxC + 1); const Y2 = cnt => base - Math.log10((cnt || 0) + 1) / lmax * ph;
+    const sv = svgEl('svg', { viewBox: `0 0 ${W2} ${H2}`, width: '100%', style: 'display:block' });
+    for (let k = 0; k <= Math.floor(lmax); k += Math.max(1, Math.round(lmax / 5))) { const y = Y2(10 ** k - 1); sv.append(svgEl('line', { x1: L2, x2: W2 - R2, y1: y, y2: y, stroke: '#f0f0f2' }), svgEl('text', { x: L2 - 6, y: y + 4, 'text-anchor': 'end', 'font-size': 10.5, fill: '#8a8a90' }, k === 0 ? '0' : (10 ** k >= 1e6 ? (10 ** k / 1e6) + 'M' : 10 ** k >= 1e3 ? (10 ** k / 1e3) + 'k' : String(10 ** k)))); }
+    let dArea = `M${X2(hc[0])},${base}`, dLine = ''; for (let i = 0; i < n; i++) { const x = X2(hc[i]), y = Y2(hh[i]); dArea += ` L${x},${y}`; dLine += (i ? ' L' : 'M') + `${x},${y}`; } dArea += ` L${X2(hc[n - 1])},${base} Z`;
+    sv.append(svgEl('path', { d: dArea, fill: 'rgba(0,0,0,.05)' }), svgEl('path', { d: dLine, fill: 'none', stroke: '#4a4a4f', 'stroke-width': 1.1 }), svgEl('line', { x1: L2, x2: W2 - R2, y1: base, y2: base, stroke: '#c9c9ce' }));
+    for (const pw of [-100, -10, -1, -0.1, 0, 0.1, 1, 10, 100]) { if (T(pw) < blo || T(pw) > bhi) continue; sv.append(svgEl('line', { x1: X2(pw), x2: X2(pw), y1: base, y2: base + 4, stroke: '#c9c9ce' }), svgEl('text', { x: X2(pw), y: base + 16, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#8a8a90' }, pw)); }
+    marks.forEach(([lab, v, col], i) => { const x = X2(v), up = lab.startsWith('scan'); sv.append(svgEl('line', { x1: x, x2: x, y1: up ? base - 12 : base - 6, y2: base + 6, stroke: col, 'stroke-width': up ? 1.5 : 1 }), svgEl('text', { x, y: base + (up ? 42 : 30), 'text-anchor': 'middle', 'font-size': 10.5, fill: col }, `${lab} ${fmt(v)}`)); });
+    sv.append(svgEl('text', { x: L2 - 6, y: T2 - 4, 'text-anchor': 'end', 'font-size': 10.5, fill: '#8a8a90' }, 'tokens'));
+    const cap = `Every token of ${BS.n_tokens != null ? (+BS.n_tokens).toLocaleString() : ''} tokens from ${BS.corpus || 'the corpus'} scored on the live model, four GPUs, forward pass truncated at the neuron's layer.`;
+    const t2 = $('div', { class: 'tiles', style: 'margin-top:14px' }); if (BS.n_tokens != null) t2.append(kTile('tokens scanned', null, { text: (+BS.n_tokens).toLocaleString() })); if (BS.n_docs != null) t2.append(kTile('docs', null, { text: (+BS.n_docs).toLocaleString() }));
+    if (BS.max != null) t2.append(kTile('scan max vs harvest', null, { text: `${fmt(BS.max)} vs ${fmt(BS.harvest_max)}` })); if (BS.min != null) t2.append(kTile('scan min vs harvest', null, { text: `${fmt(BS.min)} vs ${fmt(BS.harvest_min)}` }));
+    const Q = BS.quantiles || {}; for (const [k, lab] of [['p99_99', 'p99.99'], ['p99_999', 'p99.999']]) if (Q[k] != null) t2.append(kTile(lab, Q[k]));
+    const win = (w, neg) => { const toksA = (w.tokens || []).map((t, i) => ({ token: t, activation: i === w.peak_index ? (w.activation || 0) : 0 })); return exRow({ activation: w.activation, token_activations: toksA.length ? toksA : null, text: w.text || (w.tokens || []).join(''), peak_index: w.peak_index, cut_left: w.cut_left, cut_right: w.cut_right }, Math.abs(w.activation || 1), neg, Math.max(Math.abs(BS.max || 0), Math.abs(BS.min || 0), 1e-9)); };
+    const lists = $('div', { class: 'cols' }, has(BS.top) ? $('div', null, $('div', { class: 'sub' }, `Top ${Math.min(6, BS.top.length)} scan windows`), BS.top.slice(0, 6).map(w => win(w, false))) : null, has(BS.bottom) ? $('div', null, $('div', { class: 'sub' }, `Bottom ${Math.min(4, BS.bottom.length)} scan windows`), BS.bottom.slice(0, 4).map(w => win(w, true))) : null);
+    big.push($('div', { class: 'sub', style: 'margin-top:36px' }, 'Larger scan'), fig(sv, cap), t2, fig(lists, 'Windows from the scan; only the peak token has a value, so it alone is shaded.')); }
+  sec({ id: 'distribution', wide: true }, 'Activation distribution', [P('Where the activation lives across the corpus: quantiles on a signed log axis, warm for positive, cool for negative. Nearly every token sits close to zero and the claim rests on the far right.')], fig(svg, 'Quantiles of the pre-down-projection activation. Axis is sign(x)·log(1+|x|/0.01).'), tiles, big); })();
+
+// 1b. Activation spectrum: stacked histogram of labeled groups per signed-log2 bin, counts (log y) or share. Datapoints appear only after a click.
+let SPEC_COLOUR = {};
+(() => { const S = B.spectrum; if (!has(S) || !has(S.edges) || !has(S.bins) || !has(S.groups)) return;
+  const G = S.groups, nb = S.edges.length - 1, bins = S.bins, pts = S.points || [], hist = (S.corpus_hist || {}).counts;
+  const colour = polePalette(G); SPEC_COLOUR = colour; const fillOf = g => colour[g.id] || 'url(#hatch)', swatch = g => colour[g.id] || HATCH_CSS;
+  let mode = hist ? 'counts' : 'share', selG = null, selBin = null, shown = 12;
+  const W = 1000, H = 340, L = 58, R = 12, T = 26, BOT = 52, base = H - BOT, plotH = base - T, band = (W - L - R) / nb, bw = band - 6;
+  const maxC = hist ? Math.max(...hist.filter(c => c != null), 10) : 1, logMax = Math.log10(maxC);
+  const yC = v => v <= 1 ? base : base - Math.log10(v) / logMax * plotH, yS = p => base - p * plotH;
+  const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', class: 'spec', style: 'display:block' });
+  svg.append(svgEl('defs', null, svgEl('pattern', { id: 'hatch', width: 5, height: 5, patternUnits: 'userSpaceOnUse', patternTransform: 'rotate(45)' }, svgEl('rect', { width: 5, height: 5, fill: '#e6e6e9' }), svgEl('rect', { width: 1.2, height: 5, fill: '#9a9aa0' }))));
+  const layer = svgEl('g'); svg.append(layer);
+  const kfmt = v => v >= 1e6 ? (v / 1e6).toFixed(v >= 1e7 ? 0 : 1) + 'M' : v >= 1e3 ? (v / 1e3).toFixed(0) + 'k' : String(v);
+  const filt = $('span', { class: 'filt' }), legend = $('div', { class: 'legend' }), list = $('div'), hd = $('div', { class: 'hd' });
+  const draw = () => { layer.replaceChildren();
+    if (mode === 'counts') for (let k = 0; k <= Math.floor(logMax); k++) { const y = yC(10 ** k); layer.append(svgEl('line', { x1: L, x2: W - R, y1: y, y2: y, stroke: '#ececee' }), svgEl('text', { x: L - 8, y: y + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#8a8a90' }, kfmt(10 ** k))); }
+    else for (const p of [0, .25, .5, .75, 1]) { const y = yS(p); layer.append(svgEl('line', { x1: L, x2: W - R, y1: y, y2: y, stroke: '#ececee' }), svgEl('text', { x: L - 8, y: y + 4, 'text-anchor': 'end', 'font-size': 11, fill: '#8a8a90' }, Math.round(100 * p) + '%')); }
+    layer.append(svgEl('text', { x: L - 8, y: T - 12, 'text-anchor': 'end', 'font-size': 11, fill: '#8a8a90' }, mode === 'counts' ? 'tokens' : 'share'));
+    bins.forEach((b, i) => { const x0 = L + i * band + 3; const nl = b.n_labeled || Object.values(b.groups || {}).reduce((a, v) => a + v, 0);
+      const col = svgEl('rect', { class: 'col', x: L + i * band, y: T, width: band, height: H - T }); col.onclick = () => { selBin = selBin === i ? null : i; shown = 12; update(); }; layer.append(col);
+      if (selBin === i) layer.append(svgEl('rect', { x: L + i * band + 0.5, y: T, width: band - 1, height: base - T + 34, fill: 'none', stroke: '#1d1d1f', 'stroke-dasharray': '3 3', rx: 3 }));
+      const Cn = hist ? hist[i] : null; if (nl > 0 && (mode === 'share' || Cn != null)) { let cum = 0;
+        const top = mode === 'counts' ? yC(Cn) : yS(1); // bar height is the corpus count on a log axis; segments split that height by labeled share
+        G.forEach(g => { const n = (b.groups || {})[g.id] || 0; if (!n) return; const sh = n / nl; const y0 = base - cum * (base - top); cum += sh; const y1 = base - cum * (base - top);
+          const dim = (selG && selG !== g.id) || (selBin != null && selBin !== i);
+          const r = svgEl('rect', { class: 'segm', x: x0, y: y1, width: bw, height: Math.max(0, y0 - y1 - 1.5), rx: 1, fill: fillOf(g), opacity: dim ? 0.22 : 1 });
+          r.onclick = ev => { ev.stopPropagation(); selG = selG === g.id ? null : g.id; shown = 12; update(); };
+          r.onmousemove = ev => showTip(ev, `<b>${g.name}</b><br>bin ${b.label} · ${n} of ${nl} labeled (${pct(sh)})` + (Cn != null ? `<br>≈ ${Math.round(sh * Cn).toLocaleString()} corpus tokens` : '')); r.onmouseleave = hideTip; layer.append(r); }); }
+      layer.append(svgEl('text', { x: x0 + bw / 2, y: base + 16, 'text-anchor': 'middle', 'font-size': 10.5, fill: '#4a4a4f', 'pointer-events': 'none' }, b.label || `${S.edges[i]}…${S.edges[i + 1]}`));
+      layer.append(svgEl('text', { x: x0 + bw / 2, y: base + 30, 'text-anchor': 'middle', 'font-size': 10, fill: '#8a8a90', 'pointer-events': 'none' }, `n ${nl}`)); });
+    layer.append(svgEl('line', { x1: L, x2: W - R, y1: base, y2: base, stroke: '#c9c9ce' })); };
+  const drawLegend = () => { legend.replaceChildren(); legend.classList.toggle('dim', !!selG);
+    G.forEach(g => { const d = $('div', { class: selG === g.id ? 'on' : '', title: g.description || '' }, $('span', { class: 'sw', style: 'background:' + swatch(g) }), $('span', { class: 'nm' }, g.name), g.n != null ? $('span', { class: 'n' }, g.n) : null);
+      d.onclick = () => { selG = selG === g.id ? null : g.id; shown = 12; update(); }; legend.append(d); }); };
+  const tileScale = Math.max(...pts.map(e => Math.abs(e.activation || 0)), 1e-9);
+  const drawList = () => { list.replaceChildren(); const active = selG || selBin != null; const gname = id => (G.find(g => g.id === id) || {}).name || id;
+    filt.replaceChildren('Filter: ', selG ? $('b', null, gname(selG)) : 'all groups', ' · ', selBin != null ? $('b', null, 'bin ' + (bins[selBin] || {}).label) : 'all bins');
+    if (active) { const a = $('a', null, 'clear'); a.onclick = () => { selG = null; selBin = null; shown = 12; update(); }; filt.append(a); }
+    if (!active) { hd.replaceChildren($('span', { class: 'empty' }, 'Click a group or a bar to see its datapoints.')); return; }
+    const sel = pts.filter(e => (!selG || e.group === selG) && (selBin == null || e.bin === selBin));
+    const negSide = selBin != null && S.edges[selBin + 1] <= 0; sel.sort((a, b) => negSide ? a.activation - b.activation : b.activation - a.activation);
+    hd.replaceChildren($('span', { class: 'sub', style: 'margin:0' }, `Labeled points · ${sel.length}`));
+    if (!sel.length) { list.append($('div', { class: 'empty' }, 'No labeled points match this filter.')); return; }
+    const s = Math.max(...sel.slice(0, 12).flatMap(e => (e.token_activations || []).map(t => Math.abs(t.activation || 0))), 1e-9);
+    list.append(moreList(sel, 12, e => { const row = exRow(e, s, (e.activation || 0) < 0, tileScale); row.append($('div', { style: 'grid-column:2;font-size:12px;color:var(--ink3)' }, gname(e.group) + (e.source ? ' · ' + e.source : ''))); return row; })); };
+  const update = () => { draw(); drawLegend(); drawList(); };
+  const seg = $('div', { class: 'seg' }); const mk = (m, label) => { const b = $('button', { class: mode === m ? 'on' : '' }, label); b.onclick = () => { mode = m; seg.querySelectorAll('button').forEach(x => x.classList.remove('on')); b.classList.add('on'); draw(); }; return b; };
+  if (hist) seg.append(mk('counts', 'Counts, log')); seg.append(mk('share', 'Share per bin'));
+  const cap = `Groups defined by Fable; labels assigned by ${S.labeler || 'Sonnet'} labelers.` + ((S.corpus_hist || {}).source ? ` Corpus counts from a ${S.corpus_hist.source}.` : '') + ' In the counts view, bar height is the corpus count on a log axis and the segments are the labeled shares, so segment proportions match the share view and only bar heights differ.';
+  update();
+  sec({ id: 'spectrum', wide: true }, 'Activation spectrum', [P('Every labeled token, binned by activation on signed log-2 edges and coloured by the group its label fell into. Warm groups sit at the positive pole, cool ones at the negative pole, grey ones on neither. Click a group or a bar to see its datapoints.')],
+    fig($('div', null, $('div', { class: 'ctlrow' }, seg, filt), svg, legend), cap), $('div', { class: 'pts' }, hd, list)); })();
+
+// 2. Exemplars: 5 top, 4 bottom, band tabs of 5; the rest behind show-more.
+(() => { const E = B.exemplars; if (!has(E)) return; const figs = []; const G = extreme(E.top || [], E.bottom || [], ...Object.values(E.bands || {}));
+  const listMore = (items, n, neg) => { const s = Math.max(...items.flatMap(e => (e.token_activations || []).map(t => Math.abs(t.activation || 0))), ...items.map(e => Math.abs(e.activation || 0)), 1e-9); return moreList(items, n, e => exRow(e, s, neg, G)); };
+  if (has(E.top)) figs.push(fig($('div', null, $('div', { class: 'sub' }, `Top activations · ${E.top.length}`), listMore(E.top, 5, false)), 'Peak token outlined. Token shading is scaled within each list; the value tiles are scaled against the corpus extremes so lists compare.'));
+  if (has(E.bottom)) figs.push(fig($('div', null, $('div', { class: 'sub' }, `Bottom activations · ${E.bottom.length}`), listMore(E.bottom, 4, true))));
+  if (has(E.bands)) { const keys = Object.keys(E.bands); const bar = $('div', { class: 'bands' }), panes = $('div');
+    keys.forEach((k, i) => { const b = $('button', { class: i === 0 ? 'on' : '' }, k.replace('_', '.')); const pane = $('div', { class: 'pane' + (i === 0 ? ' on' : '') }, $('div', { class: 'sub' }, 'Band ' + k.replace('_', '.') + ` · ${E.bands[k].length} samples`), listMore(E.bands[k], 5, false));
+      b.onclick = () => { bar.querySelectorAll('button').forEach(x => x.classList.remove('on')); panes.querySelectorAll('.pane').forEach(x => x.classList.remove('on')); b.classList.add('on'); pane.classList.add('on'); }; bar.append(b); panes.append(pane); });
+    figs.push(fig($('div', null, $('div', { class: 'sub' }, 'Random samples by quantile band'), bar, panes), 'Random draws from each band, so the middle of the distribution is visible as well as the peak.')); }
+  sec({ id: 'exemplars', wide: true }, 'Exemplars', [P('The strongest and weakest tokens in the corpus, with the text around them. Read the outlined token first, then the tokens before it.')], figs); })();
+
+// 3. Search regions: four visible, the rest in a details table.
+(() => { const S = B.search; if (!has(S) || !has(S.regions)) return;
+  const G = Math.max(Math.abs(S.corpus_max || 0), Math.abs(S.corpus_min || 0), ...S.regions.map(r => Math.abs(r.best || 0)), 1e-9);
+  const top = S.regions.slice(0, 4), rest = S.regions.slice(4).concat(S.regions_more || []);
+  const grid = $('div', { class: 'regions' }, top.map(r => { const s = Math.max(...(r.frontier || []).flatMap(e => (e.token_activations || []).map(t => Math.abs(t.activation || 0))), Math.abs(r.best || 0), 1e-9);
+    return $('div', { class: 'region' }, $('h4', null, r.name), $('div', { class: 'best' }, r.n != null ? `${r.n} probes · best ` : 'best ', tile(r.best, { signed: true, scale: G })), (r.frontier || []).slice(0, 3).map(e => exRow(e, s, (e.activation || 0) < 0, G))); }));
+  const tiles = $('div', { class: 'tiles', style: 'margin:0 0 20px' }); if (S.corpus_max != null) tiles.append(kTile('corpus max', S.corpus_max)); if (S.corpus_min != null) tiles.append(kTile('corpus min', S.corpus_min));
+  let more = null; if (rest.length) more = $('details', null, $('summary', null, `${rest.length} more regions`),
+    $('table', null, rest.map(r => $('tr', null, $('td', null, r.name), $('td', { class: 'num' }, tile(r.best, { signed: true, scale: G })), $('td', { class: 'dim' }, r.n != null ? `${r.n} probes` : ''), $('td', { class: 'dim' }, (r.frontier && r.frontier[0]) ? (r.frontier[0].text || '').slice(0, 120) : '')))));
+  sec({ id: 'search', wide: true }, 'Activation search', [P(`Written probes, region by region. Each region is a hypothesis about what drives the unit; the frontier is the best text found there. ${S.n_regions ? S.n_regions + ' regions, ' : ''}${S.n_texts ? S.n_texts.toLocaleString() + ' texts scored. ' : ''}A region whose best value stays far below the corpus maximum is not where the unit lives.`)], tiles.children.length ? tiles : null, fig(grid), more); })();
+
+// 4. Clusters (the readable grouping) with the raw route factorization behind a details block.
+(() => { const K = B.clusters || [], R = B.routes || [], M = B.routes_matrix; if (!has(K) && !has(R) && !has(M)) return; const figs = [];
+  if (has(K)) { const pal = polePalette(K); const colourOf = k => { const g = (k.member_groups || []).find(id => SPEC_COLOUR[id]); return g ? SPEC_COLOUR[g] : pal[k.id]; };
+    K.forEach(k => CLUSTER_COLOUR[k.id] = colourOf(k) || '#b5b5ba'); const total = K.reduce((a, k) => a + (k.share || 0), 0) || 1;
+    figs.push(fig($('div', { class: 'sharebar' }, K.map(k => $('div', { style: `width:${100 * (k.share || 0) / total}%;background:${colourOf(k) || HATCH_CSS};color:${colourOf(k) ? '#fff' : '#1d1d1f'}`, title: `${k.name} ${pct(k.share)}` }, (k.share || 0) / total > 0.08 ? k.name : ''))), 'Share of attribution mass per cluster.'));
+    const exScale = extreme(...K.map(k => k.examples || []), K.map(k => ({ activation: k.typical_activation })));
+    figs.push($('div', null, K.map(k => $('div', { class: 'card', id: 'cluster-' + k.id },
+      $('div', null, $('div', { class: 'name' }, $('span', { class: 'sw', style: 'background:' + (colourOf(k) || HATCH_CSS) }), k.name), $('div', { class: 'story' }, k.story || ''),
+        $('div', { class: 'tiles' }, k.share != null ? kTile('share', null, { text: pct(k.share) }) : null, Number.isFinite(+k.typical_activation) && k.typical_activation !== null ? kTile('typical activation', +k.typical_activation, { signed: true, scale: exScale }) : null),
+        has(k.key_units) ? [$('div', { class: 'sub', style: 'margin-top:14px' }, 'Key units'), $('div', { class: 'chips' }, k.key_units.slice(0, 6).map(u => chip(u)))] : null),
+      $('div', null, has(k.examples) ? [$('div', { class: 'sub' }, 'Examples'), exList(k.examples.slice(0, 3), poleOf(k) === 'negative', exScale)] : null),
+      $('div', { class: 'members' }, [has(k.member_routes) ? `Routes ${k.member_routes.join(', ')}` : null, has(k.member_groups) ? `groups ${k.member_groups.join(', ')}` : null, k.n_graphs != null ? `${k.n_graphs} graphs` : null, k.n_points != null ? `${k.n_points} labeled points` : null].filter(Boolean).join(' · ')))))); }
+  // raw factorization
+  const raw = []; if (has(R)) { const wScale = Math.max(...R.flatMap(r => [...(r.upstream || []), ...(r.readers || [])].map(u => Math.abs(u.weight || 0))), 1e-9);
+    raw.push($('div', null, R.map(r => $('div', { class: 'route', id: 'route-' + r.id }, $('div', null, $('div', { class: 'name' }, r.name || `Route ${r.id}` + (r.pole != null ? (poleOf(r) === 'negative' ? ' (negative pole)' : '') : '')), $('div', { class: 'desc' }, [r.share != null ? `share ${pct(r.share)}` : null, r.n_graphs != null ? `${r.n_graphs} graphs` : null].filter(Boolean).join(' · ')), r.description ? $('div', { class: 'desc' }, r.description) : null),
+      $('div', null, has(r.upstream) ? [$('div', { class: 'sub' }, 'Upstream'), $('div', { class: 'chips' }, r.upstream.slice(0, 8).map(u => chip(u, wScale)))] : null, has(r.readers) ? [$('div', { class: 'sub' }, 'Readers'), $('div', { class: 'chips' }, r.readers.slice(0, 8).map(u => chip(u, wScale)))] : null,
+        has(r.examples) ? exList(r.examples.slice(0, 2)) : null))))); }
+  const matrix = (ids, rows, names, title) => { if (!has(rows)) return null; const cols = ids || []; const cw = Math.max(2, Math.min(28, Math.floor(830 / Math.max(1, cols.length)))), rh = 22, L = 200, top = 6, W = L + cw * cols.length + 8, botLab = cw >= 14 ? 62 : 8, H = top + rh * rows.length + botLab;
+    const mx = Math.max(...rows.flat().map(Math.abs), 1e-9); const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', style: `display:block;max-width:${W}px` });
+    rows.forEach((row, i) => { svg.append(svgEl('text', { x: L - 8, y: top + i * rh + rh / 2 + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#1d1d1f' }, names[i] || `route ${i + 1}`));
+      row.forEach((v, j) => { const c = svgEl('rect', { x: L + j * cw, y: top + i * rh, width: Math.max(0.5, cw - (cw > 4 ? 1.5 : 0.3)), height: rh - 1.5, rx: cw > 4 ? 2 : 0, fill: hexA(v >= 0 ? POS : NEG, 0.05 + 0.9 * Math.abs(v) / mx) }); c.append(svgEl('title', null, `${cols[j] || j} · ${names[i] || ''} · ${fmt(v)}`)); svg.append(c); }); });
+    if (cw >= 14) cols.forEach((g, j) => svg.append(svgEl('text', { x: L + j * cw + cw / 2, y: top + rh * rows.length + 6, 'font-size': 9.5, fill: '#8a8a90', transform: `rotate(-60 ${L + j * cw + cw / 2} ${top + rh * rows.length + 6})`, 'text-anchor': 'end' }, String(g).slice(0, 10))));
+    return fig($('div', null, title ? $('div', { class: 'sub', style: 'margin-top:18px' }, title) : null, svg), `${cols.length} graphs across ${rows.length} routes. Shade is the route's weight in that graph; hover a cell for the graph id.`); };
+  if (has(M)) { const rname = id => { const r = R.find(x => String(x.id) === String(id)); return (r && r.name) || `route ${id}`; };
+    if (has(M.route_weights)) raw.push(matrix(M.graph_ids, M.route_weights, R.map(r => r.name || `route ${r.id}`), 'Routes by graphs'));
+    for (const side of ['pos', 'neg']) { const m = M[side]; if (!has(m) || !has(m.route_weights)) continue; const ids = m.route_ids || []; const rows = ids.map((_, i) => m.route_weights.map(row => row[i] || 0)); raw.push(matrix(m.graph_ids, rows, ids.map(rname), side === 'pos' ? 'Positive-pole graphs' : 'Negative-pole graphs')); } }
+  if (raw.length) figs.push($('details', { style: 'margin-top:28px' }, $('summary', null, `Raw factorization (${R.length} routes)`), $('div', { style: 'margin-top:12px' }, raw)));
+  sec({ id: 'clusters', wide: true }, has(K) ? 'Clusters' : 'Routes', [P(has(K) ? 'The attribution graphs, grouped into clusters a reader can name. Each cluster is one story about how the unit gets driven: the key units feeding it, and a few graphs where that story dominates. A − mark on a unit means it feeds through its negative pole.' : 'The graphs that explain this unit’s firing, factorized into routes.')], figs); })();
+
+// 5a. Inside the neuron: gate × up scatter, quadrant counts per cluster, the strip sentence as three aligned bar rows.
+(() => { const A = B.anatomy; if (!has(A)) return; const figs = []; const pts = A.points || [];
+  const bars3 = s => { const T = s.tokens || [], rows = [['gate', s.gate || [], () => '#8a8a90'], ['up', s.up || [], v => v >= 0 ? POS : NEG], ['act', s.act || [], v => v >= 0 ? POS : NEG]];
+    const cols = $('div', { class: 'cols3' }); T.forEach((t, i) => { const col = $('div', { class: 'tc' });
+      rows.forEach(([name, vals, colF]) => { const m = Math.max(...vals.map(Math.abs), 1e-9), v = vals[i] || 0, h = 22 * Math.abs(v) / m; col.append($('div', { class: 'bb', title: `${name} ${fmt(v)}` }, $('i', { style: `height:${h}px;background:${colF(v)};${v >= 0 ? 'bottom:50%' : 'top:50%'}` }))); });
+      col.append($('div', { class: 'tk' }, t)); cols.append(col); });
+    return $('div', { class: 'bars3' }, $('div', { class: 'lbls' }, rows.map(r => $('div', null, r[0])), $('div')), cols); };
+  if (pts.length) { const gm = Math.max(...pts.map(p => Math.abs(p.gate || 0)), 1e-9), um = Math.max(...pts.map(p => Math.abs(p.up || 0)), 1e-9);
+    const W = 560, H = 420, M = 44, X = g => M + (g + gm) / (2 * gm) * (W - 2 * M), Y = u => H - M - (u + um) / (2 * um) * (H - 2 * M);
+    const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', style: 'display:block' });
+    svg.append(svgEl('rect', { x: X(0), y: M, width: W - M - X(0), height: Y(0) - M, fill: hexA(POS, 0.05) }), svgEl('rect', { x: X(0), y: Y(0), width: W - M - X(0), height: H - M - Y(0), fill: hexA(NEG, 0.05) }), svgEl('rect', { x: M, y: M, width: X(0) - M, height: H - 2 * M, fill: 'rgba(0,0,0,.03)' }));
+    svg.append(svgEl('line', { x1: X(0), x2: X(0), y1: M, y2: H - M, stroke: '#c9c9ce' }), svgEl('line', { x1: M, x2: W - M, y1: Y(0), y2: Y(0), stroke: '#c9c9ce' }));
+    const lab = (x, y, txt, anchor) => svg.append(svgEl('text', { x, y, 'font-size': 11, fill: '#8a8a90', 'text-anchor': anchor || 'start' }, txt));
+    lab(W / 2, H - M + 30, 'gate →', 'middle'); lab(M + 4, M - 8, '↑ up'); lab(X(0) + 6, M + 14, 'on, positive'); lab(X(0) + 6, H - M - 8, 'on, negative'); lab(M + 4, H - M - 8, 'gate closed: off');
+    for (const g of [-gm, gm]) lab(X(g), H - M + 16, fmt(g), 'middle'); lab(M - 6, M + 4, fmt(um), 'end'); lab(M - 6, H - M - 2, fmt(-um), 'end');
+    pts.forEach(p => { const c = svgEl('circle', { cx: X(p.gate || 0), cy: Y(p.up || 0), r: 3.5, fill: clusterColour(p.cluster), 'fill-opacity': .8, stroke: '#fff', 'stroke-width': .8 });
+      c.onmousemove = ev => showTip(ev, `<b>${fmt(p.activation)}</b> · ${clusterName(p.cluster)}<br>gate ${fmt(p.gate)} · up ${fmt(p.up)}${p.peak_token != null ? ' · peak ' + JSON.stringify(p.peak_token) : ''}<br>…${(p.text || '').slice(-90)}`); c.onmouseleave = hideTip; svg.append(c); });
+    const cids = [...new Set(pts.map(p => p.cluster))].sort((a, b) => (B.clusters || []).findIndex(k => k.id === a) - (B.clusters || []).findIndex(k => k.id === b));
+    const legend = $('div', { class: 'legend' }, cids.map(id => $('div', { style: 'cursor:default' }, $('span', { class: 'sw', style: 'background:' + clusterColour(id) }), $('span', { class: 'nm' }, clusterName(id)), $('span', { class: 'n' }, pts.filter(p => p.cluster === id).length))));
+    const Q = has(A.quadrants) ? A.quadrants : pts.reduce((acc, p) => { const q = (p.gate > 0 ? 'g+' : 'g-') + (p.up > 0 ? 'u+' : 'u-'); (acc[p.cluster] = acc[p.cluster] || {})[q] = ((acc[p.cluster] || {})[q] || 0) + 1; return acc; }, {});
+    const keys = ['g+u+', 'g+u-', 'g-u+', 'g-u-']; const qrows = Object.keys(Q).sort((a, b) => cids.indexOf(a) - cids.indexOf(b));
+    const qtab = $('table', { class: 'qtab' }, $('tr', null, $('th', null, 'Cluster'), keys.map(k => $('th', { style: 'text-align:right' }, k))), qrows.map(id => { const tot = keys.reduce((a, k) => a + (Q[id][k] || 0), 0) || 1;
+      return $('tr', null, $('td', null, $('span', { class: 'csw', style: 'background:' + clusterColour(id) }), ' ', clusterName(id)), keys.map(k => { const n = Q[id][k] || 0, t = tile(n); t.style.background = hexA('#1d1d1f', 0.04 + 0.5 * n / tot); if (n / tot > 0.6) t.style.color = '#fff'; return $('td', { class: 'num' }, t); })); }));
+    const on = pts.filter(p => p.gate > 0), onPos = on.filter(p => p.up > 0);
+    figs.push(fig($('div', { class: 'cols2' }, $('div', null, svg, legend), $('div', null, $('div', { class: 'sub' }, 'Quadrant counts per cluster'), qtab)),
+      `${(A.n || pts.length).toLocaleString()} points, one per labeled token. ${pct(on.length / Math.max(1, pts.length))} have the gate open; of those, ${pct(onPos.length / Math.max(1, on.length))} have positive up and so a positive activation. Points in the shaded left band are off whatever up says.`)); }
+  if (has(A.strip) && has(A.strip.tokens)) figs.push(fig($('div', null, $('div', { class: 'sub' }, 'One sentence, three signals'), bars3(A.strip)), 'Gate (grey), up (warm or cool by sign) and the resulting activation for each token of the strip sentence. Each row is scaled to its own largest value.'));
+  if (has(A.headline)) figs.push(fig($('div', { class: 'cols' }, A.headline.slice(0, 2).map(s => $('div', null, bars3(s)))), 'Short minimal pairs read the same way.'));
+  if (!figs.length) return;
+  sec({ id: 'anatomy', wide: true }, 'Inside the neuron', [P('The activation is SiLU(gate)·up. The gate says whether the neuron is switched on; up says what it measures, and with what sign. A negative activation therefore means the gate was open and up pointed the other way, not that the gate was closed.')], figs); })();
+
+// 5b. What it does: direct logit effect and ablation at the peak token.
+(() => { const AB = B.ablation, LE = B.logit_effect; if (!has(AB) && !has(LE)) return; const figs = []; const tk = t => $('span', { class: 'tokchip' }, JSON.stringify(t));
+  if (has(LE) && (has(LE.promote) || has(LE.suppress))) { const s = Math.max(...[...(LE.promote || []), ...(LE.suppress || [])].map(u => Math.abs(u.weight || 0)), 1e-9);
+    const col = (items, title) => has(items) ? $('div', null, $('div', { class: 'sub' }, title), $('table', null, items.slice(0, 12).map(u => $('tr', null, $('td', null, tk(u.token)), $('td', { class: 'num' }, tile(u.weight, { signed: true, scale: s, d: 2 })))))) : null;
+    figs.push(fig($('div', { class: 'cols' }, col(LE.promote, 'Promotes'), col(LE.suppress, 'Suppresses')), `Direct effect of the unit's output vector on the logits${LE.norm != null ? `; vector norm ${fmt(LE.norm)}` : ''}.`)); }
+  if (has(AB) && has(AB.rows)) { const rows = [...AB.rows].sort((a, b) => (b.kl || 0) - (a.kl || 0)); const kmax = Math.max(...rows.flatMap(r => [r.kl || 0, ...(r.kl_controls || [])]), 1e-9); const sm = AB.summary || {};
+    const tiles = $('div', { class: 'tiles', style: 'margin:0 0 16px' }); if (sm.median_kl != null) tiles.append(kTile('median KL', sm.median_kl)); if (sm.median_kl_controls != null) tiles.append(kTile('median control KL', sm.median_kl_controls)); if (sm.n != null) tiles.append(kTile('texts', sm.n));
+    const tbl = $('table', null, $('tr', null, $('th', null, 'Text'), $('th', { style: 'text-align:right' }, 'KL'), $('th', { style: 'text-align:right' }, 'Max control'), $('th', null, 'Next token, before → after'), $('th', null, 'Top losses')));
+    const row = r => { const ctl = has(r.kl_controls) ? Math.max(...r.kl_controls) : null; const pb = r.next_logprob_base != null ? Math.exp(r.next_logprob_base) : null, pa = r.next_logprob_ablated != null ? Math.exp(r.next_logprob_ablated) : null; const txt = r.text || '';
+      return $('tr', null, $('td', null, r.kind ? [$('span', { class: 'pill' }, r.kind), ' '] : null, $('span', { class: 'tail' }, (txt.length > 120 ? '…' : '') + txt.slice(-120)), r.peak_token != null ? [' ', tk(r.peak_token)] : null),
+        $('td', { class: 'num' }, tile(r.kl, { signed: true, scale: kmax, d: 2 })), $('td', { class: 'num' }, ctl != null ? tile(ctl, { d: 2 }) : '–'),
+        $('td', { style: 'white-space:nowrap' }, r.next_token != null ? [tk(r.next_token), ' ', pb != null ? `${pct(pb)} → ${pct(pa)}` : ''] : ''),
+        $('td', null, (r.losses || []).slice(0, 3).map(l => $('span', { class: 'tokchip loss' }, JSON.stringify(l.token), ' ', fmt(l.dp))))); };
+    rows.slice(0, 12).forEach(r => tbl.append(row(r))); let btn = null; if (rows.length > 12) { btn = $('button', { class: 'more' }, `Show ${rows.length - 12} more`); btn.onclick = () => { rows.slice(12).forEach(r => tbl.append(row(r))); btn.remove(); }; }
+    figs.push(fig($('div', null, tiles, $('div', { class: 'sub' }, 'Ablation at the peak token'), tbl, btn), 'Zeroing the unit at the peak token. KL is between the base and ablated next-token distributions; controls zero three random other neurons of the same layer instead. Losses are the tokens whose probability fell most.')); }
+  if (!figs.length) return;
+  sec({ id: 'ablation', wide: true }, 'What it does', [P('Two readings of the unit’s effect on the output. The direct logit effect is what its output vector alone adds to each token. Ablation removes the unit at the peak token and measures how much the next-token distribution moves, against controls that zero random other neurons of the same layer.')], figs); })();
+
+// 5c. Where it sits: family heatmap over one sentence and the upstream/downstream neighbourhood.
+(() => { const F = B.family; if (!has(F)) return; const figs = []; const fam = [...(F.family || [])].sort((a, b) => (a.layer - b.layer) || (a.neuron - b.neuron)); const isSelf = u => u.layer === N.layer && u.neuron === N.neuron; const Ms = F.measurements || [];
+  if (fam.length && Ms.length) { let sel = 0; const holder = $('div'); const select = $('select', { class: 'sel' }, Ms.map((m, i) => $('option', { value: i }, (m.prompt || `sentence ${i + 1}`).slice(0, 96))));
+    const drawHeat = () => { holder.replaceChildren(); const m = Ms[sel], T = m.tokens || []; const L = 300, cw = Math.max(12, Math.min(34, Math.floor(780 / Math.max(1, T.length)))), rh = 22, top = 6, botLab = 70, W = L + cw * T.length + 8, H = top + rh * fam.length + botLab;
+      const svg = svgEl('svg', { viewBox: `0 0 ${W} ${H}`, width: '100%', style: `display:block;max-width:${W}px` });
+      fam.forEach((u, i) => { const ro = (m.readouts || []).find(r => r.layer === u.layer && r.neuron === u.neuron), vals = ro ? ro.values || [] : [], mx = Math.max(...vals.map(Math.abs), 1e-9), y = top + i * rh;
+        svg.append(svgEl('text', { x: L - 8, y: y + rh / 2 + 4, 'text-anchor': 'end', 'font-size': 12, 'font-weight': isSelf(u) ? 700 : 400, fill: '#1d1d1f' }, `${unitId(u)} · ${(isSelf(u) ? 'this neuron' : (u.label || '')).slice(0, 30)}`));
+        T.forEach((t, j) => { const v = vals[j] || 0, c = svgEl('rect', { x: L + j * cw, y, width: cw - 1.5, height: rh - 1.5, rx: 2, fill: hexA(v >= 0 ? POS : NEG, 0.04 + 0.9 * Math.abs(v) / mx) }); c.append(svgEl('title', null, `${unitId(u)} · ${JSON.stringify(t)} · ${fmt(v)}`)); svg.append(c); }); });
+      T.forEach((t, j) => svg.append(svgEl('text', { x: L + j * cw + cw / 2 + 3, y: top + rh * fam.length + 8, 'font-size': 10, fill: '#4a4a4f', transform: `rotate(-60 ${L + j * cw + cw / 2 + 3} ${top + rh * fam.length + 8})`, 'text-anchor': 'end' }, t.trim() || '␣')));
+      holder.append(svg); };
+    select.onchange = () => { sel = +select.value; drawHeat(); }; drawHeat();
+    figs.push(fig($('div', null, Ms.length > 1 ? $('div', { class: 'ctlrow' }, 'Sentence ', select) : null, holder), 'Each row is one unit of the family, normalised to its own largest |activation| on the sentence, so the token pattern is comparable even when scales differ. This neuron’s row is bold.')); }
+  const up = F.upstream || [], dn = F.downstream || []; if (up.length || dn.length) { const wmax = Math.max(...[...up, ...dn].map(u => Math.abs(u.weight || 0)), 1e-9);
+    const mkChip = u => { const c = chip(u, wmax); if (u.cluster) c.prepend($('span', { class: 'csw', title: clusterName(u.cluster), style: 'background:' + clusterColour(u.cluster) })); return c; };
+    const left = $('div', { class: 'ncol' }), right = $('div', { class: 'ncol' }), centre = $('div', { class: 'ncentre' }, $('div', { class: 'nid' }, N.layer != null ? unitId(N) : (N.id || '')), $('div', { class: 'ntitle' }, C.title || N.autointerp_label || ''));
+    const svg = svgEl('svg', { class: 'wires' }), wrap = $('div', { class: 'neighwrap' }, svg, $('div', { class: 'neigh' }, $('div', null, $('div', { class: 'sub' }, `Upstream · ${up.length}`), left), centre, $('div', null, $('div', { class: 'sub' }, `Downstream · ${dn.length}`), right)));
+    const draw = () => { const R = wrap.getBoundingClientRect(); if (!R.width) return; svg.setAttribute('viewBox', `0 0 ${R.width} ${R.height}`); svg.setAttribute('width', R.width); svg.setAttribute('height', R.height); svg.replaceChildren(); const cr = centre.getBoundingClientRect();
+      const wire = (el, u, side) => { const r = el.getBoundingClientRect(); const x1 = side < 0 ? r.right - R.left : r.left - R.left, y1 = r.top + r.height / 2 - R.top, x2 = side < 0 ? cr.left - R.left : cr.right - R.left, y2 = cr.top + cr.height / 2 - R.top, mx = (x1 + x2) / 2;
+        svg.append(svgEl('path', { d: `M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}`, fill: 'none', stroke: (u.weight || 0) >= 0 ? POS : NEG, 'stroke-opacity': .5, 'stroke-width': 0.6 + 4 * Math.abs(u.weight || 0) / wmax })); };
+      [...left.querySelectorAll('.chip')].forEach((el, i) => wire(el, up[i], -1)); [...right.querySelectorAll('.chip')].forEach((el, i) => wire(el, dn[i], 1)); };
+    const fill = (col, items, n) => { col.replaceChildren(); items.slice(0, n).forEach(u => col.append(mkChip(u))); if (items.length > n) { const b = $('button', { class: 'more' }, `Show ${items.length - n} more`); b.onclick = () => { fill(col, items, items.length); draw(); }; col.append(b); } };
+    fill(left, up, 12); fill(right, dn, 12); requestAnimationFrame(() => { draw(); setTimeout(draw, 300); }); window.addEventListener('resize', draw);
+    figs.push(fig(wrap, 'Upstream units on the left write into the neuron; readers on the right take from it. Line width follows |weight| and colour follows sign. A coloured square marks the cluster an upstream unit belongs to.')); }
+  if (!figs.length) return;
+  sec({ id: 'family', wide: true }, 'Where it sits', [P('The same idea appears in several units across layers. The heatmap shows which of them fire on the cue tokens and which on the slot token. The diagram shows the neuron’s immediate neighbourhood in the attribution graphs.')], figs); })();
+
+// 6. Circuit tables: 12 rows each, show-more for the rest.
+(() => { const G = B.circuit; if (!has(G)) return;
+  const utab = (items, cap) => { if (!has(items)) return null; const s = Math.max(...items.map(u => Math.abs(u.weight || 0)), 1e-9); const hasCount = items[0].count != null;
+    const tbl = $('table', null, $('tr', null, $('th', null, 'Unit'), $('th', null, 'Label'), $('th', { style: 'text-align:right' }, 'Weight'), hasCount ? $('th', { style: 'text-align:right' }, 'Graphs') : null));
+    const row = u => $('tr', null, $('td', { class: 'id' }, unitId(u)), $('td', null, u.label || ''), $('td', { class: 'num' }, tile(u.weight, { signed: true, scale: s, d: 2 })), hasCount ? $('td', { class: 'num' }, u.count) : null);
+    items.slice(0, 12).forEach(u => tbl.append(row(u))); let btn = null;
+    if (items.length > 12) { btn = $('button', { class: 'more' }, `Show ${items.length - 12} more`); btn.onclick = () => { items.slice(12).forEach(u => tbl.append(row(u))); btn.remove(); }; }
+    return fig($('div', null, tbl, btn), cap); };
+  const ltab = (items, cap) => { if (!has(items)) return null; const s = Math.max(...items.map(u => Math.abs(u.weight || 0)), 1e-9);
+    return fig($('table', null, $('tr', null, $('th', null, 'Token'), $('th', { style: 'text-align:right' }, 'Weight')), items.slice(0, 12).map(u => $('tr', null, $('td', null, $('span', { style: 'font-family:var(--mono);font-size:13px' }, JSON.stringify(u.token))), $('td', { class: 'num' }, tile(u.weight, { signed: true, scale: s, d: 2 }))))), cap); };
+  const grid = $('div', { class: 'cols' }); const a = utab(G.upstream, 'Upstream units, aggregated over the atlas graphs.'), b = utab(G.downstream, 'Readers of this unit.'); if (a) grid.append($('div', null, $('div', { class: 'sub' }, 'Upstream'), a)); if (b) grid.append($('div', null, $('div', { class: 'sub' }, 'Downstream'), b));
+  const lg = $('div', { class: 'cols', style: 'margin-top:28px' }); const p = ltab(G.logits?.promote, 'Direct output weights the unit raises.'), q = ltab(G.logits?.suppress, 'Direct output weights the unit lowers.'); if (p) lg.append($('div', null, $('div', { class: 'sub' }, 'Promotes'), p)); if (q) lg.append($('div', null, $('div', { class: 'sub' }, 'Suppresses'), q));
+  if (!grid.children.length && !lg.children.length) return;
+  sec({ id: 'circuit', wide: true }, 'Circuit', [P(`Who writes to the unit and who reads from it, summed over the atlas graphs where it appears${G.n_atlas_graphs ? ` (${G.n_atlas_graphs} graphs)` : ''}. Weight tiles are tinted by sign and magnitude.`)], grid.children.length ? grid : null, lg.children.length ? lg : null); })();
+
+// 7. Tests.
+(() => { const T = B.tests; if (!has(T)) return; const figs = [];
+  const blind = (b, name, neg) => { if (!has(b)) return null; const s = Math.max(Math.abs(b.target || 0), Math.abs(b.achieved || 0), 1e-9);
+    return $('div', { class: 'pair' }, $('div', { class: 'tiles' }, kTile('target', b.target, { signed: true, scale: s }), kTile('achieved', b.achieved, { signed: true, scale: s, big: true })), $('div', null, $('div', { class: 'sub' }, name), has(b.token_activations) ? toks(b.token_activations, b.peak_index, null, neg, { left: b.cut_left, right: b.cut_right }) : $('span', { class: 'toks' }, b.text || ''))); };
+  const bm = blind(T.blind_max, 'Blind max: write a text that reaches the corpus peak'), bn = blind(T.blind_min, 'Blind min: write a text that reaches the corpus trough', true);
+  if (bm || bn) figs.push(fig($('div', null, bm, bn), 'The explanation is used to write text without looking at the corpus. Achieved is the model’s measured activation on that text.'));
+  const rp = T.route_prediction; if (has(rp)) { const box = $('div', { class: 'pair' }, $('div', { class: 'tiles' }, kTile('accuracy', null, { text: pct(rp.accuracy), big: true }), rp.baseline != null ? kTile('baseline', null, { text: pct(rp.baseline) }) : null, rp.n != null ? kTile('n', rp.n) : null), $('div', null, $('div', { class: 'sub' }, 'Route prediction'), $('p', { style: 'font-size:15px;color:var(--ink2);margin:0' }, 'Given only the text, predict which route the graph will use, then run the graph and check.')));
+    if (has(rp.confusion)) { const R = B.routes || [], k = rp.confusion.length, cs = 26, L = 210, mx = Math.max(...rp.confusion.flat(), 1), W = Math.max(L + cs * k + 8, L + 300); const svg = svgEl('svg', { viewBox: `0 0 ${W} ${cs * k + 40}`, width: W, style: 'display:block;margin-top:10px;max-width:100%' });
+      rp.confusion.forEach((row, i) => { svg.append(svgEl('text', { x: L - 8, y: 30 + i * cs + cs / 2 + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#1d1d1f' }, (rp.route_names && rp.route_names[i]) || (R[i] || {}).name || `route ${i + 1}`)); row.forEach((v, j) => { svg.append(svgEl('rect', { x: L + j * cs, y: 30 + i * cs, width: cs - 1.5, height: cs - 1.5, rx: 2, fill: hexA('#1d1d1f', 0.04 + 0.7 * v / mx) })); svg.append(svgEl('text', { x: L + j * cs + cs / 2 - 0.75, y: 30 + i * cs + cs / 2 + 4, 'text-anchor': 'middle', 'font-size': 11, fill: v / mx > 0.5 ? '#fff' : '#1d1d1f' }, v)); }); });
+      svg.append(svgEl('text', { x: L, y: 18, 'font-size': 11, fill: '#8a8a90' }, 'columns: predicted route · rows: actual route')); box.lastChild.append(svg); }
+    figs.push(fig(box)); }
+  if (has(T.steering)) { const s = Math.max(...T.steering.flatMap(x => [Math.abs(x.baseline || 0), Math.abs(x.steered || 0)]), 1e-9);
+    figs.push(fig($('div', null, $('div', { class: 'sub' }, 'Steering'), $('table', null, $('tr', null, $('th', null, 'Prompt'), $('th', { style: 'text-align:right' }, 'Strength'), $('th', { style: 'text-align:right' }, 'Baseline'), $('th', { style: 'text-align:right' }, 'Steered'), $('th', null, 'Note')),
+      T.steering.map(x => $('tr', null, $('td', null, $('span', { class: 'toks' }, x.prompt)), $('td', { class: 'num' }, fmt(x.strength)), $('td', { class: 'num' }, tile(x.baseline, { signed: true, scale: s })), $('td', { class: 'num' }, tile(x.steered, { signed: true, scale: s })), $('td', { style: 'color:var(--ink2);font-size:13.5px' }, x.note || ''))))), 'Baseline and steered values are the measured quantity named in each note.')); }
+  if (has(T.ablation)) { const s = Math.max(...T.ablation.map(x => Math.abs(x.effect || 0)), 1e-9);
+    figs.push(fig($('div', null, $('div', { class: 'sub' }, 'Ablation'), $('table', null, $('tr', null, $('th', null, 'Graph'), $('th', { style: 'text-align:right' }, 'Effect'), $('th', null, 'Note')), T.ablation.map(x => $('tr', null, $('td', { class: 'id' }, x.graph_id), $('td', { class: 'num' }, tile(x.effect, { signed: true, scale: s, d: 2 })), $('td', { style: 'color:var(--ink2);font-size:13.5px' }, x.note || ''))))), 'Effect of zeroing the unit on each graph’s target, as measured.')); }
+  if (!figs.length) return; sec({ id: 'tests', wide: true }, 'Tests', [P('Predictions made from the explanation and then checked against the model. Blind max and min are the sharpest: if the explanation is right, a text written from it alone should reach the corpus extremes.')], figs); })();
+
+// 8. Criticism: compact table, each row expands to the result and evidence.
+(() => { const K = B.criticism; if (!has(K)) return;
+  const s = Math.max(...K.flatMap(k => (k.evidence || []).map(e => Math.abs(e.activation || 0))), 1e-9);
+  const rows = K.map(k => $('details', { class: 'crow' }, $('summary', null, $('span', { class: 'n' }, k.round), $('span', null, $('span', { class: 'pill ' + (k.verdict || '') }, k.verdict || '')), $('span', { class: 'att', title: k.attack || '' }, k.attack || '')),
+    $('div', { class: 'bodyc' }, k.prediction ? P($('b', null, 'Prediction. '), k.prediction) : null, k.result ? P($('b', null, 'Result. '), k.result) : null, has(k.evidence) ? $('div', { class: 'ev' }, k.evidence.map(e => $('div', null, tile(e.activation, { signed: true, scale: s }), $('span', null, e.text)))) : null)));
+  sec('criticism', 'Criticism', [P('Each round, a critic tries to break the claim. The verdict records whether the claim survived as written, was narrowed, or was rejected. Open a row for the result and evidence.')], $('div', null, rows)); })();
+
+// 9. Appendix.
+(() => { const A = B.appendix || {}; const parts = [];
+  if (has(A.notes)) parts.push($('details', null, $('summary', null, 'Notes'), $('ul', null, A.notes.map(n => $('li', null, n)))));
+  if (has(V.history)) parts.push($('details', null, $('summary', null, 'Version history'), $('ul', null, V.history.map(h => $('li', null, `v${h.n} · ${(h.ts || '').slice(0, 16).replace('T', ' ')} · ${h.note || ''}`)))));
+  if (has(A.provenance)) parts.push($('details', null, $('summary', null, 'Provenance'), $('ul', null, A.provenance.map(n => $('li', null, n)))));
+  if (!parts.length) return; sec('appendix', 'Appendix', [P('Nuance, caveats and where every number came from.')], $('div', null, parts)); })();
+</script>
+<!-- paper-review:start --><style>
+.pr-box{border:1px solid var(--rule2,#d9dde0);border-radius:8px;padding:14px 18px 12px;margin:0 0 26px;background:#fafbfb;font-size:15px;line-height:1.5;color:var(--ink,#1f2328)}
+.pr-top{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;margin:0 0 6px}
+.pr-k{font:600 11px/1.2 var(--sans,-apple-system,sans-serif);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3,#6b7178)}
+.pr-g{font-weight:600}
+.pr-s{color:var(--ink3,#6b7178);font-size:13px}
+.pr-one{margin:0 0 10px}
+.pr-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:4px 22px}
+.pr-cols h4{margin:6px 0 2px;font:600 13px/1.3 var(--sans,-apple-system,sans-serif);color:var(--ink2,#3b4248)}
+.pr-cols ul{margin:0;padding-left:18px}.pr-cols li{margin:2px 0;font-size:14px}
+.pr-poles{margin:0 0 10px;font-size:14px;color:var(--ink2,#3b4248)}
+.pr-box>summary{list-style:none;cursor:pointer}.pr-box>summary::-webkit-details-marker{display:none}.pr-box>summary::after{content:'show';margin-left:auto;font:12px var(--sans,-apple-system,sans-serif);color:var(--ink3,#6b7178)}.pr-box[open]>summary::after{content:'hide'}.pr-box:not([open])>summary{margin:0}.pr-box:not([open]){padding-bottom:12px}.pr-note{margin:8px 0 0;font-size:12px;color:var(--ink3,#6b7178)}
+</style><script type="application/json" id="paper-review-data">__PAPER_DATA_paper-review-data__</script><script>/* Saved review JSON is retained without a display renderer. */</script><!-- paper-review:end --><!-- paper-review-full:start --><style>
+.prf{scroll-margin-top:72px;max-width:760px;margin:56px auto 40px;padding:26px 0 0;border-top:1px solid var(--rule2,#d9dde0);color:var(--ink,#1f2328);font-size:16px;line-height:1.6}
+.prf-k{font:600 11px/1.2 var(--sans,-apple-system,sans-serif);letter-spacing:.08em;text-transform:uppercase;color:var(--ink3,#6b7178);margin:0 0 6px}
+.prf h2{font-size:26px;line-height:1.25;margin:0 0 6px}
+.prf-meta{color:var(--ink3,#6b7178);font-size:14px;margin:0 0 18px}
+.prf h3{font:600 15px/1.3 var(--sans,-apple-system,sans-serif);margin:26px 0 8px;color:var(--ink2,#3b4248)}
+.prf p{margin:0 0 10px}
+.prf-item{border-left:3px solid var(--rule2,#d9dde0);padding:2px 0 2px 14px;margin:0 0 14px}
+.prf-item b{display:block;margin:0 0 4px}
+.prf-row{font-size:15px;margin:2px 0}
+.prf-row span{color:var(--ink3,#6b7178);font:600 12px/1.4 var(--sans,-apple-system,sans-serif);letter-spacing:.04em;text-transform:uppercase;margin-right:6px}
+.prf-tag{display:inline-block;font:600 11px/1.6 var(--sans,-apple-system,sans-serif);letter-spacing:.05em;text-transform:uppercase;border-radius:4px;padding:0 6px;margin-left:6px;vertical-align:2px}
+.prf-tag.used{background:#fbe9d7;color:#8a4b12}.prf-tag.inert{background:#e7eef2;color:#3f5866}.prf-tag.unknown{background:#efe9f5;color:#5b4a73}
+.prf ul{margin:0 0 6px;padding-left:20px}.prf li{margin:3px 0}
+.prf-note{margin:22px 0 0;font-size:13px;color:var(--ink3,#6b7178)}
+.prf-poles{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 22px;margin:4px 0 6px}
+.prf-pole{border:1px solid var(--rule2,#d9dde0);border-radius:6px;padding:10px 12px}
+.prf-pole b{display:block;margin:0 0 2px}
+.prf-pole .prf-r{color:var(--ink3,#6b7178);font-size:13px;margin:0 0 6px}
+.prf-pole p{font-size:15px;margin:0 0 4px}
+@media (max-width:820px){.prf{margin:40px 16px 32px}}
+</style><script type="application/json" id="paper-review-full-data">__PAPER_DATA_paper-review-full-data__</script><script>/* Saved review JSON is retained without a display renderer. */</script><!-- paper-review-full:end --></body></html>
