@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="title desc">
+  <title id="title">Neuron Investigator data flow</title>
+  <desc id="desc">Saved activations are sampled and semantically labelled before interpretation. Three separate agent containers exchange JSON and HTML. Only the experiment stage requests new model measurements from a host GPU worker. Fixed code publishes the revised report.</desc>
+  <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10" fill="none" stroke="#50545a" stroke-width="1.5"/></marker></defs>
+  <rect width="1280" height="470" rx="18" fill="#f6f9fe"/>
+  <g font-family="Helvetica, Arial, sans-serif" fill="#1e3551">
+    <text x="24" y="30" font-size="19">Saved activations + token records</text>
+    <path d="M130 43V93" stroke="#50545a" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="24" y="100" width="212" height="112" rx="10" fill="#edf3fc" stroke="#c4d5eb" stroke-width="1.5"/>
+    <text x="42" y="135" font-size="23">Prepare evidence</text>
+    <text x="42" y="170" font-size="18" fill="#60738b">Sample by amplitude</text>
+    <text x="42" y="195" font-size="18" fill="#60738b">LLM semantic labels</text>
+
+    <g stroke="#50545a" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+      <path d="M236 156H346"/>
+      <path d="M582 156H674"/>
+      <path d="M910 156H1002"/>
+    </g>
+    <g text-anchor="middle" font-size="18" fill="#60738b">
+      <text x="292" y="143">Evidence</text>
+      <text x="629" y="143">Claim</text>
+      <text x="956" y="143">Results</text>
+    </g>
+
+    <g fill="white" stroke="#44494f" stroke-width="1.5">
+      <rect x="350" y="100" width="232" height="112" rx="10" fill="#fff8f3" stroke="#e6b995"/>
+      <rect x="678" y="100" width="232" height="112" rx="10" fill="#f0f6ff" stroke="#9cbee8"/>
+      <rect x="1006" y="100" width="250" height="112" rx="10" fill="#f0f8f6" stroke="#9dc8c3"/>
+    </g>
+    <g font-size="17" fill="#60738b">
+      <text x="350" y="86">AGENT 1 · CONTAINER 1</text>
+      <text x="678" y="86">AGENT 2 · CONTAINER 2</text>
+      <text x="1006" y="86">AGENT 3 · CONTAINER 3</text>
+    </g>
+    <g font-size="24">
+      <text x="368" y="139" fill="#b85e30" font-weight="600">Interpret</text>
+      <text x="696" y="139" fill="#286fb7" font-weight="600">Experiment</text>
+      <text x="1024" y="139" fill="#257e78" font-weight="600">Revise</text>
+    </g>
+    <g font-family="Menlo, Consolas, monospace" font-size="17" fill="#60738b">
+      <text x="368" y="183">skills/interpret/</text>
+      <text x="696" y="183">skills/experiment/</text>
+      <text x="1024" y="183">skills/revise/</text>
+    </g>
+
+    <path d="M794 221V298" stroke="#50545a" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
+    <text x="810" y="260" font-size="17" fill="#60738b">Tool calls / measurements</text>
+    <rect x="610" y="307" width="340" height="115" rx="10" fill="#eaf2fc" stroke="#bfd3eb" stroke-width="1.5"/>
+    <text x="628" y="339" font-size="21">Target model · host GPU worker</text>
+    <text x="628" y="369" font-size="18" fill="#60738b">Replacements, RelP, interventions</text>
+    <text x="628" y="396" font-size="18" fill="#60738b">Read-only weights and saved inputs</text>
+
+    <path d="M1131 212V300" stroke="#50545a" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <rect x="1006" y="307" width="250" height="115" rx="10" fill="white" stroke="#c9d7e6" stroke-width="1.5"/>
+    <text x="1024" y="339" font-size="21">Render and publish</text>
+    <text x="1024" y="370" font-size="18" fill="#60738b">Text + measurements</text>
+    <text x="1024" y="398" font-size="18" fill="#60738b">→ interactive HTML report</text>
+
+    <text x="24" y="339" font-size="20">run.sh</text>
+    <text x="24" y="370" font-size="18" fill="#60738b">Starts containers, mounts inputs, passes handoffs.</text>
+    <text x="24" y="397" font-size="18" fill="#60738b">Host tools also handle API accounting and rendering.</text>
+    <text x="24" y="450" font-size="16" fill="#737980">Handoffs use JSON + HTML. All three agents use the LLM API; only Stage 2 runs new target-model measurements.</text>
+  </g>
+</svg>

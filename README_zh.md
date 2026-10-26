@@ -1,12 +1,38 @@
-# Neuron Investigator
+<p align="center">
+  <img src="assets/hero.png" width="100%" alt="Neuron Investigator">
+</p>
+
+<h1 align="center">
+  Neuron Investigator<br>
+  <sub>🔬 用 agent 和实验研究神经元</sub>
+</h1>
+
+<p align="center">
+  <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
+  <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
+  <a href="#reports"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
+  <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
+</p>
+
+<p align="center"><a href="README.md">English</a> · <b>简体中文</b></p>
+
+<p align="center">
+  <a href="#overview">📖 概览</a> ·
+  <a href="#workflow">⚗️ 工作流程</a> ·
+  <a href="#reports">🖼️ 报告</a> ·
+  <a href="#quick-start">🚀 快速开始</a> ·
+  <a href="#documentation">📚 文档</a>
+</p>
+
+## 📖 项目概览 <a id="overview"></a>
 
 一个研究 dense Qwen3 原生 MLP neuron 的三阶段 agent pipeline：从已有激活提出解释，设计并测量实验，再根据测量修订解释，生成可交互 HTML。
 
-[English](README.md) · [安装与运行](docs/running.md) · [输入格式](docs/data.md) · [方法与代码](docs/method.md)
+仓库只包含代码、三个 skills、软件测试、不含数据的页面模板及文档配图。模型、激活、完整实验报告、原博客页面快照、API 日志和密钥均不上传。
 
-仓库只包含代码、三个 skills、软件测试及不含数据的页面模板。模型、激活、实验结果、原博客页面快照、API 日志和密钥均不上传。
+## ⚗️ 工作流程 <a id="workflow"></a>
 
-## 流程
+![先准备证据，再运行三个独立 agent 容器；用 JSON/HTML 交接，由宿主工具执行模型测量](assets/workflow.png)
 
 1. **准备证据**：从已有激活按幅度区间抽候选点，各区间最多 40 点，再按候选数量比例保留最多 256 点，交给 DeepSeek 标注语义。此步骤在初步解释之前。
 2. **初步解释**：第一个独立容器只装 interpret skill 和目标 neuron 的 HTML、结构化证据。
@@ -16,15 +42,39 @@
 
 Clusters 使用 agent 明确指定的语义成员，可跨 route 合并或拆分；原始 NMF routes 保留。弱激活、反例和未归类成员不会因为不符合名字就被删除。数字、占比及例句来自原始测量。
 
-## 安装
+## 🖼️ 报告局部 <a id="reports"></a>
 
-完整流程需要 Linux、Bash 4+、Docker、Python 3.10+、本地 dense-Qwen3 权重、已有激活和初始报告包，以及 DeepSeek API 凭证。默认 DeepSeek high。GPU 只承担目标模型的测量，四卡共同承载一份模型。
+<p align="center">
+  <img src="assets/report-anatomy.png" width="560" alt="从已有报告导出的 Qwen3-32B L1/N20535 散点图：横轴为原始 gate，纵轴为 up">
+</p>
+
+*Inside the neuron，Qwen3-32B L1/N20535。* 从语料和实验中选出的 token 位置，横轴为原始 gate，纵轴为 up。橙、蓝、灰分别表示正向、负向、混合或未明确的语义组，不代表单点的激活正负。灰色背景里标作“closed”的区域仍可能有非零的 `SiLU(gate) × up`。这张图原样导自已有报告；点经过选取，不代表语料中的密度分布。
+
+完整报告还包含激活样本、token 统计、替换实验、归因图、干预实验、Criticism 和独立评阅。固定代码画实测数据，agent 写解释和图注。[报告指南](docs/reports.md)说明了各项怎么读、数据从哪里来。
+
+## 🚀 快速开始 <a id="quick-start"></a>
+
+### 1. 在本地体验报告渲染
 
 ```bash
 git clone https://github.com/RUC-TrustworthyAI/Neuron-Investigator.git
 cd Neuron-Investigator
 python3 -m venv .venv
 source .venv/bin/activate
+python -m pip install -r requirements/cpu.txt
+python examples/demo.py --output runs/demo
+python -m http.server 8000 --directory runs/demo
+```
+
+打开 **http://localhost:8000/** 查看演示。
+
+演示使用代码生成的合成数据，仅检查页面功能，不是实验结果。它不需要 API、Docker 或模型，也可以在 macOS 上运行。
+
+### 2. 配置真实实验
+
+完整流程需要 Linux、Bash 4+、Docker、Python 3.10+、本地 dense-Qwen3 权重、已有激活和初始报告包，以及 DeepSeek API 凭证。默认 DeepSeek high。GPU 只承担目标模型的测量，四卡共同承载一份模型。
+
+```bash
 python -m pip install -r requirements/gpu.txt
 # 按驱动选择 CUDA wheel；以下为研究环境版本。
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
@@ -36,7 +86,7 @@ cp settings.json settings.local.json
 
 在宿主机环境中提供 `DEEPSEEK_API_KEY`，或通过 `NEURON_PAPER_API_KEY_FILE` 指向本地密钥文件。不要把密钥写进配置或 Git。
 
-## 运行与查看
+### 3. 运行并查看
 
 ```bash
 NEURON_PAPER_BUDGET_USD=5 ./run.sh prepare \
@@ -57,14 +107,47 @@ python -m http.server 8000 --directory results/example
 
 更多续跑、单阶段和复用测量操作见 [运行说明](docs/running.md)。页面中 Exemplars 与 Clusters 只截短展示上文，计算仍使用采集时完整前缀和明确评分位置。
 
-## 无 GPU 演示
+## 📚 文档导航 <a id="documentation"></a>
 
-```bash
-python -m pip install -r requirements/cpu.txt
-python examples/demo.py --output runs/demo
-python -m http.server 8000 --directory runs/demo
+| 文档 | 解决什么问题 |
+|---|---|
+| [运行说明](docs/running.md) | 安装依赖，配置 GPU、认证，启动或继续一批实验 |
+| [输入数据](docs/data.md) | 准备激活档案和目标报告数据 |
+| [方法与实现](docs/method.md) | 从流程找到代码，了解各类测量的口径 |
+| [报告指南](docs/reports.md) | 查找某张图或某个章节的数据来源和生成阶段 |
+| [开发说明](docs/development.md) | 运行 CPU 软件测试与离线演示 |
+| [发布说明](docs/release.md) | 查看当前打包版本及其变动 |
+
+<details>
+<summary><strong>仓库目录</strong></summary>
+
+```text
+run.sh                 容器启动、排队与阶段交接
+settings.json          科学参数默认值及可配置的宿主路径
+Dockerfile             Agent 镜像与固定版本的 harness
+skills/
+  interpret/           初步解释
+  experiment/          实验设计与工具调用
+  revise/              修订、Criticism 和图注
+tools/                 宿主证据读取、测量、渲染与费用记录
+analysis/              从已有激活生成初始报告和统计表
+examples/demo.py       离线合成报告示例
+assets/                项目头图、流程图和报告局部
+tests/                 CPU 软件样例和微型随机模型测试
+requirements/          CPU、GPU 宿主及测试依赖
+docs/                  环境、数据、方法与报告指南
 ```
 
-演示使用代码生成的合成数据，仅检查页面功能，不是实验结果。它不需要 API、Docker 或模型，也可以在 macOS 上运行。
+</details>
 
-代码结构、方法来源和第三方说明见 [英文 README](README.md)、[release.md](docs/release.md) 和 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+## 🤝 参与贡献 <a id="contributing"></a>
+
+请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 和[开发说明](docs/development.md)。测量方法的改变应与展示、工程整理分开说明。修改 pipeline，再从已有输入重新生成报告，不手工改写科学产物。
+
+## 🙏 致谢 <a id="acknowledgements"></a>
+
+报告结构参考 Goodfire 的 [Neural Networks Are Already Clean](https://already-clean.goodfire.com/)，RelP 适配参考 [TransluceAI/circuits](https://github.com/TransluceAI/circuits)，agent 执行使用 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)。Skill 的组织形式及本仓库的展示方式参考了 [AREX-Skill](https://github.com/VectorSpaceLab/AREX-Skill) 和 [Search-SWE](https://github.com/VectorSpaceLab/Search-SWE)。
+
+## 📄 许可与来源 <a id="license"></a>
+
+项目原创代码使用 [MIT](LICENSE)。第三方组件及沿用渲染器的来源另见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
