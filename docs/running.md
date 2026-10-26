@@ -12,7 +12,7 @@ Install host dependencies:
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements/gpu.txt
-# Example of the experiment environment; choose a wheel compatible with your driver.
+# Choose a CUDA wheel compatible with your NVIDIA driver.
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
 ```
 
@@ -24,13 +24,13 @@ Build the agent image:
 docker build -t neuron-investigator:local .
 ```
 
-The Dockerfile installs jq, ripgrep, Bash and DeepSeek Harness SDK/runtime 0.2.1rc2 from public packages. It does not inherit the historical research-machine image. `--build-arg BASE_IMAGE=python:3.11-slim` can use an already cached compatible public Python base.
+The Dockerfile installs jq, ripgrep, Bash and DeepSeek Harness SDK/runtime 0.2.1rc2 from public packages. `--build-arg BASE_IMAGE=python:3.11-slim` can use an already cached compatible public Python base.
 
 The default Debian package source uses HTTPS. On a network with slow access to upstream registries, `--build-arg DEBIAN_MIRROR=https://mirrors.tuna.tsinghua.edu.cn` and `--build-arg PYPI_INDEX=https://pypi.tuna.tsinghua.edu.cn/simple` select alternative package mirrors for the build; runtime settings are unaffected.
 
 ## Configuration
 
-Copy `settings.json` to ignored `settings.local.json`. Relative paths resolve against the settings file's directory and are frozen as absolute paths when preparing a run.
+Copy `settings.json` to `settings.local.json`. Relative paths resolve against the settings file's directory and are frozen as absolute paths when preparing a run.
 
 | Field | Meaning |
 |---|---|
@@ -46,7 +46,7 @@ Copy `settings.json` to ignored `settings.local.json`. Relative paths resolve ag
 | `llm` | Provider/model/reasoning configuration, output capacity and upstream URLs |
 | `pricing` | Explicit token-price estimate and peak-hour schedule |
 
-Scientific settings (sampling, atlas, family, graph and blind-test parameters) live in the same file. Host paths, pricing and scheduling are not included in agent-facing scientific settings. The existing DeepSeek high setup is retained. The output capacity is the configured provider maximum, not a lower task-specific truncation policy; update it if your endpoint differs.
+Scientific settings (sampling, atlas, family, graph and blind-test parameters) live in the same file. Host paths, pricing and scheduling are not included in agent-facing scientific settings. The default investigator uses DeepSeek with high reasoning effort. Set the output capacity to the maximum supported by your endpoint.
 
 Credentials stay on the host. Set `DEEPSEEK_API_KEY` in your shell environment, or set `NEURON_PAPER_API_KEY_FILE` to a local key file. Never put a key in settings or in Git. The agent receives only a temporary credential for the host API proxy. Authentication headers are not written to the API request records.
 
@@ -61,7 +61,7 @@ NEURON_PAPER_BUDGET_USD=5 ./run.sh prepare \
 ./run.sh execute --run runs/example
 ```
 
-`prepare` snapshots only runtime source files; `.git`, credentials, local settings, models, archives and previous runs are excluded. `execute` invokes this snapshot. Preparation, each stage and the API meter save their records under the run directory.
+`prepare` saves a snapshot of the runtime source and configuration. `execute` uses that snapshot, so later edits do not change the prepared run. Preparation, each stage and the API meter save their records under the run directory.
 
 Calling `execute` again skips stages already marked complete. An interrupted stage retains its workspace and measurements; inspect its records before continuing. To start from a saved handoff in a new run:
 
@@ -82,7 +82,7 @@ python -m http.server 8000 --directory results/example
 
 Publication preserves the generated scientific content and adds shared display controls. If `paths.references/Lx_Ny.html` exists, the export includes a local original-page snapshot and a collapsible Compare control. Its two panes align corresponding sections and subsections, link scrolling, and support a resizable divider. The reference page is never mounted into an agent or included in a scientific handoff. Without a reference snapshot, publication exports the independent report without that control.
 
-Top, Bottom, quantile samples, and cluster examples share the display rule: retain up to 128 saved tokens before the first token highlighted by the existing colour rule, while preserving the scored anchor and the remaining saved context. This does not shorten model inputs or change measurements. Full run directories contain prompts, outputs and local paths; they are research records, not minimal presentation bundles.
+Top, Bottom, quantile samples, and cluster examples share the display rule: retain up to 128 saved tokens before the first token highlighted by the existing colour rule, while preserving the scored anchor and the remaining saved context. This does not shorten model inputs or change measurements.
 
 ## Records
 
@@ -96,5 +96,3 @@ Top, Bottom, quantile samples, and cluster examples share the display rule: reta
 - `units/Lx_Ny/*/handoff/`: JSON, HTML and measured artifacts for the next stage.
 - `units/Lx_Ny/PIPELINE_TERMINAL.json`: final state and report path.
 - `BATCH_TERMINAL.json`: per-neuron terminal states.
-
-No HTTP service, scheduled automation or background full batch is started by installation or `prepare`.

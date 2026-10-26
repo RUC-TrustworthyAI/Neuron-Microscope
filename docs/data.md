@@ -1,6 +1,6 @@
 # Input data
 
-The production pipeline starts from **saved native activations**. This release does not collect a new 1B-token corpus or download weights automatically. Small archives use the same format; 1B is the size of the research dataset, not a required constant.
+The pipeline takes **saved native activations** and local model weights as inputs. Activation archives can contain any number of tokens, provided they follow the format below.
 
 ## A target report package
 
@@ -65,7 +65,7 @@ The scan uses `histogram`, `iter_neuron`, document rows and token IDs. The optio
 
 ## Generate initial reports from an existing archive
 
-`analysis/build_dataset_reports.py` is the saved-dataset builder used by the research pipeline. It also expects the original token-input sidecars (`block-NNNNNN.ids.u32.npy`, `.offsets.u64.npy`, `.documents.json`) and capture metadata in the archive manifest: `model`, `model_snapshot`, `capture`, `selection`, `documents` and `neuron_count`. Existing archive completion metadata is read as before; no new collection protocol is introduced here.
+`analysis/build_dataset_reports.py` builds initial reports from saved activations. It expects the original token-input sidecars (`block-NNNNNN.ids.u32.npy`, `.offsets.u64.npy`, `.documents.json`) and capture metadata in the archive manifest: `model`, `model_snapshot`, `capture`, `selection`, `documents` and `neuron_count`.
 
 ```bash
 python analysis/build_dataset_reports.py \
@@ -81,7 +81,7 @@ Omit `--existing` if there are no reports to reuse. This is a CPU saved-data sca
 python analysis/add_token_tables.py --help
 ```
 
-Alternatively the report builder accepts `--token-tables --token-cache DIR` to reuse the token-count/label cache in the same scan. The full argument list is available with `--help`; the original calculation code is retained.
+Alternatively the report builder accepts `--token-tables --token-cache DIR` to reuse the token-count/label cache in the same scan. The full argument list is available with `--help`.
 
 ## Coordinates and sampling
 

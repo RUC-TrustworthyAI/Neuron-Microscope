@@ -7,5 +7,3 @@ For a measurement change, explain the unit, input prefix, scoring position, dtyp
 For a report change, update the renderer and regenerate from saved inputs. Preserve the requested section structure; do not add metadata panels or a Capture setting table.
 
 Do not commit weights, activation archives, credentials, full API logs or private corpus examples. Keep local settings in `settings.local.json`. Record failures and limitations honestly; passing software tests does not validate a neuron interpretation.
-
-Review THIRD_PARTY_NOTICES.md before changing repository visibility or redistributing inherited material.

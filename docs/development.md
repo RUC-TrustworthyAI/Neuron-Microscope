@@ -16,7 +16,7 @@ python -m http.server 8080 --directory .local/demo
 
 Open `http://localhost:8080/`. The demo uses synthetic measurements to exercise report generation and interaction; it is not a neuron interpretation or a scientific result. No downloaded model, GPU, API credential or paid request is needed for these checks. RelP tests instantiate a tiny random model on CPU.
 
-The software tests cover preserved input prefixes, data selection, native attribution operations, stage isolation and handoff, saved-output reuse, API accounting, report assembly and layout. These are development tests, not additional acceptance gates imposed on the research agents. Passing them does not establish the scientific validity of an explanation.
+The software tests cover preserved input prefixes, data selection, native attribution operations, stage isolation and handoff, saved-output reuse, API accounting, report assembly and layout. Passing them does not establish the scientific validity of an explanation.
 
 Build the agent image separately:
 
@@ -29,5 +29,3 @@ docker run --rm --network none neuron-investigator:local \
 The image installs the public harness SDK and runtime packages. GPU measurement dependencies run on the host, as described in [running.md](running.md); they are not copied into each agent container.
 
 Keep credentials, local settings, model files, activation archives and run records outside Git. A prepared run snapshots only the framework's source directories and selected settings; it does not copy the repository's `.git`, local runs or weights. Scientific evidence and outputs are never edited to make a test pass. Changes to calculation or selection rules should be stated explicitly and exercised with a small fixture before starting a research run.
-
-This source-only repository does not import the history of earlier research checkouts. See [release.md](release.md) for the packaging scope and [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for component provenance.

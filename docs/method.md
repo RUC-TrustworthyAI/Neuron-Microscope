@@ -22,7 +22,7 @@ The subject is a native dense-Qwen3 MLP neuron. The investigator is a separate D
 
 The three skills are files mounted into fresh containers and explicitly named in each short task. The agent loads the instructions and calls their scripts over a Unix socket. Only one skill is present per stage.
 
-The numerical rules are retained from the research pipeline: native BF16 channels, full captured prefixes, explicit score positions and signed response poles. Corpus sample counts are not population semantic coverage. A coherent description, a predictive explanation and a causal account remain different claims.
+Measurements use native BF16 channels, full captured prefixes, explicit score positions and signed response poles. Corpus sample counts are not population semantic coverage. A coherent description, a predictive explanation and a causal account remain different claims.
 
 ## RelP and intervention scope
 
@@ -43,5 +43,3 @@ Fresh interpretation receives no official neuron description or historical expla
 ## Records and limits
 
 Every model/API operation retains inputs and outputs. Failed or incomplete measurements remain recorded. Software tests exercise the implementation; scientific evidence comes from the saved measurements.
-
-This release packages the investigation pipeline; it does not establish a percentage of interpretable neurons or reproduce a historical research result solely by rendering a similar page. Population estimation, matched comparisons and independent heldout assessment belong to the subsequent research milestones.

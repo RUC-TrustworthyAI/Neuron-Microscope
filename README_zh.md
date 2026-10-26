@@ -28,8 +28,6 @@
 
 一个研究 dense Qwen3 原生 MLP neuron 的三阶段 agent pipeline：从已有激活提出解释，设计并测量实验，再根据测量修订解释，生成可交互 HTML。
 
-仓库只包含代码、三个 skills、软件测试、不含数据的页面模板及文档配图。模型、激活、完整实验报告、原博客页面快照、API 日志和密钥均不上传。
-
 ## ⚗️ 工作流程 <a id="workflow"></a>
 
 ![先准备证据，再运行三个独立 agent 容器；用 JSON/HTML 交接，由宿主工具执行模型测量](assets/workflow.png)
@@ -40,7 +38,7 @@
 4. **修订**：第三个独立容器装 revise skill，根据测量修订解释、Criticism 和图注；固定代码生成 HTML 与费用章节。
 5. **发布**：若提供对应原博客的本地快照，发布工具自动加入左右分屏、版块对齐和同步滚动。官方内容只加入展示页，不进入研究 agent 的输入。
 
-Clusters 使用 agent 明确指定的语义成员，可跨 route 合并或拆分；原始 NMF routes 保留。弱激活、反例和未归类成员不会因为不符合名字就被删除。数字、占比及例句来自原始测量。
+**Clusters** 按语义组织已测量的样本。原始 NMF routes 描述归因模式，一个语义组可以跨越多条 route。各组的样本数、归因贡献占比和上游汇总由实测数据计算。
 
 ## 🖼️ 报告局部 <a id="reports"></a>
 
@@ -48,7 +46,7 @@ Clusters 使用 agent 明确指定的语义成员，可跨 route 合并或拆分
   <img src="assets/report-anatomy.png" width="560" alt="从已有报告导出的 Qwen3-32B L1/N20535 散点图：横轴为原始 gate，纵轴为 up">
 </p>
 
-*Inside the neuron，Qwen3-32B L1/N20535。* 从语料和实验中选出的 token 位置，横轴为原始 gate，纵轴为 up。橙、蓝、灰分别表示正向、负向、混合或未明确的语义组，不代表单点的激活正负。灰色背景里标作“closed”的区域仍可能有非零的 `SiLU(gate) × up`。这张图原样导自已有报告；点经过选取，不代表语料中的密度分布。
+*Inside the neuron，Qwen3-32B L1/N20535。* 从语料和实验中选出的 token 位置，横轴为原始 gate，纵轴为 up。橙、蓝、灰分别表示正向、负向、混合或未明确的语义组，不代表单点的激活正负。灰色背景里标作“closed”的区域仍可能有非零的 `SiLU(gate) × up`。图中的点经过选取，不代表语料中的密度分布。
 
 完整报告还包含激活样本、token 统计、替换实验、归因图、干预实验、Criticism 和独立评阅。固定代码画实测数据，agent 写解释和图注。[报告指南](docs/reports.md)说明了各项怎么读、数据从哪里来。
 
@@ -76,7 +74,7 @@ python -m http.server 8000 --directory runs/demo
 
 ```bash
 python -m pip install -r requirements/gpu.txt
-# 按驱动选择 CUDA wheel；以下为研究环境版本。
+# 安装与 NVIDIA 驱动匹配的 CUDA wheel。
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
 docker build -t neuron-investigator:local .
 cp settings.json settings.local.json
@@ -103,7 +101,7 @@ python -m http.server 8000 --directory results/example
 - `publish`：保留生成的科学内容，加入统一显示与可选对比功能。
 - 默认整批 API 上限 2 美元；示例设为 5 美元。设 `unlimited` 可取消上限。费用是配置单价计算的估算，不是账户账单。
 - `--neurons` 后可列多个 neuron。默认前一个第二阶段结束后才启动下一个，第三阶段可与下一个第一阶段重叠。
-- 完整请求、输出、测量、费用和耗时保存在 `runs/`。旧结果保留；这些目录被 Git 忽略。
+- 完整请求、输出、测量、费用和耗时保存在 `runs/`，可按 neuron 和阶段查看。
 
 更多续跑、单阶段和复用测量操作见 [运行说明](docs/running.md)。页面中 Exemplars 与 Clusters 只截短展示上文，计算仍使用采集时完整前缀和明确评分位置。
 
@@ -116,7 +114,6 @@ python -m http.server 8000 --directory results/example
 | [方法与实现](docs/method.md) | 从流程找到代码，了解各类测量的口径 |
 | [报告指南](docs/reports.md) | 查找某张图或某个章节的数据来源和生成阶段 |
 | [开发说明](docs/development.md) | 运行 CPU 软件测试与离线演示 |
-| [发布说明](docs/release.md) | 查看当前打包版本及其变动 |
 
 <details>
 <summary><strong>仓库目录</strong></summary>
@@ -142,12 +139,12 @@ docs/                  环境、数据、方法与报告指南
 
 ## 🤝 参与贡献 <a id="contributing"></a>
 
-请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 和[开发说明](docs/development.md)。测量方法的改变应与展示、工程整理分开说明。修改 pipeline，再从已有输入重新生成报告，不手工改写科学产物。
+请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 和[开发说明](docs/development.md)。
 
 ## 🙏 致谢 <a id="acknowledgements"></a>
 
-报告结构参考 Goodfire 的 [Neural Networks Are Already Clean](https://already-clean.goodfire.com/)，RelP 适配参考 [TransluceAI/circuits](https://github.com/TransluceAI/circuits)，agent 执行使用 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)。Skill 的组织形式及本仓库的展示方式参考了 [AREX-Skill](https://github.com/VectorSpaceLab/AREX-Skill) 和 [Search-SWE](https://github.com/VectorSpaceLab/Search-SWE)。
+报告结构参考 Goodfire 的 [Neural Networks Are Already Clean](https://already-clean.goodfire.com/)，RelP 适配参考 [TransluceAI/circuits](https://github.com/TransluceAI/circuits)，agent 执行使用 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)。
 
-## 📄 许可与来源 <a id="license"></a>
+## 📄 许可 <a id="license"></a>
 
-项目原创代码使用 [MIT](LICENSE)。第三方组件及沿用渲染器的来源另见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
+项目原创代码使用 [MIT License](LICENSE)。

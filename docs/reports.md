@@ -2,7 +2,7 @@
 
 [Home](../README.md) · [Method](method.md) · [Run guide](running.md) · [Data format](data.md)
 
-A report follows one investigation from saved evidence to a revised claim. The HTML is assembled by code from measurements and agent submissions. It is not a second, manually edited explanation.
+A report follows one investigation from saved evidence to a revised claim. The HTML is assembled by code from measurements and agent submissions.
 
 ## How to interpret the plots
 
@@ -35,7 +35,7 @@ A report follows one investigation from saved evidence to a revised claim. The H
 | Interpretation costs | Stage records, worker telemetry and API usage estimates | Fixed code after revision | [report_costs.py](../tools/report_costs.py) |
 | An agent's read, in full | Revised explanation and its measurement summary | Independent LLM reader called during Stage 3 completion | [paper_reading.py](../tools/paper_reading.py) |
 
-Appendix remains unfilled. The final layout places Criticism before Interpretation costs, then Appendix, with the full independent reading last. Layout changes belong in [report_layout.py](../tools/report_layout.py) and [report.py](../tools/report.py), so future runs use the same presentation.
+Appendix remains unfilled. The final layout places Criticism before Interpretation costs, then Appendix, with the full independent reading last.
 
 Publication optionally adds a local original/report comparison through [comparison.py](../tools/comparison.py). The headline, independent reading, Peak census column headings, Top/Bottom examples, quantile samples and other matching sections have independent alignment anchors. The [shared display helper](../tools/exemplar_display.py) limits preceding context for exemplars and cluster examples without changing measured prefixes. Reference pages are supplied separately and used only in the published export.
 
@@ -56,4 +56,4 @@ units/Lx_Ny/
   PIPELINE_TERMINAL.json             Final state and report path
 ```
 
-These records stay local to the run. A report may have unavailable sections when the corresponding measurements have not been made or have failed; descriptive prose does not substitute for that evidence. Use the [run guide](running.md#records) to locate the records and the [method map](method.md) to trace their computation.
+A report may have unavailable sections when the corresponding measurements have not been made or have failed; descriptive prose does not substitute for that evidence. Use the [run guide](running.md#records) to locate the records and the [method map](method.md) to trace their computation.
