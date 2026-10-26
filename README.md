@@ -173,10 +173,6 @@ docs/                   Setup, data contracts, methods and report guide
 
 </details>
 
-## 🤝 Contributing <a id="contributing"></a>
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) and the [development guide](docs/development.md).
-
 ## 🙏 Acknowledgements <a id="acknowledgements"></a>
 
 The report structure follows [Goodfire's neuron reports](https://already-clean.goodfire.com/). RelP adapts [TransluceAI/circuits](https://github.com/TransluceAI/circuits), with the source revision recorded in `tools/relp-source.json`. Agents use the official [DeepSeek Harness SDK](https://github.com/deepseek-ai/deepseek-harness/tree/master/python/sdk).

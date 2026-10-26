@@ -137,10 +137,6 @@ docs/                  环境、数据、方法与报告指南
 
 </details>
 
-## 🤝 参与贡献 <a id="contributing"></a>
-
-请先阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 和[开发说明](docs/development.md)。
-
 ## 🙏 致谢 <a id="acknowledgements"></a>
 
 报告结构参考 Goodfire 的 [Neural Networks Are Already Clean](https://already-clean.goodfire.com/)，RelP 适配参考 [TransluceAI/circuits](https://github.com/TransluceAI/circuits)，agent 执行使用 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)。
