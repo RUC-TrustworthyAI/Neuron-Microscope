@@ -115,13 +115,8 @@ class BatchTests(unittest.TestCase):
                     self.assertEqual(b["bigscan"]["hist"],[len(raw)])
                 self.assertIn("SOFTWARE FIXTURE",b["claim"]["title"])
                 self.assertEqual(b["claim"]["one_paragraph"],"—")
-                descriptions=[note for note in b["appendix"]["notes"] if note.startswith("p") and "uniformly sampled anchors." in note]
-                self.assertEqual(len(descriptions),14)
-                for band in data["bands"]:
-                    key="p%s–%s: " % (band["low"],band["high"])
-                    matching=[note for note in descriptions if note.startswith(key)]
-                    self.assertEqual(len(matching),1)
-                    self.assertIn(str(band["count"])+" tokens;",matching[0])
+                self.assertEqual(b["appendix"],{"notes":[],"provenance":[]})
+                self.assertNotIn(str(inputs),json.dumps(b))
                 self.assertIsNone(b["tests"]);self.assertIsNone(b["circuit"])
                 self.assertLessEqual(len(b["exemplars"]["top"]),10)
                 self.assertLessEqual(len(b["exemplars"]["bottom"]),8)

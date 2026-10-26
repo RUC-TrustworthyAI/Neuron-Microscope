@@ -1,4 +1,4 @@
-"""Read all available neurons over one canonical1B-token corpus."""
+"""Read native neuron activations from a saved corpus archive."""
 from pathlib import Path
 import json
 import numpy as np

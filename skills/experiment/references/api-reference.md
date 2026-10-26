@@ -173,9 +173,9 @@ python scripts/label_spectrum.py --input /workspace/groups.json
 
 - Fresh request: groups is the group-definition array. Submit a nonempty, complete set of definitions.
 - Each definition: id is a unique stable string; name is its displayed name; description states the semantic membership criterion; pole is positive, negative or either. Supply all four fields. id and name are read by the tool; the definitions and pole drive classification and colours.
-- The sample set is all unique positions in the target report's points: extrema, quantile examples and scatter positions. It is neither only the cases used to propose a group nor all 1B corpus tokens.
+- The sample set is all unique positions in the target report's points: extrema, quantile examples and scatter positions. It is neither only the cases used to propose a group nor all tokens in the activation archive.
 - There is no sample-count or pilot-size argument. In particular, groups[*].case_ids does not select the labeling sample set. One group still sends all saved positions for classification.
-- Requests are internally batched in groups of 24 cases. For 434 saved positions, a fresh call makes 19 labeler requests, regardless of the number of semantic groups.
+- Requests are internally batched in groups of 24 cases. A fresh call makes ceil(n / 24) labeler requests for n saved positions, regardless of the number of semantic groups.
 - Numerical signs alone do not identify semantic groups. Independent blind tests remain separate from this scatter.
 - A result reports status, n_requested, n_assigned, groups, missing_case_ids, batch_count, n_retained, n_new_requested, resume_from and new_model_forwards. Unassigned cases do not imply a smaller input sample.
 
@@ -197,7 +197,7 @@ Replace spectrum-003 with the returned directory. The tool loads that directory'
 
 Call `scripts/run_tests.py` once. The writer receives the frozen initial explanation. Candidate count and text length come from settings.json. Its declared metric is the maximum or minimum over the written input. These measured candidates automatically receive the same follow-up calculations.
 
-Route prediction is paused. Its report slot stays —.
+Route prediction is disabled in this pipeline. Its report slot stays —.
 
 ## Complete
 

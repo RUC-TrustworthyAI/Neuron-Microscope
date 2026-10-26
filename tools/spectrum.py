@@ -89,7 +89,7 @@ def build(data, groups, assignments):
         definitions.append({'id':'unlabelled','name':'Unlabelled','description':'No resolved semantic assignment.','pole':'either','n':counts['unlabelled']})
     return {'edges':edges,'groups':definitions,'bins':bins,'points':points,
             'labeler':'DeepSeek high','sample_hist':{'counts':[b['n_labeled'] for b in bins]},
-            'sampling':'All unique saved report positions: extremes, quantile examples and scatter samples. These are sample counts, not estimated semantic frequencies across the 1B-token corpus.',
+            'sampling':'All unique saved report positions: extremes, quantile examples and scatter samples. These are sample counts, not estimated semantic frequencies across the full corpus.',
             'n_requested':len(points),'n_assigned':len(points)-counts['unlabelled']}
 
 def run(session, arguments, llm=None):

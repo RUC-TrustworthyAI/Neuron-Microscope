@@ -1,7 +1,6 @@
 {
   "repo": "https://api.github.com/repos/TransluceAI/circuits",
   "commit": "2d215d4ba016ba8602b69d71fc0f1ad139a427b7",
-  "fetched_at": "2026-10-24T06:45:42.955222+00:00",
   "implementation": "Forward-preserving HF Qwen3 adapter of the public RelP backward rules and local edge algorithm.",
   "source_files": [
     "circuits/tracing/grad/__init__.py",

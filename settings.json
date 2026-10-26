@@ -105,6 +105,6 @@
       4
     ],
     "source": "https://api-docs.deepseek.com/quick_start/pricing/",
-    "note": "Inherited experiment tariff; update for your endpoint. Estimates are not invoices."
+    "note": "Configure token prices for your API endpoint. Costs are estimates, not account invoices."
   }
 }

@@ -23,7 +23,7 @@
   const link = make('a', {href:original, target:'_blank', rel:'noopener noreferrer', title:'Open the original blog', 'aria-label':'Open the original blog'});
   link.innerHTML = externalIcon; leftHeading.append(link);
   const rightHeading = make('div', {id:'np-compare-right-heading', class:'np-compare-heading'});
-  rightHeading.append(make('strong', {}, 'Our report'), make('small', {}, neuron));
+  rightHeading.append(make('strong', {}, 'Generated report'), make('small', {}, neuron));
   const close = make('button', {id:'np-compare-close', type:'button', title:'Close comparison', 'aria-label':'Close comparison'}, '\u00d7');
   rightHeading.append(close);
   const divider = make('div', {id:'np-compare-divider', role:'separator', tabindex:'0', 'aria-label':'Resize comparison panes', 'aria-orientation':'vertical', 'aria-valuemin':'25', 'aria-valuemax':'75', 'aria-valuenow':'50'});
@@ -193,7 +193,7 @@
   function loadFrames() {
     let loaded=0;
     [reference,location.href].forEach((url,index) => {
-      const frame = make('iframe', {title:index===0?'Original blog \u00b7 '+neuron:'Our report \u00b7 '+neuron, src:url});
+      const frame = make('iframe', {title:index===0?'Original blog \u00b7 '+neuron:'Generated report \u00b7 '+neuron, src:url});
       frames[index]=frame;panes[index].prepend(frame);
       frame.addEventListener('load',()=>{
         panes[index].classList.add('np-compare-loaded');

@@ -1,4 +1,4 @@
-"""Isolated explanation-only writers; route prediction is paused."""
+"""Independent explanation-only candidate generation and scoring."""
 import hashlib
 import json
 import os
@@ -110,7 +110,7 @@ def record_tests(session,folder,tests):
 def run(session,args,llm=call):
     if args.get('only')=='route_prediction':
         return {'status':'not_run','tests':{'route_prediction':None},
-                'reason':'Route prediction is paused.',
+                'reason':'Route prediction is disabled in this pipeline.',
                 'new_model_forwards':0,'llm_requests':0}
     # This source is the incoming handoff, never caller-supplied examples or the official answer.
     claim=session.prior['interpretation']['claim']
@@ -173,9 +173,9 @@ def run(session,args,llm=call):
             'generated_candidates':{p:len(generated[p]) if isinstance(generated[p],list) else 1 for p in ['positive','negative']}}
     except Exception as e:statuses['writer']={'status':'failed','error':str(e)}
 
-    # Paused independently of atlas/factorization measurements.
+    # Route prediction is disabled; atlas and factorization measurements are separate.
     tests['route_prediction']=None
-    statuses['route_prediction']={'status':'not_run','reason':'Route prediction is paused.'}
+    statuses['route_prediction']={'status':'not_run','reason':'Route prediction is disabled in this pipeline.'}
     tests['execution']=statuses
     write(folder/'tests.json',tests)
     if measured_folder:

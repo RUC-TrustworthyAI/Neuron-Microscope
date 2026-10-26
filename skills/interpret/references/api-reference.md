@@ -1,6 +1,6 @@
 # Evidence API
 
-Run `scripts/read_evidence.py` relative to this skill directory. With no arguments it returns the evidence index for the assigned neuron. The host reads the target-only report package mounted at `/inputs/report`; raw 1B activation arrays and other neurons are not mounted.
+Run `scripts/read_evidence.py` relative to this skill directory. With no arguments it returns the evidence index for the assigned neuron. The host reads the target-only report package mounted at `/inputs/report`; the full activation archive and other neurons are not mounted.
 
 Options:
 

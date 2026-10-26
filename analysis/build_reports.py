@@ -239,7 +239,7 @@ class CaptureView:
 def render_report(data,out):
     data["_histogram_path"]=str(out/"histograms.npz")
     blocks=core.paper_blocks(data,PROFILE)
-    b=blocks["bundle"];identity=data["identity"];plan=data["plan"]
+    b=blocks["bundle"];identity=data["identity"]
     b["claim"]["title"]=("SOFTWARE FIXTURE · " if all(doc["source"].get("source_file")=="software-fixture" for doc in data["documents"].values()) else "")+identity["id"]+" · "+str(data["n_tokens"])+" saved tokens"
     b["claim"]["lede"]=f'{data["n_tokens"]:,} tokens · {data["n_documents"]:,} documents · saved native gate/value/product. Interpretation: —.'
     b["neuron"]["model"]=identity["model"]
@@ -255,30 +255,9 @@ def render_report(data,out):
     b["local_metadata"]={
         "statistics":data["statistics"],"sign_counts":data["gate_value_sign_counts"],
         "scatter_uniform_n":data["scatter_uniform_n"],"scatter_total":len(data["scatter"]),
-        "model_snapshot":plan.get("model_snapshot"),"batch_size":plan.get("batch_size"),
-        "attention":plan.get("attention"),"dtype":plan.get("dtype"),"max_tokens":plan.get("max_tokens"),
-        "dataset_seed":plan.get("dataset_seed"),"population_documents":data["n_documents"],
+        "population_documents":data["n_documents"],
     }
-    b["appendix"]["notes"]=[
-        "— denotes unavailable measurements or interpretation. No LLM, new target-model inference, attribution or ablation.",
-        "Main display: 10 document maxima, 8 document minima, seven bands of up to five. All saved extrema and 14 bands are in additional samples.",
-        "Extrema are ranks, not semantic poles: all-zero or one-sided units may have tied or zero-valued examples.",
-        "Quantile samples are uniform tokens within numeric intervals, not document extrema. Ties stay together; empty bands stay empty.",
-        "Main band tiles retain the highlighted extremum from the original window. Sampling-anchor values and full prefixes are shown separately.",
-        "Scatter: fixed-seed uniform tokens plus selected extreme and band anchors; not a population-density estimate.",
-        "Examples show up to 512 tokens before the highlighted peak, capped by the document start. Original sampling anchors, highlighted peaks and following context are retained.",
-        "Source integrity: read-only mappings and unchanged file metadata, not a full rehash of the terabyte capture.",
-    ]
-    b["appendix"]["notes"].extend(
-        "p%s–%s: [%s, %s%s; %s tokens; %s uniformly sampled anchors." %
-        (band["low"],band["high"],band["lower"],band["upper"],
-         "]" if band["upper_inclusive"] else ")",band["count"],len(band["points"]))
-        for band in data["bands"])
-    b["appendix"]["provenance"]=[
-        "Capture: "+plan["input_run"],"Snapshot: "+plan["model_snapshot"],
-        "Raw gate before SiLU; raw up/value; native down-projection input. Product is not recomputed.",
-        "Original Goodfire HTML/CSS/renderer with a local missing-data and provenance adapter.",
-    ]
+    b["appendix"]={"notes":[],"provenance":[]}
     contexts={}
     for pid,p in data["points"].items():
         doc=data["documents"][p["document"]];j=p["position"]

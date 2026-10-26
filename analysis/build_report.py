@@ -258,10 +258,10 @@ def package(records, cache, hist, quadrants, extremes, bands, inputs, tokenizer_
                              extremes="Exact token extrema and distinct-document extrema; ties ordered by scan index.",
                              scatter="Up to 256 uniform tokens, augmented by displayed extreme and band anchors; this is not a population-density plot.",
                              anatomy="Raw gate before SiLU, raw up/value, and captured native product; product is not recomputed.",
-                             contexts="Actual captured input IDs, with per-document context reset and 4096-token truncation; no new forwards."))
+                             contexts="Captured token IDs aligned with native activations; observed contexts end at the measured anchor."))
 
 def paper_blocks(d, profile=None):
-    """Map our measurements into the original paper schema; absent evidence stays absent."""
+    """Map measured data into the report schema; absent evidence stays absent."""
     import html
     missing = "—"
     def window(point_id, kind="extra", pole=None):
@@ -314,14 +314,11 @@ def paper_blocks(d, profile=None):
     top = [window(p,"top") for p in d["examples"]["top_documents"]]
     bottom = [window(p,"bottom") for p in d["examples"]["bottom_documents"]]
     bands = {}
-    descriptions = []
     for band in reversed(d["bands"]):
         key = "p%s–%s" % (band["low"],band["high"])
         main_source = any(x["source_key"]==key for x in (profile or {}).get("bands", []))
         bands[key] = [window(p, "band" if main_source else "additional_band",
                              "negative" if band["upper"]<=0 else "positive") for p in band["points"]]
-        descriptions.append("%s: [%s, %s%s; %s tokens; %s uniformly sampled anchors." %
-                            (key,band["lower"],band["upper"],"]" if band["upper_inclusive"] else ")",band["count"],len(band["points"])))
     points = [window(p) for p in d["scatter"]]
     anatomy_points = [dict(p, text=html.escape(p["text"]),peak_token=html.escape(p["peak_token"])) for p in points]
     # Tooltip strings in the original renderer are HTML; escape corpus text at this boundary.
@@ -342,11 +339,11 @@ def paper_blocks(d, profile=None):
     name = d["identity"]["id"]
     corpus_size = "1B" if d["n_tokens"]==1_000_000_000 else format(d["n_tokens"],",")+" tokens"
     fixture = all(doc["source"].get("source_file")=="software-fixture" for doc in d["documents"].values())
-    title = ("SOFTWARE FIXTURE · " if fixture else "")+name+" · FineWeb "+corpus_size
+    title = ("SOFTWARE FIXTURE · " if fixture else "")+name+" · "+corpus_size
     b = dict(neuron=dict(model=d["identity"]["model"],layer=d["identity"]["layer"],neuron=d["identity"]["neuron"],id=d["identity"]["id"],
                          autointerp_label=missing,autointerp_description=missing),
              version=dict(n=None,ts=None,history=[]),
-             claim=dict(title=title,lede="%s tokens · %s document sequences · BF16, batch 1, SDPA auto. Missing data: —." %
+             claim=dict(title=title,lede="%s tokens · %s document sequences · saved native gate/value/product." %
                         (format(d["n_tokens"],","),format(d["n_documents"],",")),
                         one_paragraph=missing,negative_pole=missing,what_would_change_my_mind=missing,confidence=missing),
              distribution=dict(mean=s["mean"],std=s["std"],n_tokens=d["n_tokens"],corpus_min=s["min"],corpus_max=s["max"],quantiles=qs),
@@ -356,23 +353,13 @@ def paper_blocks(d, profile=None):
                           strip=dict(text=strip["text"],tokens=strip["tokens"],gate=strip["gate_trace"],up=strip["up_trace"],act=strip["act"]),
                           headline=[]),
              headline=dict(strip=dict(text=strip["text"],tokens=strip["tokens"],values=strip["act"],
-                                      caption="A saved natural-corpus context at the strongest document peak; no synthetic probe.")),
-             bigscan=dict(n_tokens=d["n_tokens"],n_docs=d["n_documents"],corpus="FineWeb sample-10BT",
+                                      caption="Natural-corpus context at the strongest saved document peak.")),
+             bigscan=dict(n_tokens=d["n_tokens"],n_docs=d["n_documents"],corpus="Saved activation corpus",
                           hist=hh.tolist(),hist_centers=centers.tolist(),min=s["min"],max=s["max"],
                           harvest_min=None,harvest_max=None,top=[],bottom=[],quantiles={}),
              spectrum=None,routes=[],routes_matrix=None,routes_meta=None,clusters=[],family=None,
              circuit=None,logit_effect=None,ablation=None,graphs_curated=None,custom=None,tests=None,criticism=[],
-             appendix=dict(notes=["— denotes missing evidence or an experiment not performed. No semantic labels or agent explanations were generated.",
-                                   "Extreme lists show 30 distinct documents per pole, ranked by the saved native product. Exact token extrema are retained in extremes.json.",
-                                   "Anatomy: 256 uniform token anchors plus the union of token extrema, document extrema and band anchors (six token extrema are not among the 172 audited cases). Cluster labels are —; the quadrant table counts these displayed points, not the whole corpus. Its g-/u- columns include exact zero, matching the original renderer.",
-                                   "Full-population gate/value sign counts (negative, zero, positive) are retained in report.json and histograms.npz.",
-                                   "Both distribution panels use the same saved 1B-token population; the original author's separate harvest reference is —.",
-                                   "Quantiles: exact empirical linear quantiles from native BF16 counts. Numeric bands keep tied BF16 values together; empty bands remain empty. Anchor, not context maximum, determines band membership.",
-                                   *descriptions],
-                           provenance=["Source capture: "+d["plan"]["input_run"],"Model snapshot: "+d["plan"]["model_snapshot"],
-                                       "Uniform document sampling seed %s; per-document cap %s tokens." % (d["plan"]["dataset_seed"],d["plan"]["max_tokens"]),
-                                       "Raw gate before SiLU, raw up/value, captured native product. No product recomputation or model forwards.",
-                                       "Template: Goodfire neuron paper; all original scientific payloads replaced."]))
+             appendix=dict(notes=[],provenance=[]))
     review = dict(group_name=missing,organized=missing,understood=missing,confidence=None,one_line=missing,
                   main_job=missing,where_it_branches=[dict(branch=missing,grows_from=missing,path=missing,size=missing,evidence=missing)],
                   remainders=[dict(what=missing,share=missing,evidence=missing)],concerning=[missing],fine=[missing],

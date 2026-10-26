@@ -76,11 +76,11 @@ def merge_test_fields(previous,current):
 def merge(source, patches):
     bundle, (start,stop) = source_bundle(source)
     bundle.update(patches)
-    # Keep historical route scores in raw artifacts; current reports show a placeholder.
+    # Route prediction is disabled; retain raw artifacts and leave the report slot empty.
     tests=copy.deepcopy(bundle.get('tests') or {})
     had_route_score=tests.get('route_prediction') is not None
     tests['route_prediction']=None
-    tests.setdefault('execution',{})['route_prediction']={'status':'not_run','reason':'Route prediction is paused.'}
+    tests.setdefault('execution',{})['route_prediction']={'status':'not_run','reason':'Route prediction is disabled in this pipeline.'}
     bundle['tests']=tests
     if had_route_score:
         # The earlier combined summary includes the now-hidden route score.

@@ -27,5 +27,3 @@ docker run --rm --network none neuron-investigator:local \
 ```
 
 The image installs the public harness SDK and runtime packages. GPU measurement dependencies run on the host, as described in [running.md](running.md); they are not copied into each agent container.
-
-Keep credentials, local settings, model files, activation archives and run records outside Git. A prepared run snapshots only the framework's source directories and selected settings; it does not copy the repository's `.git`, local runs or weights. Scientific evidence and outputs are never edited to make a test pass. Changes to calculation or selection rules should be stated explicitly and exercised with a small fixture before starting a research run.
