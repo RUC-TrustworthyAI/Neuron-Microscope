@@ -16,7 +16,7 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory website
 
 演示使用静态 HTML、CSS 和 JavaScript，无需 API key、模型、GPU、Docker 或额外 Python 包。
 
-![Neuron Microscope 中文演示](../assets/live-demo-zh.png)
+![Neuron Microscope 中文演示](../assets/live-demo-zh-hd.png)
 
 ## 演示内容
 

@@ -40,7 +40,7 @@ Next, we plan to **[FUTURE PLANS]**. We welcome test results and feedback to hel
 
 Follow a real Colorado neuron investigation from its initial evidence page through all three agent stages. Explore prompt examples, key operations, measured experiments and saved interactive reports. The walkthrough opens in English by default, with a Chinese switch. Preview locally now; hosted access will follow once GitHub Pages is enabled.
 
-[![Preview of the Neuron Microscope walkthrough](assets/live-demo-en.png)](docs/live-demo.md)
+[![Preview of the Neuron Microscope walkthrough](assets/live-demo-en-hd.png)](docs/live-demo.md)
 
 ## ⚗️ How It Works <a id="workflow"></a>
 

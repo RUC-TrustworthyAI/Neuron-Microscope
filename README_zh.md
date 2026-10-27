@@ -40,7 +40,7 @@
 
 跟随一次真实的 Colorado neuron 研究，从初始证据页走完三个 agent 阶段，查看 Prompt 节选、关键操作、实验测量与交互报告。支持中英切换，默认英语；中文入口和打开方法见演示说明。目前可本地预览，组织套餐升级并启用 GitHub Pages 后上线。
 
-[![Neuron Microscope 逐步演示预览](assets/live-demo-zh.png)](docs/live-demo_zh.md)
+[![Neuron Microscope 逐步演示预览](assets/live-demo-zh-hd.png)](docs/live-demo_zh.md)
 
 ## ⚗️ 工作流程 <a id="workflow"></a>
 
