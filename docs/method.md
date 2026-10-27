@@ -6,9 +6,10 @@ The subject is a native dense-Qwen3 MLP neuron. The research agent uses a separa
 |---|---|---|
 | Source/configuration snapshot and containers | `run.sh`, `tools/launch_files.py` | Fixed host code |
 | Scan before explanation | `tools/initial_scan.py`, `anatomy_scan.py`, `anatomy_selection.py` | Saved activations; fixed sampling |
-| New scan/probe semantics | `tools/anatomy_semantics.py` | DeepSeek annotations of observed prefixes |
+| Response-group definitions | `skills/interpret/`, `skills/revise/` | Submitted with the initial and revised explanations |
+| Blind response prediction | `tools/blind_anatomy.py` | Independent text-only predictions from a fixed explanation and its groups |
 | Initial explanation | `skills/interpret/` | Agent 1 |
-| On-demand context/statistics | `tools/evidence.py`, `stage_session.py` | Saved target measurements |
+| On-demand context/statistics | `tools/evidence.py`, `stage_session.py`, `stage_brief.py` | Saved target measurements, section summaries and prediction feedback |
 | Replacement sweeps | `tools/model_tools.py` | Agent designs text; model supplies numbers |
 | Full-prefix scoring and automatic followups | `tools/experiment_defaults.py`, `followups.py` | Fixed selection and saved conditions |
 | Activation search / family / atlas | `tools/paper_sections.py` | Agent plan and measured native responses |
@@ -18,11 +19,20 @@ The subject is a native dense-Qwen3 MLP neuron. The research agent uses a separa
 | Revision and Criticism | `skills/revise/` | Agent 3 from the measured handoff |
 | Independent reader | `tools/paper_reading.py` | Separate LLM reading and classification |
 | HTML structure, plots and costs | `tools/report*.py`, `analysis/report.html` | Fixed rendering of submitted data and prose |
+| Display-only updates | `tools/report_annotations.py` | Saved measurements and submitted caption/selection updates |
 | API requests, tokens and estimates | `tools/api_meter.py` | Host proxy; full request/response records |
 
 The three skills are files mounted into fresh containers and explicitly named in each short task. The agent loads the instructions and calls their scripts over a Unix socket. Only one skill is present per stage.
 
 Measurements use native BF16 channels, full captured prefixes, explicit score positions and signed response poles. Corpus sample counts are not population semantic coverage. A coherent description, a predictive explanation and a causal account remain different claims.
+
+## Explanation and prediction
+
+The initial agent reads saved extrema, quantile examples and statistics, then submits an explanation and response groups: at most three positive conditions, three negative conditions, and one No visible cue group. Each directional group describes a textual condition and its anchor position. The fixed prediction prompt is in `tools/blind_anatomy.py`.
+
+After that submission, an independent predictor receives the fixed explanation, group definitions, complete observed prefixes and anchors. It does not receive measured activations or gate/up values. Fixed code joins predictions to measurements for feedback. The experiment stage reuses predictions for identical inputs and the same explanation, adding predictions for new measured contexts. The revision agent reads this feedback alongside experimental results before submitting its revised explanation. A document-disjoint final set is revealed after submission.
+
+Anatomy coordinates and spectrum bins use measured values; colours show predicted response groups. Strong prediction disagreements can challenge the explanation. Values close to zero provide weak evidence about directional selectivity. Semantic Clusters over attribution graphs are a separate grouping described below.
 
 ## RelP and intervention scope
 

@@ -272,7 +272,7 @@ def run(request,output,runtime=None):
         raw['route_assignments']=factors['assignments']
         write(output/'sections.json',patch)
     family=plan.get('family')
-    if family:
+    if family and family.get('cases'):
         units={coord(u):u for u in family.get('units',[])}
         circuit=patch.get('circuit',{})
         for side in ['upstream','downstream']:

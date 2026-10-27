@@ -54,5 +54,18 @@ class SemanticClusterTests(unittest.TestCase):
             self.assertEqual(member['observed_prefix'],rows[1]['observed_prefix'])
             self.assertEqual(member['selected']['product'],.2)
 
+    def test_derived_followups_without_status_retain_completed_members(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp);rows=self.fixture(folder)
+            for row in rows:row.pop('status')
+            rows.append({'id':'failed','status':'failed'})
+            write(folder/'atlas-raw.json',rows)
+            bundle={}
+            apply(bundle,[{'id':'all','name':'All measured members',
+                           'graph_ids':['a','b','c','d'],'example_graph_ids':['b','c']}],[folder])
+            self.assertEqual(bundle['clusters'][0]['graph_ids'],['a','b','c','d'])
+            self.assertEqual([e['activation'] for e in bundle['clusters'][0]['examples']],[.2,-3.])
+            self.assertEqual(evidence([folder],{})['n_members'],4)
+
 
 if __name__=='__main__':unittest.main()

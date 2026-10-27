@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="title desc">
   <title id="title">Neuron Microscope data flow</title>
-  <desc id="desc">Saved activations are sampled and semantically labelled before interpretation. Three separate agent containers exchange JSON and HTML. Only the experiment stage requests new model measurements from a host GPU worker. Fixed code publishes the revised report.</desc>
+  <desc id="desc">Saved activations are sampled before interpretation. After the initial explanation and response groups are submitted, an independent predictor labels feedback samples. Three separate agent containers exchange JSON and HTML. The experiment stage requests model measurements from a host GPU worker. Final submission is followed by independent review and held-out prediction.</desc>
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10" fill="none" stroke="#50545a" stroke-width="1.5"/></marker></defs>
   <rect width="1280" height="470" rx="18" fill="#f6f9fe"/>
   <g font-family="Helvetica, Arial, sans-serif" fill="#1e3551">
@@ -9,7 +9,7 @@
     <rect x="24" y="100" width="212" height="112" rx="10" fill="#edf3fc" stroke="#c4d5eb" stroke-width="1.5"/>
     <text x="42" y="135" font-size="23">Prepare evidence</text>
     <text x="42" y="170" font-size="18" fill="#60738b">Sample by amplitude</text>
-    <text x="42" y="195" font-size="18" fill="#60738b">LLM semantic labels</text>
+    <text x="42" y="195" font-size="18" fill="#60738b">Reserve scan samples</text>
 
     <g stroke="#50545a" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
       <path d="M236 156H346"/>
@@ -18,7 +18,7 @@
     </g>
     <g text-anchor="middle" font-size="18" fill="#60738b">
       <text x="292" y="143">Evidence</text>
-      <text x="629" y="143">Claim</text>
+      <text x="629" y="143" font-size="14">Claim + labels</text>
       <text x="956" y="143">Results</text>
     </g>
 
@@ -42,6 +42,7 @@
       <text x="696" y="183">skills/experiment/</text>
       <text x="1024" y="183">skills/revise/</text>
     </g>
+    <text x="368" y="160" font-size="14" fill="#60738b">Explain → blind feedback</text>
 
     <path d="M794 221V298" stroke="#50545a" stroke-width="1.5" marker-start="url(#arrow)" marker-end="url(#arrow)"/>
     <text x="810" y="260" font-size="17" fill="#60738b">Tool calls / measurements</text>
@@ -51,6 +52,7 @@
     <text x="628" y="396" font-size="18" fill="#60738b">Read-only weights and saved inputs</text>
 
     <path d="M1131 212V300" stroke="#50545a" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="1010" y="280" font-size="14" fill="#60738b">Review + held-out predictions</text>
     <rect x="1006" y="307" width="250" height="115" rx="10" fill="white" stroke="#c9d7e6" stroke-width="1.5"/>
     <text x="1024" y="339" font-size="21">Render and publish</text>
     <text x="1024" y="370" font-size="18" fill="#60738b">Text + measurements</text>

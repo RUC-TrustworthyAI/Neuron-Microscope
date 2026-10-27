@@ -2,7 +2,7 @@
 
 ## Host and container
 
-Use Linux and Bash 4+ for the production shell orchestration. The offline demo can also run on macOS. Python must be 3.10 or newer.
+Use Linux and Bash 4+ for container orchestration. The offline demo can also run on macOS. Python must be 3.10 or newer.
 
 The host reads saved arrays, serves evidence and runs GPU workers. Containers run the agent only; installing CUDA in the agent image is unnecessary. Each container receives a single skill and an isolated workspace. Inputs and handoffs are read-only mounts. The first agent receives only its own report directory; full activations and weights are not mounted there. Host preparation uses the archive and tokenizer before that agent starts.
 
@@ -11,9 +11,9 @@ Install host dependencies:
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements/gpu.txt
 # Choose a CUDA wheel compatible with your NVIDIA driver.
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
+python -m pip install -r requirements/gpu.txt
 ```
 
 The recorded development environment used torch 2.7.1+cu118, Transformers 4.57.6, tokenizers 0.22.2, NumPy 2.2.6, PyArrow 21.0.0 and SciPy 1.15.3. The adapter shards complete dense-Qwen3 layers over the configured GPU group. Available memory depends on model size, input prefixes and backward storage; changing the group does not change the model identity.
@@ -82,7 +82,9 @@ python -m http.server 8000 --directory results/example
 
 Publication preserves the generated scientific content and adds shared display controls. If `paths.references/Lx_Ny.html` exists, the export includes a local original-page snapshot and a collapsible Compare control. Its two panes align corresponding sections and subsections, link scrolling, and support a resizable divider. The reference page is never mounted into an agent or included in a scientific handoff. Without a reference snapshot, publication exports the independent report without that control.
 
-Top, Bottom, quantile samples, and cluster examples share the display rule: retain up to 128 saved tokens before the first token highlighted by the existing colour rule, while preserving the scored anchor and the remaining saved context. This does not shorten model inputs or change measurements.
+Top, Bottom, quantile and cluster examples initially show the selected anchor with up to 32 preceding tokens; expand an example to read its saved context. Activation spectrum examples retain up to 128 saved tokens before the first highlighted activation. Display windows do not change model inputs or scoring positions.
+
+During the experiment and revision stages, `scripts/read_evidence.py --section brief` combines section summaries, experiment paths and prediction feedback. `--sections SECTION ...` reads several complete evidence sections in one call. After a final submission, `scripts/render_report.py` in the revision skill can update captions, introductions and displayed figure selections without repeating review or response prediction; see its [API](../skills/revise/references/api-reference.md#update-captions-and-presentation).
 
 ## Records
 
@@ -90,7 +92,8 @@ Top, Bottom, quantile samples, and cluster examples share the display rule: reta
 - `framework-source/`: runtime source used by this run.
 - `logs/api/`: each complete outgoing request, streamed response, usage and billing estimate.
 - `logs/usage.json`: cumulative estimates and in-flight/unknown reservations.
-- `units/Lx_Ny/01-interpretation/preparation/initial-scan/`: scan and semantic labeling.
+- `units/Lx_Ny/01-interpretation/preparation/initial-scan/`: amplitude-stratified scan and document split.
+- `units/Lx_Ny/*/workspace/response-predictions-*/`: frozen explanations and per-sample predictions joined to measured responses.
 - `units/Lx_Ny/*/logs/agent/`: harness events and terminal status.
 - `units/Lx_Ny/*/workspace/`: tool inputs, outputs and full spilled shell results.
 - `units/Lx_Ny/*/handoff/`: JSON, HTML and measured artifacts for the next stage.

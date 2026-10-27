@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Render synthetic saved activations using production analysis and report code."""
+"""Render synthetic saved activations using the shared analysis and report code."""
 import argparse
 import json
 import sys
@@ -47,7 +47,7 @@ def main():
     (out/'index.html').write_text(page)
     core.write(out/'paper-data.json',{'bundle':bundle})
     core.write(out/'demo.json',{'synthetic':True,'model_forwards':0,'llm_requests':0,
-                               'renderer':'production saved-data and report modules'})
+                               'renderer':'shared saved-data and report modules'})
     print(out/'index.html')
 
 if __name__=='__main__':main()

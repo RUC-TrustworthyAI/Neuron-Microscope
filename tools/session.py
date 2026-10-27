@@ -240,7 +240,7 @@ class Session:
             while (self.root/('paper' if number==1 else 'paper-%03d'%number)).exists():number+=1
             suffix='' if number==1 else '-%03d'%number
             interpretation=self.root/('interpretation'+suffix);interpretation.mkdir()
-            write(interpretation/'output.json',{k:arguments[k] for k in ['claim','criticism','agent_read'] if k in arguments})
+            write(interpretation/'output.json',{k:arguments[k] for k in ['claim','criticism','agent_read','response_rules'] if k in arguments})
             for name in ['input.json','manifest.json']:
                 source=self.root/'evidence'/name
                 if source.exists():write(interpretation/name,read(source))
@@ -255,9 +255,9 @@ class Session:
                                and (Path(j['request']['output'])/'graph.json').exists()]}
             request['sections']=[j['request']['output'] for j in self.jobs
                                  if j['tool'] in ['paper_sections','followup_measurements'] and (Path(j['request']['output'])/'sections.json').exists()]
-            if self.config.get('stage')=='02-experiments':
-                self.finalize_anatomy(request)
             write(interpretation/'agent-output.json',arguments)
+            if self.config.get('stage') in ('01-interpretation','02-experiments','03-revision'):
+                self.finalize_anatomy(request)
             write(interpretation/'publication-request.json',request)
             result=render(request,paper)
             write(self.root/'latest-paper.json',{'path':str(paper/'index.html')})

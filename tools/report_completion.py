@@ -115,13 +115,46 @@ def full_reading(bundle):
     bundle['agent_read_full']=full
 
 
+def measured_contexts(bundle,report,folders=()):
+    """Attach existing native traces to the displayed graph and steering inputs."""
+    folders=[*(Path(report)/'artifacts').glob('graphs-*'),*map(Path,folders)]
+    measured={};by_prompt={}
+    for folder in folders:
+        path=folder/'result.json'
+        if not path.is_file():continue
+        result=read(path);trace=result.get('trace') or []
+        if result.get('status')!='complete' or not trace:continue
+        graph=result.get('graph') or {}
+        identity=graph.get('id') or folder.name.removeprefix('graphs-')
+        context={'text':''.join(t['token'] for t in trace),
+                 'token_activations':[{'token':t['token'],'activation':t['product']} for t in trace],
+                 'peak_index':graph.get('position',len(trace)-1)}
+        peak=context['peak_index'];context['activation']=trace[peak]['product']
+        measured[identity]=context
+        steering=result.get('steering') or {}
+        if steering.get('prompt'):by_prompt[steering['prompt']]=context
+    graphs=bundle.get('graphs_curated') or {}
+    for pick in (graphs if isinstance(graphs,list) else graphs.get('picks',[])):
+        context=measured.get(pick.get('id'))
+        if context:pick['graph']['token_activations']=copy.deepcopy(context['token_activations'])
+    for row in (bundle.get('tests') or {}).get('steering',[]):
+        context=by_prompt.get(row.get('prompt'))
+        if context:row['activation_context']=copy.deepcopy(context)
+
+
 def complete(bundle,request,data=None):
     from anatomy_selection import build
     if request.get('report') and (Path(request['report'])/'report.json').is_file():
         build(bundle,data if data is not None else read(Path(request['report'])/'report.json'),request)
-    from anatomy_semantics import apply, prior_labels
-    apply(bundle,prior_labels(request))
+    from blind_anatomy import apply as apply_predictions, prior
+    predictions=prior(request)
+    if predictions:
+        apply_predictions(bundle,predictions[-1])
+    else:
+        from anatomy_semantics import apply, prior_labels
+        apply(bundle,prior_labels(request))
     corpus_counts(bundle)
     minimal_pairs(bundle,request.get('sweeps',[]),request.get('report'))
     unit_labels(bundle,request.get('sections',[]))
+    measured_contexts(bundle,request.get('report','.'),request.get('graphs',[]))
     full_reading(bundle)

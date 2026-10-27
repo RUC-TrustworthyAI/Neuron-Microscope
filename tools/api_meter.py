@@ -1,6 +1,6 @@
 """Shared native-Messages/ChatCompletions meter with the existing configured tariff."""
 import datetime as dt
-import http.server,json,os,secrets,threading,urllib.request,urllib.error,ssl,time
+import http.server,json,os,secrets,threading,urllib.request,urllib.error,ssl,time,hashlib
 from pathlib import Path
 from common import write as save
 def write(path,value):
@@ -21,6 +21,11 @@ class Budget:
         key_file=os.environ.get('NEURON_PAPER_API_KEY_FILE')
         self.key=Path(key_file).read_text().strip() if key_file else os.environ.get('DEEPSEEK_API_KEY','').strip()
         if not self.key:raise ValueError('Set DEEPSEEK_API_KEY or NEURON_PAPER_API_KEY_FILE on the host.')
+        from api_concurrency import RequestSlots
+        from settings import paths
+        state=Path(manifest.get('paths',{}).get('state') or paths(defaults)['state'])
+        account=hashlib.sha256(self.key.encode()).hexdigest()
+        self.slots=RequestSlots(state/'api-concurrency'/account,self.llm.get('max_concurrent_requests',10))
         self.usage={'prompt_tokens':0,'prompt_cache_hit_tokens':0,'prompt_cache_miss_tokens':0,'completion_tokens':0,'total_tokens':0}
         previous=run/'logs/usage.json'
         if previous.exists():
@@ -67,8 +72,11 @@ def handler(budget):
         write(dest/'request.json',req)
         started=dt.datetime.now(dt.timezone.utc)
         write(dest/'attempt.json',{'started_at':started.isoformat(),'reserved_usd':reserve,'client_route':self.path})
-        usage=None;attempted=False;completed=False
+        usage=None;attempted=False;completed=False;slot=None;queue_seconds=0.
+        first_chunk=None;last_chunk=None
+        request_clock=time.monotonic();first_chunk_clock=None;last_chunk_clock=None
         try:
+            slot=budget.slots.acquire();queue_seconds=time.monotonic()-request_clock
             endpoint=budget.llm['messages_url'] if is_messages else budget.llm['chat_url']
             headers={'x-api-key':budget.key,'anthropic-version':'2023-06-01','Content-Type':'application/json'} if is_messages else {'Authorization':'Bearer '+budget.key,'Content-Type':'application/json'}
             request=urllib.request.Request(endpoint,data=raw,headers=headers)
@@ -79,6 +87,9 @@ def handler(budget):
                 self.send_response(resp.status);self.send_header('Content-Type',resp.headers.get('Content-Type','text/event-stream'));self.end_headers()
                 write(dest/'headers.json',{'status':resp.status,'date':resp.headers.get('Date'),'request_id':resp.headers.get('x-request-id')})
                 for line in resp:
+                    if line.startswith(b'data:'):
+                        last_chunk=dt.datetime.now(dt.timezone.utc);last_chunk_clock=time.monotonic()
+                        if first_chunk is None:first_chunk=last_chunk;first_chunk_clock=last_chunk_clock
                     log.write(line);log.flush()
                     if line.startswith(b'data:'):
                         try:
@@ -107,6 +118,14 @@ def handler(budget):
             try:self.send_error(502,'Upstream request failed')
             except Exception:pass
         finally:
+            if slot is not None:budget.slots.release(slot)
+            write(dest/'timing.json',{'started_at':started.isoformat(),
+                'first_chunk_at':first_chunk.isoformat() if first_chunk else None,
+                'last_chunk_at':last_chunk.isoformat() if last_chunk else None,
+                'finished_at':dt.datetime.now(dt.timezone.utc).isoformat(),
+                'request_seconds':time.monotonic()-request_clock,'queue_seconds':queue_seconds,
+                'stream_seconds':last_chunk_clock-first_chunk_clock if first_chunk_clock is not None else 0.,
+                'completed':completed})
             with budget.lock:
                 budget.pending-=reserve
                 if usage:

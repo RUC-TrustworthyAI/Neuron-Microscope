@@ -48,8 +48,14 @@ def strip_capture_table(source):
 
 
 def presentation(source):
-    """Shared report layout; keep long verdicts readable and Appendix unfilled."""
-    style = '<style id="neuron-paper-layout">\n' + "#criticism .crow > summary{\n  display:grid;grid-template-columns:2rem minmax(0,1fr);\n  gap:.5rem 1rem;align-items:start;padding:14px 0;\n}\n#criticism .crow > summary > .n{grid-column:1;grid-row:1 / span 2;line-height:1.5}\n#criticism .crow > summary > span:nth-child(2){grid-column:2;min-width:0}\n#criticism .crow > summary .pill{\n  display:inline-block;box-sizing:border-box;max-width:100%;\n  white-space:normal;overflow-wrap:anywhere;word-break:normal;\n  text-transform:none;letter-spacing:0;line-height:1.5;padding:3px 8px;\n}\n#criticism .crow > summary > .att{\n  grid-column:2;min-width:0;white-space:normal;overflow:visible;\n  text-overflow:clip;overflow-wrap:anywhere;line-height:1.5;\n}\n#criticism .crow .bodyc{padding:0 0 16px 3rem}\n@media(max-width:600px){\n  #criticism .crow > summary{grid-template-columns:1.25rem minmax(0,1fr);gap:.5rem .75rem}\n  #criticism .crow .bodyc{padding-left:2rem}\n}" + '\n</style>'
+    """Shared report layout; short verdict badges, readable challenges and blank Appendix."""
+    style = """<style id="neuron-paper-layout">
+#criticism .crow > summary .pill{max-width:100%;white-space:nowrap}
+@media(max-width:600px){
+  #criticism .crow > summary{grid-template-columns:24px 90px minmax(0,1fr);gap:0 10px}
+  #criticism .crow .bodyc{padding-left:0}
+}
+</style>"""
     source = re.sub(r'<style id="neuron-paper-layout">.*?</style>', '', source, flags=re.S)
     source = source.replace('</head>', style + '\n</head>', 1)
     appendix = """// 9. Appendix.
@@ -101,6 +107,10 @@ def merge(source, patches):
     source=render_spectrum(source)
     from saved_display import render as render_saved
     source=render_saved(source)
+    # Layout transforms can change text before the bootstrap, including styles.
+    # Locate it in the transformed source instead of reusing earlier offsets.
+    start = source.find('const B =')
+    stop = source.find('const POS =',start)
     source = source[:start]+"const B = JSON.parse(document.getElementById('bundle').textContent);\n\n"+source[stop:]
     match = BUNDLE.search(source)
     encoded = json.dumps(bundle,ensure_ascii=False,allow_nan=False,separators=(',',':')).replace('<','\\u003c').replace('\u2028','\\u2028').replace('\u2029','\\u2029')
@@ -123,7 +133,7 @@ def merge(source, patches):
         source = source.replace('none among visible source-to-root lines','none among visible edges')
         source = source.replace('Node size follows total first-order influence on the root; lines do not isolate direct neuron-to-neuron edges. The thick black ring marks this neuron.',
             'Node size follows RelP influence on the root. Edges show signed flow between neurons; the thick black ring marks this neuron.')
-    source = source.replace("'Three graphs'", "'Attribution graphs'")
+    source = source.replace("'Attribution graphs'", "'Three graphs'")
     source = source.replace("'circuit','tests'];", "'circuit','tests','appendix','criticism'];")
     source=re.sub(r"(if\(node.textContent!=='One sentence, three signals'\)return;)(?:\s*if\(B\.anatomy\?\.strip\?\.case_id\)return;)*",
         r"\1 if(B.anatomy?.strip?.case_id)return;", source)
@@ -171,7 +181,8 @@ def merge(source, patches):
     source=source.replace('</body>',adapter+'\n</body>') if '</body>' in source else source+adapter
     source=re.sub(r'<!-- paper-review:start -->.*?<!-- paper-review:end -->','',source,flags=re.S)
     from report_layout import render as align_layout
-    return readable_data_scripts(strip_capture_table(presentation(align_layout(source)))), bundle
+    from exemplar_display import render as render_exemplars
+    return readable_data_scripts(strip_capture_table(presentation(render_exemplars(align_layout(source))))), bundle
 
 def run(request,output):
     output, report = Path(output), Path(request['report']).resolve()
@@ -191,6 +202,10 @@ def run(request,output):
         number=2 if request['stage']=='03-revision' else 1
         patches['version']={'n':number,'ts':now(),'history':[]}
     annotations=read(request['annotations']) if request.get('annotations') else {}
+    selection={**effective.get('display_selection',{})}
+    for key in ['headline_figure_id','graph_ids']:
+        if key in annotations:selection[key]=annotations[key]
+    if selection:patches['display_selection']=selection
     applied_annotations={'figures':set(),'graphs':set()}
     if request.get('interpretation'):
         interpretation = Path(request['interpretation']).resolve()
@@ -242,6 +257,9 @@ def run(request,output):
         if source_request.exists() and read(source_request).get('only')=='route_prediction':
             refreshed_test_fields.add('route_prediction')
         for key,value in section_data.items():
+            # An omitted measurement round must not erase an earlier measured family.
+            if key=='family' and not value.get('measurements'):
+                continue
             if key=='ablation':
                 from followups import combine_ablations
                 value=combine_ablations(patches.get(key) or effective.get(key),value)
@@ -311,7 +329,7 @@ def run(request,output):
     from report_completion import complete
     combined=copy.deepcopy({**effective,**patches})
     complete(combined,request,data)
-    for field in ['spectrum','anatomy','family','circuit','routes','clusters','agent_read_full']:
+    for field in ['spectrum','anatomy','family','circuit','routes','clusters','agent_read_full','graphs_curated','tests']:
         if field in combined:patches[field]=combined[field]
     page,bundle = merge(source,patches)
     (output/'index.html').write_text(page)
@@ -356,15 +374,36 @@ def refresh_review(report,review,output):
 
 
 def refresh_layout(report,output,sections=(),bundle_patch=None):
-    """Render saved data with current presentation code and any saved Tests sections."""
+    """Render saved data, restoring measured sections from their existing artifacts."""
     import os
     report,output=Path(report),Path(output)
     shutil.copytree(report,output,copy_function=os.link)
     saved,_=source_bundle((report/'index.html').read_text())
     patch=copy.deepcopy(bundle_patch or {})
+    if saved.get('headline') and (report/'report.json').is_file():
+        from report_layout import headline
+        patch['headline']=headline({**saved,**patch},report,sections)
     for folder in sections:
-        tests=read(Path(folder)/'sections.json').get('tests')
+        section_data=read(Path(folder)/'sections.json')
+        tests=section_data.get('tests')
         if tests:patch['tests']=merge_test_fields(patch.get('tests') or saved.get('tests'),tests)
+        family=section_data.get('family')
+        if family and family.get('measurements'):patch['family']=copy.deepcopy(family)
+    if 'family' in patch and (report/'annotations.json').is_file():
+        from paper_sections import labelled
+        patch['family']=labelled({'family':patch['family']},read(report/'annotations.json'))['family']
+    definitions=patch.get('cluster_definitions',saved.get('cluster_definitions'))
+    if definitions is not None and sections:
+        from semantic_clusters import apply as apply_semantic_clusters
+        combined={**saved,**patch}
+        apply_semantic_clusters(combined,definitions,sections)
+        for key in ['clusters','cluster_definitions','cluster_source']:
+            if key in combined:patch[key]=combined[key]
+    from report_completion import measured_contexts
+    combined=copy.deepcopy({**saved,**patch})
+    measured_contexts(combined,report)
+    for key in ['graphs_curated','tests']:
+        if combined.get(key)!=saved.get(key):patch[key]=combined[key]
     page,bundle=merge((report/'index.html').read_text(),patch)
     temporary=output/'index.html.tmp'
     temporary.write_text(page)

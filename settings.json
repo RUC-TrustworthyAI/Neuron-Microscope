@@ -26,15 +26,15 @@
   "atlas": {
     "documents": 12,
     "extremes_per_pole": 4,
-    "reader_count": 8,
+    "reader_count": 30,
     "top_units": 128,
     "routes_per_pole": 3,
     "holdout_fraction": 0.25,
     "nmf_steps": 200
   },
   "family": {
-    "cases": 4,
-    "neighbours_per_side": 6
+    "cases": 11,
+    "neighbours_per_side": 10
   },
   "graphs": {
     "mlp_nodes": 64,
@@ -78,6 +78,7 @@
     "provider": "deepseek-official",
     "model": "deepseek-flash",
     "reasoning_effort": "high",
+    "max_concurrent_requests": 10,
     "max_output_tokens": 393216,
     "chat_url": "https://api.deepseek.com/chat/completions",
     "messages_url": "https://api.deepseek.com/anthropic/v1/messages"

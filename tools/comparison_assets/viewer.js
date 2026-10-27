@@ -11,19 +11,29 @@
     if (text !== undefined) element.textContent = text;
     return element;
   };
-  const panelIcon = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2.2" y="3.5" width="15.6" height="13" rx="2"/><path d="M9 3.5v13M5.8 8l-2 2 2 2"/></svg>';
+  const panelIcon = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2.2" y="3.5" width="15.6" height="13" rx="2"/><path d="M9 3.5v13"/><path class="np-compare-arrow" d="M4.5 8l2 2-2 2"/></svg>';
   const externalIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M9 2h5v5M14 2 7 9M7 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9"/></svg>';
-  const toggle = make('button', {id:'np-compare-toggle', type:'button', 'aria-label':'Compare with the original blog', 'aria-expanded':'false', 'aria-controls':'np-compare-shell', title:'Compare with the original blog'});
+  const toggle = make('button', {id:'np-compare-toggle', type:'button', 'aria-label':'Compare reports', 'aria-expanded':'false', 'aria-controls':'np-compare-shell', title:'Compare reports'});
   toggle.innerHTML = panelIcon;
-  toggle.append(make('span', {}, 'Compare'));
+  const toggleLabel = make('span', {}, 'Compare reports');
+  const toggleArrow = toggle.querySelector('.np-compare-arrow');
+  toggle.append(toggleLabel);
+  const setToggleState = expanded => {
+    const label = expanded ? 'Close comparison' : 'Compare reports';
+    toggleLabel.textContent = label;
+    toggleArrow.setAttribute('d', expanded ? 'M6.5 8l-2 2 2 2' : 'M4.5 8l2 2-2 2');
+    toggle.setAttribute('aria-expanded', String(expanded));
+    toggle.setAttribute('aria-label', label);
+    toggle.title = label;
+  };
   document.body.append(toggle);
   const shell = make('div', {id:'np-compare-shell', role:'dialog', 'aria-label':'Compare the same neuron', 'aria-modal':'true', hidden:''});
   const leftHeading = make('div', {id:'np-compare-left-heading', class:'np-compare-heading'});
-  leftHeading.append(make('strong', {}, 'Original blog'), make('small', {}, neuron));
-  const link = make('a', {href:original, target:'_blank', rel:'noopener noreferrer', title:'Open the original blog', 'aria-label':'Open the original blog'});
+  leftHeading.append(make('strong', {}, 'Published report'), make('small', {}, neuron));
+  const link = make('a', {href:original, target:'_blank', rel:'noopener noreferrer', title:'Open published report', 'aria-label':'Open published report'});
   link.innerHTML = externalIcon; leftHeading.append(link);
   const rightHeading = make('div', {id:'np-compare-right-heading', class:'np-compare-heading'});
-  rightHeading.append(make('strong', {}, 'Generated report'), make('small', {}, neuron));
+  rightHeading.append(make('strong', {}, 'Replication report'), make('small', {}, neuron));
   const close = make('button', {id:'np-compare-close', type:'button', title:'Close comparison', 'aria-label':'Close comparison'}, '\u00d7');
   rightHeading.append(close);
   const divider = make('div', {id:'np-compare-divider', role:'separator', tabindex:'0', 'aria-label':'Resize comparison panes', 'aria-orientation':'vertical', 'aria-valuemin':'25', 'aria-valuemax':'75', 'aria-valuenow':'50'});
@@ -50,7 +60,7 @@
     if (head) {
       add(head.querySelector('.lede'),'head-lede');
       add(head.querySelector('.pr-box'),'head-agent-read');
-      add(head.querySelector('.headline'),'head-headline');
+      add(head.querySelector(':scope > .headline-poles, :scope > .headline'),'head-headline');
       add(head.querySelector('.metarow'),'head-meta');
     }
     doc.querySelectorAll('main > section[id], main > .prf[id]').forEach(section=>{
@@ -75,6 +85,30 @@
       roles.forEach(([key,pattern])=>{
         add(titles.find(title=>pattern.test(title.textContent.trim())),key);
       });
+    }
+    const clusters=doc.getElementById('clusters');
+    if (clusters) {
+      const raw=[...clusters.querySelectorAll('details > summary')].find(
+        title=>/^Raw factorization\b/i.test(title.textContent.trim()));
+      add(raw?.parentElement,'clusters-raw-factorization');
+    }
+    const family=doc.getElementById('family');
+    if (family) {
+      const heatmap=family.querySelector('svg:not(.wires)');
+      add(heatmap?.parentElement,'family-heatmap');
+      add(family.querySelector('.neighwrap'),'family-neighbourhood');
+    }
+    const routeTitle=[...doc.querySelectorAll('#tests .sub')].find(
+      node=>/^Route prediction$/i.test(node.textContent.trim()));
+    add(routeTitle?.closest('figure') || routeTitle,'tests-route-prediction');
+    const criticism=doc.getElementById('criticism');
+    if (criticism) {
+      let end=doc.querySelector('[data-np-criticism-end]');
+      if (!end) {
+        end=doc.createElement('div');end.dataset.npCriticismEnd='';
+        end.setAttribute('aria-hidden','true');criticism.after(end);
+      }
+      add(end,'criticism-end');
     }
     return anchors.sort((a,b)=>a.compareDocumentPosition(b)&4?-1:1);
   };
@@ -193,7 +227,7 @@
   function loadFrames() {
     let loaded=0;
     [reference,location.href].forEach((url,index) => {
-      const frame = make('iframe', {title:index===0?'Original blog \u00b7 '+neuron:'Generated report \u00b7 '+neuron, src:url});
+      const frame = make('iframe', {title:index===0?'Published report \u00b7 '+neuron:'Replication report \u00b7 '+neuron, src:url});
       frames[index]=frame;panes[index].prepend(frame);
       frame.addEventListener('load',()=>{
         panes[index].classList.add('np-compare-loaded');
@@ -205,8 +239,7 @@
     if (opened) return;
     savedPosition=capture(window);opened=true;shell.hidden=false;
     document.documentElement.classList.add('np-comparing');
-    toggle.setAttribute('aria-expanded','true');
-    toggle.setAttribute('aria-label','Close comparison');toggle.title='Close comparison';
+    setToggleState(true);
     if (!frames.length) loadFrames();
     else if (ready) {
       align();
@@ -220,7 +253,7 @@
     if (!opened) return;
     const position=ready?capture(frames[1].contentWindow):savedPosition;
     opened=false;shell.hidden=true;document.documentElement.classList.remove('np-comparing');
-    toggle.setAttribute('aria-expanded','false');toggle.setAttribute('aria-label','Compare with the original blog');toggle.title='Compare with the original blog';
+    setToggleState(false);
     window.scrollTo({top:positionAt(window,position),behavior:'instant'});
     toggle.focus({preventScroll:true});
   }

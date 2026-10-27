@@ -6,6 +6,7 @@ import copy
 import math
 from pathlib import Path
 from common import read, write, now
+from measured_response import annotate_spectrum, semantic_definition, response_pole
 
 def window(data, case_id, before=512, after=10):
     point = data['points'][str(case_id)]
@@ -59,7 +60,8 @@ def cases(data, tokenizer):
         pos = point['position']
         result.append({'id':str(key), 'sample_groups':memberships.get(str(key),['scatter']),
             'anchor':{'token':doc['tokens'][pos], 'position':pos,
-                      'gate':point['values'][0], 'value':point['values'][1], 'product':point['values'][2]},
+                      'gate':point['values'][0], 'value':point['values'][1], 'product':point['values'][2],
+                      'response_pole':response_pole(point['values'][2])},
             'observed_prefix':tokenizer.decode(doc['token_ids'][:pos+1],skip_special_tokens=False),
             'following_prediction_target':tokenizer.decode(doc['token_ids'][pos+1:pos+11],skip_special_tokens=False)})
     return result
@@ -87,10 +89,10 @@ def build(data, groups, assignments):
     definitions = [dict(g,n=counts[g['id']]) for g in groups]
     if counts['unlabelled']:
         definitions.append({'id':'unlabelled','name':'Unlabelled','description':'No resolved semantic assignment.','pole':'either','n':counts['unlabelled']})
-    return {'edges':edges,'groups':definitions,'bins':bins,'points':points,
+    return annotate_spectrum({'edges':edges,'groups':definitions,'bins':bins,'points':points,
             'labeler':'DeepSeek high','sample_hist':{'counts':[b['n_labeled'] for b in bins]},
             'sampling':'All unique saved report positions: extremes, quantile examples and scatter samples. These are sample counts, not estimated semantic frequencies across the full corpus.',
-            'n_requested':len(points),'n_assigned':len(points)-counts['unlabelled']}
+            'n_requested':len(points),'n_assigned':len(points)-counts['unlabelled']})
 
 def run(session, arguments, llm=None):
     from tokenizers import Tokenizer
@@ -113,6 +115,7 @@ def run(session, arguments, llm=None):
                 for key,value in read(candidate/'assignments.json').items():prior.setdefault(key,value)
                 sources.append(str(candidate))
         write(folder/'resume-source.json',{'directories':sources,'n_retained':len(prior)})
+    groups=[semantic_definition(g) for g in groups]
     allowed={g['id'] for g in groups}
     tokenizer=Tokenizer.from_file(str(Path(session.config['model'])/'tokenizer.json'))
     inputs=cases(data,tokenizer)
@@ -122,7 +125,7 @@ def run(session, arguments, llm=None):
         index, batch=item
         out=folder/('batch-%03d'%index)
         messages=[
-          {'role':'system','content':'Classify each saved neuron activation context into one of the supplied semantic groups. Read the observed prefix through the anchor token. Following text is a prediction target, not prior context. Use the group definitions and the context together; a sign or magnitude alone does not identify its meaning. Return JSON: {"labels":[{"id":"case ID","group":"group ID","reason":"short explanation"}]}.'},
+          {'role':'system','content':'Classify each saved neuron activation context into one of the supplied semantic groups. Read the observed prefix through the anchor token. Following text is a prediction target, not prior context. Use the group definitions and the context together; response_pole is fixed from the measured product sign. Use magnitude when evaluating response conditions. Assign semantic meaning from context; do not infer or alter a response pole. Return JSON: {"labels":[{"id":"case ID","group":"group ID","reason":"short explanation"}]}.'},
           {'role':'user','content':'Semantic groups:\n'+groups_json+'\n\nSaved cases:\n'+__import__('json').dumps(batch,ensure_ascii=False)}]
         try:
             answer=llm(messages,out,'spectrum-labeler',max_tokens=393216)
@@ -141,10 +144,6 @@ def run(session, arguments, llm=None):
         for result in pool.map(label_batch,batches):assignments.update(result)
     write(folder/'assignments.json',assignments)
     spectrum=build(data,groups,assignments)
-    from group_poles import POLES, annotate
-    if any(g.get('pole') not in POLES for g in spectrum['groups']):
-        spectrum=annotate(spectrum,folder/'group-poles',llm=llm)
-        write(folder/'groups.json',spectrum['groups'])
     from saved_analysis import semantic_clusters
     write(folder/'sections.json',{'spectrum':spectrum,'clusters':semantic_clusters(spectrum),
                                  'cluster_source':'saved_semantic_groups'})
@@ -192,6 +191,9 @@ def _legacy_render(source):
 
 def render(source):
     source=_legacy_render(source)
+    source=source.replace(
+        'Every labeled token, binned by activation on signed log-2 edges and coloured by the group its label fell into. Warm groups sit at the positive pole, cool ones at the negative pole, grey ones on neither. Click a group or a bar to see its datapoints.',
+        'Tokens are binned by measured activation. Colours identify response patterns predicted from the fixed explanation: warm groups predict positive responses, cool groups predict negative responses, and grey groups are uncertain. Click a group or a bar to inspect its samples.')
     source=source.replace('hist = (S.sample_hist || S.corpus_hist || {}).counts;',
                           'hist = (S.corpus_hist || S.sample_hist || {}).counts;')
     source=source.replace('const sampled = !!S.sample_hist;',

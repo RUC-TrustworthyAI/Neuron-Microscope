@@ -7,6 +7,7 @@ import collections
 import copy
 from pathlib import Path
 from common import read
+from measured_response import describe_group, semantic_definition
 
 
 def catalog(folders):
@@ -21,7 +22,7 @@ def catalog(folders):
     routes = factors.get('routes', [])
     membership = {identity: route['id'] for route in routes for identity in route.get('graph_ids', [])}
     members = {row['id']: row for row in read(latest/'atlas-raw.json')
-               if row.get('status') == 'complete' and row.get('id') in membership}
+               if row.get('status', 'complete') == 'complete' and row.get('id') in membership}
     weights = {}
     for matrix in factors.get('routes_matrix', {}).values():
         for identity, values in zip(matrix['graph_ids'], matrix['route_weights']):
@@ -71,7 +72,7 @@ def apply(bundle, definitions, folders):
     if not data['routes']:
         return
     members = data['members']
-    definitions = copy.deepcopy(definitions)
+    definitions = [semantic_definition(d) for d in definitions]
     used = set()
     clusters = []
     total_mass = sum(sum(abs(u['weight']) for u in row['upstream']) for row in members.values()) or 1.
@@ -93,16 +94,16 @@ def apply(bundle, definitions, folders):
         member_groups = list(dict.fromkeys(
             groups.get(str(row.get('case_id')), row.get('semantic_group'))
             for row in rows))
-        return {
+        return describe_group({
             'id': definition['id'], 'name': definition['name'],
-            'story': definition.get('story', ''), 'pole': definition.get('pole', 'either'),
+            'story': definition.get('story', ''),
             'graph_ids': identities, 'example_graph_ids': [e['graph_id'] for e in examples],
             'member_routes': list(dict.fromkeys(data['membership'][identity] for identity in identities)),
             'member_groups': [g for g in member_groups if g],
             'n_graphs': len(rows),
             'share': sum(sum(abs(u['weight']) for u in row['upstream']) for row in rows)/total_mass,
             'key_units': units, 'examples': examples,
-        }
+        }, [row['selected']['product'] for row in rows])
 
     for definition in definitions:
         # Each measured member is counted once; no measurement is removed.

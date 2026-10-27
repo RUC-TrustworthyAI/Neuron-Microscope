@@ -66,14 +66,15 @@ def submit(tool,args):
     return response(job)
 
 TOOL_DESCRIPTIONS={
-    'evidence':'Read the target neuron evidence by section or saved case.',
+    'evidence':'Read an evidence brief, complete sections or saved cases for the target neuron.',
     'submit_interpretation':'Save the initial explanation and render its HTML.',
     'label_spectrum':'Label saved activation samples with semantic groups.',
     'run_experiments':'Run an experiment group and wait for its recorded result.',
     'run_tests':'Run the independent writer tests and wait for the result.',
     'prepare_tests':'Save test proposals without model inference.',
     'complete_experiments':'Complete the experiment handoff and render its HTML.',
-    'finish':'Save the revised report and render its HTML.'
+    'finish':'Submit the final explanation, run its independent review and response predictions, and render its HTML.',
+    'render_report':'Update saved report captions, section introductions and figure selections without API or model calls.'
 }
 
 def _arguments(tool):
@@ -85,21 +86,23 @@ def _arguments(tool):
     source.add_argument('--worker',metavar='JOB_DIR',help=argparse.SUPPRESS)
     source.add_argument('--wait',metavar='JOB_DIR',help=argparse.SUPPRESS)
     if tool=='evidence':
-        parser.add_argument('--section',help='Evidence section, for example index or contexts.')
+        sections=parser.add_mutually_exclusive_group()
+        sections.add_argument('--section',help='Evidence section, for example brief, index or contexts.')
+        sections.add_argument('--sections',nargs='+',help='Read several complete evidence sections in one call.')
         parser.add_argument('--group',help='Context sample group.')
         parser.add_argument('--ids',nargs='+',help='Saved case IDs.')
         parser.add_argument('--offset',type=int,help='First sample offset.')
         parser.add_argument('--limit',type=int,help='Number of samples.')
     args=parser.parse_args()
     if args.worker or args.wait:
-        if tool=='evidence' and any(getattr(args,k) is not None for k in ['section','group','ids','offset','limit']):
+        if tool=='evidence' and any(getattr(args,k) is not None for k in ['section','sections','group','ids','offset','limit']):
             parser.error('Evidence flags cannot be combined with a legacy job command.')
         return args,None
-    fields={k:getattr(args,k) for k in ['section','group','ids','offset','limit']
+    fields={k:getattr(args,k) for k in ['section','sections','group','ids','offset','limit']
             if tool=='evidence' and getattr(args,k) is not None}
     if fields:
         if args.input is not None:parser.error('Use evidence flags or JSON input, not both.')
-        fields.setdefault('section','index')
+        if 'sections' not in fields:fields.setdefault('section','index')
         return args,fields
     if args.input is None and sys.stdin.isatty() and tool=='evidence':
         return args,{'section':'index'}

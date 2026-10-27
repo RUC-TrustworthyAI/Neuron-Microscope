@@ -5,9 +5,72 @@ import tempfile
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from report_layout import headline,render,CIRCUIT,COLOURS
+from report_layout import headline,render,CIRCUIT,COLOURS,VERDICT_CODE,GRAPH_HELPERS
 
 class LayoutTests(unittest.TestCase):
+    def test_merge_relocates_bootstrap_after_earlier_layout_text_changes(self):
+        from report import merge
+        from unittest.mock import patch
+        from html.parser import HTMLParser
+        bundle={'neuron':{'id':'L1_N2'},'distribution':{'n_tokens':100},'claim':{'title':'Saved title'}}
+        source='<html><head><style>old-style</style></head><body><main id="main"></main>'
+        source+='<script type="application/json" id="bundle">'+json.dumps(bundle)+'</script>'
+        source+="<script>\nconst B = JSON.parse(document.getElementById('bundle').textContent);\nconst POS = '#d9480f';\n</script></body></html>"
+        class Scripts(HTMLParser):
+            def __init__(self):super().__init__();self.active=False;self.contents=[]
+            def handle_starttag(self,tag,attrs):
+                if tag=='script':self.active=True;self.contents.append('')
+            def handle_endtag(self,tag):
+                if tag=='script':self.active=False
+            def handle_data(self,data):
+                if self.active:self.contents[-1]+=data
+        for text in ['x','longer replacement style']:
+            with self.subTest(style=text),patch('spectrum.render',side_effect=lambda page:page.replace('old-style',text)):
+                rendered,result=merge(source,{})
+            parser=Scripts();parser.feed(rendered)
+            scripts=[s for s in parser.contents if 'const B =' in s]
+            self.assertEqual(len(scripts),1)
+            self.assertIn("const POS = '#d9480f'",scripts[0])
+            self.assertEqual(result['claim'],bundle['claim'])
+
+    def test_combined_peak_census_keeps_both_tails_and_inputs(self):
+        import subprocess
+        script=(Path(__file__).resolve().parents[1]/'tools/peak_census_display.js').read_text()
+        script+="\nconst p={n:30,kinds:[{kind:'word',n:30}],tokens:[{token:' a',n:30}]},n={n:30,kinds:[{kind:'word',n:10},{kind:'digit',n:20}],tokens:[{token:' a',n:10},{token:'1',n:20}]}; const before=JSON.stringify([p,n]);const c=combinedPeakCensus(p,n);console.log(JSON.stringify({c,unchanged:before===JSON.stringify([p,n])}));"
+        out=json.loads(subprocess.run(['node','-e',script],check=True,capture_output=True,text=True).stdout)
+        self.assertTrue(out['unchanged'])
+        self.assertEqual(out['c']['n'],60)
+        self.assertEqual({x['kind']:x['n'] for x in out['c']['kinds']},{'word':40,'digit':20})
+        self.assertEqual({x['token']:x['n'] for x in out['c']['tokens']},{' a':40,'1':20})
+
+    def test_graph_axis_labels_keep_attributed_cue_missed_by_uniform_ticks(self):
+        import subprocess
+        code=GRAPH_HELPERS+"\nconsole.log(JSON.stringify([...graphLabelPositions(Array(577).fill('x'),[{ctx_idx:518,influence:65},{ctx_idx:0,influence:100}],576,1.8)]));"
+        result=subprocess.run(['node','-e',code],capture_output=True,text=True,check=True)
+        self.assertIn(518,json.loads(result.stdout))
+        self.assertNotEqual(518 % 15,0)
+
+    def test_example_preview_preserves_anchor_and_full_saved_input(self):
+        import subprocess
+        code="const argmaxAbs=a=>a.indexOf(Math.max(...a));\n"+(Path(__file__).resolve().parents[1]/'tools/exemplar_display.js').read_text()
+        code+="\nconst e={peak_index:350,token_activations:Array.from({length:500},(_,i)=>({token:String(i),activation:i===350?90:0}))};const p=exemplarPreview(e);console.log(JSON.stringify([p.token_activations.length,p.peak_index,p.token_activations[0].token,p.token_activations[p.peak_index].activation,e.token_activations.length]));"
+        result=subprocess.run(['node','-e',code],capture_output=True,text=True,check=True)
+        self.assertEqual(json.loads(result.stdout),[33,32,'318',90,500])
+
+    def test_criticism_uses_short_badges_and_preserves_legacy_decisions(self):
+        import subprocess
+        values=['survived','narrowed','rejected','Survived with a narrower mechanism: measured qualification.',
+                'Partially supported and broadened: a qualified account.',
+                'Directionally supported but not sufficient to reproduce the extremes.',
+                'Partial support for output engagement.', 'Unknown decision']
+        code=VERDICT_CODE+'\nconsole.log(JSON.stringify('+json.dumps(values)+'.map(verdictOf)));'
+        result=subprocess.run(['node','-e',code],capture_output=True,text=True,check=True)
+        self.assertEqual(json.loads(result.stdout),['survived','narrowed','rejected','narrowed','narrowed','narrowed','narrowed',''])
+        html='// 8. Criticism: compact table, each row expands to the result and evidence.\nold();\n// 9. Appendix.\n'
+        rendered=render(html)
+        self.assertIn("P($('b',null,'Verdict. '),original)",rendered)
+        self.assertEqual(render(rendered),rendered)
+
     def test_circuit_uses_two_independent_slots(self):
         self.assertIn("table(G.upstream,",CIRCUIT)
         self.assertIn("table(G.downstream,",CIRCUIT)
@@ -20,7 +83,7 @@ class LayoutTests(unittest.TestCase):
         once=render(source);twice=render(once)
         self.assertEqual(twice.count("missing('Route prediction')"),1)
         self.assertEqual(twice.count('id="paper-layout-order"'),1)
-        self.assertNotIn('old',twice)
+        self.assertNotIn('\nold\n',twice)
 
     def test_publication_removes_extra_scan_without_removing_distribution(self):
         source="// 1. Distribution\nmain_distribution();\n"
@@ -79,6 +142,24 @@ class LayoutTests(unittest.TestCase):
             self.assertEqual(h['strip'],{'tokens':['saved']})
 
 class SignedSelectionTests(unittest.TestCase):
+    def test_combined_headline_uses_only_scored_span_and_keeps_weak_controls(self):
+        from pole_selection import comparison_ladder
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp)/'artifacts/sweeps-probe';folder.mkdir(parents=True)
+            rows=[{'condition':0,'status':'complete','label':'candidate','replacement':'a',
+                   'text':'prefix a','scored_positions':[1,2],'selected':{'product':5},
+                   'trace':[{'token':'prefix','product':1000},{'token':'a','product':5},{'token':'b','product':-7}]},
+                  {'condition':1,'status':'complete','label':'control','replacement':'c',
+                   'text':'prefix c','scored_positions':[1],'selected':{'product':.4},
+                   'trace':[{'token':'prefix','product':2000},{'token':'c','product':.4}]}]
+            (folder/'conditions.json').write_text(json.dumps(rows))
+            figure={'id':'probe','kind':'sweep','template':'prefix {slot}',
+                    'results':[{'activation':5},{'activation':.4}]}
+            result=comparison_ladder({'custom':{'figures':[figure]}},tmp)
+            self.assertEqual([x['activation'] for x in result['fillers']],[-7,.4])
+            self.assertEqual(result['fillers'][0]['peak_index'],2)
+            self.assertEqual(json.loads((folder/'conditions.json').read_text()),rows)
+
     def test_contrast_and_intent_prevent_incidental_negative_control_selection(self):
         from pole_selection import select
         b={'distribution':{'corpus_min':-60,'corpus_max':400},'custom':{'figures':[

@@ -30,6 +30,7 @@ def make_batch(output,stages,units):
           'settings':config,'paths':resolved,'gpu_pairs':config['gpu_groups'],
           'start_next_after':os.environ.get('NEURON_PAPER_START_NEXT_AFTER',config.get('execution',{}).get('start_next_after','02-experiments')),'budget_usd':budget,'existing_only':bool(os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS')),
           'reuse_measurements':os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS') or None,
+          'reuse_completed_experiments':bool(os.environ.get('NEURON_PAPER_REUSE_COMPLETED')),
           'image':config.get('execution',{}).get('image','neuron-microscope:local'),
           'agent_wall_seconds':config.get('execution',{}).get('agent_wall_seconds',10800)})
 
@@ -39,11 +40,12 @@ def make_stage(batch,unit,stage,skill):
     layer,index=map(int,unit.replace('L','').replace('N','').split('_'))
     manifest=read(batch/'manifest.json');settings=manifest['settings'];host=manifest['paths']
     for name in ['control','workspace','logs/agent']:(step/name).mkdir(parents=True)
-    reuse=os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS')
+    reuse=manifest.get('reuse_measurements') or os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS')
     if reuse and (Path(reuse)/unit/'handoff.json').is_file():
         reuse=str(Path(reuse)/unit)
     cfg={'session_dir':str(step/'workspace'),'stage':stage,'full_paper':True,
-         'existing_only':bool(os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS')),
+         'existing_only':bool(reuse),
+         'reuse_completed_experiments':manifest.get('reuse_completed_experiments',False),
          'reuse_measurements':reuse if stage=='02-experiments' else None,
          'report':str(Path(host['reports'])/unit),
          'model':host['model'],'tokenizer':host['tokenizer'],
@@ -53,6 +55,7 @@ def make_stage(batch,unit,stage,skill):
          'runtime':{**settings['runtime'],'devices':list(range(len(settings['gpu_groups'][0])))},
          'gpu_pairs':settings['gpu_groups'],'gpu_lock_dir':str(Path(host['state'])/'gpu-locks'),
          'experiment_seconds':settings['experiment_seconds'],'queue_seconds':settings['queue_seconds']}
+    cfg['private_scan']=str(batch/'units'/unit/'01-interpretation/preparation/initial-scan')
     if stage=='01-interpretation':
         cfg['source_report']=cfg['report']
         cfg['report']=str(step/'input/report')
@@ -70,8 +73,11 @@ def make_stage(batch,unit,stage,skill):
             task='Use saved activations, CPU coactivation and saved measurements to complete semantic groups, propose text tests and write the report for neuron '+unit+'. No new model inference is available. Read the existing-only workflow in the skill.'
         elif stage=='03-revision':
             task+=' Use only the supplied measurements and newly labelled spectrum; no new experiments.'
+            if cfg['reuse_completed_experiments']:
+                task+=' The handoff includes reused measured GPU experiments and blind predictions from the current initial explanation. Use each experiment\'s recorded method and scoring position. Independent text tests retain the explanation version they originally tested.'
     (step/'control/task.txt').write_text(task+' Use the skill at /skills/'+skill+'/SKILL.md.\n')
-    shutil.copy2(batch/'framework-source/tools/agent.py',step/'control/agent.py')
+    entry='reuse_saved.py' if stage=='02-experiments' and cfg['reuse_completed_experiments'] else 'agent.py'
+    shutil.copy2(batch/'framework-source/tools'/entry,step/'control/agent.py')
     shutil.copy2(batch/'framework-source/tools/output-policy.yml',step/'control/output-policy.yml')
     shutil.copy2(batch/'framework-source/tools/rpc_client.py',step/'control/rpc_client.py')
     (step/'control/bin').mkdir(exist_ok=True)
@@ -99,7 +105,7 @@ def initial_html(source,data=None):
     if anatomy.get('strip'):
         for key in ['case_id','source_start','anchor_index']:anatomy['strip'].pop(key,None)
         anatomy['strip']['caption']='Saved native gate, value and product.'
-    anatomy['points']=[p for p in anatomy.get('points',[]) if p.get('source_family')!='probe']
+    anatomy['points']=[p for p in anatomy.get('points',[]) if p.get('source_family')!='probe' and p.get('source')!='corpus:scan']
     anatomy['n']=len(anatomy['points'])
     anatomy.pop('selection',None)
     anatomy.pop('groups',None)
@@ -111,7 +117,8 @@ def initial_html(source,data=None):
     anatomy['group_names']={}
     for point in anatomy.get('points',[]):
         point['cluster']='unassigned'
-        for key in ['semantic_group','label_source','label_reason']:point.pop(key,None)
+        for key in ['semantic_group','label_source','label_reason','predicted_pole','prediction_reason','explanation_version','evaluation_split']:point.pop(key,None)
+    for key in ['prediction_summary','explanation_version','colour_mode']:anatomy.pop(key,None)
     page,_=merge(source,{**scan,'neuron':neuron,'claim':claim,'criticism':[],
         'agent_read':None,'agent_read_full':None,'interpretation_costs':None,'spectrum':None,'clusters':[],'routes':[],'routes_matrix':None,'routes_meta':None,
         'cluster_source':None,'cluster_definitions':[],'section_prose':{},'family':None,'circuit':None,'tests':None,
@@ -131,8 +138,7 @@ def stage_input(folder):
     from initial_scan import prepare
     artifact=prepare(target,cfg,Path(cfg['preparation_activations']),
                      Path(folder)/'preparation/initial-scan')
-    if artifact:cfg['initial_scan']=str(artifact)
-    else:cfg.pop('initial_scan',None)
+    cfg.pop('initial_scan',None)
     write(Path(folder)/'host-session.json',cfg)
 
 

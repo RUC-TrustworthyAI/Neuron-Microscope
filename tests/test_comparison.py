@@ -1,5 +1,6 @@
 """Publication controls must never modify the scientific handoff or its reference."""
 from pathlib import Path
+import re
 import tempfile
 import unittest
 from comparison import publish
@@ -19,7 +20,9 @@ class ComparisonTests(unittest.TestCase):
             self.assertEqual((source/'index.html').read_text(),html)
             self.assertFalse((source/'comparison').exists())
             self.assertEqual((output/'comparison/original.html').read_text(),original)
-            self.assertIn('comparison/viewer.js',(output/'index.html').read_text())
+            script=re.search(r'src="(comparison/viewer\.[0-9a-f]{12}\.js)"',(output/'index.html').read_text())
+            self.assertIsNotNone(script)
+            self.assertTrue((output/script[1]).is_file())
 
     def test_no_reference_still_publishes_independent_report(self):
         with tempfile.TemporaryDirectory() as tmp:

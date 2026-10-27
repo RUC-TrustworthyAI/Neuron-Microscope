@@ -34,9 +34,9 @@ def measured_plan(plan, report, seed=None, settings=None):
     result=copy.deepcopy(plan)
     result['atlas']={**(result.get('atlas') or {}),**cfg['atlas'],
                     'cases':[{**{k:v for k,v in r.items() if not k.startswith('_')},'split':'test' if r['_document'] in tests else 'train'} for r in chosen]}
-    family=result.setdefault('family',{})
-    family.setdefault('cases',[r['case_id'] for r in chosen[::max(1,len(chosen)//cfg['family']['cases'])]][:cfg['family']['cases']])
-    family['neighbours_per_side']=cfg['family']['neighbours_per_side']
+    # Joint display inputs are authored explicitly; natural atlas cases retain full prefixes.
+    if result.get('family'):
+        result['family']['neighbours_per_side']=cfg['family']['neighbours_per_side']
     return result
 
 def semantic_cases(jobs, quota):

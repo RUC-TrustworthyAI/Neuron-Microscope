@@ -64,93 +64,29 @@ class InitialScanTests(unittest.TestCase):
                     'clusters':[{'id':'cluster','name':'Observed contexts','member_groups':['meaning']}]}
         return llm
 
-    def test_scan_is_labelled_before_initial_explanation_and_reused(self):
+    def test_scan_remains_private_until_explanation_submission(self):
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);report,data,cfg=self.fixture(root);folder=root/'preparation/initial-scan'
-            calls=[]
+            before=(report/'index.html').read_bytes();calls=[]
             with patch('anatomy_scan.ensure',self.scan):
                 prepare(report,cfg,root/'archive',folder,llm=self.labeler(calls))
-            self.assertEqual(sum(len(c['experimental_points']) for c in calls),256)
-            self.assertTrue(all(not c['semantic_groups'] for c in calls[:1]))
-            saved=read(report/'anatomy-scan-evidence.json')
+            self.assertEqual(calls,[])
+            self.assertEqual((report/'index.html').read_bytes(),before)
+            self.assertFalse((report/'anatomy-scan-evidence.json').exists())
+            saved=read(folder/'selected-scan.json')
             self.assertEqual(len(saved['points']),256)
-            self.assertEqual(sum(b['selected'] for b in saved['sampling']['bins']),256)
-            self.assertEqual({p['semantic_group'] for p in saved['points']},{'meaning'})
-            bundle,_=source_bundle((report/'index.html').read_text())
-            self.assertEqual(bundle['claim']['one_paragraph'],'—')
-            self.assertIsNone(bundle['spectrum'])
-            self.assertEqual(bundle['anatomy']['selection']['scan_anchors'],256)
-            before=len(calls)
-            with patch('anatomy_scan.ensure',self.scan):
-                prepare(report,cfg,root/'archive',folder,llm=self.labeler(calls))
-            self.assertEqual(len(calls),before)
-            cfg['initial_scan']=str(folder)
-            session=StageSession(cfg)
-            self.assertNotIn('activations',session.config)
-            self.assertEqual(len(session.jobs),1)
-            with patch.object(session,'prepare',return_value={'contexts_json':{'cases':[]}}):
-                index=session.evidence({'section':'index'})
-            self.assertIn('anatomy_scan',index['sections'])
-            page=session.evidence({'section':'anatomy_scan','offset':7,'limit':2})
-            self.assertEqual(page['total'],256)
-            self.assertEqual(page['next_offset'],9)
-            self.assertTrue(page['cases'][0]['observed_prefix'].startswith('FULL PREFIX'))
-            self.assertEqual(page['cases'][0]['semantic_group'],'meaning')
-            summary=evidence(report,{'limit':0})
-            self.assertEqual(summary['cases'],[])
-            self.assertEqual(summary['groups'][0]['id'],'meaning')
-            self.assertFalse((report/'host-session.json').exists())
-            self.assertFalse((report/'anatomy-semantics.json').exists())
+            self.assertEqual(read(folder/'preparation.json')['llm_requests'],0)
+            self.assertTrue(all('semantic_group' not in p for p in saved['points']))
 
-    def test_stage_two_only_labels_new_probe_and_never_rescans(self):
-        with tempfile.TemporaryDirectory() as tmp:
-            root=Path(tmp);report,data,cfg=self.fixture(root);folder=root/'preparation/initial-scan'
-            calls=[]
-            with patch('anatomy_scan.ensure',self.scan):
-                prepare(report,cfg,root/'archive',folder,llm=self.labeler(calls))
-            numeric=spectrum(data,[],{})
-            numeric['groups']=read(folder/'anatomy-semantics.json')['groups']
-            page,_=merge((report/'index.html').read_text(),{'spectrum':numeric})
-            (report/'index.html').write_text(page)
-            experiment=root/'experiment';experiment.mkdir()
-            write(experiment/'sections.json',{})
-            write(experiment/'figure.json',{'id':'sweep','title':'Measured probe'})
-            write(experiment/'conditions.json',[{'status':'complete','text':'new prefix',
-                'token_ids':[9],'selected':{'position':0,'token':'new prefix','offset':[0,10],
-                                          'gate':2,'value':3,'product':6}}])
-            request={'report':str(report),'sections':[str(folder),str(experiment)],'settings':cfg['settings'],
-                     'activations':str(root/'archive')}
-            fresh=[]
-            with patch('anatomy_scan.ensure',side_effect=AssertionError('Stage two must not scan')):
-                result=label_request(request,root/'new-labels',llm=self.labeler(fresh),include_scan=False)
-            self.assertIsNotNone(result)
-            self.assertEqual(len(fresh),1)
-            self.assertEqual(len(fresh[0]['experimental_points']),1)
-            self.assertTrue(fresh[0]['experimental_points'][0]['id'].startswith('probe-'))
-            stats=read(root/'new-labels/result.json')
-            self.assertEqual(stats['n_retained'],256)
-            self.assertEqual(stats['n_requested'],1)
-            self.assertEqual(stats['n_scan_points'],256)
-
-    def test_initial_report_render_preserves_scan_data_and_labels(self):
-        from report import run
-        with tempfile.TemporaryDirectory() as tmp:
-            root=Path(tmp);report,data,cfg=self.fixture(root);folder=root/'preparation/initial-scan'
-            with patch('anatomy_scan.ensure',self.scan):
-                prepare(report,cfg,root/'archive',folder,llm=self.labeler([]))
-            output=root/'rendered';output.mkdir()
-            request={'report':str(report),'model':cfg['model'],'settings':cfg['settings'],
-                     'stage':'01-interpretation','sections':[str(folder)]}
-            with patch('report.model_config',return_value=(root/'model',{})):
-                run(request,output)
-            bundle,_=source_bundle((output/'index.html').read_text())
-            points=[p for p in bundle['anatomy']['points'] if p.get('source')=='corpus:scan']
-            self.assertEqual(len(points),256)
-            self.assertEqual({p['semantic_group'] for p in points},{'meaning'})
-            self.assertEqual(read(output/'anatomy-scan-evidence.json'),
-                             read(report/'anatomy-scan-evidence.json'))
-            self.assertTrue((output/'artifacts/sections-1/anatomy-scan.json').exists())
-            self.assertTrue((output/'artifacts/sections-1/anatomy-semantics.json').exists())
+    def test_split_keeps_documents_disjoint_and_seen_documents_in_feedback(self):
+        from initial_scan import split_documents
+        points=[{'id':str(i),'document':str(i//2)} for i in range(256)]
+        splits=split_documents(points,{'0','1'})
+        docs={name:{p['document'] for p in points if splits[p['id']]==name}
+              for name in ('feedback','final_holdout')}
+        self.assertEqual(len([x for x in splits.values() if x=='final_holdout']),128)
+        self.assertFalse(docs['feedback'] & docs['final_holdout'])
+        self.assertFalse({'0','1'} & docs['final_holdout'])
 
     def test_preparation_cost_is_charged_to_preparation_row(self):
         from report_costs import collect

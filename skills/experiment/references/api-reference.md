@@ -6,8 +6,12 @@ Read `/control/settings.json` for the experiment and sampling parameters. Submit
 
 ```bash
 mkdir -p /workspace/reads
+python scripts/read_evidence.py --section brief > /workspace/reads/brief.json
+python scripts/read_evidence.py --sections distribution peak_census output_effects > /workspace/reads/statistics.json
 python scripts/read_evidence.py --section contexts --group top_tokens --offset 0 --limit 4 > /workspace/reads/top_tokens.json
 ```
+
+The brief combines interpretation, section summaries, experiment_index (including paths and JSON file names), figure and graph descriptions, cluster definitions and prediction feedback. Its prediction cases retain complete observed prefixes and anchors, ordered with strong directional errors first. Use --limit for the number of feedback cases. Use --sections to read several complete evidence sections in one call; use --ids ID ... to fetch several complete contexts or route members together. Choose further reads from the returned IDs and paths. Complete requested records remain available.
 
 Use /workspace/reads for your own exports. /workspace/evidence also contains host-generated input.json and manifest.json; manifest.json.cases is a count, whereas a contexts response has a cases list. Read the context files you exported rather than treating every JSON file in the internal evidence directory as a context page.
 
@@ -42,13 +46,18 @@ Semantic grouping uses graph_id, not the corpus case_id. Account for all index m
     "title": "A controlled replacement test",
     "pole": "positive",
     "prediction": "How changing the cue should change the specified response.",
-    "template": "<fixed prefix> {slot} <fixed response marker>",
-    "replacements": ["<candidate>", "<matched alternative>"],
+    "template": "<fixed prefix> {slot}<single-token response marker><fixed suffix>",
+    "replacements": [
+      "<candidate 1>", "<candidate 2>", "<candidate 3>", "<candidate 4>",
+      "<opposite-pole candidate 1>", "<opposite-pole candidate 2>",
+      "<opposite-pole candidate 3>", "<opposite-pole candidate 4>",
+      "<unrelated control 1>", "<unrelated control 2>"
+    ],
     "score": {
       "location": "marker",
-      "text": "<fixed response marker>",
+      "text": "<single-token response marker>",
       "occurrence": 0,
-      "token_offset": -1,
+      "token_offset": 0,
       "reduction": "single"
     }
   }],
@@ -64,12 +73,24 @@ Semantic grouping uses graph_id, not the corpus case_id. Account for all index m
       "name": "<hypothesis>",
       "pole": "positive",
       "rival": "<alternative>",
-      "score": {"location":"marker","text":"<response marker>","token_offset":-1,"reduction":"single"},
+      "score": {"location":"marker","text":"<single-token response marker>","token_offset":0,"reduction":"single"},
       "candidates": [{"text":"<candidate input>"}],
       "controls": [{"text":"<matched control input>"}]
     }],
     "atlas": {"cases":["<optional additional saved ID>"]},
-    "family": {"cases":["<saved ID>"]},
+    "family": {"cases":[
+      {"text":"<short authored showcase>","position":-1},
+      {"text":"<matched written input 1>","position":-1},
+      {"text":"<matched written input 2>","position":-1},
+      {"text":"<matched written input 3>","position":-1},
+      {"text":"<matched written input 4>","position":-1},
+      {"text":"<matched written input 5>","position":-1},
+      {"text":"<matched written input 6>","position":-1},
+      {"text":"<matched written input 7>","position":-1},
+      {"text":"<matched written input 8>","position":-1},
+      {"text":"<matched written input 9>","position":-1},
+      {"text":"<matched written input 10>","position":-1}
+    ]},
     "anatomy": {"sentence":{"case_id":"<saved ID>"}}
   }
 }
@@ -83,13 +104,17 @@ Routes per pole, neighbour counts, attribution node and edge counts, controls an
 
 Declare the location and reduction before measuring candidates. Candidates and matched controls use the same rule. A candidate may carry its own explicit score when its frame requires a different marker.
 
+For marker scoring, occurrence is the zero-based occurrence of the literal marker text. token_offset indexes the tokens overlapping that marker: 0 is its first token and -1 is its last token. It does not move to the token before the marker. With no token_offset, the declared reduction applies to all tokens overlapping the marker. The single-token markers below are format examples, not a recommendation to score the beginning or end of every phrase. Choose the actual token from the scientific hypothesis and name it in prediction.
+
+For an upcoming-value hypothesis, the response is before the value begins, not at the last digit or word after the value has already been supplied. One option is to end each matched written input at the intended boundary and use {"location":"token_position","position":-1,"reduction":"single"}; then -1 means the last token of that entire input. Preserve any intended trailing whitespace. The returned selected.token and selected.position identify the measured token. Compare a cue-span score separately when needed; do not substitute a whole-input maximum for a declared response-slot measurement.
+
 ```json
 [
   {
     "location": "marker",
-    "text": "<fixed response marker>",
+    "text": "<single-token response marker>",
     "occurrence": 0,
-    "token_offset": -1,
+    "token_offset": 0,
     "reduction": "single"
   },
   {
@@ -136,62 +161,21 @@ Named semantic groups also contribute representative saved anchors, covering eac
 
 ## Spectrum and labels
 
-Define the complete group catalog from this neuron's evidence before submitting it. The following is a complete API-shape example, not proposed semantic groups or interpretation examples. Replace it with the groups supported by the target evidence; add, remove or split groups as needed. Include an observed opposite pole only when the evidence supports one.
+The incoming response_rules define the spectrum's response groups: at most three positive, at most three negative, and one No visible cue group for cases with no distinguishable direction. The host has already frozen these definitions and obtained independent text-only assignments. Use the evidence reader's response_predictions section to inspect errors and ambiguous cases.
+
+To read the current group definitions and counts:
 
 ```json
-{
-  "groups": [
-    {
-      "id": "positive-context",
-      "name": "Supported positive context",
-      "description": "Describe the recurring positive-response context established from this neuron's saved evidence.",
-      "pole": "positive"
-    },
-    {
-      "id": "negative-context",
-      "name": "Supported negative context",
-      "description": "Describe the recurring negative-response context established from this neuron's saved evidence.",
-      "pole": "negative"
-    },
-    {
-      "id": "background",
-      "name": "Background or unclear context",
-      "description": "Saved contexts that do not fit the supported response groups, including ambiguous or background material.",
-      "pole": "either"
-    }
-  ]
-}
+{}
 ```
-
-Save that object to /workspace/groups.json and call:
 
 ```bash
-python scripts/label_spectrum.py --input /workspace/groups.json
+python scripts/label_spectrum.py --input /workspace/request.json
 ```
 
-### Fields and scope
+The tool returns groups, n_requested, explanation_version, reused, llm_requests and new_model_forwards. It reuses the incoming predictions. Do not submit a new topic taxonomy during this stage. At completion the host predicts new measured contexts under the same explanation, reusing unchanged inputs.
 
-- Fresh request: groups is the group-definition array. Submit a nonempty, complete set of definitions.
-- Each definition: id is a unique stable string; name is its displayed name; description states the semantic membership criterion; pole is positive, negative or either. Supply all four fields. id and name are read by the tool; the definitions and pole drive classification and colours.
-- The sample set is all unique positions in the target report's points: extrema, quantile examples and scatter positions. It is neither only the cases used to propose a group nor all tokens in the activation archive.
-- There is no sample-count or pilot-size argument. In particular, groups[*].case_ids does not select the labeling sample set. One group still sends all saved positions for classification.
-- Requests are internally batched in groups of 24 cases. A fresh call makes ceil(n / 24) labeler requests for n saved positions, regardless of the number of semantic groups.
-- Numerical signs alone do not identify semantic groups. Independent blind tests remain separate from this scatter.
-- A result reports status, n_requested, n_assigned, groups, missing_case_ids, batch_count, n_retained, n_new_requested, resume_from and new_model_forwards. Unassigned cases do not imply a smaller input sample.
-
-### Reuse and continuation
-
-- Repeating the same group definitions in the same stage workspace returns an existing recorded result when the groups match, including a partial result. This does not fill its missing labels.
-- Matching includes group order and the submitted definition fields. A change to IDs, wording, poles, group membership criteria or the group list is not an unchanged request.
-- To continue missing labels under unchanged definitions, use the exact resume_from directory returned by the previous result:
-
-```json
-{"resume_from": "spectrum-003"}
-```
-
-Replace spectrum-003 with the returned directory. The tool loads that directory's saved groups and assignments, retains existing assignments, and labels only still-unassigned cases. resume_from takes the saved definitions; supplying changed groups alongside it does not replace those definitions.
-- To revise the group definitions, submit a fresh complete groups array. The fresh run labels all saved positions; do not expect labels from a different taxonomy to be reused.
-- Cache lookup is within the current stage workspace, not an automatic import from another run.
+Every spectrum point keeps its observed activation and bin. Colour follows the predicted response group: positive, negative or uncertain. Opposite-sign members are retained as counterexamples. The scatter and spectrum share one prediction for an identical observed prefix and anchor. Full API records are saved by the tools.
 
 ## Independent tests
 
@@ -207,6 +191,8 @@ The complete example below specifies the input shape. Replace its prose and IDs 
 {
   "summary": "Summarize the measured findings and remaining alternatives.",
   "annotations": {
+    "headline_figure_id": "MEASURED_SWEEP_ID",
+    "graph_ids": ["MEASURED_DISPLAY_GRAPH_ID_A", "MEASURED_DISPLAY_GRAPH_ID_B", "MEASURED_DISPLAY_GRAPH_ID_C"],
     "routes": {
       "MEASURED_ROUTE_ID": {
         "name": "Name supported by the measured route examples",
@@ -218,7 +204,6 @@ The complete example below specifies the input shape. Replace its prose and IDs 
         "id": "c1",
         "name": "Evidence-supported semantic cluster",
         "story": "Membership criterion, observed shared contribution pattern, and exceptions or unresolved evidence.",
-        "pole": "positive",
         "graph_ids": ["MEASURED_GRAPH_ID_A", "MEASURED_GRAPH_ID_B"],
         "example_graph_ids": ["MEASURED_GRAPH_ID_A", "MEASURED_GRAPH_ID_B"]
       }
@@ -266,6 +251,9 @@ python scripts/complete_experiments.py --input /workspace/completion.json
 Fields:
 
 - summary: the experiment findings as a string.
+- annotations.headline_figure_id: a measured replacement sweep ID with ten conditions in one frame, covering likely positive, likely negative and unrelated inputs. The renderer uses its complete measured comparison.
+- annotations.graph_ids: exactly three measured multi-hop display graph IDs in the desired order. Use IDs returned by graphs, not the local route-atlas graph_ids used in semantic clusters. Other measured graphs remain in saved artifacts.
+- paper.family.cases: eleven explicit written inputs, one showcase plus ten matched variations. Each has text and position. The host measures every token for joint traces. Omit family in later rounds to reuse the completed family. Use the configured neighbours; unit labels are provided at completion.
 - annotations.routes: keyed by actual measured route ID, such as a route returned in measured_sections.routes. Each value is an object with name and description. A route value is not a plain string.
 - annotations.clusters: a complete array of semantic cluster definitions in the shape above. Each graph_id comes from the latest routes index. The measured membership may cross raw route boundaries. Counts, shares, key units and example activations are derived by the host. Submitted members are never removed from raw routes; any unassigned measured members remain visible as unassigned contexts.
 - annotations.units: keyed by a measured Lx_Ny identifier. Each value is a label string, not a name/description object. L0_N0 above only illustrates the key syntax; replace it with a measured unit or leave units empty.
@@ -276,3 +264,7 @@ Fields:
 
 
 Existing-only runs retain their existing-only workflow: they do not submit numerical experiments or automatic GPU follow-ups.
+
+## Frozen-explanation response predictions
+
+Use `python scripts/read_evidence.py --section response_predictions --limit 4` for prediction-versus-measurement feedback. The response includes the frozen claim and rules, separate feedback/seen/experiment counts, and full-prefix cases ordered with strong directional errors first. Use `--ids`, `--group`, `--offset` and `--limit` to inspect cases. Keep the initial claim and response_rules fixed in this stage; design experiments that clarify their errors and uncertain conditions.

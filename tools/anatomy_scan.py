@@ -51,8 +51,8 @@ def choose(points, edges, total=256, seed=42):
 
 
 def saved(request):
-    folders = list(map(Path, request.get('sections', [])))
-    folders += sorted((Path(request['report'])/'artifacts').glob('*'))
+    folders = sorted((Path(request['report'])/'artifacts').glob('*'))
+    folders += list(map(Path, request.get('sections', [])))
     return [p/'anatomy-scan.json' for p in dict.fromkeys(folders)
             if (p/'anatomy-scan.json').is_file()]
 

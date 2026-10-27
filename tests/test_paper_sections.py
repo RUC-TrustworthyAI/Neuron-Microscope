@@ -4,11 +4,18 @@ from pathlib import Path
 from types import SimpleNamespace
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
 from common import write,read,Runtime
-from paper_sections import prepare,factorize,local_graph,labelled
+from paper_sections import prepare,factorize,local_graph,labelled,run as run_sections
 from experiment_worker import run
 import blind_tests
 
 class SectionsTests(unittest.TestCase):
+    def test_empty_family_request_emits_no_replacement_section(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            folder=Path(tmp)
+            result=run_sections({'plan':{'family':{'cases':[]}}},folder)
+            self.assertNotIn('family',read(folder/'sections.json'))
+            self.assertEqual(result['status'],'complete')
+
     def test_saved_selection_keeps_ids_and_native_traces(self):
         with tempfile.TemporaryDirectory() as d:
             p=Path(d)

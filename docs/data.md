@@ -17,7 +17,7 @@ The pipeline takes **saved native activations** and local model weights as input
 
 `report.json` includes `identity` (`id`, `layer`, `neuron`, `model`), `statistics`, `methods`, `examples`, `bands`, `scatter`, `points` and `documents`. Each point identifies its document, token position, and `[gate, value, product]`. Each document contains exact `token_ids`, decoded `tokens`, and aligned `gate`, `value`, `product` arrays. Cases are report-local identifiers; their names are not global token offsets.
 
-The initial stage copies only its target's measurement files, rebuilds the activation-only HTML and removes old claims, semantic annotations, official labels and review history. The new scan's semantic labels are then added before the agent starts. API records and the full archive are not copied into that report input.
+The initial stage receives only the target's measurement files and activation-only HTML. Its inputs contain native statistics, extrema and quantile examples. Scan points remain private until the initial explanation is submitted, when feedback samples receive predictions from the frozen explanation. API records and the full activation archive remain on the host.
 
 ## Canonical activation archive
 
@@ -85,8 +85,8 @@ Alternatively the report builder accepts `--token-tables --token-cache DIR` to r
 
 ## Coordinates and sampling
 
-The measured activation is `SiLU(gate) * up`, taken from the native model tensor rather than reconstructed from rounded display values. Semantic group colours reflect an explicitly assigned response pole, not a median-sign fallback.
+The measured activation is `SiLU(gate) * up`, taken from the native model tensor rather than reconstructed from rounded display values. Scatter point colours show blind predictions from a frozen explanation: orange for positive, blue for negative and grey for uncertainty. Stored records keep the prediction, measured activation and explanation version separately.
 
-The pre-interpretation scan samples at most 40 candidates per activation-amplitude interval. It then retains up to 256 points in proportion to **candidate-bin counts**, with largest-remainder allocation and a fixed seed. These are not proportions of the full corpus and the plot is not a density estimate. Extrema and other measured experimental points are retained by their separate selection rules.
+The pre-interpretation scan samples at most 40 candidates per activation-amplitude interval. It then retains up to 256 points in proportion to **candidate-bin counts**, with largest-remainder allocation and a fixed seed. The selected scan points are kept private until the initial explanation is submitted. A document-disjoint portion remains private until the revised explanation is submitted. These are not proportions of the full corpus and the plot is not a density estimate. Extrema and other measured experimental points are retained by their separate selection rules.
 
 All saved contexts used for model experiments preserve the captured prefix through the chosen anchor. The display can show a shorter window without changing the model input or scoring position.

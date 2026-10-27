@@ -2,11 +2,28 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from report_completion import corpus_counts, minimal_pairs, unit_labels, full_reading
+from report_completion import corpus_counts, minimal_pairs, unit_labels, full_reading, measured_contexts
 from launch_files import initial_html
 from report import source_bundle
 
 class ReportCompletionTests(unittest.TestCase):
+    def test_display_context_reuses_exact_measured_trace_and_steering_numbers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);folder=root/'artifacts/graphs-g1';folder.mkdir(parents=True)
+            trace=[{'token':'old','product':0.}, {'token':' cue','product':12.}]
+            result={'status':'complete','trace':trace,'graph':{'position':1},
+                    'steering':{'prompt':'old cue'}}
+            (folder/'result.json').write_text(json.dumps(result))
+            b={'graphs_curated':{'picks':[{'id':'g1','graph':{'position':1}}]},
+               'tests':{'steering':[{'prompt':'old cue','baseline':.2,'steered':.4,'strength':2}]}}
+            measured_contexts(b,root)
+            row=b['tests']['steering'][0]
+            self.assertEqual((row['baseline'],row['steered'],row['strength']),(.2,.4,2))
+            self.assertEqual(row['activation_context']['activation'],12.)
+            self.assertEqual(row['activation_context']['peak_index'],1)
+            self.assertEqual(b['graphs_curated']['picks'][0]['graph']['token_activations'],
+                             [{'token':'old','activation':0.},{'token':' cue','activation':12.}])
+
     def test_corpus_mass_is_separate_from_selected_semantic_samples(self):
         bundle={'bigscan':{'hist_centers':[-2,0,3],'hist':[2,100,3]},
                 'spectrum':{'edges':[-4,-1,1,4],'sample_hist':{'counts':[10,1,10]}}}

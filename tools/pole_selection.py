@@ -67,3 +67,57 @@ def corpus_strips(data, preferred=()):
             'anchor_index':position-start,'pole':pole,
             'caption':pole.title()+' saved context · product '+format(point['values'][2],'.6g')+'.'}
     return result
+
+
+def comparison_ladder(bundle, report, folders=()):
+    """One common-frame signed comparison, derived only from saved scored traces."""
+    candidates=[]
+    distribution=bundle.get('distribution') or {}
+    positive=abs(distribution.get('corpus_max') or 1.)
+    negative=abs(distribution.get('corpus_min') or 1.)
+    for item in sweeps(bundle,report,folders):
+        fillers=[]
+        for row in item['rows']:
+            trace=row.get('trace',[])
+            positions=row.get('scored_positions',[])
+            if not trace or not positions:continue
+            peak=max(positions,key=lambda p:abs(trace[p]['product']))
+            point=trace[peak]
+            fillers.append({'tag':row.get('label',row.get('replacement','')),
+                'text':row.get('replacement',''),'full_text':row['text'],
+                'activation':point['product'],'peak_index':peak,'peak_token':point['token'],
+                'tokens':[t['token'] for t in trace],'values':[t['product'] for t in trace],
+                'source_condition':row['condition'],'scored_positions':positions})
+        if len(fillers)<2:continue
+        hi=max(f['activation'] for f in fillers);lo=min(f['activation'] for f in fillers)
+        both=hi>0 and lo<0
+        balanced=min(max(hi,0)/positive,max(-lo,0)/negative)
+        rank=(both,balanced,max(hi,0)/positive+max(-lo,0)/negative)
+        candidates.append((rank,{'template':item['figure'].get('template'),'fillers':fillers,
+            'source_figure_id':item['figure']['id'],
+            'metric':'signed_largest_absolute_product_at_saved_scored_positions',
+            'caption':'Signed neuron activation at the largest absolute response within the recorded scoring span; every row uses the same template and scoring rule.'}))
+    if not candidates:return None
+    preferred=(bundle.get('display_selection') or {}).get('headline_figure_id')
+    explicit=next((value for _,value in candidates if value['source_figure_id']==preferred),None)
+    if explicit:return explicit
+    best=max(candidates,key=lambda item:(len(item[1]['fillers'])==10,item[0]))
+    if best[0][1]>=.1 or distribution.get('corpus_max',0)<=0 or distribution.get('corpus_min',0)>=0:
+        return best[1]
+    # A common frame that barely touches one observed pole must not replace that pole's evidence.
+    pos=max(candidates,key=lambda item:max(f['activation'] for f in item[1]['fillers']))[1]
+    neg=min(candidates,key=lambda item:min(f['activation'] for f in item[1]['fillers']))[1]
+    if pos['source_figure_id']==neg['source_figure_id']:return best[1]
+    fillers=[]
+    for index,(frame,sign) in enumerate([(pos,1),(neg,-1)],1):
+        ordered=sorted(frame['fillers'],key=lambda f:-sign*f['activation'])
+        chosen=ordered[:4]+sorted(ordered,key=lambda f:abs(f['activation']))[:2]
+        seen=set()
+        for row in chosen:
+            if row['source_condition'] in seen:continue
+            seen.add(row['source_condition'])
+            fillers.append({**row,'tag':str(row['tag'])+' ['+str(index)+']',
+                'template':frame['template'],'source_figure_id':frame['source_figure_id']})
+    return {'template':None,'fillers':fillers,'metric':best[1]['metric'],
+        'frames':[{'source_figure_id':f['source_figure_id'],'template':f['template']} for f in [pos,neg]],
+        'caption':'Signed peaks from two measured templates, marked [1] and [2]; each row uses its saved scoring span. Hover a row for its actual text. Complete comparisons remain in the figures below.'}

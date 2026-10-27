@@ -119,6 +119,15 @@ def render(source):
             "(() => { const A = B.appendix || {}; const parts = [];\n"
             "  const absolute = peakCensusFigure(B.peak_census_absolute, 'Absolute Top' + (B.peak_census_absolute?.n || ''));\n"
             "  if(absolute)parts.push($('details',null,$('summary',null,'Absolute peak census'),absolute));")
+    # One publication panel pools both saved tails; the source fields remain separate.
+    source=re.sub(r'(?:function combinedPeakCensus\(.*?|function peakCensusFigure\(.*?)' +
+                  r'(?=\n\n// Header:)',
+                  lambda m:Path(__file__).with_name('peak_census_display.js').read_text().rstrip(),
+                  source,count=1,flags=re.S)
+    source=re.sub(r"  const census = peakCensusFigure\(B\.peak_census,.*?null, census, negative\);",
+                  "  const census = peakCensusFigure(combinedPeakCensus(B.peak_census,B.peak_census_negative));\n"
+                  "  if (!parts.length && !census) return; sec('claim', 'The claim in detail', null, parts.length ? $('div', {class:'detail'}, parts) : null, census);",
+                  source,count=1,flags=re.S)
     source = source.replace("return $('div', { class: 'region' }, $('h4', null, r.name), $('div', { class: 'best' }, r.n != null ? `${r.n} probes · best ` : 'best ', tile(r.best, { signed: true, scale: G })), (r.frontier || []).slice(0, 3).map(e => exRow(e, s, (e.activation || 0) < 0, G)));", "const best = r.source_kind === 'saved_replacement_sweep'\n      ? $('div',{class:'best'},`${r.n} scored conditions · max `,tile(r.maximum,{signed:true,scale:G}),' · min ',tile(r.minimum,{signed:true,scale:G}))\n      : $('div',{class:'best'},r.n != null ? `${r.n} probes · best ` : 'best ',tile(r.best,{signed:true,scale:G}));\n    return $('div',{class:'region'},$('h4',null,r.name),best,(r.frontier||[]).slice(0,3).map(e=>exRow(e,s,(e.activation||0)<0,G)));")
     source = source.replace("[P(`Written probes, region by region. Each region is a hypothesis about what drives the unit; the frontier is the best text found there. ${S.n_regions ? S.n_regions + ' regions, ' : ''}${S.n_texts ? S.n_texts.toLocaleString() + ' texts scored. ' : ''}A region whose best value stays far below the corpus maximum is not where the unit lives.`)]", "[P(S.source_kind==='saved_replacement_sweeps' ? `${S.n_regions} saved replacement sweeps · ${S.n_texts} scored conditions. Values retain each sweep’s original scoring rule.` : `Written probes, region by region. Each region is a hypothesis about what drives the unit; the frontier is the best text found there. ${S.n_regions ? S.n_regions + ' regions, ' : ''}${S.n_texts ? S.n_texts.toLocaleString() + ' texts scored. ' : ''}A region whose best value stays far below the corpus maximum is not where the unit lives.`)]")
     source = source.replace("...S.regions.map(r => Math.abs(r.best || 0))",

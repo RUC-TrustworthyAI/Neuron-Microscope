@@ -157,7 +157,7 @@ def semantic_clusters(spectrum):
         group = groups.get(identity, {'name':identity,'description':'','pole':'either'})
         ordered = sorted(selected, key=lambda p:(-abs(p['activation']),p['id']))
         clusters.append({'id':identity, 'name':group['name'], 'story':group.get('description',''),
-            'pole':group.get('pole','either'), 'share':len(selected)/total,
+            'pole':group.get('pole','either'), 'response_summary':group.get('response_summary',{}), 'share':len(selected)/total,
             'n_points':len(selected), 'member_groups':[identity], 'member_routes':[],
             'key_units':[], 'examples':ordered[:3],
             'typical_activation':float(np.median([p['activation'] for p in selected]))})

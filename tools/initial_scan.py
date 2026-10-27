@@ -1,6 +1,7 @@
-"""Prepare labelled corpus-scan evidence before the interpretation container starts."""
+"""Prepare private scan samples for explanation feedback and a final held-out test."""
 import copy
 import html
+import hashlib
 import time
 from pathlib import Path
 from common import read, write, now
@@ -9,11 +10,10 @@ from common import read, write, now
 def prepare(report, config, activations, folder, llm=None):
     if config.get('settings',{}).get('anatomy_scan',{}).get('enabled',True) is False:
         return None
-    from report import source_bundle, merge
+    from report import source_bundle
     from spectrum import build as spectrum
     from anatomy_selection import build
     from anatomy_scan import ensure
-    from anatomy_semantics import annotate, apply, checkpoint_labels
     report,folder=Path(report),Path(folder)
     folder.mkdir(parents=True,exist_ok=True)
     # Host-only route metadata: the container never receives the archive or API records.
@@ -30,25 +30,37 @@ def prepare(report, config, activations, folder, llm=None):
     build(bundle,data,request)
     if ensure(request,bundle,folder) is None:return None
     build(bundle,data,request)
-    for point in bundle['anatomy']['points']:
-        point.pop('semantic_group',None)
-        point['cluster']='unlabelled-scan' if point.get('source')=='corpus:scan' else 'unlabelled'
-    previous=checkpoint_labels(folder)
-    semantics=annotate(bundle,folder,previous,llm,
-        batch_size=config['settings'].get('anatomy_scan',{}).get('label_batch_size',32))
-    apply(bundle,semantics)
     points=[copy.deepcopy(p) for p in bundle['anatomy']['points'] if p.get('source')=='corpus:scan']
-    selection=bundle['anatomy']['selection']
-    evidence={'groups':semantics['groups'],'clusters':semantics['clusters'],
-              'sampling':{k:selection[k] for k in ('policy','edges','bins','scan_anchors','scan_seconds','tokens_scanned','final_rule') if k in selection},
-              'points':points}
-    write(report/'anatomy-scan-evidence.json',evidence)
-    page,_=merge(source,{'anatomy':bundle['anatomy']})
-    (report/'index.html').write_text(page)
+    splits=split_documents(points,set(map(str,data['documents'])))
+    for point in points:
+        point['evaluation_split']=splits[point['id']]
+        point['cluster']='unassigned'
+        for key in ('semantic_group','label_reason','label_source'):
+            point.pop(key,None)
+    scan=read(folder/'anatomy-scan.json')
+    scan['points']=points
+    scan['split_policy']='Document-disjoint feedback and final holdout; documents present in the initial report are feedback only.'
+    write(folder/'selected-scan.json',scan)
     write(folder/'preparation.json',{'started_at':started,'finished_at':now(),
         'wall_seconds':time.perf_counter()-clock,'scan_points':len(points),
+        'feedback_points':sum(p['evaluation_split']=='feedback' for p in points),
+        'final_holdout_points':sum(p['evaluation_split']=='final_holdout' for p in points),
+        'llm_requests':0,
         'new_model_forwards':0,'gpu_seconds':0})
     return folder
+
+
+def split_documents(points, seen_documents):
+    """Choose the final test without sharing documents with feedback or initial evidence."""
+    groups={}
+    for point in points:groups.setdefault(str(point['document']),[]).append(point)
+    eligible=sorted((d for d in groups if d not in seen_documents),
+                    key=lambda d:hashlib.sha256(('holdout:'+d).encode()).hexdigest())
+    target=len(points)//2;chosen=set();count=0
+    for document in eligible:
+        if count>=target:break
+        chosen.add(document);count+=len(groups[document])
+    return {p['id']:('final_holdout' if str(p['document']) in chosen else 'feedback') for p in points}
 
 
 def evidence(report, arguments):
@@ -64,7 +76,8 @@ def evidence(report, arguments):
     cases=[{'id':p['id'],'semantic_group':p.get('semantic_group'),'cluster':p['cluster'],
             'label_reason':p.get('label_reason',''),'observed_prefix':p['observed_prefix'],
             'anchor':{'position':p['position'],'token':html.unescape(p['peak_token']),
-                      'gate':p['gate'],'value':p['up'],'product':p['activation']}}
+                      'gate':p['gate'],'value':p['up'],'product':p['activation'],
+                      'response_pole':p.get('response_pole')}}
            for p in page]
     return {'section':'anatomy_scan','groups':saved['groups'],'clusters':saved['clusters'],
             'sampling':saved['sampling'],'total':len(points),'offset':offset,

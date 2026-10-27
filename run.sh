@@ -210,6 +210,7 @@ main() {
                     --from) from=$2; shift 2 ;;
                     --handoff) initial_handoff=$(realpath -- "$2"); shift 2 ;;
                     --reuse-measurements) reuse_measurements=$(realpath -- "$2"); shift 2 ;;
+                    --reuse-completed-experiments) reuse_measurements=$(realpath -- "$2"); export NEURON_PAPER_REUSE_COMPLETED=1; shift 2 ;;
                     --neurons) shift; units=("$@"); break ;;
                     *) echo "Unknown argument: $1" >&2; return 2 ;;
                 esac

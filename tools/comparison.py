@@ -1,5 +1,6 @@
 """Human-only original/independent report comparison, added at publication time."""
 import argparse
+import hashlib
 import html
 import os
 import re
@@ -36,15 +37,16 @@ def install(report, neuron, references=None):
     report = Path(report)
     folder = report / 'comparison'
     folder.mkdir(exist_ok=True)
-    for name in ('viewer.js', 'style.css'):
-        _replace_file(ASSETS / name, folder / name)
+    viewer_name = 'viewer.' + hashlib.sha256((ASSETS / 'viewer.js').read_bytes()).hexdigest()[:12] + '.js'
+    _replace_file(ASSETS / 'viewer.js', folder / viewer_name)
+    _replace_file(ASSETS / 'style.css', folder / 'style.css')
     _replace_file(reference, folder / 'original.html')
     page = report / 'index.html'
     source = MARKER.sub('', page.read_text())
     markup = (
         '<!-- neuron-comparison:start -->\n'
         '<link rel="stylesheet" href="comparison/style.css">\n'
-        '<script defer src="comparison/viewer.js" data-neuron="' + html.escape(neuron, quote=True)
+        '<script defer src="comparison/' + viewer_name + '" data-neuron="' + html.escape(neuron, quote=True)
         + '" data-reference="comparison/original.html" data-original="https://already-clean.goodfire.com/neuron-scientist/'
         + neuron + '/"></script>\n'
         '<!-- neuron-comparison:end -->\n'
