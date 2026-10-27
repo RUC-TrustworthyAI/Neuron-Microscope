@@ -1,16 +1,16 @@
 <p align="center">
-  <img src="assets/hero.png" width="100%" alt="Neuron Investigator">
+  <img src="assets/neuron-microscope.png" width="100%" alt="Neuron Microscope">
 </p>
 
 <h1 align="center">
-  Neuron Investigator<br>
-  <sub>🔬 用 agent 和实验研究神经元</sub>
+  Neuron Microscope<br>
+  <sub>🔬 用 agent 复现 AlreadyClean</sub>
 </h1>
 
 <p align="center">
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
-  <a href="#reports"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
+  <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
   <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
 </p>
 
@@ -19,14 +19,18 @@
 <p align="center">
   <a href="#overview">📖 概览</a> ·
   <a href="#workflow">⚗️ 工作流程</a> ·
-  <a href="#reports">🖼️ 报告</a> ·
   <a href="#quick-start">🚀 快速开始</a> ·
+  <a href="#reproduction-results">🧪 复现结果</a> ·
   <a href="#documentation">📚 文档</a>
 </p>
 
 ## 📖 项目概览 <a id="overview"></a>
 
-一个研究 dense Qwen3 原生 MLP neuron 的三阶段 agent pipeline：从已有激活提出解释，设计并测量实验，再根据测量修订解释，生成可交互 HTML。
+我们复现了 [AlreadyClean](https://already-clean.goodfire.com/) 的主要神经元分析与报告生成功能，并通过独立实验考察原博客的发现能否复现。我们通过实验观察到 **【主要发现】**，并得出 **【复现结论】**。详细实验与分析见下文的[复现结果](#reproduction-results)。
+
+我们同时开源了完整的三阶段 pipeline，用于研究 dense Qwen3 模型的原生 MLP 神经元。流程覆盖证据整理、初步解释、实验设计与执行、解释修订和交互式 HTML 报告生成，并增加了 **【扩展功能】**，供社区使用和开展进一步研究。
+
+后续，我们计划 **【后续计划】**。欢迎大家提供测试结果与反馈，共同改进神经元解释流程。
 
 ## ⚗️ 工作流程 <a id="workflow"></a>
 
@@ -40,23 +44,13 @@
 
 **Clusters** 按语义组织已测量的样本。原始 NMF routes 描述归因模式，一个语义组可以跨越多条 route。各组的样本数、归因贡献占比和上游汇总由实测数据计算。
 
-## 🖼️ 报告局部 <a id="reports"></a>
-
-<p align="center">
-  <img src="assets/report-anatomy.png" width="560" alt="从已有报告导出的 Qwen3-32B L1/N20535 散点图：横轴为原始 gate，纵轴为 up">
-</p>
-
-*Inside the neuron，Qwen3-32B L1/N20535。* 从语料和实验中选出的 token 位置，横轴为原始 gate，纵轴为 up。橙、蓝、灰分别表示正向、负向、混合或未明确的语义组，不代表单点的激活正负。灰色背景里标作“closed”的区域仍可能有非零的 `SiLU(gate) × up`。图中的点经过选取，不代表语料中的密度分布。
-
-完整报告还包含激活样本、token 统计、替换实验、归因图、干预实验、Criticism 和独立评阅。固定代码画实测数据，agent 写解释和图注。[报告指南](docs/reports.md)说明了各项怎么读、数据从哪里来。
-
 ## 🚀 快速开始 <a id="quick-start"></a>
 
 ### 1. 在本地体验报告渲染
 
 ```bash
-git clone https://github.com/RUC-TrustworthyAI/Neuron-Investigator.git
-cd Neuron-Investigator
+git clone https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+cd Neuron-Microscope
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements/cpu.txt
@@ -76,7 +70,7 @@ python -m http.server 8000 --directory runs/demo
 python -m pip install -r requirements/gpu.txt
 # 安装与 NVIDIA 驱动匹配的 CUDA wheel。
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
-docker build -t neuron-investigator:local .
+docker build -t neuron-microscope:local .
 cp settings.json settings.local.json
 ```
 
@@ -105,6 +99,13 @@ python -m http.server 8000 --directory results/example
 
 更多续跑、单阶段和复用测量操作见 [运行说明](docs/running.md)。页面中 Exemplars 与 Clusters 只截短展示上文，计算仍使用采集时完整前缀和明确评分位置。
 
+## 🧪 复现结果 <a id="reproduction-results"></a>
+
+【主要对比图：原博客与本项目的复现结果】
+
+- **主要发现：**【主要发现及对应实验】
+- **复现结论：**【原博客的哪些发现已复现、部分复现或未能复现】
+
 ## 📚 文档导航 <a id="documentation"></a>
 
 | 文档 | 解决什么问题 |
@@ -129,7 +130,7 @@ skills/
 tools/                 宿主证据读取、测量、渲染与费用记录
 analysis/              从已有激活生成初始报告和统计表
 examples/demo.py       离线合成报告示例
-assets/                项目头图、流程图和报告局部
+assets/                项目头图、流程图和配图
 tests/                 CPU 软件样例和微型随机模型测试
 requirements/          CPU、GPU 宿主及测试依赖
 docs/                  环境、数据、方法与报告指南

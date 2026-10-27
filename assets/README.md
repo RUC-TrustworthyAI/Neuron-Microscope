@@ -1,6 +1,6 @@
 # Documentation figures
 
-`hero.svg` / `hero.png` contain the project banner. `badges/*.svg` are the README navigation badges.
+`neuron-microscope.svg` / `neuron-microscope.png` contain the project banner. `badges/*.svg` are the README navigation badges.
 
 `workflow.svg` is the editable data-flow diagram; `workflow.png` is its README export. It shows evidence preparation, the three container stages, and host model execution.
 
@@ -12,7 +12,7 @@ With Node.js and `sharp` installed, save the following as a `.cjs` script and ru
 const sharp = require('sharp');
 
 async function main() {
-  await sharp('assets/hero.svg').png().toFile('assets/hero.png');
+  await sharp('assets/neuron-microscope.svg').png().toFile('assets/neuron-microscope.png');
   await sharp('assets/workflow.svg').png().toFile('assets/workflow.png');
   await sharp('assets/report-anatomy.svg', { density: 144 })
     .flatten({ background: '#fff' }).png().toFile('assets/report-anatomy.png');

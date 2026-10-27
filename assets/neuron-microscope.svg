@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500" role="img" aria-labelledby="title desc">
+  <title id="title">Neuron Microscope</title>
+  <desc id="desc">A blue microscope examines an orange neuron beside the Neuron Microscope title.</desc>
+  <defs>
+    <linearGradient id="paper" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f4f8ff"/><stop offset=".52" stop-color="#ffffff"/><stop offset="1" stop-color="#f1f6ff"/></linearGradient>
+    <linearGradient id="ink" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1a3156"/><stop offset="1" stop-color="#294b80"/></linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#77a9f2"/><stop offset="1" stop-color="#377be0"/></linearGradient>
+  </defs>
+  <rect width="1600" height="500" fill="url(#paper)"/>
+  <path d="M1340 -70L1560 -70L1360 130Q1330 160 1292 160H1190Z" fill="#eaf2ff"/>
+  <path d="M1430 500L1600 330V500Z" fill="#e5efff"/>
+  <path d="M-50 410L90 270Q112 248 136 269Q159 291 135 315L-20 470Z" fill="#e5efff"/>
+  <rect x="1370" y="90" width="148" height="10" rx="5" fill="#d8e7fc"/>
+  <rect x="1430" y="113" width="88" height="10" rx="5" fill="#e7effa"/>
+  <ellipse cx="273" cy="425" rx="164" ry="13" fill="#dae7f9" opacity=".45"/>
+
+  <g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M326 391C374 359 399 316 399 264C399 213 370 171 326 153L255 151" fill="none" stroke="url(#ink)" stroke-width="31"/>
+    <path d="M338 365C371 337 385 301 385 265" fill="none" stroke="#4b76ae" stroke-width="6"/>
+    <path d="M256 244L233 301H303L279 244Z" fill="#dceaff" opacity=".8"/>
+
+    <g transform="translate(240 184) rotate(-25)">
+      <rect x="-19" y="-101" width="38" height="42" rx="5" fill="#243e63"/>
+      <rect x="-27" y="-107" width="54" height="14" rx="5" fill="#182d4c"/>
+      <rect x="-29" y="-67" width="58" height="94" rx="12" fill="url(#ink)"/>
+      <path d="M-16 -52V11" stroke="#6e9edc" stroke-width="7"/>
+      <rect x="-35" y="19" width="70" height="17" rx="6" fill="#426da5"/>
+      <rect x="-17" y="34" width="34" height="27" rx="4" fill="#243e63"/>
+      <path d="M-14 60H14" stroke="#91b9ea" stroke-width="6"/>
+    </g>
+
+    <circle cx="370" cy="243" r="29" fill="#f5f8ff" stroke="#243e63" stroke-width="8"/>
+    <circle cx="370" cy="243" r="15" fill="#4b86d4"/>
+    <circle cx="370" cy="243" r="5" fill="#a6c9f5"/>
+
+    <rect x="175" y="305" width="190" height="19" rx="6" fill="#243e63"/>
+    <rect x="216" y="298" width="103" height="7" rx="3.5" fill="#a4c2e7"/>
+    <path d="M188 301V295H208M337 301V295H325" fill="none" stroke="#426da5" stroke-width="5"/>
+
+    <g fill="none" stroke="#e66f3d" stroke-width="3.5">
+      <path d="M268 277L250 264L237 268M250 264L248 253M268 277L285 265L297 268M285 265L288 255M268 277L267 290L252 296M267 290L281 295"/>
+    </g>
+    <circle cx="268" cy="277" r="9" fill="#e66f3d"/>
+    <circle cx="265" cy="274" r="2.8" fill="#ffbd91"/>
+    <g fill="#e66f3d">
+      <circle cx="237" cy="268" r="3"/><circle cx="248" cy="253" r="3"/>
+      <circle cx="297" cy="268" r="3"/><circle cx="288" cy="255" r="3"/>
+    </g>
+
+    <path d="M257 378L270 352L286 378" fill="#d4e4f8" stroke="#7298c8" stroke-width="5"/>
+    <ellipse cx="270" cy="351" rx="21" ry="10" fill="#e8f1fd" stroke="#7298c8" stroke-width="5"/>
+    <path d="M153 391H383C398 391 409 402 409 417H127C127 402 138 391 153 391Z" fill="url(#ink)"/>
+    <path d="M151 401H310" stroke="#4b76ae" stroke-width="5"/>
+    <path d="M150 419H177M357 419H385" stroke="#172844" stroke-width="9"/>
+  </g>
+  <path d="M415 104V125M404 115H426" stroke="#e3976c" stroke-width="5" stroke-linecap="round"/>
+
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="526" y="246" font-size="82" font-weight="800" letter-spacing="-2.5" fill="#172844">Neuron Microscope</text>
+    <text x="530" y="303" font-size="29" fill="#6a7890">Reproducing AlreadyClean with agents.</text>
+    <path d="M532 342H582" stroke="#e66f3d" stroke-width="5" stroke-linecap="round"/>
+    <path d="M594 342H644" stroke="#4b86d4" stroke-width="5" stroke-linecap="round"/>
+  </g>
+</svg>

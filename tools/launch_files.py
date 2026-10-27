@@ -30,7 +30,7 @@ def make_batch(output,stages,units):
           'settings':config,'paths':resolved,'gpu_pairs':config['gpu_groups'],
           'start_next_after':os.environ.get('NEURON_PAPER_START_NEXT_AFTER',config.get('execution',{}).get('start_next_after','02-experiments')),'budget_usd':budget,'existing_only':bool(os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS')),
           'reuse_measurements':os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS') or None,
-          'image':config.get('execution',{}).get('image','neuron-investigator:local'),
+          'image':config.get('execution',{}).get('image','neuron-microscope:local'),
           'agent_wall_seconds':config.get('execution',{}).get('agent_wall_seconds',10800)})
 
 

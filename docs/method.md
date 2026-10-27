@@ -1,6 +1,6 @@
 # Method and implementation
 
-The subject is a native dense-Qwen3 MLP neuron. The investigator is a separate DeepSeek model accessed through its API. A GPU group holds one sharded copy of the subject model, not several different models.
+The subject is a native dense-Qwen3 MLP neuron. The research agent uses a separate DeepSeek model accessed through its API. A GPU group holds one sharded copy of the subject model, not several different models.
 
 | Operation | Code | Origin of content |
 |---|---|---|

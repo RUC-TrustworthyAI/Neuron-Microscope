@@ -204,7 +204,7 @@ main() {
         prepare)
             while [[ $# -gt 0 ]]; do
                 case "$1" in
-                    --settings) export NEURON_INVESTIGATOR_SETTINGS=$(realpath -- "$2"); shift 2 ;;
+                    --settings) export NEURON_MICROSCOPE_SETTINGS=$(realpath -- "$2"); shift 2 ;;
                     --output) output=$2; shift 2 ;;
                     --through) through=$2; shift 2 ;;
                     --from) from=$2; shift 2 ;;
@@ -235,7 +235,7 @@ main() {
         execute)
             if [[ ${1:-} != --run || $# != 2 ]]; then echo 'Specify --run DIR.' >&2; return 2; fi
             batch=$(realpath -- "$2")
-            unset NEURON_INVESTIGATOR_SETTINGS
+            unset NEURON_MICROSCOPE_SETTINGS
             # Execute the prepared snapshot, preserving the real project root.
             if [[ "$FRAMEWORK_DIR/run.sh" != "$batch/framework-source/run.sh" ]]; then
                 exec "$batch/framework-source/run.sh" execute --run "$batch"

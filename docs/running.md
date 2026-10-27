@@ -21,7 +21,7 @@ The recorded development environment used torch 2.7.1+cu118, Transformers 4.57.6
 Build the agent image:
 
 ```bash
-docker build -t neuron-investigator:local .
+docker build -t neuron-microscope:local .
 ```
 
 The Dockerfile installs jq, ripgrep, Bash and DeepSeek Harness SDK/runtime 0.2.1rc2 from public packages. `--build-arg BASE_IMAGE=python:3.11-slim` can use an already cached compatible public Python base.
@@ -46,7 +46,7 @@ Copy `settings.json` to `settings.local.json`. Relative paths resolve against th
 | `llm` | Provider/model/reasoning configuration, output capacity and upstream URLs |
 | `pricing` | Explicit token-price estimate and peak-hour schedule |
 
-Scientific settings (sampling, atlas, family, graph and blind-test parameters) live in the same file. Host paths, pricing and scheduling are not included in agent-facing scientific settings. The default investigator uses DeepSeek with high reasoning effort. Set the output capacity to the maximum supported by your endpoint.
+Scientific settings (sampling, atlas, family, graph and blind-test parameters) live in the same file. Host paths, pricing and scheduling are not included in agent-facing scientific settings. The default research agent uses DeepSeek with high reasoning effort. Set the output capacity to the maximum supported by your endpoint.
 
 Credentials stay on the host. Set `DEEPSEEK_API_KEY` in your shell environment, or set `NEURON_PAPER_API_KEY_FILE` to a local key file. Never put a key in settings or in Git. The agent receives only a temporary credential for the host API proxy. Authentication headers are not written to the API request records.
 

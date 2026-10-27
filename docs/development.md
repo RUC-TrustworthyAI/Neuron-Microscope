@@ -21,8 +21,8 @@ The software tests cover preserved input prefixes, data selection, native attrib
 Build the agent image separately:
 
 ```bash
-docker build -t neuron-investigator:local .
-docker run --rm --network none neuron-investigator:local \
+docker build -t neuron-microscope:local .
+docker run --rm --network none neuron-microscope:local \
   python -c 'import deepseek_harness; import shutil; assert shutil.which("jq"); assert shutil.which("rg")'
 ```
 

@@ -70,7 +70,7 @@
     "references": "data/reference-pages"
   },
   "execution": {
-    "image": "neuron-investigator:local",
+    "image": "neuron-microscope:local",
     "agent_wall_seconds": 10800,
     "start_next_after": "02-experiments"
   },

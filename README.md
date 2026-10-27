@@ -1,16 +1,16 @@
 <p align="center">
-  <img src="assets/hero.png" width="100%" alt="Neuron Investigator">
+  <img src="assets/neuron-microscope.png" width="100%" alt="Neuron Microscope">
 </p>
 
 <h1 align="center">
-  Neuron Investigator<br>
-  <sub>🔬 Investigating neurons with agents and experiments</sub>
+  Neuron Microscope<br>
+  <sub>🔬 Reproducing AlreadyClean with agents</sub>
 </h1>
 
 <p align="center">
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
-  <a href="#reports"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
+  <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
   <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
 </p>
 
@@ -18,15 +18,19 @@
 
 <p align="center">
   <a href="#overview">📖 Overview</a> ·
-  <a href="#workflow">⚗️ Workflow</a> ·
-  <a href="#reports">🖼️ Reports</a> ·
-  <a href="#quick-start">🚀 Quick start</a> ·
+  <a href="#workflow">⚗️ How It Works</a> ·
+  <a href="#quick-start">🚀 Quick Start</a> ·
+  <a href="#reproduction-results">🧪 Reproduction Results</a> ·
   <a href="#documentation">📚 Documentation</a>
 </p>
 
 ## 📖 Overview <a id="overview"></a>
 
-A three-stage agent pipeline for investigating native MLP neurons in dense Qwen3 models. It starts with saved activation evidence, runs controlled measurements, and produces an interactive HTML report.
+We reproduce the main neuron analysis and report-generation features of [AlreadyClean](https://already-clean.goodfire.com/) and independently investigate whether the original blog's findings can be reproduced. Our experiments show **[KEY FINDINGS]** and lead us to **[REPRODUCTION CONCLUSIONS]**. The supporting experiments and analysis are presented in [Reproduction Results](#reproduction-results).
+
+We also open-source the complete three-stage pipeline for investigating native MLP neurons in dense Qwen3 models. It covers evidence preparation, initial interpretation, experiment design and execution, explanation revision, and interactive HTML reporting. We add **[ADDITIONAL FEATURES]** for the community to use and build on.
+
+Next, we plan to **[FUTURE PLANS]**. We welcome test results and feedback to help improve the neuron interpretation workflow together.
 
 ## ⚗️ How It Works <a id="workflow"></a>
 
@@ -38,19 +42,9 @@ A three-stage agent pipeline for investigating native MLP neurons in dense Qwen3
 4. **Revise.** A fresh container loads `skills/revise/`, reviews the measurements, and revises the explanation, Criticism, and captions. Fixed code assembles the report and cost records.
 5. **Publish.** Export the generated report. If a local reference snapshot is available, publication adds a collapsible side-by-side comparison with aligned sections and linked scrolling. Reference content is added only at publication; it is not given to the research agents.
 
-Each agent runs in a separate container with one skill. Host tools handle paths, GPU allocation, accounting, and HTML generation. The default investigator is `deepseek-flash` with `reasoning_effort: high`.
+Each agent runs in a separate container with one skill. Host tools handle paths, GPU allocation, accounting, and HTML generation. The default research agent is `deepseek-flash` with `reasoning_effort: high`.
 
 **Semantic Clusters** group measured examples by meaning. Raw NMF routes describe attribution patterns, and a semantic cluster may span several routes. Counts, attribution-mass shares and upstream summaries are computed from the measured members.
-
-## 🖼️ Report Excerpt <a id="reports"></a>
-
-<p align="center">
-  <img src="assets/report-anatomy.png" width="560" alt="Raw gate versus up for selected Qwen3-32B L1/N20535 positions, exported from an existing generated report">
-</p>
-
-*Inside the neuron, Qwen3-32B L1/N20535.* Selected corpus and experimental token positions, plotted by raw gate and up. Orange, blue and grey denote positive, negative and mixed or unresolved semantic groups; they do not set an individual point's activation sign. The shaded “closed” half can still have nonzero `SiLU(gate) × up`. These selected samples do not estimate corpus density.
-
-A full report also includes activation examples, token statistics, replacement experiments, attribution graphs, interventions, Criticism and an independent review. Fixed code plots the measurements; agents write the explanations and captions. The [report guide](docs/reports.md) explains how to read these sections and where their data comes from.
 
 ## 🚀 Quick Start <a id="quick-start"></a>
 
@@ -59,8 +53,8 @@ A full report also includes activation examples, token statistics, replacement e
 The demo generates a small synthetic fixture; it is not an experimental result. It needs no API key, Docker, GPU, or downloaded model and also works on macOS.
 
 ```bash
-git clone https://github.com/RUC-TrustworthyAI/Neuron-Investigator.git
-cd Neuron-Investigator
+git clone https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+cd Neuron-Microscope
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements/cpu.txt
@@ -85,7 +79,7 @@ The agent container does not need CUDA. Model computation runs through host tool
 python -m pip install -r requirements/gpu.txt
 # Choose a CUDA wheel compatible with your NVIDIA driver:
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
-docker build -t neuron-investigator:local .
+docker build -t neuron-microscope:local .
 cp settings.json settings.local.json
 ```
 
@@ -97,7 +91,7 @@ Edit `settings.local.json` to point to your inputs:
     "reports": "/path/to/initial-reports",
     "activations": "/path/to/activation-archive",
     "model": "/path/to/Qwen3-32B",
-    "state": "/tmp/neuron-investigator",
+    "state": "/tmp/neuron-microscope",
     "references": "/path/to/optional-reference-pages"
   },
   "gpu_groups": [[0, 1, 2, 3]]
@@ -144,6 +138,13 @@ runs/example/
 
 Each run retains its requests, measurements and reports. Fresh interpretations use the target activation evidence without previous explanations or official labels.
 
+## 🧪 Reproduction Results <a id="reproduction-results"></a>
+
+[MAIN COMPARISON FIGURES: ORIGINAL BLOG VS. OUR REPRODUCTION]
+
+- **Findings:** [KEY FINDINGS AND SUPPORTING EXPERIMENTS]
+- **Reproduction conclusions:** [WHICH ORIGINAL FINDINGS WERE REPRODUCED, PARTIALLY REPRODUCED, OR NOT REPRODUCED]
+
 ## 📚 Documentation <a id="documentation"></a>
 
 | Guide | Start here when you want to… |
@@ -164,7 +165,7 @@ Dockerfile              Agent image with pinned harness, jq and ripgrep
 skills/                 interpret, experiment, revise
 tools/                  Evidence, GPU measurements, rendering and accounting
 analysis/               Initial report builders and data-free HTML/JS templates
-assets/                 Project banner, workflow diagram and report excerpt
+assets/                 Project banner, workflow diagram and figures
 requirements/           Host and development dependencies
 tests/                  Software tests and synthetic fixtures
 examples/demo.py        Synthetic offline renderer example

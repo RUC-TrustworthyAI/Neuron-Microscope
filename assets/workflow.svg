@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="470" viewBox="0 0 1280 470" role="img" aria-labelledby="title desc">
-  <title id="title">Neuron Investigator data flow</title>
+  <title id="title">Neuron Microscope data flow</title>
   <desc id="desc">Saved activations are sampled and semantically labelled before interpretation. Three separate agent containers exchange JSON and HTML. Only the experiment stage requests new model measurements from a host GPU worker. Fixed code publishes the revised report.</desc>
   <defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10" fill="none" stroke="#50545a" stroke-width="1.5"/></marker></defs>
   <rect width="1280" height="470" rx="18" fill="#f6f9fe"/>
