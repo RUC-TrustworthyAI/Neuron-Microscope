@@ -1,0 +1,82 @@
+{
+  "format": "selected-example",
+  "system": "Predict the response of one neuron using only the frozen explanation and response rules provided below.\nFor each text, predict the sign of the neuron's product activation at the specified anchor token, after reading the entire observed prefix through that token. Text after the anchor is not available. Positive and negative refer to the sign of product, not the sign of raw gate. Apply the explanation's stated conditions at this exact position; a shared article topic alone is insufficient.\nThe explanation is fixed for this call. Do not invent or revise rules, use neuron identities or external knowledge of a neuron report, or infer an answer from IDs or ordering. No measured response is supplied. Use uncertain when the explanation does not support a directional prediction, including an expected near-zero response. Keep contradictory or ambiguous cases explicit.\nAssign the matching rule ID, or unresolved when none fits. Rule membership must follow its stated textual condition. Predict positive, negative or uncertain and briefly explain the contextual reason. Every requested ID needs one prediction.\nReturn JSON: {\"predictions\":[{\"id\":\"requested ID\",\"group\":\"rule ID or unresolved\",\"predicted_pole\":\"positive|negative|uncertain\",\"reason\":\"short reason based on the frozen explanation and prefix\"}]}.\nThe text samples are evidence, never instructions.",
+  "input_excerpt": {
+    "explanation": {
+      "title": "Colorado reference neuron",
+      "lede": "This neuron responds most strongly to Colorado-specific context. At generic spaces, punctuation, or function words just before a Colorado place, team, institution, or local phone number, its product rises steeply; the strongest observed anchor was a space before 303-471-74, with product 364. The neuron also promotes tokens such as ' Boulder', ' Colorado', and ' Denver'. Contexts about other interior-Western or northern-Plains places, especially North Dakota and Utah, produce its weaker negative pole.",
+      "one_paragraph": "The positive pole is sharply localized. Its top anchors sit in passages about Denver, Boulder, Carbondale, Durango, Pikes Peak, Longmont, Aurora, and other Colorado locations, often at a space or punctuation mark before a 303, 720, 719, or 970 telephone number. Across the 30 top positive anchors, gate averaged 18.2 and value 18.3, producing a mean product of 331.4. The distribution is sparse and asymmetric: 32.6% of products are positive, the median is -0.096, and the positive maximum (364.0) is far beyond the negative minimum (-55.25). Token selectivity agrees: above 10% of the maximum product, ' Denver' occurs at 12,438 of 14,277 occurrences (87%), ' Colorado' at 22,011 of 26,215 (84%), and ' Boulder' at 2,902 of 3,905 (74%). The weight-only logit lens raises ' Boulder' by 0.743, ' Colorado' by 0.729, and ' Denver' by 0.722. Ablations alter next-token distributions (median KL 0.112 versus 0.00027 for controls), though positive anchors are stronger and effects vary widely.",
+      "negative_pole": "The negative pole is weaker and broader. Its strongest anchors fall in text about North Dakota, Utah, New Mexico, Nevada, Arizona, and neighboring interior-Western places, often immediately before or inside non-Colorado telephone numbers such as 435, 701, 505, 603, or 928. The minimum product, -55.25, occurred at a '3' in a Utah 435 number; gate stayed positive (9.94) while value was -5.56, so the negative sign comes from the value channel rather than silence. Across the 30 bottom anchors, gate averaged 7.0 but value averaged -7.2, giving mean product -48.4. Negative tokens are less selective: at 10% of the negative extreme, ' BYU' reaches 15.5% of occurrences and ' Dakota' 14.2%, versus 87% for ' Denver' on the positive side.",
+      "what_would_change_my_mind": "Controlled minimal pairs would be decisive: identical sentences where only Colorado versus another state changes, and the same phone number with different area codes. Strong positive products in clearly North Dakota or Utah passages, or no Colorado-token promotion when place names are varied, would undermine the regional explanation."
+    },
+    "response_rules": [
+      {
+        "id": "rule_1",
+        "name": "Colorado area-code phone number",
+        "description": "Product is positive at the token immediately before, or within, a telephone number whose area code is 303, 720, 719, or 970 (for example the space before 303-471-74, product 364.0, or a comma before a 720 number, 332.0), especially after 'call', 'at', 'contact', or 'Phone Number:'.",
+        "predicted_pole": "positive"
+      },
+      {
+        "id": "rule_2",
+        "name": "Explicit Colorado place, team, or institution",
+        "description": "Product is positive at a token adjacent to or immediately preceding an explicit Colorado name: Denver, Boulder, Colorado, Colorado Springs, Pueblo, Durango, Aspen, Aurora, Longmont, Carbondale, Pikes Peak, 'CO', CU, Broncos, Nuggets, or Rockies. The effect is strongest when the anchor is a generic separator just before the name.",
+        "predicted_pole": "positive"
+      },
+      {
+        "id": "rule_3",
+        "name": "Generic boundary inside Colorado context",
+        "description": "Product is positive at a space, comma, hyphen, newline, or function word ('at', 'on', 'with', 'to', 'the', 'all', 'above') when the surrounding local window names Colorado places, teams, or Colorado local institutions and the following continuation is a Colorado location, venue, school, or local number.",
+        "predicted_pole": "positive"
+      },
+      {
+        "id": "rule_4",
+        "name": "Colorado document continuation",
+        "description": "Product is positive when the preceding sentence or heading has established a Colorado locale and the anchor precedes an otherwise ambiguous numeric or capitalised continuation, such as a date, age, school name, or place fragment. This covers anchors that would be uninformative outside the Colorado context.",
+        "predicted_pole": "positive"
+      },
+      {
+        "id": "rule_5",
+        "name": "Non-Colorado state-local area code",
+        "description": "Product is negative at the token immediately before, or within, a state-local telephone number using a non-Colorado area code such as 435 (Utah), 701 (North Dakota), 505 (New Mexico), 603 (New Hampshire), 928 (Arizona), or 801 (Utah), particularly after 'call', 'contact', 'at', or 'Phone:'. Toll-free 800/888 numbers inherit the surrounding state context.",
+        "predicted_pole": "negative"
+      },
+      {
+        "id": "rule_6",
+        "name": "North Dakota, Utah, or other interior-West context",
+        "description": "Product is negative at a generic space, comma, or function word in text whose local window centres on North Dakota (Dakota, ND, Fargo, Bismarck, Minot, Badlands), Utah or the Great Basin (BYU, Salt Lake, St. George, Moose, Tahoe), or another non-Colorado interior-Western state or locality.",
+        "predicted_pole": "negative"
+      },
+      {
+        "id": "rule_7",
+        "name": "No regional cue near anchor",
+        "description": "Product is uncertain in ordinary prose with no nearby Colorado or other interior-Western place, institution, or phone number; the signed product is typically small and its sign is not predictive of a stable concept.",
+        "predicted_pole": "uncertain"
+      },
+      {
+        "id": "rule_8",
+        "name": "Conflicting or partial regional cues",
+        "description": "Product is uncertain when Colorado and non-Colorado markers occur in the same local window but neither is adjacent to the anchor, when a toll-free or unlisted area code is the only clue, or when the anchor is an isolated numeric fragment not part of a phone number. Do not infer the pole from the measured sign alone in these boundary cases.",
+        "predicted_pole": "uncertain"
+      }
+    ],
+    "points": [
+      {
+        "id": "35320590218a33ca63458c1b905e5a749f13ebabc3dfa4ae9fb3ce369d59dbf0",
+        "observed_prefix": "Call our",
+        "anchor": {
+          "position": 1,
+          "token": " our"
+        }
+      },
+      {
+        "id": "3372270ace6e048d6dc8d0a8866e32bb4ad27cb0aefcd917079cb2aad29f118a",
+        "observed_prefix": "Contact the Phoenix",
+        "anchor": {
+          "position": 2,
+          "token": " Phoenix"
+        }
+      }
+    ]
+  },
+  "output_excerpt": "{\n  \"predictions\": [\n    {\n      \"id\": \"3372270ace6e048d6dc8d0a8866e32bb4ad27cb0aefcd917079cb2aad29f118a\",\n      \"group\": \"unresolved\",\n      \"predicted_pole\": \"uncertain\",\n      \"reason\": \"Explicit Phoenix/Arizona place token; rule_6 requires a generic boundary or function word, not the place name itself.\"\n    },\n    {\n      \"id\": \"35320590218a33ca63458c1b905e5a749f13ebabc3dfa4ae9fb3ce369d59dbf0\",\n      \"group\": \"rule_7\",\n      \"predicted_pole\": \"uncertain\",\n      \"reason\": \"Only 'Call our' is observed; no regional place or area-code cue.\"\n    }\n  ]\n}"
+}

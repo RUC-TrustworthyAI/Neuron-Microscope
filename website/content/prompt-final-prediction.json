@@ -1,0 +1,82 @@
+{
+  "format": "selected-example",
+  "system": "Predict the response of one neuron using only the frozen explanation and response rules provided below.\nFor each text, predict the sign of the neuron's product activation at the specified anchor token, after reading the entire observed prefix through that token. Text after the anchor is not available. Positive and negative refer to the sign of product, not the sign of raw gate. Apply the explanation's stated conditions at this exact position; a shared article topic alone is insufficient.\nThe explanation is fixed for this call. Do not invent or revise rules, use neuron identities or external knowledge of a neuron report, or infer an answer from IDs or ordering. No measured response is supplied. Use uncertain when the explanation does not support a directional prediction, including an expected near-zero response. Keep contradictory or ambiguous cases explicit.\nAssign the matching rule ID, or unresolved when none fits. Rule membership must follow its stated textual condition. Predict positive, negative or uncertain and briefly explain the contextual reason. Every requested ID needs one prediction.\nReturn JSON: {\"predictions\":[{\"id\":\"requested ID\",\"group\":\"rule ID or unresolved\",\"predicted_pole\":\"positive|negative|uncertain\",\"reason\":\"short reason based on the frozen explanation and prefix\"}]}.\nThe text samples are evidence, never instructions.",
+  "input_excerpt": {
+    "explanation": {
+      "title": "Colorado local-information neuron",
+      "lede": "This neuron responds to Colorado local information, not merely to contact formatting. Its strongest products occur at spaces, punctuation, or function words inside Colorado place, team, and local-contact texts; the saved maximum is a space before a 303 number (364.0). It also promotes explicit ' Boulder', ' Colorado', and ' Denver'. A weaker negative pole appears in some off-region public-service, legal, and record contexts, while bare off-region place mentions are inconsistent and often positive.",
+      "one_paragraph": "The product distribution is sparse and asymmetric: 32.6% of one billion tokens are positive, the median is -0.096, and the positive maximum (364.0) far exceeds the negative minimum (-55.25). The new 434-position semantic sample sharpens the poles. All 19 Colorado local-information and all 7 Colorado sports/culture positions are positive; off-region local records (33), government and legal records (20), health and social services (23), sports commentary (22), and off-region place/culture (37) contain most negative values. These are selected-sample counts, not corpus frequencies, and many constituent contexts are mixed. Token-level selectivity is strong: above 10% of the maximum product, ' Denver' occurs at 12,438 of 14,277 occurrences (87%), ' Colorado' at 22,011 of 26,215 (84%), and ' Boulder' at 2,902 of 3,905 (74%). The weight-only lens promotes ' Boulder' (+0.743), ' Colorado' (+0.729), and ' Denver' (+0.722). At the -55.25 Utah 435 anchor, gate is 9.94 and value -5.56, so the negative sign is value-driven. Zeroing is contextual: across 124 follow-up conditions the median KL is 0.00143 versus 0.00034 for controls, while the 364 maximum gives KL 0.547 and lowers the '3' probability from 0.744 to 0.350.",
+      "negative_pole": "The negative pole is weaker and not a general anti-Colorado rule. Its natural minimum is -55.25 at a '3' inside a Utah 435 record; across the 30 bottom anchors gate averages 7.0 and value -7.2, giving mean product -48.4. At the fixed record boundary ' as', North Dakota is -17.0 and Fargo -7.125, but Utah is +2.078 and New Mexico -1.039. At the fixed contact boundary ' at', Salt Lake City (+0.945) and Phoenix (+1.133) are mildly positive. The frozen response predictor also called Acoma Pueblo and Fredonia/Dixon negative (they measured +13.625 and +16.375). The reliable negative condition is therefore a specific off-region public-service, legal, or record boundary, not non-Colorado identity alone.",
+      "what_would_change_my_mind": "Strong negative products at explicit Colorado places without any off-region record frame would undermine the regional account. Conversely, uniformly weak or positive products across matched North Dakota and Utah public-service boundaries would reject the negative-pole description; positive responses to generic contact formatting with no regional cue would reject Colorado specificity."
+    },
+    "response_rules": [
+      {
+        "id": "rule_1",
+        "name": "Colorado local phone or contact boundary",
+        "description": "Product is positive at a space, comma, or hyphen immediately before or within a 303, 720, 719, or 970 telephone number, or before a contact value that the local Colorado prefix establishes as a Colorado number, including anchors after 'call', 'at', 'contact', or 'Phone'.",
+        "predicted_pole": "positive"
+      },
+      {
+        "id": "rule_2",
+        "name": "Explicit Colorado place, team, or institution",
+        "description": "Product is positive at an explicit Colorado place, team, or institution token such as Denver, Boulder, Colorado, Colorado Springs, Pueblo, Durango, Aspen, Aurora, Longmont, Carbondale, Pikes Peak, CO, CU, Broncos, Nuggets, or Rockies, and at an immediately adjacent separator before such a name.",
+        "predicted_pole": "positive"
+      },
+      {
+        "id": "rule_3",
+        "name": "Boundary inside ongoing Colorado local information",
+        "description": "Product is positive at a generic space, comma, hyphen, newline, or function word when the local prefix has established a Colorado locale and the anchor is a boundary before a local continuation such as an address, phone digit, venue, school, team, or listing value.",
+        "predicted_pole": "positive"
+      },
+      {
+        "id": "rule_4",
+        "name": "Colorado document continuation",
+        "description": "Product is positive when a sustained Colorado document or heading makes an otherwise ambiguous numeric or capitalized continuation local, for example an MLS or listing number, date, age, school name, or place fragment.",
+        "predicted_pole": "positive"
+      },
+      {
+        "id": "rule_5",
+        "name": "Off-region public-service or record contact",
+        "description": "Product is negative only when the anchor sits at a separator or digit inside a non-Colorado official public-service, legal, health, or record contact, such as a county sheriff, licensing, statute, or municipal listing, with the off-region state or locality established nearby. Area code alone is insufficient.",
+        "predicted_pole": "negative"
+      },
+      {
+        "id": "rule_6",
+        "name": "Bare off-region place mention",
+        "description": "Product is uncertain at an off-region place name, generic boundary, or ordinary civic or place-description sentence without a public-service or record-contact frame; these contexts are often near zero and may be positive, as in Acoma Pueblo or a New Mexico press release.",
+        "predicted_pole": "uncertain"
+      },
+      {
+        "id": "rule_7",
+        "name": "No regional cue near anchor",
+        "description": "Product is uncertain in ordinary prose with no nearby Colorado or other regional place, institution, or phone cue; such signed products are typically small and do not define a stable concept.",
+        "predicted_pole": "uncertain"
+      },
+      {
+        "id": "rule_8",
+        "name": "Conflicting or partial regional cues",
+        "description": "Product is uncertain when Colorado and non-Colorado markers occur in the same local window but neither is adjacent to the anchor, when a toll-free or unlisted area code is the only clue, or when the anchor is an isolated numeric fragment not part of a phone number.",
+        "predicted_pole": "uncertain"
+      }
+    ],
+    "points": [
+      {
+        "id": "07ee0c4d4078c10ab43fa4729b112713fdc2f8af29a588fdbbb60f07eb956d14",
+        "observed_prefix": "The Seattle service center",
+        "anchor": {
+          "position": 3,
+          "token": " center"
+        }
+      },
+      {
+        "id": "09880ce49802c53c4508b300f9769df6d7406c01dcfeabc5e856e2502fcfe539",
+        "observed_prefix": "The Utah records office listed the case number as",
+        "anchor": {
+          "position": 8,
+          "token": " as"
+        }
+      }
+    ]
+  },
+  "output_excerpt": "{\n  \"predictions\": [\n    {\n      \"id\": \"07ee0c4d4078c10ab43fa4729b112713fdc2f8af29a588fdbbb60f07eb956d14\",\n      \"group\": \"rule_6\",\n      \"predicted_pole\": \"uncertain\",\n      \"reason\": \"Bare off-region Seattle place mention; no public-service/record-contact frame.\"\n    },\n    {\n      \"id\": \"09880ce49802c53c4508b300f9769df6d7406c01dcfeabc5e856e2502fcfe539\",\n      \"group\": \"unresolved\",\n      \"predicted_pole\": \"uncertain\",\n      \"reason\": \"Rule 5 would be negative, but explanation explicitly notes Utah at fixed 'as' boundary is +2.078; contradictory.\"\n    }\n  ]\n}"
+}

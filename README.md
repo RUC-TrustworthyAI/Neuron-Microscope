@@ -11,6 +11,7 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
+  <a href="docs/live-demo.md"><img src="assets/badges/live-demo.svg" alt="Live Demo: pending"></a>
   <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
 </p>
 
@@ -18,6 +19,7 @@
 
 <p align="center">
   <a href="#overview">📖 Overview</a> ·
+  <a href="#live-demo">▶ Live Demo</a> ·
   <a href="#workflow">⚗️ How It Works</a> ·
   <a href="#quick-start">🚀 Quick Start</a> ·
   <a href="#reproduction-results">🧪 Reproduction Results</a> ·
@@ -31,6 +33,14 @@ We reproduce the main neuron analysis and report-generation features of [Already
 We also open-source the complete three-stage pipeline for investigating native MLP neurons in dense Qwen3 models. It covers evidence preparation, initial interpretation, experiment design and execution, explanation revision, and interactive HTML reporting. We add **[ADDITIONAL FEATURES]** for the community to use and build on.
 
 Next, we plan to **[FUTURE PLANS]**. We welcome test results and feedback to help improve the neuron interpretation workflow together.
+
+## ▶ Live Demo <a id="live-demo"></a>
+
+**[Explore the recorded walkthrough →](docs/live-demo.md)** · Deployment pending
+
+Follow a real Colorado neuron investigation from its initial evidence page through all three agent stages. Explore prompt examples, key operations, measured experiments and saved interactive reports. Preview locally now; hosted access will follow once GitHub Pages is enabled.
+
+[![Preview of the Neuron Microscope walkthrough](assets/live-demo-cover.jpg)](docs/live-demo.md)
 
 ## ⚗️ How It Works <a id="workflow"></a>
 

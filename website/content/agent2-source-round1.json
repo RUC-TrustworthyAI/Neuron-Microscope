@@ -1,0 +1,239 @@
+{
+  "analysis": "The positive tail could reflect Colorado place semantics, or merely the local-contact/phone/address formatting that co-occurs with it. A controlled replacement of the place cue while holding a fixed contact or record frame separates those accounts. The negative tail is tested separately with minimum scoring at an off-region record boundary.",
+  "round": 1,
+  "sweeps": [
+    {
+      "title": "Place-cue selectivity inside a fixed sentence",
+      "pole": "positive",
+      "prediction": "If the neuron carries Colorado locality, Denver, Colorado, Boulder and Aurora should raise the maximum product over the replacement cue above Salt Lake City, Fargo, Phoenix and Seattle and the unrelated controls. A formatting-only account predicts no Colorado advantage.",
+      "template": "The regional meeting moved from the downtown office to {slot} this morning.",
+      "replacements": [
+        "Denver",
+        "Colorado",
+        "Boulder",
+        "Aurora",
+        "Salt Lake City",
+        "Fargo",
+        "Phoenix",
+        "Seattle",
+        "the community center",
+        "our usual venue"
+      ],
+      "score": {
+        "location": "replacement_span",
+        "reduction": "max"
+      }
+    },
+    {
+      "title": "Off-region place cue before a local record value",
+      "pole": "negative",
+      "prediction": "If negative product marks off-region local-record contexts, Utah, North Dakota, Fargo and New Mexico should produce lower minimum product at the fixed boundary than the Colorado alternatives. A formatting-only account predicts similar minima across all place cues.",
+      "template": "The {slot} records office listed the case number as",
+      "replacements": [
+        "Utah",
+        "North Dakota",
+        "Fargo",
+        "New Mexico",
+        "Colorado",
+        "Denver",
+        "Boulder",
+        "Aurora",
+        "public",
+        "central"
+      ],
+      "score": {
+        "location": "token_position",
+        "position": -1,
+        "reduction": "single"
+      }
+    }
+  ],
+  "graphs": [
+    {
+      "title": "Colorado real-estate contact boundary",
+      "prediction": "Tests the positive local-information account where an explicit Colorado listing and 303 contact cue precede the measured boundary.",
+      "case_id": "798915249",
+      "root": {
+        "kind": "neuron_product"
+      }
+    },
+    {
+      "title": "Colorado team context without a phone block",
+      "prediction": "Tests whether a Colorado-linked sports context raises product at a sentence-internal function-word boundary, separating place identity from contact formatting.",
+      "case_id": "202142470",
+      "root": {
+        "kind": "neuron_product"
+      }
+    },
+    {
+      "title": "Off-region county contact negative",
+      "prediction": "Tests the negative pole in a Utah county contact and record-number context, away from any Colorado cue.",
+      "case_id": "997363977",
+      "root": {
+        "kind": "neuron_product"
+      }
+    }
+  ],
+  "paper": {
+    "search": [
+      {
+        "id": "colorado-contact-boundary",
+        "name": "Colorado locality at a contact boundary",
+        "pole": "positive",
+        "rival": "A local-contact or phone-formatting response insensitive to Colorado place identity.",
+        "score": {
+          "location": "token_position",
+          "position": -1,
+          "reduction": "single"
+        },
+        "candidates": [
+          {
+            "text": "For same-day service in Denver, call our office at"
+          },
+          {
+            "text": "The Boulder branch can be reached at"
+          },
+          {
+            "text": "Contact the Aurora customer desk at"
+          },
+          {
+            "text": "Our Colorado Springs team is available at"
+          },
+          {
+            "text": "The Littleton service center answers calls at"
+          },
+          {
+            "text": "Visitors to the Denver office should check in at"
+          }
+        ],
+        "controls": [
+          {
+            "text": "For same-day service in Salt Lake City, call our office at"
+          },
+          {
+            "text": "The Fargo branch can be reached at"
+          },
+          {
+            "text": "Contact the Phoenix customer desk at"
+          },
+          {
+            "text": "Our Seattle team is available at"
+          },
+          {
+            "text": "The Boise service center answers calls at"
+          },
+          {
+            "text": "Visitors to the Portland office should check in at"
+          }
+        ]
+      },
+      {
+        "id": "offregion-record-boundary",
+        "name": "Off-region local record boundary",
+        "pole": "negative",
+        "rival": "A record-number or formatting response that is independent of region.",
+        "score": {
+          "location": "token_position",
+          "position": -1,
+          "reduction": "single"
+        },
+        "candidates": [
+          {
+            "text": "The Utah records office listed the case number as"
+          },
+          {
+            "text": "The North Dakota permit office recorded the application as"
+          },
+          {
+            "text": "The Fargo county clerk entered the parcel number as"
+          },
+          {
+            "text": "The New Mexico district office logged the complaint as"
+          },
+          {
+            "text": "The Nevada registry office filed the license number as"
+          },
+          {
+            "text": "The Arizona records desk indexed the document as"
+          }
+        ],
+        "controls": [
+          {
+            "text": "The Colorado records office listed the case number as"
+          },
+          {
+            "text": "The Denver permit office recorded the application as"
+          },
+          {
+            "text": "The Boulder county clerk entered the parcel number as"
+          },
+          {
+            "text": "The Aurora district office logged the complaint as"
+          },
+          {
+            "text": "The Pueblo registry office filed the license number as"
+          },
+          {
+            "text": "The Fort Collins records desk indexed the document as"
+          }
+        ]
+      }
+    ],
+    "atlas": {
+      "cases": []
+    },
+    "family": {
+      "cases": [
+        {
+          "text": "After the Denver planning office moved its Front Range service desk downtown, the clerk told callers that the new Colorado contact line and local address would be listed at",
+          "position": -1
+        },
+        {
+          "text": "For same-day service in Denver, call our Colorado office at",
+          "position": -1
+        },
+        {
+          "text": "The Boulder branch lists its local address and phone number at",
+          "position": -1
+        },
+        {
+          "text": "Visitors to the Aurora service desk should check in at",
+          "position": -1
+        },
+        {
+          "text": "Our Colorado Springs team answers Front Range calls at",
+          "position": -1
+        },
+        {
+          "text": "The Salt Lake City office lists a local phone number at",
+          "position": -1
+        },
+        {
+          "text": "Residents in Fargo can reach the North Dakota desk at",
+          "position": -1
+        },
+        {
+          "text": "The Phoenix service center posts its Arizona address at",
+          "position": -1
+        },
+        {
+          "text": "The Seattle branch records local permit numbers at",
+          "position": -1
+        },
+        {
+          "text": "The downtown community center lists its regular hours at",
+          "position": -1
+        },
+        {
+          "text": "Our regional office posts a general information notice at",
+          "position": -1
+        }
+      ]
+    },
+    "anatomy": {
+      "sentence": {
+        "case_id": "599945814"
+      }
+    }
+  }
+}

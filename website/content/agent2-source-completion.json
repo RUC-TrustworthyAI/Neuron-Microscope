@@ -1,0 +1,223 @@
+{
+  "summary": "Controlled replacements favor a Colorado/local-information account over a pure phone-formatting rival. At a fixed pre-contact boundary, Denver (158), Colorado (152), Boulder (130) and Aurora (34) far exceeded matched off-region places (range -14.3 to 1.1) and generic controls (2.2 and 3.0). At a place-token sweep, Colorado places reached 100-116 while off-region places stayed below 7, and numeric off-region contact inputs peaked at only 9.75. The negative tail is weaker and mostly reflects absence of the positive Colorado drive: off-region record cues sat near zero or negative (North Dakota -17.0) while Colorado controls were strongly positive. Blind tests reproduced the semantic contrast (best +354 and -32.5) but did not exceed the saved extremes (+364 and -55.25). One Denver-team graph showed a contrary, context-specific output effect, so the output role is not settled.",
+  "annotations": {
+    "headline_figure_id": "sweep-003",
+    "graph_ids": [
+      "graph-001",
+      "graph-002",
+      "graph-003"
+    ],
+    "routes": {
+      "p1": {
+        "name": "Local phone-boundary outlier",
+        "description": "The single top-product graph ends a long workplace-productivity article at a space before a 303 contact number. Its upstream flow is dominated by L38_N489 and L51_N4854, with additional L54_N2872 contribution; this is a contact-boundary outlier rather than a place-name token."
+      },
+      "p2": {
+        "name": "Cross-region contact-to-place boundary",
+        "description": "A New Mexico solar-garden press release lists several office phone numbers and ends before the continuation 'Carbondale, CO'. The graph mixes off-region contact formatting with an imminent Colorado place, making it the strongest boundary case against a simple Colorado-only account."
+      },
+      "p3": {
+        "name": "Colorado place and local-listing route",
+        "description": "Ten natural graphs combine Colorado places, teams, venues, real-estate listings and community features. Shared upstream flow comes from L14_N489, L6_N7831, L38_N489, L49_N12697 and L31_N11703; the route also contains a local-running post without an explicit Colorado name."
+      },
+      "n1": {
+        "name": "Off-region contact and record route",
+        "description": "Utah county and senior-service phone boundaries, an Arizona legal listing, a Montana ecology report and a personal field-work narrative. Flow is led by L37_N171 and L51_N4854 with mixed L52_N15786 and L38_N8626 contributions; the route crosses contact, record and narrative semantics."
+      },
+      "n2": {
+        "name": "Public-health and institutional-document route",
+        "description": "North Dakota public-health and licensing lines, state facts, a nursing-program list and a child-support statute, plus a weak Nebraska innovation feature. L35_N10229 and L37_N10370 carry the most negative upstream weight, with L47_N2209 and L6_N24380 mixed in."
+      },
+      "n3": {
+        "name": "Weak sports-opinion and fragment route",
+        "description": "Two low-amplitude sports-opinion graphs and a three-token 'Owned and operated by AZ Party' fragment. Products are only -1.09 to -3.72, and upstream weights are weak and heterogeneous; this route is retained as an unresolved background factor rather than a semantic class."
+      }
+    },
+    "clusters": [
+      {
+        "id": "c1",
+        "name": "Local contact and listing boundaries",
+        "story": "Members share an anchor at a phone, address, MLS, registration or place-continuation boundary on local business and listing pages. The top-product productivity page and the New Mexico-to-Colorado press release are boundary cases: both contain contact formatting without a complete Colorado prefix, so the cluster is not purely place-name driven. One product-catalogue graph broadens the membership.",
+        "pole": "positive",
+        "graph_ids": [
+          "eec3ba03401465798a0d5881a0e9649d2405f68987fd7ebf1e69b39eac848bd6",
+          "5a454fae5605b406eea12e0759ef6ded9b6e846ae95a532b5b7644ea867d3d0b",
+          "2a8633b3d67f059cde3bfe1ccd10afc51cdf9597fb810b6023d484911dae4570",
+          "53d5a4b47f76d07d578b2eef8d71cd4fa762e8fe65611ba2e975434e3202d853",
+          "8813e78da045ac0eca255610b7d5bac0e4a1523d34bba923a001720305661b49"
+        ],
+        "example_graph_ids": [
+          "2a8633b3d67f059cde3bfe1ccd10afc51cdf9597fb810b6023d484911dae4570",
+          "eec3ba03401465798a0d5881a0e9649d2405f68987fd7ebf1e69b39eac848bd6",
+          "5a454fae5605b406eea12e0759ef6ded9b6e846ae95a532b5b7644ea867d3d0b"
+        ]
+      },
+      {
+        "id": "c2",
+        "name": "Colorado place, team, and local-culture contexts",
+        "story": "Members contain explicit Colorado, Denver or Boulder cues in venue, school, sports, environmental or political contexts, with anchors at spaces, punctuation or function words before a local continuation. The local 5k post lacks an explicit Colorado name and is retained as the main membership exception; lower-amplitude NHL and convention examples show weaker place effects.",
+        "pole": "positive",
+        "graph_ids": [
+          "fe21f0546654140f3770156afbc467fce5e16335776efc7ff373ed17be839ccd",
+          "dd6060d3435eabe80c207c5973fec6c33cc25389ee0b0d3ba040df55db37d047",
+          "e6562921cf39d3e5a04cb673190819327f63ebd4f9218383f62b8742a7f44361",
+          "8b93dbb37627e6d2499f5091427830db8a9b71267895b4f468df0f0090b3acb6",
+          "d072d07d1d5aa2c56dcc892f8918e120b89a24bb913da925bd2fbea3ca13ff25",
+          "0d5f67bd6d44a79f47a29979034e5db17cc4e498ff5a16c9fd4183dcd516bdea",
+          "f2d0e6dcf4575ffbba798919eb816050cb735a9d993d25b180ee2551a1e20a74"
+        ],
+        "example_graph_ids": [
+          "e6562921cf39d3e5a04cb673190819327f63ebd4f9218383f62b8742a7f44361",
+          "fe21f0546654140f3770156afbc467fce5e16335776efc7ff373ed17be839ccd",
+          "8b93dbb37627e6d2499f5091427830db8a9b71267895b4f468df0f0090b3acb6"
+        ]
+      },
+      {
+        "id": "c3",
+        "name": "Off-region public-service contact lines",
+        "story": "These four members place the anchor inside or immediately before non-Colorado public-service telephone numbers: Utah sheriff and senior-center lines and North Dakota health and licensing lines. They share the strongest negative products and negative L35_N10229/L37_N171 upstream flow. The off-region service-contact frame, not an anti-Colorado concept, is the common observation.",
+        "pole": "negative",
+        "graph_ids": [
+          "c3b75b4deaf8aa243a315f5f7c873658551ab2f4c82d83cea5a6715051451810",
+          "11ece8e65e7fbccaeab8d28613063042071919631c49b107226a0be8fcae3bdc",
+          "bb67168630f4f2b06495ccbf2a0b5570aac4abf4c5d97fd88c7ead7aedfe2076",
+          "c5fe69bbe2752ab4bf627c21dc7faf9de7cdefdfd7403f2a10695c291aa02bdd"
+        ],
+        "example_graph_ids": [
+          "c3b75b4deaf8aa243a315f5f7c873658551ab2f4c82d83cea5a6715051451810",
+          "11ece8e65e7fbccaeab8d28613063042071919631c49b107226a0be8fcae3bdc",
+          "bb67168630f4f2b06495ccbf2a0b5570aac4abf4c5d97fd88c7ead7aedfe2076"
+        ]
+      },
+      {
+        "id": "c4",
+        "name": "Government, legal, and education records",
+        "story": "This cluster contains legal, statutory, state-fact and nursing-program documents whose anchors fall on record punctuation, digits or course-list boundaries. Products range from -51.25 to -7.94. Colorado counters are absent; shared negative upstream contributions from L35_N10229 and L37_N10370 link the members despite different document genres.",
+        "pole": "negative",
+        "graph_ids": [
+          "02f53574d55447ffdbb988d0b4175692ec529fcf3dbcf90bf0ac40bcec08a63d",
+          "efef648cc464d4e2c596e2f287c363e85099440e2f571fa87b2215eb9894fa33",
+          "0130712dc39430933b98f98d8c8a7ccc13b45e200d04da62b43c676f368749e1",
+          "4bee3d2ca96f4ab0ff1c0663a09d87dc2dbdf9e35449718557e0871cec0206a8"
+        ],
+        "example_graph_ids": [
+          "4bee3d2ca96f4ab0ff1c0663a09d87dc2dbdf9e35449718557e0871cec0206a8",
+          "0130712dc39430933b98f98d8c8a7ccc13b45e200d04da62b43c676f368749e1",
+          "02f53574d55447ffdbb988d0b4175692ec529fcf3dbcf90bf0ac40bcec08a63d"
+        ]
+      },
+      {
+        "id": "c5",
+        "name": "Science and regional-development reporting",
+        "story": "The ecology report and Nebraska regional-development feature share institutional or scientific prose but differ in content and amplitude (-11.81 versus -2.41). No single semantic account joins them; they are kept as an either-pole mixed cluster because a small numerical route crosses unrelated document types.",
+        "pole": "either",
+        "graph_ids": [
+          "a7607090a56012095a9a89e721e3f882d7edf26e490ef6cb47e1b24449f27c9c",
+          "6dea5b6747dc2d6d2d68e420035b6e204d909d153cc1c7e4a784a9830aa390a2"
+        ],
+        "example_graph_ids": [
+          "a7607090a56012095a9a89e721e3f882d7edf26e490ef6cb47e1b24449f27c9c",
+          "6dea5b6747dc2d6d2d68e420035b6e204d909d153cc1c7e4a784a9830aa390a2"
+        ]
+      },
+      {
+        "id": "c6",
+        "name": "Near-zero sports commentary",
+        "story": "Both sports-opinion members are near-zero (-0.80 and -1.09) and occur at sentence punctuation or a function word in NFL and college-football commentary. They do not support a distinct sports-negative mechanism; the shared observation is weak late-sentence output in sports prose.",
+        "pole": "either",
+        "graph_ids": [
+          "21e456f00037acb4beebaad86d62ca251a2fd0c19ed7d514ffce91ae41976359",
+          "82d914ec01355421f31beafbdca779dc0a7e108d3e25835f9615ff9c6b925aeb"
+        ],
+        "example_graph_ids": [
+          "21e456f00037acb4beebaad86d62ca251a2fd0c19ed7d514ffce91ae41976359",
+          "82d914ec01355421f31beafbdca779dc0a7e108d3e25835f9615ff9c6b925aeb"
+        ]
+      },
+      {
+        "id": "c7",
+        "name": "Personal narrative and ambiguous fragment",
+        "story": "The personal fire-crew narrative reaches -44.75 at ' Spring', whereas the three-token AZ Party fragment is only -3.72. They share no topic or upstream pattern, so this is an unresolved either-pole cluster; retaining both prevents the strong narrative negative from being absorbed into a semantic claim.",
+        "pole": "either",
+        "graph_ids": [
+          "8c51a5be7943ffb4e7143c68b9357f89d4d682ad2ab95798b3cad610e8abf41b",
+          "7634f9ee9e27f6ee521a8acedb6bcd7b995b7c80e1de2a48bc902011de692570"
+        ],
+        "example_graph_ids": [
+          "8c51a5be7943ffb4e7143c68b9357f89d4d682ad2ab95798b3cad610e8abf41b",
+          "7634f9ee9e27f6ee521a8acedb6bcd7b995b7c80e1de2a48bc902011de692570"
+        ]
+      }
+    ],
+    "units": {
+      "L55_N11703": "Colorado local-information neuron",
+      "L38_N489": "Shared positive context contributor",
+      "L14_N489": "Early local-context feature",
+      "L49_N12697": "General-background suppressing feature",
+      "L6_N7831": "Weak early business-context feature",
+      "L31_N11703": "Mid-layer mixed place feature",
+      "L51_N4854": "Off-region contact suppressor",
+      "L37_N11715": "Mid-layer local-contact feature",
+      "L13_N11715": "Weak early local-context feature",
+      "L47_N2209": "Weak negative-context contributor",
+      "L48_N15759": "Positive local-context contributor",
+      "L59_N9433": "Strong Colorado-negative downstream reader",
+      "L62_N21256": "Strong Colorado-positive downstream reader",
+      "L58_N13678": "Colorado-negative downstream reader",
+      "L63_N8214": "Colorado-negative downstream reader",
+      "L57_N20833": "Broad negative downstream reader",
+      "L56_N25582": "Weak negative downstream reader",
+      "L59_N7793": "Colorado-positive downstream reader",
+      "L62_N12079": "Colorado-negative downstream reader",
+      "L63_N2632": "Weak Colorado-negative downstream reader",
+      "L58_N16894": "Colorado-positive downstream reader",
+      "L56_N11642": "Negative downstream contact reader",
+      "L59_N12158": "Negative downstream reader candidate",
+      "L62_N22745": "Positive downstream reader candidate",
+      "L56_N20962": "Negative downstream reader candidate",
+      "L57_N16330": "Negative downstream reader candidate",
+      "L57_N13943": "Positive downstream reader candidate",
+      "L57_N9064": "Positive downstream reader candidate",
+      "L57_N14248": "Positive downstream reader candidate",
+      "L56_N2920": "Positive downstream reader candidate",
+      "L58_N10911": "Positive downstream reader candidate",
+      "L57_N16": "Negative downstream reader candidate",
+      "L57_N10505": "Positive downstream reader candidate",
+      "L57_N22212": "Negative downstream reader candidate",
+      "L58_N14446": "Weak positive downstream reader candidate",
+      "L57_N17424": "Weak positive downstream reader candidate",
+      "L56_N14146": "Negative downstream reader candidate",
+      "L57_N4804": "Negative downstream reader candidate",
+      "L63_N15387": "Weak positive downstream reader candidate",
+      "L56_N21760": "Weak negative downstream reader candidate",
+      "L56_N4352": "Very weak downstream reader candidate"
+    },
+    "sections": {
+      "spectrum": {
+        "summary": "Fourteen semantic groups describe 434 saved positions. Colorado local information (n=19) and Colorado sports and culture (n=7) are positive throughout, while off-region contacts (33), government and legal records (20), health and social services (23), sports commentary (22) and off-region place description (37) supply most of the negative tail; 212 positions remain mixed or background."
+      },
+      "search": {
+        "summary": "At the shared pre-contact boundary, Denver (158), Colorado (152), Boulder (130) and Aurora (34) exceeded Salt Lake City (0.95), Phoenix (1.13), Seattle (-0.91) and Fargo (-14.3); generic controls were 2.16 and 3.05. Numeric off-region contact inputs reached only 9.75 (control median 2.09). At the record boundary, off-region places stayed near zero or negative while Colorado controls were strongly positive."
+      },
+      "clusters": {
+        "summary": "The 26 measured route members form seven reader-facing clusters. Positive clusters separate local contact and listing boundaries from Colorado place, team and culture mentions; negative clusters separate public-service contact lines from government, legal and education records. Two small clusters remain mixed or unresolved."
+      },
+      "anatomy": {
+        "summary": "At the saved maximum, gate 20.25 and value 18.0 multiply to 364. The selected trace ends a workplace-productivity page at a space before a 303 contact number; zeroing the neuron lowers the local '3' probability from 0.744 to 0.382 and gives KL 0.495 versus at most 0.0015 for same-layer controls.",
+        "strip_caption": "The selected saved trace ends a long workplace-productivity article at a space before a 303 telephone number. Gate and value open together at the anchor, and zeroing the neuron sharply lowers the local '3' probability, consistent with a contact-number boundary response."
+      },
+      "ablation": {
+        "summary": "Direct output weights promote Boulder (+0.743), Colorado (+0.729) and Denver (+0.722). Zeroing is context-specific: the median KL is 0.112 across 30 natural cases versus 0.00027 for same-layer random controls; some contact-boundary cases shift strongly, while others are nearly unaffected."
+      },
+      "family": {
+        "summary": "Across eleven authored inputs the target is strongly positive for Colorado cues (median 51.9) and near zero for off-region cues (median -0.74). Downstream units at layers 58-63 show both positive and negative Colorado-related responses, so the surrounding circuit is not a single sign."
+      },
+      "circuit": {
+        "summary": "Upstream flow is led by L38_N489, L14_N489, L49_N12697, L6_N7831 and L31_N11703. Among thirty downstream readers, positive and negative Colorado-linked responses coexist, so this is not one unidirectional local circuit."
+      },
+      "tests": {
+        "summary": "The frozen writer's best positive candidate reached 354 against the 364 corpus maximum, and its strongest negative reached -32.5 against -55.25; neither beat the saved extreme. Both blind sets reproduced Colorado-linked contact and off-region record boundaries, matching the measured semantics but not the full magnitude. Route prediction was disabled."
+      }
+    }
+  }
+}

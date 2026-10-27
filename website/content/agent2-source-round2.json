@@ -1,0 +1,87 @@
+{
+  "analysis": "Round 1 showed a strong Colorado place advantage at the place token and at a fixed pre-record boundary, while off-region place cues sat near zero and generic controls did not become negative. Round 2 isolates the strongest rival: whether numeric local-contact formatting alone can drive the positive response without a Colorado cue, and whether the Colorado advantage persists at a fixed pre-contact boundary.",
+  "round": 2,
+  "sweeps": [
+    {
+      "title": "Colorado cue before a fixed contact boundary",
+      "pole": "positive",
+      "prediction": "If Colorado locality drives the response, Denver, Boulder, Aurora and Colorado should raise product at the shared final boundary token 'at' above matched off-region places and generic controls. If the neuron is a pure contact-format detector, all place variants should be similar because the same contact frame is present.",
+      "template": "For local service in {slot}, call our office at",
+      "replacements": [
+        "Denver",
+        "Boulder",
+        "Aurora",
+        "Colorado",
+        "Salt Lake City",
+        "Fargo",
+        "Phoenix",
+        "Seattle",
+        "the area",
+        "your community"
+      ],
+      "score": {
+        "location": "token_position",
+        "position": -1,
+        "reduction": "single"
+      }
+    }
+  ],
+  "graphs": [],
+  "paper": {
+    "search": [
+      {
+        "id": "offregion-contact-formatting",
+        "name": "Numeric local-contact formatting without Colorado",
+        "pole": "positive",
+        "rival": "Colorado place specificity: if locality rather than formatting drives this neuron, matched non-Colorado numeric contact inputs should not reproduce the positive response.",
+        "score": {
+          "location": "input",
+          "reduction": "max"
+        },
+        "candidates": [
+          {
+            "text": "Call our Fargo office at 701-555-0142 for local service."
+          },
+          {
+            "text": "The Salt Lake City branch lists 435-555-0109 as its contact number."
+          },
+          {
+            "text": "Contact the Phoenix desk at (602) 555-0177 for an appointment."
+          },
+          {
+            "text": "The Seattle service center posts 206-555-0134 for customer questions."
+          },
+          {
+            "text": "The Boise records office can be reached at 208-555-0168."
+          },
+          {
+            "text": "The Albuquerque permit desk lists 505-555-0121 for local callers."
+          }
+        ],
+        "controls": [
+          {
+            "text": "Call our Fargo office for general information about local service."
+          },
+          {
+            "text": "The Salt Lake City branch lists its contact hours for customers."
+          },
+          {
+            "text": "Contact the Phoenix desk for an appointment with a representative."
+          },
+          {
+            "text": "The Seattle service center posts customer questions and answers."
+          },
+          {
+            "text": "The Boise records office can be reached through the main desk."
+          },
+          {
+            "text": "The Albuquerque permit desk lists local caller information."
+          }
+        ]
+      }
+    ],
+    "atlas": {
+      "cases": []
+    }
+  }
+}

@@ -1,0 +1,1601 @@
+{
+  "format": "selected-example",
+  "system": "Read a neuron paper and its evidence. Assess the overall organization of this neuron's responses and assess each response pole separately.\n\nUse these seven classification codes:\n- one_idea: One explanatory principle accounts for the material responses. Small exceptions do not by themselves establish another job.\n- branching: A clear core job has related variants or branches. The evidence supports their relationship to that core.\n- unplaced: A clear main job is supported, but some material responses remain outside the account. These are unexplained residuals, rather than established additional jobs.\n- two_related: Two distinct, supported jobs are present and have an intelligible relationship, but neither is adequately described as a variant of one core job.\n- mixture: Multiple distinct jobs are positively supported and lack an adequate unifying relationship. Heterogeneous or unexplained examples alone do not establish multiple jobs.\n- unresolved: The evidence does not support a stable main account or distinguish the competing accounts.\n- none: There are no substantial strong responses of the pole being assessed. Use this for the overall result only when neither pole has substantial strong responses.\n\nOverall classification rules:\nAssess the positive and negative poles first, then explain their combined organization. Do not take the worse pole's code, vote between the poles, or require them to be clean antonyms.\nA well-supported main job with meaningful remaining responses outside its account is unplaced. This includes a clear main account on one pole with substantial unexplained responses on the other.\nUse one_idea when a single account covers the material responses of the active poles, and branching when their additional patterns are supported variants of that core.\nUse two_related or mixture only when the additional jobs themselves are supported: related distinct jobs give two_related; distinct jobs without a supported relationship give mixture.\nAn inactive opposite pole does not prevent a coherent active pole from being one_idea. If no main account is supported, use unresolved.\nConsider response strength, recurrence and explanatory coverage. Counts in selected extrema or stratified examples are not population frequencies. Explain the chosen codes in one_line and the pole notes.\n\nGive organized and understood scores from 1 to 5 as your assessment, plus what is convincing and what remains unexplained.\nReturn JSON with group (one of the seven codes), organized, understood, one_line, main_job, remainders (objects with what and evidence), where_it_branches (objects with branch, grows_from and path), concerning (strings), fine (strings), and poles (positive and negative objects with group and notes).\nReturn classification codes; display names are assigned by the renderer.",
+  "input_excerpt": {
+    "claim": {
+      "title": "Colorado local-information neuron",
+      "lede": "This neuron responds to Colorado local information, not merely to contact formatting. Its strongest products occur at spaces, punctuation, or function words inside Colorado place, team, and local-contact texts; the saved maximum is a space before a 303 number (364.0). It also promotes explicit ' Boulder', ' Colorado', and ' Denver'. A weaker negative pole appears in some off-region public-service, legal, and record contexts, while bare off-region place mentions are inconsistent and often positive.",
+      "one_paragraph": "The product distribution is sparse and asymmetric: 32.6% of one billion tokens are positive, the median is -0.096, and the positive maximum (364.0) far exceeds the negative minimum (-55.25). The new 434-position semantic sample sharpens the poles. All 19 Colorado local-information and all 7 Colorado sports/culture positions are positive; off-region local records (33), government and legal records (20), health and social services (23), sports commentary (22), and off-region place/culture (37) contain most negative values. These are selected-sample counts, not corpus frequencies, and many constituent contexts are mixed. Token-level selectivity is strong: above 10% of the maximum product, ' Denver' occurs at 12,438 of 14,277 occurrences (87%), ' Colorado' at 22,011 of 26,215 (84%), and ' Boulder' at 2,902 of 3,905 (74%). The weight-only lens promotes ' Boulder' (+0.743), ' Colorado' (+0.729), and ' Denver' (+0.722). At the -55.25 Utah 435 anchor, gate is 9.94 and value -5.56, so the negative sign is value-driven. Zeroing is contextual: across 124 follow-up conditions the median KL is 0.00143 versus 0.00034 for controls, while the 364 maximum gives KL 0.547 and lowers the '3' probability from 0.744 to 0.350.",
+      "negative_pole": "The negative pole is weaker and not a general anti-Colorado rule. Its natural minimum is -55.25 at a '3' inside a Utah 435 record; across the 30 bottom anchors gate averages 7.0 and value -7.2, giving mean product -48.4. At the fixed record boundary ' as', North Dakota is -17.0 and Fargo -7.125, but Utah is +2.078 and New Mexico -1.039. At the fixed contact boundary ' at', Salt Lake City (+0.945) and Phoenix (+1.133) are mildly positive. The frozen response predictor also called Acoma Pueblo and Fredonia/Dixon negative (they measured +13.625 and +16.375). The reliable negative condition is therefore a specific off-region public-service, legal, or record boundary, not non-Colorado identity alone.",
+      "what_would_change_my_mind": "Strong negative products at explicit Colorado places without any off-region record frame would undermine the regional account. Conversely, uniformly weak or positive products across matched North Dakota and Utah public-service boundaries would reject the negative-pole description; positive responses to generic contact formatting with no regional cue would reject Colorado specificity.",
+      "confidence": "medium"
+    },
+    "criticism": [
+      {
+        "round": 1,
+        "attack": "The positive pole may be only a generic contact- or phone-formatting detector; Colorado could be incidental.",
+        "prediction": "If formatting dominates, matched place fillers should give similar products at the same contact frame. If Colorado identity matters, Colorado fillers should be substantially higher.",
+        "result": "The Colorado advantage survived. At the recorded final ' at' in sweep-003 (single-token scoring; position 9 for most fillers, 11 for Salt Lake City, 10 for generic controls), Denver 158.0, Colorado 152.0, Boulder 130.0, and Aurora 34.0 exceeded Salt Lake City 0.945, Phoenix 1.133, Seattle -0.906, Fargo -14.313, and generic controls 2.156 and 3.047. In sweep-001's replacement-span maximum, Colorado fillers were 116.0, 105.5, 100.0, and 28.875 versus -5.656 to 6.906 for off-region fillers. Off-region places are not all negative, but contact formatting alone does not explain the Colorado contrast.",
+        "verdict": "survived",
+        "evidence": [
+          {
+            "text": "For local service in Denver, call our office at",
+            "activation": 158.0
+          },
+          {
+            "text": "For local service in Salt Lake City, call our office at",
+            "activation": 0.9453125
+          },
+          {
+            "text": "For local service in Fargo, call our office at",
+            "activation": -14.3125
+          }
+        ]
+      },
+      {
+        "round": 2,
+        "attack": "The negative pole is a broad non-Colorado or interior-Western response.",
+        "prediction": "Matched non-Colorado place and record contexts should be consistently negative.",
+        "result": "The broad version failed and needs qualification. At the fixed final ' as' record boundary, North Dakota was -17.0 and Fargo -7.125, but Utah was +2.078 and New Mexico -1.039; at the final ' at' contact boundary Salt Lake City +0.945 and Phoenix +1.133 were mildly positive. The frozen feedback predictor of version de01fabb also called Acoma Pueblo and Fredonia/Dixon negative when they measured +13.625 and +16.375. The negative pole remains measurable in specific off-region public-service, legal, and record contexts but is not a general non-Colorado effect.",
+        "verdict": "narrowed",
+        "evidence": [
+          {
+            "text": "The North Dakota records office listed the case number as",
+            "activation": -17.0
+          },
+          {
+            "text": "The Utah records office listed the case number as",
+            "activation": 2.078125
+          },
+          {
+            "text": "Traditional Acoma Pottery\nby Lisa Little, Acoma Pueblo\nThe Acoma Pueblo of New Mexico is the oldest continually inhabited settlement in the United States.",
+            "activation": 13.625
+          },
+          {
+            "text": "Town Manager Dan Watson updated the council on Dixon",
+            "activation": 16.375
+          }
+        ]
+      },
+      {
+        "round": 3,
+        "attack": "The explanation should generate independent text that reaches the corpus extremes.",
+        "prediction": "A frozen writer using the explanation should approach 364.0 for the positive pole and -55.25 for the negative pole.",
+        "result": "Independent text tests retained explanation version 92a89160e5724aa5ce1f14241a63e14a6bb913493cfba80612a515e13c9ab525. Its best positive candidate, a Denver/Boulder/Colorado contact listing, reached 354.0; its best negative candidate, a North Dakota Fargo property and official-record listing, reached -32.5. Neither beat the saved extreme, though both reproduced the intended Colorado-contact and off-region-record semantics. Route prediction: —.",
+        "verdict": "narrowed",
+        "evidence": [
+          {
+            "text": "Denver-area contacts and Colorado local listings: Denver office, 1550 Wewatta St, Denver, CO 80202, 303-555-0120; Colorado front desk, 720-555-0171; Boulder branch, 1942 Broadway, Boulder, CO 80302, 303-555-0184. Denver County callers use 720-555-0190; Boulder County callers use 303-555-0162; Colorado mountain line 970-555-0148. The listing notes Denver, Boulder, and Colorado addresses with local phone numbers and venue details.",
+            "activation": 354.0
+          },
+          {
+            "text": "North Dakota Fargo property listing: 701-555-0133; parcel 02-445-1180; record no. ND-2024-77120; coordinates 46.8772 N, 96.7898 W. Fargo city office, 200 N 3rd St, Fargo, ND 58102. Phone 701-555-0177. Dakota Abstract desk 701-555-0160. Boundary tokens include listing digits, RING, and record-number punctuation. Off-region official record page.",
+            "activation": -32.5
+          }
+        ]
+      },
+      {
+        "round": 4,
+        "attack": "A non-Colorado area code or a generic off-region function-word boundary is sufficient for a negative prediction.",
+        "prediction": "Independent Phoenix, Boise, and New Mexico contact prompts should score below zero, while Colorado prompts should score above zero.",
+        "result": "This over-broad rule failed and was revised. Frozen version de01fabb predicted negative at the Phoenix desk '(60' anchor (position 7), the Boise ' at' boundary (position 7), and the New Mexico district ' as' boundary (position 8), but the measured products were +7.156, +6.0, and +5.594. Of 38 directional experiment predictions on positive-truth positions, 15 were called negative. Rule 5 now requires an explicit off-region public-service, legal, or record frame rather than an area code alone, and rule 6 is uncertain for bare off-region place mentions.",
+        "verdict": "rejected",
+        "evidence": [
+          {
+            "text": "Contact the Phoenix desk at (60",
+            "activation": 7.15625
+          },
+          {
+            "text": "The Boise records office can be reached at",
+            "activation": 6.0
+          },
+          {
+            "text": "The New Mexico district office logged the complaint as",
+            "activation": 5.59375
+          }
+        ]
+      }
+    ],
+    "distribution": {
+      "channels": {
+        "gate": {
+          "n": 1000000000,
+          "mean": -1.9469329211830642,
+          "std": 1.3366116536613921,
+          "min": -14.875,
+          "max": 20.25,
+          "positive": 62214793,
+          "negative": 937785207,
+          "zero": 0,
+          "quantiles": {
+            "0": -14.875,
+            "0.01": -8.1875,
+            "0.1": -6.53125,
+            "1": -4.96875,
+            "5": -3.96875,
+            "10": -3.5,
+            "25": -2.78125,
+            "50": -1.9921875,
+            "75": -1.1796875,
+            "90": -0.3671875,
+            "95": 0.1767578125,
+            "99": 1.6484375,
+            "99.9": 5.375,
+            "99.99": 11.5,
+            "100": 20.25
+          },
+          "histogram": {
+            "edges": [
+              -14.875,
+              -4.96875,
+              -4.53125,
+              -4.28125,
+              -4.125,
+              -3.96875,
+              -3.859375,
+              -3.75,
+              -3.65625,
+              -3.578125,
+              -3.5,
+              -3.4375,
+              -3.375,
+              -3.3125,
+              -3.265625,
+              -3.203125,
+              -3.15625,
+              -3.109375,
+              -3.0625,
+              -3.015625,
+              -2.96875,
+              -2.9375,
+              -2.890625,
+              -2.859375,
+              -2.8125,
+              -2.78125,
+              -2.75,
+              -2.703125,
+              -2.671875,
+              -2.640625,
+              -2.609375,
+              -2.578125,
+              -2.53125,
+              -2.5,
+              -2.46875,
+              -2.4375,
+              -2.40625,
+              -2.375,
+              -2.34375,
+              -2.3125,
+              -2.28125,
+              -2.265625,
+              -2.234375,
+              -2.203125,
+              -2.171875,
+              -2.140625,
+              -2.109375,
+              -2.078125,
+              -2.046875,
+              -2.015625,
+              -1.9921875,
+              -1.9609375,
+              -1.9375,
+              -1.90625,
+              -1.875,
+              -1.84375,
+              -1.8125,
+              -1.7890625,
+              -1.7578125,
+              -1.7265625,
+              -1.6953125,
+              -1.6640625,
+              -1.6328125,
+              -1.6015625,
+              -1.5703125,
+              -1.5390625,
+              -1.5,
+              -1.46875,
+              -1.4375,
+              -1.3984375,
+              -1.3671875,
+              -1.328125,
+              -1.296875,
+              -1.2578125,
+              -1.21875,
+              -1.1796875,
+              -1.140625,
+              -1.1015625,
+              -1.0546875,
+              -1.015625,
+              -0.96875,
+              -0.921875,
+              -0.87109375,
+              -0.8203125,
+              -0.76953125,
+              -0.7109375,
+              -0.65234375,
+              -0.5859375,
+              -0.51953125,
+              -0.447265625,
+              -0.3671875,
+              -0.283203125,
+              -0.1865234375,
+              -0.0849609375,
+              0.0291748046875,
+              0.1767578125,
+              0.359375,
+              0.59765625,
+              0.95703125,
+              1.6484375,
+              20.25
+            ],
+            "counts": [
+              9899533,
+              10090974,
+              9923910,
+              8467074,
+              11291676,
+              9127136,
+              10596214,
+              10365565,
+              9614403,
+              10562380,
+              9163974,
+              9820102,
+              10491949,
+              8320425,
+              11724855,
+              9261182,
+              9666189,
+              10075984,
+              10475447,
+              10882125,
+              7479274,
+              11550772,
+              7911927,
+              12194740,
+              8330834,
+              8499004,
+              13052039,
+              8893077,
+              9050257,
+              9188546,
+              9322808,
+              14238710,
+              9654569,
+              9765442,
+              9883347,
+              9994614,
+              10092495,
+              10176897,
+              10262746,
+              10345477,
+              5196227,
+              10442334,
+              10503835,
+              10547090,
+              10588064,
+              10610460,
+              10637401,
+              10652475,
+              10660332,
+              9325681,
+              10644852,
+              7975014,
+              10600745,
+              10566453,
+              10524806,
+              10462398,
+              7810568,
+              10354153,
+              10276483,
+              10200482,
+              10124248,
+              10026868,
+              9918482,
+              9808042,
+              9688608,
+              11948917,
+              9412748,
+              9277085,
+              11402908,
+              8964155,
+              10993125,
+              8621983,
+              10558832,
+              10310652,
+              10055710,
+              9783559,
+              9537553,
+              11080329,
+              8940592,
+              10794879,
+              9972612,
+              10374803,
+              9924433,
+              9493989,
+              10405662,
+              9820844,
+              10466091,
+              9764818,
+              10004014,
+              10068293,
+              10077384,
+              10025814,
+              10043761,
+              10014767,
+              9992225,
+              9998376,
+              9887398,
+              10106647,
+              10015859,
+              10004410
+            ]
+          }
+        },
+        "value": {
+          "n": 1000000000,
+          "mean": 0.6625057196151433,
+          "std": 1.3535825067901652,
+          "min": -16.375,
+          "max": 20.625,
+          "positive": 713421575,
+          "negative": 286578418,
+          "zero": 7,
+          "quantiles": {
+            "0": -16.375,
+            "0.01": -7.78125,
+            "0.1": -5.125,
+            "1": -2.84375,
+            "5": -1.53125,
+            "10": -0.96875,
+            "25": -0.1416015625,
+            "50": 0.69140625,
+            "75": 1.5,
+            "90": 2.25,
+            "95": 2.734375,
+            "99": 3.828125,
+            "99.9": 6.5,
+            "99.99": 12.0,
+            "100": 20.625
+          },
+          "histogram": {
+            "edges": [
+              -16.375,
+              -2.84375,
+              -2.265625,
+              -1.9296875,
+              -1.703125,
+              -1.53125,
+              -1.3828125,
+              -1.2578125,
+              -1.1484375,
+              -1.0546875,
+              -0.96875,
+              -0.88671875,
+              -0.81640625,
+              -0.74609375,
+              -0.68359375,
+              -0.62109375,
+              -0.56640625,
+              -0.51171875,
+              -0.45703125,
+              -0.408203125,
+              -0.359375,
+              -0.3125,
+              -0.26953125,
+              -0.2255859375,
+              -0.1826171875,
+              -0.1416015625,
+              -0.10205078125,
+              -0.06298828125,
+              -0.024658203125,
+              0.01263427734375,
+              0.0439453125,
+              0.078125,
+              0.11328125,
+              0.1484375,
+              0.1826171875,
+              0.216796875,
+              0.25,
+              0.283203125,
+              0.31640625,
+              0.34765625,
+              0.380859375,
+              0.412109375,
+              0.443359375,
+              0.474609375,
+              0.5078125,
+              0.5390625,
+              0.56640625,
+              0.59765625,
+              0.62890625,
+              0.66015625,
+              0.69140625,
+              0.71875,
+              0.75,
+              0.78125,
+              0.8125,
+              0.84375,
+              0.87109375,
+              0.90234375,
+              0.93359375,
+              0.96484375,
+              0.99609375,
+              1.03125,
+              1.0625,
+              1.09375,
+              1.125,
+              1.15625,
+              1.1875,
+              1.21875,
+              1.2578125,
+              1.2890625,
+              1.3203125,
+              1.359375,
+              1.390625,
+              1.4296875,
+              1.46875,
+              1.5,
+              1.5390625,
+              1.578125,
+              1.625,
+              1.6640625,
+              1.703125,
+              1.75,
+              1.796875,
+              1.84375,
+              1.890625,
+              1.9453125,
+              2.0,
+              2.0625,
+              2.125,
+              2.1875,
+              2.25,
+              2.328125,
+              2.421875,
+              2.515625,
+              2.609375,
+              2.734375,
+              2.890625,
+              3.078125,
+              3.34375,
+              3.828125,
+              20.625
+            ],
+            "counts": [
+              9880150,
+              9798310,
+              10314917,
+              9888803,
+              9640916,
+              10151005,
+              10070128,
+              10101353,
+              9723993,
+              10071172,
+              10311962,
+              9560713,
+              10257996,
+              9726518,
+              10307504,
+              9522045,
+              9988891,
+              10666567,
+              9761583,
+              10145276,
+              10103263,
+              9576123,
+              10212157,
+              10186085,
+              9997025,
+              9943831,
+              9995095,
+              10086139,
+              9996291,
+              9942647,
+              10020892,
+              9914242,
+              9993897,
+              9931468,
+              10071225,
+              9917018,
+              9878440,
+              10148053,
+              9652473,
+              10347519,
+              9828934,
+              9897989,
+              9975875,
+              10353115,
+              10094619,
+              8872299,
+              10184781,
+              10217247,
+              10248911,
+              10265980,
+              8995914,
+              10283630,
+              10282602,
+              10274447,
+              10255640,
+              8954570,
+              10200190,
+              10163914,
+              10118041,
+              10063996,
+              10623224,
+              9924808,
+              9853115,
+              9778670,
+              9681169,
+              9579671,
+              9483438,
+              11699671,
+              9230729,
+              9100946,
+              11211195,
+              8815263,
+              10824653,
+              10602521,
+              8317826,
+              10179229,
+              9939086,
+              11600502,
+              9396067,
+              9135553,
+              10617197,
+              10241375,
+              9854330,
+              9476030,
+              10575386,
+              10060820,
+              10214784,
+              10256764,
+              9617837,
+              8997463,
+              10389785,
+              11284894,
+              10066291,
+              8932718,
+              10311394,
+              10599905,
+              9910018,
+              9960927,
+              10129301,
+              10189066
+            ]
+          }
+        },
+        "product": {
+          "n": 1000000000,
+          "mean": 0.0045650193475090155,
+          "std": 2.625774472130969,
+          "min": -55.25,
+          "max": 364.0,
+          "positive": 326025525,
+          "negative": 673974468,
+          "zero": 7,
+          "quantiles": {
+            "0": -55.25,
+            "0.01": -8.6875,
+            "0.1": -2.0,
+            "1": -0.875,
+            "5": -0.59765625,
+            "10": -0.470703125,
+            "25": -0.27734375,
+            "50": -0.09619140625,
+            "75": 0.044189453125,
+            "90": 0.2119140625,
+            "95": 0.37890625,
+            "99": 2.203125,
+            "99.9": 22.75,
+            "99.99": 134.0,
+            "100": 364.0
+          },
+          "histogram": {
+            "edges": [
+              -55.25,
+              -0.875,
+              -0.75390625,
+              -0.68359375,
+              -0.63671875,
+              -0.59765625,
+              -0.5625,
+              -0.53515625,
+              -0.51171875,
+              -0.490234375,
+              -0.470703125,
+              -0.451171875,
+              -0.435546875,
+              -0.41796875,
+              -0.404296875,
+              -0.390625,
+              -0.376953125,
+              -0.36328125,
+              -0.3515625,
+              -0.33984375,
+              -0.328125,
+              -0.318359375,
+              -0.306640625,
+              -0.296875,
+              -0.287109375,
+              -0.27734375,
+              -0.26953125,
+              -0.259765625,
+              -0.251953125,
+              -0.2421875,
+              -0.234375,
+              -0.2265625,
+              -0.2177734375,
+              -0.2099609375,
+              -0.203125,
+              -0.1953125,
+              -0.1875,
+              -0.1806640625,
+              -0.173828125,
+              -0.1669921875,
+              -0.16015625,
+              -0.1533203125,
+              -0.146484375,
+              -0.1396484375,
+              -0.1337890625,
+              -0.126953125,
+              -0.12060546875,
+              -0.1142578125,
+              -0.1083984375,
+              -0.10205078125,
+              -0.09619140625,
+              -0.09033203125,
+              -0.08447265625,
+              -0.07861328125,
+              -0.07275390625,
+              -0.06689453125,
+              -0.06103515625,
+              -0.055419921875,
+              -0.0498046875,
+              -0.044189453125,
+              -0.03857421875,
+              -0.033203125,
+              -0.027587890625,
+              -0.022216796875,
+              -0.0167236328125,
+              -0.0113525390625,
+              -0.006134033203125,
+              -0.00150299072265625,
+              0.0030059814453125,
+              0.00830078125,
+              0.01373291015625,
+              0.0194091796875,
+              0.0252685546875,
+              0.03125,
+              0.03759765625,
+              0.044189453125,
+              0.051025390625,
+              0.058349609375,
+              0.06591796875,
+              0.07373046875,
+              0.08251953125,
+              0.09130859375,
+              0.1005859375,
+              0.11083984375,
+              0.12158203125,
+              0.1337890625,
+              0.146484375,
+              0.16015625,
+              0.17578125,
+              0.1923828125,
+              0.2119140625,
+              0.2333984375,
+              0.259765625,
+              0.291015625,
+              0.328125,
+              0.37890625,
+              0.451171875,
+              0.57421875,
+              0.87890625,
+              2.203125,
+              364.0
+            ],
+            "counts": [
+              9823452,
+              9820385,
+              10098076,
+              9442198,
+              9896342,
+              10584584,
+              10108674,
+              9497172,
+              10294331,
+              9767294,
+              10506943,
+              9138803,
+              11008346,
+              9033671,
+              9714238,
+              10066561,
+              10593036,
+              9649039,
+              10009446,
+              10533314,
+              8857929,
+              11399472,
+              9410933,
+              10208888,
+              9841390,
+              8752752,
+              10839028,
+              8850834,
+              12095927,
+              9317873,
+              9527977,
+              11164778,
+              10015313,
+              8965216,
+              10441302,
+              10502233,
+              9531435,
+              9630891,
+              9820502,
+              9960121,
+              10225287,
+              10216073,
+              10186717,
+              9134208,
+              10736265,
+              10462563,
+              10157684,
+              9543422,
+              10415813,
+              9703309,
+              9778114,
+              9924627,
+              10053415,
+              10087444,
+              10101885,
+              10469760,
+              9927180,
+              9983376,
+              10016607,
+              10120327,
+              9679777,
+              10336702,
+              9841204,
+              10122056,
+              10054903,
+              9978651,
+              10000726,
+              10009312,
+              9986582,
+              9925140,
+              9960569,
+              10013558,
+              9830368,
+              9980128,
+              10045220,
+              9931241,
+              10198347,
+              9867090,
+              9781304,
+              10455753,
+              9941218,
+              9721323,
+              10167495,
+              9866962,
+              10257636,
+              9907622,
+              9882239,
+              10179129,
+              9751338,
+              10156670,
+              9834210,
+              10135363,
+              10140328,
+              9778566,
+              10207861,
+              10069940,
+              10009405,
+              9997467,
+              10003190,
+              10028632
+            ]
+          }
+        }
+      },
+      "bands": [
+        {
+          "low": 0,
+          "high": 0.01,
+          "lower": -55.25,
+          "upper": -8.6875,
+          "count": 98973,
+          "upper_inclusive": false
+        },
+        {
+          "low": 0.01,
+          "high": 0.1,
+          "lower": -8.6875,
+          "upper": -2.0,
+          "count": 896318,
+          "upper_inclusive": false
+        },
+        {
+          "low": 0.1,
+          "high": 1,
+          "lower": -2.0,
+          "upper": -0.875,
+          "count": 8828161,
+          "upper_inclusive": false
+        },
+        {
+          "low": 1,
+          "high": 5,
+          "lower": -0.875,
+          "upper": -0.59765625,
+          "count": 39257001,
+          "upper_inclusive": false
+        },
+        {
+          "low": 5,
+          "high": 10,
+          "lower": -0.59765625,
+          "upper": -0.470703125,
+          "count": 50252055,
+          "upper_inclusive": false
+        },
+        {
+          "low": 10,
+          "high": 25,
+          "lower": -0.470703125,
+          "upper": -0.27734375,
+          "count": 149972009,
+          "upper_inclusive": false
+        },
+        {
+          "low": 25,
+          "high": 50,
+          "lower": -0.27734375,
+          "upper": -0.09619140625,
+          "count": 250197523,
+          "upper_inclusive": false
+        },
+        {
+          "low": 50,
+          "high": 75,
+          "lower": -0.09619140625,
+          "upper": 0.044189453125,
+          "count": 250227631,
+          "upper_inclusive": false
+        },
+        {
+          "low": 75,
+          "high": 90,
+          "lower": 0.044189453125,
+          "upper": 0.2119140625,
+          "count": 150065367,
+          "upper_inclusive": false
+        },
+        {
+          "low": 90,
+          "high": 95,
+          "lower": 0.2119140625,
+          "upper": 0.37890625,
+          "count": 50096328,
+          "upper_inclusive": false
+        },
+        {
+          "low": 95,
+          "high": 99,
+          "lower": 0.37890625,
+          "upper": 2.203125,
+          "count": 40080002,
+          "upper_inclusive": false
+        },
+        {
+          "low": 99,
+          "high": 99.9,
+          "lower": 2.203125,
+          "upper": 22.75,
+          "count": 9024072,
+          "upper_inclusive": false
+        },
+        {
+          "low": 99.9,
+          "high": 99.99,
+          "lower": 22.75,
+          "upper": 134.0,
+          "count": 903465,
+          "upper_inclusive": false
+        },
+        {
+          "low": 99.99,
+          "high": 100,
+          "lower": 134.0,
+          "upper": 364.0,
+          "count": 101095,
+          "upper_inclusive": true
+        }
+      ],
+      "methods": {
+        "quantiles": "Exact empirical linear quantiles from native BF16 value counts.",
+        "bands": "Numeric intervals [lower, upper), final interval includes maximum. Duplicate cutoffs can create empty bands; ties are never split.",
+        "sampling": "Uniform token sampling without replacement inside each numeric band; seed fixed. Multiple anchors may come from one document.",
+        "extremes": "Exact token extrema and distinct-document extrema; ties ordered by scan index.",
+        "scatter": "Up to 256 uniform tokens, augmented by displayed extreme and band anchors; this is not a population-density plot.",
+        "anatomy": "Raw gate before SiLU, raw up/value, and captured native product; product is not recomputed.",
+        "contexts": "Actual captured input IDs, with per-document context reset and 4096-token truncation; no new forwards."
+      }
+    },
+    "contexts": [
+      {
+        "id": "942400591",
+        "document": "1499194",
+        "groups": [
+          "top_tokens",
+          "top_documents",
+          "scatter"
+        ],
+        "anchor": {
+          "position": 13,
+          "token_id": 389,
+          "token": " on",
+          "gate": 17.75,
+          "value": 19.125,
+          "product": 340.0
+        },
+        "observed_prefix": "This morning, a story in Denverite about the Far East Center on",
+        "prediction_target": " South Federal Boulevard caught my eye, mainly because I",
+        "trace": [
+          [
+            -13,
+            "This",
+            -0.0810546875,
+            0.026123046875,
+            -0.00101470947265625
+          ],
+          [
+            -12,
+            " morning",
+            -0.4609375,
+            2.046875,
+            -0.365234375
+          ],
+          [
+            -11,
+            ",",
+            -2.953125,
+            0.88671875,
+            -0.1298828125
+          ],
+          [
+            -10,
+            " a",
+            0.0703125,
+            0.9921875,
+            0.0361328125
+          ],
+          [
+            -9,
+            " story",
+            -1.7890625,
+            1.4921875,
+            -0.380859375
+          ],
+          [
+            -8,
+            " in",
+            -0.408203125,
+            1.4140625,
+            -0.23046875
+          ],
+          [
+            -7,
+            " Denver",
+            11.4375,
+            12.8125,
+            147.0
+          ],
+          [
+            -6,
+            "ite",
+            3.265625,
+            5.8125,
+            18.25
+          ],
+          [
+            -5,
+            " about",
+            14.1875,
+            15.8125,
+            224.0
+          ],
+          [
+            -4,
+            " the",
+            11.9375,
+            12.0,
+            143.0
+          ],
+          [
+            -3,
+            " Far",
+            12.8125,
+            13.625,
+            175.0
+          ],
+          [
+            -2,
+            " East",
+            5.46875,
+            7.90625,
+            43.0
+          ],
+          [
+            -1,
+            " Center",
+            2.03125,
+            3.796875,
+            6.8125
+          ],
+          [
+            0,
+            " on",
+            17.75,
+            19.125,
+            340.0
+          ],
+          [
+            1,
+            " South",
+            13.4375,
+            14.8125,
+            199.0
+          ],
+          [
+            2,
+            " Federal",
+            11.4375,
+            12.6875,
+            145.0
+          ],
+          [
+            3,
+            " Boulevard",
+            3.546875,
+            6.375,
+            22.0
+          ],
+          [
+            4,
+            " caught",
+            2.78125,
+            4.5,
+            11.8125
+          ],
+          [
+            5,
+            " my",
+            1.1015625,
+            2.359375,
+            1.953125
+          ],
+          [
+            6,
+            " eye",
+            -1.7265625,
+            2.1875,
+            -0.57421875
+          ],
+          [
+            7,
+            ",",
+            -2.09375,
+            1.734375,
+            -0.3984375
+          ],
+          [
+            8,
+            " mainly",
+            -1.921875,
+            2.484375,
+            -0.609375
+          ],
+          [
+            9,
+            " because",
+            4.34375,
+            9.125,
+            39.0
+          ],
+          [
+            10,
+            " I",
+            -1.09375,
+            2.734375,
+            -0.75390625
+          ]
+        ],
+        "evidence": {
+          "text": "This morning, a story in Denverite about the Far East Center⟦ on⟧\nFollowing prediction target:  South Federal Boulevard caught my eye, mainly because I",
+          "activation": 340.0
+        }
+      },
+      {
+        "id": "154950398",
+        "document": "245023",
+        "groups": [
+          "bottom_tokens",
+          "bottom_documents",
+          "scatter"
+        ],
+        "anchor": {
+          "position": 75,
+          "token_id": 220,
+          "token": " ",
+          "gate": 9.4375,
+          "value": -5.3125,
+          "product": -50.25
+        },
+        "observed_prefix": "Lobbyist Regulation Act Reporting Guidelines\nThe Secretary of State has published the new Lobbyist Regulation Act Reporting Guidelines for use as a reference for lobbyist and lobbyist employers. Additionally, please refer to the Lobbyist Regulation Act, NMSA 2-11-1 through 2-11-9, as the ultimate legal authority.\nPlease contact our ethics staff at ",
+        "prediction_target": "505.827.36",
+        "trace": [
+          [
+            -24,
+            "1",
+            7.5,
+            -0.91796875,
+            -6.875
+          ],
+          [
+            -23,
+            "-",
+            7.78125,
+            -3.3125,
+            -25.75
+          ],
+          [
+            -22,
+            "1",
+            7.40625,
+            -0.7421875,
+            -5.5
+          ],
+          [
+            -21,
+            " through",
+            4.8125,
+            0.15234375,
+            0.7265625
+          ],
+          [
+            -20,
+            " ",
+            6.5625,
+            -3.21875,
+            -21.125
+          ],
+          [
+            -19,
+            "2",
+            5.21875,
+            0.107421875,
+            0.55859375
+          ],
+          [
+            -18,
+            "-",
+            2.890625,
+            -1.0703125,
+            -2.921875
+          ],
+          [
+            -17,
+            "1",
+            -0.3359375,
+            0.37109375,
+            -0.0517578125
+          ],
+          [
+            -16,
+            "1",
+            6.625,
+            0.05908203125,
+            0.390625
+          ],
+          [
+            -15,
+            "-",
+            -0.4140625,
+            0.2119140625,
+            -0.034912109375
+          ],
+          [
+            -14,
+            "9",
+            6.84375,
+            -1.4375,
+            -9.8125
+          ],
+          [
+            -13,
+            ",",
+            3.671875,
+            0.7578125,
+            2.71875
+          ],
+          [
+            -12,
+            " as",
+            1.2890625,
+            1.40625,
+            1.4140625
+          ],
+          [
+            -11,
+            " the",
+            1.4609375,
+            1.4140625,
+            1.6796875
+          ],
+          [
+            -10,
+            " ultimate",
+            -0.56640625,
+            0.1181640625,
+            -0.0242919921875
+          ],
+          [
+            -9,
+            " legal",
+            0.9921875,
+            0.369140625,
+            0.267578125
+          ],
+          [
+            -8,
+            " authority",
+            -0.09326171875,
+            0.54296875,
+            -0.024169921875
+          ],
+          [
+            -7,
+            ".\n",
+            2.140625,
+            -0.44140625,
+            -0.84375
+          ],
+          [
+            -6,
+            "Please",
+            0.3203125,
+            1.1484375,
+            0.212890625
+          ],
+          [
+            -5,
+            " contact",
+            5.0625,
+            0.71484375,
+            3.59375
+          ],
+          [
+            -4,
+            " our",
+            2.46875,
+            0.859375,
+            1.9609375
+          ],
+          [
+            -3,
+            " ethics",
+            2.078125,
+            0.97265625,
+            1.796875
+          ],
+          [
+            -2,
+            " staff",
+            1.8671875,
+            1.328125,
+            2.140625
+          ],
+          [
+            -1,
+            " at",
+            6.15625,
+            -0.7578125,
+            -4.65625
+          ],
+          [
+            0,
+            " ",
+            9.4375,
+            -5.3125,
+            -50.25
+          ],
+          [
+            1,
+            "5",
+            8.25,
+            -3.71875,
+            -30.625
+          ],
+          [
+            2,
+            "0",
+            7.3125,
+            -2.671875,
+            -19.5
+          ],
+          [
+            3,
+            "5",
+            5.15625,
+            -2.21875,
+            -11.375
+          ],
+          [
+            4,
+            ".",
+            6.0625,
+            -4.34375,
+            -26.375
+          ],
+          [
+            5,
+            "8",
+            8.125,
+            -4.53125,
+            -36.75
+          ],
+          [
+            6,
+            "2",
+            8.5,
+            -0.12158203125,
+            -1.03125
+          ],
+          [
+            7,
+            "7",
+            3.09375,
+            -1.2265625,
+            -3.625
+          ],
+          [
+            8,
+            ".",
+            7.5625,
+            -2.90625,
+            -22.0
+          ],
+          [
+            9,
+            "3",
+            4.1875,
+            -0.515625,
+            -2.125
+          ],
+          [
+            10,
+            "6",
+            3.859375,
+            0.08251953125,
+            0.3125
+          ]
+        ],
+        "evidence": {
+          "text": "eference for lobbyist and lobbyist employers. Additionally, please refer to the Lobbyist Regulation Act, NMSA 2-11-1 through 2-11-9, as the ultimate legal authority.\nPlease contact our ethics staff at⟦ ⟧\nFollowing prediction target: 505.827.36",
+          "activation": -50.25
+        }
+      }
+    ],
+    "experiments": [
+      {
+        "id": "scan-feedback",
+        "tool": "paper_sections",
+        "title": "scan-feedback",
+        "prediction": "",
+        "status": "complete",
+        "wall_seconds": null,
+        "sections": [
+          "anatomy"
+        ],
+        "atlas_completed": null,
+        "atlas_expected": null,
+        "anatomy_cases": null,
+        "family_units": []
+      },
+      {
+        "id": "response-predictions-01-interpretation-001",
+        "tool": "paper_sections",
+        "title": "response-predictions-01-interpretation-001",
+        "prediction": "",
+        "status": "complete",
+        "wall_seconds": 1171.896570446901,
+        "sections": [
+          "anatomy"
+        ],
+        "atlas_completed": null,
+        "atlas_expected": null,
+        "anatomy_cases": null,
+        "family_units": [],
+        "measured_sections": {
+          "spectrum": {
+            "edges": [
+              -64.0,
+              -32.0,
+              -16.0,
+              -8.0,
+              -4.0,
+              -2.0,
+              2.0,
+              4.0,
+              8.0,
+              16.0,
+              32.0,
+              64.0,
+              128.0,
+              256.0,
+              512.0
+            ],
+            "groups": [
+              {
+                "id": "unlabelled",
+                "name": "Unlabelled",
+                "description": "No resolved semantic assignment.",
+                "n": 434,
+                "pole": "either",
+                "response_summary": {
+                  "n": 434,
+                  "positive": 171,
+                  "negative": 263,
+                  "zero": 0,
+                  "min": -55.25,
+                  "max": 364.0
+                }
+              }
+            ],
+            "bins": [
+              {
+                "i": 0,
+                "label": "-64…-32",
+                "n_labeled": 35,
+                "groups": {
+                  "unlabelled": 35
+                }
+              },
+              {
+                "i": 1,
+                "label": "-32…-16",
+                "n_labeled": 1,
+                "groups": {
+                  "unlabelled": 1
+                }
+              },
+              {
+                "i": 2,
+                "label": "-16…-8",
+                "n_labeled": 7,
+                "groups": {
+                  "unlabelled": 7
+                }
+              },
+              {
+                "i": 3,
+                "label": "-8…-4",
+                "n_labeled": 2,
+                "groups": {
+                  "unlabelled": 2
+                }
+              },
+              {
+                "i": 4,
+                "label": "-4…-2",
+                "n_labeled": 6,
+                "groups": {
+                  "unlabelled": 6
+                }
+              },
+              {
+                "i": 5,
+                "label": "-2…2",
+                "n_labeled": 324,
+                "groups": {
+                  "unlabelled": 324
+                }
+              },
+              {
+                "i": 6,
+                "label": "2…4",
+                "n_labeled": 7,
+                "groups": {
+                  "unlabelled": 7
+                }
+              },
+              {
+                "i": 7,
+                "label": "4…8",
+                "n_labeled": 2,
+                "groups": {
+                  "unlabelled": 2
+                }
+              },
+              {
+                "i": 8,
+                "label": "8…16",
+                "n_labeled": 2,
+                "groups": {
+                  "unlabelled": 2
+                }
+              },
+              {
+                "i": 9,
+                "label": "16…32",
+                "n_labeled": 2,
+                "groups": {
+                  "unlabelled": 2
+                }
+              },
+              {
+                "i": 10,
+                "label": "32…64",
+                "n_labeled": 4,
+                "groups": {
+                  "unlabelled": 4
+                }
+              },
+              {
+                "i": 11,
+                "label": "64…128",
+                "n_labeled": 3,
+                "groups": {
+                  "unlabelled": 3
+                }
+              },
+              {
+                "i": 12,
+                "label": "128…256",
+                "n_labeled": 8,
+                "groups": {
+                  "unlabelled": 8
+                }
+              },
+              {
+                "i": 13,
+                "label": "256…512",
+                "n_labeled": 31,
+                "groups": {
+                  "unlabelled": 31
+                }
+              }
+            ],
+            "labeler": "DeepSeek high",
+            "sample_hist": {
+              "counts": [
+                35,
+                1,
+                7,
+                2,
+                6,
+                324,
+                7,
+                2,
+                2,
+                2,
+                4,
+                3,
+                8,
+                31
+              ]
+            },
+            "sampling": "All unique saved report positions: extremes, quantile examples and scatter samples. These are sample counts, not estimated semantic frequencies across the full corpus.",
+            "n_requested": 434,
+            "n_assigned": 0
+          }
+        }
+      }
+    ]
+  },
+  "output_excerpt": "{\n  \"group\": \"two_related\",\n  \"organized\": 4,\n  \"understood\": 3,\n  \"one_line\": \"A strong Colorado local-information/contact positive job and a narrower, related off-region public-service/legal/record negative job; both are supported, but the negative is context-bound and leaves mixed off-region residuals.\",\n  \"main_job\": \"Regional local-information/record-boundary encoding: Colorado local-contact, place, and team information is promoted strongly, while a weaker complementary negative response appears in some off-region public-service, legal, and record contexts.\",\n  \"remainders\": [\n    {\n      \"what\": \"Off-region sports commentary and bare off-region place/culture material are mixed rather than consistently negative.\",\n      \"evidence\": \"Sports-commentary typical activation is only about -0.38 and offregion-culture-place about -0.08; North Dakota facts and Bismarck school examples are strongly negative (-49.5, -48.75), while other off-region place mentions are positive or near zero.\"\n    },\n    {\n      \"what\": \"Matched off-region record/contact boundaries do not all turn negative.\",\n      \"evidence\": \"At the fixed ' as' record boundary, North Dakota is -17 and Fargo -7.125, but Utah is +2.078 and New Mexico -1.039; at the ' at' contact boundary Salt Lake City +0.945 and Phoenix +1.133. Phoenix/Boise/New Mexico prompts measured +7.156, +6.0, +5.594.\"\n    },\n    {\n      \"what\": \"Some positive local/event or contact-like examples lack an explicit Colorado cue.\",\n      \"evidence\": \"A travel/outdoor 5k example reaches 334 without a clear Colorado place; generic contact controls are only about 2-3, so this is a residual rather than the main formatting account.\"\n    },\n    {\n      \"what\": \"The negative sign is value-driven and the exact off-region record feature is unresolved.\",\n      \"evidence\": \"At the -55.25 Utah 435 anchor gate is 9.94 and value -5.56; broad area-code/non-Colorado rules failed, so the reliable negative cue is narrower than 'off-region' alone.\"\n    }\n  ],\n  \"where_it_branches\": [\n    {\n      \"branch\": \"Colorado local-contact/phone/address boundary\",\n      \"grows_from\": \"Colorado local information\",\n      \"path\": \"Colorado identity or 303/720/970 local-contact cue -> space/punctuation/function word before phone or address -> high positive product.\"\n    },\n    {\n      \"branch\": \"Colorado sports, media, and place identity\",\n      \"grows_from\": \"Colorado local information\",\n      \"path\": \"Colorado team/venue/place/culture cue -> function-word boundary without a contact block -> positive product.\"\n    },\n    {\n      \"branch\": \"Off-region public-service/legal/record boundary\",\n      \"grows_from\": \"off-region administrative/record negative pole\",\n      \"path\": \"Off-region area code or record/public-service frame -> digit, space, or record punctuation -> negative product.\"\n    },\n    {\n      \"branch\": \"Off-region health/social-service and government/legal records\",\n      \"grows_from\": \"off-region administrative/record negative pole\",\n      \"path\": \"Official health/legal/public-service listing -> contact or record boundary -> negative product.\"\n    }\n  ],\n  \"concerning\": [\n    \"The negative pole is not a general non-Colorado effect; matched Utah/New Mexico record boundaries and Phoenix/Boise/New Mexico contact prompts can be positive.\",\n    \"Off-region sports and bare place/culture contexts are inconsistent, so the negative account does not cover all negative material.\",\n    \"Positive responses can be driven by 303/720/970 phone digits even when the explicit place is absent, so part of the positive pole overlaps generic local-contact formatting.\",\n    \"Selected semantic-sample counts are not population frequencies, and the exact feature distinguishing negative off-region records from positive off-region places remains unclear.\"\n  ],\n  \"fine\": [\n    \"Token-level selectivity is strong: Denver 87%, Colorado 84%, Boulder 74% above 10% of the maximum product.\",\n    \"Matched replacement sweeps show Colorado fillers 100-158 at the same contact frame versus roughly -14 to +1 for off-region fillers and about 2-3 for generic controls.\",\n    \"Ablation of the neuron changes digit probabilities at the contact boundary, supporting a causal role.\",\n    \"The positive pole covers explicit Colorado places, local contacts, and Colorado sports/culture as related variants.\",\n    \"The negative pole has strong bottom anchors in some off-region public-service/legal/record contexts, especially North Dakota/Fargo and Utah record examples.\"\n  ],\n  \"poles\": {\n    \"positive\": {\n      \"group\": \"branching\",\n      \"notes\": \"Core Colorado local-information/place/contact encoding. All 19 Colorado local-info and 7 Colorado sports/culture positions are positive; Boulder/Colorado/Denver are promoted; matched sweeps separate Colorado identity from contact formatting. Related variants are local-contact/address boundaries and sports/culture/place mentions without contact. Some non-Colorado local/event positives remain unexplained.\"\n    },\n    \"negative\": {\n      \"group\": \"branching\",\n      \"notes\": \"Narrower off-region public-service/legal/record negative pole. Strong bottom anchors occur at Utah/North Dakota/New Mexico phone and record boundaries, with offregion-local-records and government/legal/health contributing. Branches include local records, government/legal records, and health/social-service listings. Broad non-Colorado or area-code-only accounts failed; matched records vary and off-region sports/culture remain mixed.\"\n    }\n  }\n}"
+}

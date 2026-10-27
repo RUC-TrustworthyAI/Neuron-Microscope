@@ -11,6 +11,7 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
+  <a href="docs/live-demo.md"><img src="assets/badges/live-demo.svg" alt="Live Demo: pending"></a>
   <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
 </p>
 
@@ -18,6 +19,7 @@
 
 <p align="center">
   <a href="#overview">📖 概览</a> ·
+  <a href="#live-demo">▶ Live Demo</a> ·
   <a href="#workflow">⚗️ 工作流程</a> ·
   <a href="#quick-start">🚀 快速开始</a> ·
   <a href="#reproduction-results">🧪 复现结果</a> ·
@@ -31,6 +33,14 @@
 我们同时开源了完整的三阶段 pipeline，用于研究 dense Qwen3 模型的原生 MLP 神经元。流程覆盖证据整理、初步解释、实验设计与执行、解释修订和交互式 HTML 报告生成，并增加了 **【扩展功能】**，供社区使用和开展进一步研究。
 
 后续，我们计划 **【后续计划】**。欢迎大家提供测试结果与反馈，共同改进神经元解释流程。
+
+## ▶ Live Demo <a id="live-demo"></a>
+
+**[查看逐步演示 →](docs/live-demo.md#中文说明)** · 待部署
+
+跟随一次真实的 Colorado neuron 研究，从初始证据页走完三个 agent 阶段，查看 Prompt 节选、关键操作、实验测量与交互报告。目前可本地预览，组织套餐升级并启用 GitHub Pages 后上线。
+
+[![Neuron Microscope 逐步演示预览](assets/live-demo-cover.jpg)](docs/live-demo.md#中文说明)
 
 ## ⚗️ 工作流程 <a id="workflow"></a>
 

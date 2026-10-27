@@ -1,0 +1,2049 @@
+{
+  "headline": {
+    "strip": {
+      "tokens": [
+        " visit",
+        " http",
+        "://",
+        "www",
+        ".th",
+        "ep",
+        "ro",
+        "duct",
+        "ivity",
+        "pro",
+        ".com",
+        " website",
+        ",",
+        " Email",
+        " Laura",
+        "@",
+        "The",
+        "Product",
+        "ivity",
+        "Pro",
+        ".com",
+        ",",
+        " or",
+        " call",
+        " ",
+        "3",
+        "0",
+        "3",
+        "-",
+        "4",
+        "7",
+        "1",
+        "-",
+        "7",
+        "4"
+      ],
+      "values": [
+        4.21875,
+        0.1669921875,
+        8.6875,
+        8.0625,
+        1.546875,
+        1.453125,
+        -0.00087738037109375,
+        0.037353515625,
+        0.32421875,
+        1.1640625,
+        -0.38671875,
+        -0.1611328125,
+        -0.439453125,
+        0.29296875,
+        -0.1826171875,
+        0.640625,
+        0.0947265625,
+        -0.30078125,
+        0.1875,
+        1.0078125,
+        -0.22265625,
+        -0.76171875,
+        -0.67578125,
+        22.375,
+        364.0,
+        264.0,
+        217.0,
+        54.75,
+        104.5,
+        70.5,
+        113.0,
+        25.25,
+        97.0,
+        29.875,
+        12.75
+      ],
+      "text": " visit http://www.theproductivitypro.com website, Email Laura@TheProductivityPro.com, or call 303-471-74",
+      "case_id": "599945814",
+      "source_start": 842,
+      "anchor_index": 24,
+      "pole": "positive",
+      "caption": "Positive saved context · product 364."
+    },
+    "poles": [
+      {
+        "pole": "positive",
+        "ladder": {
+          "template": "For local service in {slot}, call our office at",
+          "fillers": [
+            {
+              "tag": "Denver",
+              "text": "Denver",
+              "full_text": "For local service in Denver, call our office at",
+              "activation": 158.0,
+              "peak_token": " at",
+              "peak_index": 9,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " Denver",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                114.0,
+                81.5,
+                102.5,
+                81.0,
+                1.375,
+                158.0
+              ]
+            },
+            {
+              "tag": "Boulder",
+              "text": "Boulder",
+              "full_text": "For local service in Boulder, call our office at",
+              "activation": 130.0,
+              "peak_token": " at",
+              "peak_index": 9,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " Boulder",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                89.5,
+                94.5,
+                69.5,
+                44.75,
+                1.1796875,
+                130.0
+              ]
+            },
+            {
+              "tag": "Aurora",
+              "text": "Aurora",
+              "full_text": "For local service in Aurora, call our office at",
+              "activation": 34.0,
+              "peak_token": " at",
+              "peak_index": 9,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " Aurora",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                23.75,
+                51.5,
+                17.75,
+                18.0,
+                0.14453125,
+                34.0
+              ]
+            },
+            {
+              "tag": "Colorado",
+              "text": "Colorado",
+              "full_text": "For local service in Colorado, call our office at",
+              "activation": 152.0,
+              "peak_token": " at",
+              "peak_index": 9,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " Colorado",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                130.0,
+                28.5,
+                62.75,
+                139.0,
+                1.8359375,
+                152.0
+              ]
+            },
+            {
+              "tag": "Salt Lake City",
+              "text": "Salt Lake City",
+              "full_text": "For local service in Salt Lake City, call our office at",
+              "activation": 0.9453125,
+              "peak_token": " at",
+              "peak_index": 11,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " Salt",
+                " Lake",
+                " City",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                0.380859375,
+                -0.419921875,
+                1.90625,
+                1.375,
+                1.71875,
+                6.5,
+                0.4140625,
+                0.9453125
+              ]
+            },
+            {
+              "tag": "Fargo",
+              "text": "Fargo",
+              "full_text": "For local service in Fargo, call our office at",
+              "activation": -14.3125,
+              "peak_token": " at",
+              "peak_index": 9,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " Fargo",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                -8.4375,
+                -11.625,
+                -8.5625,
+                -4.75,
+                0.2041015625,
+                -14.3125
+              ]
+            },
+            {
+              "tag": "Phoenix",
+              "text": "Phoenix",
+              "full_text": "For local service in Phoenix, call our office at",
+              "activation": 1.1328125,
+              "peak_token": " at",
+              "peak_index": 9,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " Phoenix",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                0.6875,
+                2.328125,
+                1.34375,
+                3.359375,
+                -0.014404296875,
+                1.1328125
+              ]
+            },
+            {
+              "tag": "Seattle",
+              "text": "Seattle",
+              "full_text": "For local service in Seattle, call our office at",
+              "activation": -0.90625,
+              "peak_token": " at",
+              "peak_index": 9,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " Seattle",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                0.279296875,
+                0.019287109375,
+                -0.23046875,
+                0.5234375,
+                0.09326171875,
+                -0.90625
+              ]
+            },
+            {
+              "tag": "the area",
+              "text": "the area",
+              "full_text": "For local service in the area, call our office at",
+              "activation": 2.15625,
+              "peak_token": " at",
+              "peak_index": 10,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " the",
+                " area",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                -0.1982421875,
+                -0.06494140625,
+                -0.2060546875,
+                1.828125,
+                2.59375,
+                -0.0022735595703125,
+                2.15625
+              ]
+            },
+            {
+              "tag": "your community",
+              "text": "your community",
+              "full_text": "For local service in your community, call our office at",
+              "activation": 3.046875,
+              "peak_token": " at",
+              "peak_index": 10,
+              "tokens": [
+                "For",
+                " local",
+                " service",
+                " in",
+                " your",
+                " community",
+                ",",
+                " call",
+                " our",
+                " office",
+                " at"
+              ],
+              "values": [
+                -0.001373291015625,
+                -0.373046875,
+                -0.0986328125,
+                0.0262451171875,
+                0.004058837890625,
+                0.0157470703125,
+                -0.0274658203125,
+                0.39453125,
+                1.390625,
+                0.0233154296875,
+                3.046875
+              ]
+            }
+          ],
+          "caption": "Native product; token_position, single scoring.",
+          "source_figure_id": "sweep-003",
+          "pole": "positive"
+        },
+        "strip": {
+          "tokens": [
+            " visit",
+            " http",
+            "://",
+            "www",
+            ".th",
+            "ep",
+            "ro",
+            "duct",
+            "ivity",
+            "pro",
+            ".com",
+            " website",
+            ",",
+            " Email",
+            " Laura",
+            "@",
+            "The",
+            "Product",
+            "ivity",
+            "Pro",
+            ".com",
+            ",",
+            " or",
+            " call",
+            " ",
+            "3",
+            "0",
+            "3",
+            "-",
+            "4",
+            "7",
+            "1",
+            "-",
+            "7",
+            "4"
+          ],
+          "values": [
+            4.21875,
+            0.1669921875,
+            8.6875,
+            8.0625,
+            1.546875,
+            1.453125,
+            -0.00087738037109375,
+            0.037353515625,
+            0.32421875,
+            1.1640625,
+            -0.38671875,
+            -0.1611328125,
+            -0.439453125,
+            0.29296875,
+            -0.1826171875,
+            0.640625,
+            0.0947265625,
+            -0.30078125,
+            0.1875,
+            1.0078125,
+            -0.22265625,
+            -0.76171875,
+            -0.67578125,
+            22.375,
+            364.0,
+            264.0,
+            217.0,
+            54.75,
+            104.5,
+            70.5,
+            113.0,
+            25.25,
+            97.0,
+            29.875,
+            12.75
+          ],
+          "text": " visit http://www.theproductivitypro.com website, Email Laura@TheProductivityPro.com, or call 303-471-74",
+          "case_id": "599945814",
+          "source_start": 842,
+          "anchor_index": 24,
+          "pole": "positive",
+          "caption": "Positive saved context · product 364."
+        }
+      },
+      {
+        "pole": "negative",
+        "ladder": {
+          "template": "The {slot} records office listed the case number as",
+          "fillers": [
+            {
+              "tag": "Utah",
+              "text": "Utah",
+              "full_text": "The Utah records office listed the case number as",
+              "activation": 2.078125,
+              "peak_token": " as",
+              "peak_index": 8,
+              "tokens": [
+                "The",
+                " Utah",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                0.1103515625,
+                0.2021484375,
+                -0.10205078125,
+                6.0,
+                -0.162109375,
+                0.478515625,
+                0.515625,
+                2.078125
+              ]
+            },
+            {
+              "tag": "North Dakota",
+              "text": "North Dakota",
+              "full_text": "The North Dakota records office listed the case number as",
+              "activation": -17.0,
+              "peak_token": " as",
+              "peak_index": 9,
+              "tokens": [
+                "The",
+                " North",
+                " Dakota",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                0.2294921875,
+                -8.0625,
+                0.302734375,
+                0.0152587890625,
+                -3.53125,
+                -3.140625,
+                -0.130859375,
+                -2.265625,
+                -17.0
+              ]
+            },
+            {
+              "tag": "Fargo",
+              "text": "Fargo",
+              "full_text": "The Fargo records office listed the case number as",
+              "activation": -7.125,
+              "peak_token": " as",
+              "peak_index": 8,
+              "tokens": [
+                "The",
+                " Fargo",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                -6.0625,
+                0.07763671875,
+                -0.007598876953125,
+                -0.53125,
+                -0.01361083984375,
+                0.059326171875,
+                -0.92578125,
+                -7.125
+              ]
+            },
+            {
+              "tag": "New Mexico",
+              "text": "New Mexico",
+              "full_text": "The New Mexico records office listed the case number as",
+              "activation": -1.0390625,
+              "peak_token": " as",
+              "peak_index": 9,
+              "tokens": [
+                "The",
+                " New",
+                " Mexico",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                0.251953125,
+                -3.265625,
+                0.0859375,
+                -0.1533203125,
+                5.375,
+                -0.003387451171875,
+                0.19921875,
+                -1.1015625,
+                -1.0390625
+              ]
+            },
+            {
+              "tag": "Colorado",
+              "text": "Colorado",
+              "full_text": "The Colorado records office listed the case number as",
+              "activation": 131.0,
+              "peak_token": " as",
+              "peak_index": 8,
+              "tokens": [
+                "The",
+                " Colorado",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                123.5,
+                -0.1884765625,
+                -0.0177001953125,
+                54.25,
+                10.5625,
+                0.66015625,
+                3.671875,
+                131.0
+              ]
+            },
+            {
+              "tag": "Denver",
+              "text": "Denver",
+              "full_text": "The Denver records office listed the case number as",
+              "activation": 104.5,
+              "peak_token": " as",
+              "peak_index": 8,
+              "tokens": [
+                "The",
+                " Denver",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                119.0,
+                -0.0196533203125,
+                0.466796875,
+                34.5,
+                7.65625,
+                0.5859375,
+                4.71875,
+                104.5
+              ]
+            },
+            {
+              "tag": "Boulder",
+              "text": "Boulder",
+              "full_text": "The Boulder records office listed the case number as",
+              "activation": 121.5,
+              "peak_token": " as",
+              "peak_index": 8,
+              "tokens": [
+                "The",
+                " Boulder",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                74.0,
+                -0.1728515625,
+                0.703125,
+                42.25,
+                14.875,
+                0.373046875,
+                11.9375,
+                121.5
+              ]
+            },
+            {
+              "tag": "Aurora",
+              "text": "Aurora",
+              "full_text": "The Aurora records office listed the case number as",
+              "activation": 7.90625,
+              "peak_token": " as",
+              "peak_index": 8,
+              "tokens": [
+                "The",
+                " Aurora",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                8.3125,
+                0.01226806640625,
+                -0.044921875,
+                4.40625,
+                0.0625,
+                -0.029296875,
+                0.46875,
+                7.90625
+              ]
+            },
+            {
+              "tag": "public",
+              "text": "public",
+              "full_text": "The public records office listed the case number as",
+              "activation": 0.003387451171875,
+              "peak_token": " as",
+              "peak_index": 8,
+              "tokens": [
+                "The",
+                " public",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                0.2890625,
+                0.1943359375,
+                0.050048828125,
+                -0.56640625,
+                0.1787109375,
+                0.034423828125,
+                -0.2099609375,
+                0.003387451171875
+              ]
+            },
+            {
+              "tag": "central",
+              "text": "central",
+              "full_text": "The central records office listed the case number as",
+              "activation": -0.0908203125,
+              "peak_token": " as",
+              "peak_index": 8,
+              "tokens": [
+                "The",
+                " central",
+                " records",
+                " office",
+                " listed",
+                " the",
+                " case",
+                " number",
+                " as"
+              ],
+              "values": [
+                -0.00099945068359375,
+                0.1611328125,
+                0.244140625,
+                0.07177734375,
+                -0.1748046875,
+                0.24609375,
+                -0.003509521484375,
+                -0.008056640625,
+                -0.0908203125
+              ]
+            }
+          ],
+          "caption": "Native product; token_position, single scoring.",
+          "source_figure_id": "sweep-002",
+          "pole": "negative"
+        },
+        "strip": {
+          "tokens": [
+            " been",
+            " in",
+            " the",
+            " River",
+            " at",
+            " least",
+            " a",
+            " week",
+            " or",
+            " ten",
+            " days",
+            ".\n",
+            "Contact",
+            " Box",
+            " Elder",
+            " County",
+            " Sheriff",
+            " Office",
+            " ",
+            "4",
+            "3",
+            "5",
+            "-",
+            "7",
+            "3",
+            "4",
+            "-",
+            "3",
+            "8",
+            "0",
+            "0",
+            "\n",
+            "Submit",
+            " a",
+            " tip"
+          ],
+          "values": [
+            -0.1416015625,
+            -0.15625,
+            0.447265625,
+            -0.1328125,
+            -0.3984375,
+            -0.10107421875,
+            -0.087890625,
+            -0.08447265625,
+            -0.45703125,
+            -0.10546875,
+            -0.095703125,
+            0.045166015625,
+            -0.0262451171875,
+            0.90625,
+            -3.140625,
+            6.875,
+            12.9375,
+            3.0625,
+            -34.0,
+            -30.625,
+            -22.875,
+            -1.890625,
+            -44.0,
+            -37.25,
+            -55.25,
+            -1.4609375,
+            -15.875,
+            4.96875,
+            -2.15625,
+            -2.328125,
+            -0.007415771484375,
+            0.4609375,
+            0.010986328125,
+            -0.07958984375,
+            0.328125
+          ],
+          "text": " been in the River at least a week or ten days.\nContact Box Elder County Sheriff Office 435-734-3800\nSubmit a tip",
+          "case_id": "997363977",
+          "source_start": 98,
+          "anchor_index": 24,
+          "pole": "negative",
+          "caption": "Negative saved context · product -55.25."
+        }
+      }
+    ],
+    "ladder": {
+      "template": "For local service in {slot}, call our office at",
+      "fillers": [
+        {
+          "tag": "Denver",
+          "text": "Denver",
+          "full_text": "For local service in Denver, call our office at",
+          "activation": 158.0,
+          "peak_token": " at",
+          "peak_index": 9,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Denver",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            114.0,
+            81.5,
+            102.5,
+            81.0,
+            1.375,
+            158.0
+          ]
+        },
+        {
+          "tag": "Boulder",
+          "text": "Boulder",
+          "full_text": "For local service in Boulder, call our office at",
+          "activation": 130.0,
+          "peak_token": " at",
+          "peak_index": 9,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Boulder",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            89.5,
+            94.5,
+            69.5,
+            44.75,
+            1.1796875,
+            130.0
+          ]
+        },
+        {
+          "tag": "Aurora",
+          "text": "Aurora",
+          "full_text": "For local service in Aurora, call our office at",
+          "activation": 34.0,
+          "peak_token": " at",
+          "peak_index": 9,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Aurora",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            23.75,
+            51.5,
+            17.75,
+            18.0,
+            0.14453125,
+            34.0
+          ]
+        },
+        {
+          "tag": "Colorado",
+          "text": "Colorado",
+          "full_text": "For local service in Colorado, call our office at",
+          "activation": 152.0,
+          "peak_token": " at",
+          "peak_index": 9,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Colorado",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            130.0,
+            28.5,
+            62.75,
+            139.0,
+            1.8359375,
+            152.0
+          ]
+        },
+        {
+          "tag": "Salt Lake City",
+          "text": "Salt Lake City",
+          "full_text": "For local service in Salt Lake City, call our office at",
+          "activation": 0.9453125,
+          "peak_token": " at",
+          "peak_index": 11,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Salt",
+            " Lake",
+            " City",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            0.380859375,
+            -0.419921875,
+            1.90625,
+            1.375,
+            1.71875,
+            6.5,
+            0.4140625,
+            0.9453125
+          ]
+        },
+        {
+          "tag": "Fargo",
+          "text": "Fargo",
+          "full_text": "For local service in Fargo, call our office at",
+          "activation": -14.3125,
+          "peak_token": " at",
+          "peak_index": 9,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Fargo",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            -8.4375,
+            -11.625,
+            -8.5625,
+            -4.75,
+            0.2041015625,
+            -14.3125
+          ]
+        },
+        {
+          "tag": "Phoenix",
+          "text": "Phoenix",
+          "full_text": "For local service in Phoenix, call our office at",
+          "activation": 1.1328125,
+          "peak_token": " at",
+          "peak_index": 9,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Phoenix",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            0.6875,
+            2.328125,
+            1.34375,
+            3.359375,
+            -0.014404296875,
+            1.1328125
+          ]
+        },
+        {
+          "tag": "Seattle",
+          "text": "Seattle",
+          "full_text": "For local service in Seattle, call our office at",
+          "activation": -0.90625,
+          "peak_token": " at",
+          "peak_index": 9,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Seattle",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            0.279296875,
+            0.019287109375,
+            -0.23046875,
+            0.5234375,
+            0.09326171875,
+            -0.90625
+          ]
+        },
+        {
+          "tag": "the area",
+          "text": "the area",
+          "full_text": "For local service in the area, call our office at",
+          "activation": 2.15625,
+          "peak_token": " at",
+          "peak_index": 10,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " the",
+            " area",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            -0.1982421875,
+            -0.06494140625,
+            -0.2060546875,
+            1.828125,
+            2.59375,
+            -0.0022735595703125,
+            2.15625
+          ]
+        },
+        {
+          "tag": "your community",
+          "text": "your community",
+          "full_text": "For local service in your community, call our office at",
+          "activation": 3.046875,
+          "peak_token": " at",
+          "peak_index": 10,
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " your",
+            " community",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            0.004058837890625,
+            0.0157470703125,
+            -0.0274658203125,
+            0.39453125,
+            1.390625,
+            0.0233154296875,
+            3.046875
+          ]
+        }
+      ],
+      "caption": "Native product; token_position, single scoring.",
+      "source_figure_id": "sweep-003",
+      "pole": "positive"
+    },
+    "comparison": {
+      "template": "For local service in {slot}, call our office at",
+      "fillers": [
+        {
+          "tag": "Denver",
+          "text": "Denver",
+          "full_text": "For local service in Denver, call our office at",
+          "activation": 158.0,
+          "peak_index": 9,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Denver",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            114.0,
+            81.5,
+            102.5,
+            81.0,
+            1.375,
+            158.0
+          ],
+          "source_condition": 0,
+          "scored_positions": [
+            9
+          ]
+        },
+        {
+          "tag": "Boulder",
+          "text": "Boulder",
+          "full_text": "For local service in Boulder, call our office at",
+          "activation": 130.0,
+          "peak_index": 9,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Boulder",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            89.5,
+            94.5,
+            69.5,
+            44.75,
+            1.1796875,
+            130.0
+          ],
+          "source_condition": 1,
+          "scored_positions": [
+            9
+          ]
+        },
+        {
+          "tag": "Aurora",
+          "text": "Aurora",
+          "full_text": "For local service in Aurora, call our office at",
+          "activation": 34.0,
+          "peak_index": 9,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Aurora",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            23.75,
+            51.5,
+            17.75,
+            18.0,
+            0.14453125,
+            34.0
+          ],
+          "source_condition": 2,
+          "scored_positions": [
+            9
+          ]
+        },
+        {
+          "tag": "Colorado",
+          "text": "Colorado",
+          "full_text": "For local service in Colorado, call our office at",
+          "activation": 152.0,
+          "peak_index": 9,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Colorado",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            130.0,
+            28.5,
+            62.75,
+            139.0,
+            1.8359375,
+            152.0
+          ],
+          "source_condition": 3,
+          "scored_positions": [
+            9
+          ]
+        },
+        {
+          "tag": "Salt Lake City",
+          "text": "Salt Lake City",
+          "full_text": "For local service in Salt Lake City, call our office at",
+          "activation": 0.9453125,
+          "peak_index": 11,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Salt",
+            " Lake",
+            " City",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            0.380859375,
+            -0.419921875,
+            1.90625,
+            1.375,
+            1.71875,
+            6.5,
+            0.4140625,
+            0.9453125
+          ],
+          "source_condition": 4,
+          "scored_positions": [
+            11
+          ]
+        },
+        {
+          "tag": "Fargo",
+          "text": "Fargo",
+          "full_text": "For local service in Fargo, call our office at",
+          "activation": -14.3125,
+          "peak_index": 9,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Fargo",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            -8.4375,
+            -11.625,
+            -8.5625,
+            -4.75,
+            0.2041015625,
+            -14.3125
+          ],
+          "source_condition": 5,
+          "scored_positions": [
+            9
+          ]
+        },
+        {
+          "tag": "Phoenix",
+          "text": "Phoenix",
+          "full_text": "For local service in Phoenix, call our office at",
+          "activation": 1.1328125,
+          "peak_index": 9,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Phoenix",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            0.6875,
+            2.328125,
+            1.34375,
+            3.359375,
+            -0.014404296875,
+            1.1328125
+          ],
+          "source_condition": 6,
+          "scored_positions": [
+            9
+          ]
+        },
+        {
+          "tag": "Seattle",
+          "text": "Seattle",
+          "full_text": "For local service in Seattle, call our office at",
+          "activation": -0.90625,
+          "peak_index": 9,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " Seattle",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            0.279296875,
+            0.019287109375,
+            -0.23046875,
+            0.5234375,
+            0.09326171875,
+            -0.90625
+          ],
+          "source_condition": 7,
+          "scored_positions": [
+            9
+          ]
+        },
+        {
+          "tag": "the area",
+          "text": "the area",
+          "full_text": "For local service in the area, call our office at",
+          "activation": 2.15625,
+          "peak_index": 10,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " the",
+            " area",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            -0.1982421875,
+            -0.06494140625,
+            -0.2060546875,
+            1.828125,
+            2.59375,
+            -0.0022735595703125,
+            2.15625
+          ],
+          "source_condition": 8,
+          "scored_positions": [
+            10
+          ]
+        },
+        {
+          "tag": "your community",
+          "text": "your community",
+          "full_text": "For local service in your community, call our office at",
+          "activation": 3.046875,
+          "peak_index": 10,
+          "peak_token": " at",
+          "tokens": [
+            "For",
+            " local",
+            " service",
+            " in",
+            " your",
+            " community",
+            ",",
+            " call",
+            " our",
+            " office",
+            " at"
+          ],
+          "values": [
+            -0.001373291015625,
+            -0.373046875,
+            -0.0986328125,
+            0.0262451171875,
+            0.004058837890625,
+            0.0157470703125,
+            -0.0274658203125,
+            0.39453125,
+            1.390625,
+            0.0233154296875,
+            3.046875
+          ],
+          "source_condition": 9,
+          "scored_positions": [
+            10
+          ]
+        }
+      ],
+      "source_figure_id": "sweep-003",
+      "metric": "signed_largest_absolute_product_at_saved_scored_positions",
+      "caption": "Signed neuron activation at the largest absolute response within the recorded scoring span; every row uses the same template and scoring rule."
+    }
+  },
+  "figures": [
+    {
+      "id": "sweep-001",
+      "kind": "sweep",
+      "title": "Place-cue selectivity inside a fixed sentence",
+      "rationale": "If the neuron carries Colorado locality, Denver, Colorado, Boulder and Aurora should raise the maximum product over the replacement cue above Salt Lake City, Fargo, Phoenix and Seattle and the unrelated controls. A formatting-only account predicts no Colorado advantage.",
+      "pole": "positive",
+      "template": "The regional meeting moved from the downtown office to {slot} this morning.",
+      "caption": "Native product; replacement_span, max scoring.",
+      "results": [
+        {
+          "tag": "Denver",
+          "filler": "Denver",
+          "text": "The regional meeting moved from the downtown office to Denver this morning.",
+          "activation": 116.0,
+          "peak_token": " Denver",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 116.0,
+          "min": 116.0
+        },
+        {
+          "tag": "Colorado",
+          "filler": "Colorado",
+          "text": "The regional meeting moved from the downtown office to Colorado this morning.",
+          "activation": 105.5,
+          "peak_token": " Colorado",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 105.5,
+          "min": 105.5
+        },
+        {
+          "tag": "Boulder",
+          "filler": "Boulder",
+          "text": "The regional meeting moved from the downtown office to Boulder this morning.",
+          "activation": 100.0,
+          "peak_token": " Boulder",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 100.0,
+          "min": 100.0
+        },
+        {
+          "tag": "Aurora",
+          "filler": "Aurora",
+          "text": "The regional meeting moved from the downtown office to Aurora this morning.",
+          "activation": 28.875,
+          "peak_token": " Aurora",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 28.875,
+          "min": 28.875
+        },
+        {
+          "tag": "Salt Lake City",
+          "filler": "Salt Lake City",
+          "text": "The regional meeting moved from the downtown office to Salt Lake City this morning.",
+          "activation": 6.90625,
+          "peak_token": " City",
+          "peak_index": 11,
+          "scored_tokens": [
+            9,
+            10,
+            11
+          ],
+          "max": 6.90625,
+          "min": 2.703125
+        },
+        {
+          "tag": "Fargo",
+          "filler": "Fargo",
+          "text": "The regional meeting moved from the downtown office to Fargo this morning.",
+          "activation": -5.65625,
+          "peak_token": " Fargo",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": -5.65625,
+          "min": -5.65625
+        },
+        {
+          "tag": "Phoenix",
+          "filler": "Phoenix",
+          "text": "The regional meeting moved from the downtown office to Phoenix this morning.",
+          "activation": 4.65625,
+          "peak_token": " Phoenix",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 4.65625,
+          "min": 4.65625
+        },
+        {
+          "tag": "Seattle",
+          "filler": "Seattle",
+          "text": "The regional meeting moved from the downtown office to Seattle this morning.",
+          "activation": -0.3828125,
+          "peak_token": " Seattle",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": -0.3828125,
+          "min": -0.3828125
+        },
+        {
+          "tag": "the community center",
+          "filler": "the community center",
+          "text": "The regional meeting moved from the downtown office to the community center this morning.",
+          "activation": 1.6171875,
+          "peak_token": " community",
+          "peak_index": 10,
+          "scored_tokens": [
+            9,
+            10,
+            11
+          ],
+          "max": 1.6171875,
+          "min": -0.765625
+        },
+        {
+          "tag": "our usual venue",
+          "filler": "our usual venue",
+          "text": "The regional meeting moved from the downtown office to our usual venue this morning.",
+          "activation": 0.40234375,
+          "peak_token": " usual",
+          "peak_index": 10,
+          "scored_tokens": [
+            9,
+            10,
+            11
+          ],
+          "max": 0.40234375,
+          "min": -0.23046875
+        }
+      ]
+    },
+    {
+      "id": "sweep-002",
+      "kind": "sweep",
+      "title": "Off-region place cue before a local record value",
+      "rationale": "If negative product marks off-region local-record contexts, Utah, North Dakota, Fargo and New Mexico should produce lower minimum product at the fixed boundary than the Colorado alternatives. A formatting-only account predicts similar minima across all place cues.",
+      "pole": "negative",
+      "template": "The {slot} records office listed the case number as",
+      "caption": "Native product; token_position, single scoring.",
+      "results": [
+        {
+          "tag": "Utah",
+          "filler": "Utah",
+          "text": "The Utah records office listed the case number as",
+          "activation": 2.078125,
+          "peak_token": " as",
+          "peak_index": 8,
+          "scored_tokens": [
+            8
+          ],
+          "max": 2.078125,
+          "min": 2.078125
+        },
+        {
+          "tag": "North Dakota",
+          "filler": "North Dakota",
+          "text": "The North Dakota records office listed the case number as",
+          "activation": -17.0,
+          "peak_token": " as",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": -17.0,
+          "min": -17.0
+        },
+        {
+          "tag": "Fargo",
+          "filler": "Fargo",
+          "text": "The Fargo records office listed the case number as",
+          "activation": -7.125,
+          "peak_token": " as",
+          "peak_index": 8,
+          "scored_tokens": [
+            8
+          ],
+          "max": -7.125,
+          "min": -7.125
+        },
+        {
+          "tag": "New Mexico",
+          "filler": "New Mexico",
+          "text": "The New Mexico records office listed the case number as",
+          "activation": -1.0390625,
+          "peak_token": " as",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": -1.0390625,
+          "min": -1.0390625
+        },
+        {
+          "tag": "Colorado",
+          "filler": "Colorado",
+          "text": "The Colorado records office listed the case number as",
+          "activation": 131.0,
+          "peak_token": " as",
+          "peak_index": 8,
+          "scored_tokens": [
+            8
+          ],
+          "max": 131.0,
+          "min": 131.0
+        },
+        {
+          "tag": "Denver",
+          "filler": "Denver",
+          "text": "The Denver records office listed the case number as",
+          "activation": 104.5,
+          "peak_token": " as",
+          "peak_index": 8,
+          "scored_tokens": [
+            8
+          ],
+          "max": 104.5,
+          "min": 104.5
+        },
+        {
+          "tag": "Boulder",
+          "filler": "Boulder",
+          "text": "The Boulder records office listed the case number as",
+          "activation": 121.5,
+          "peak_token": " as",
+          "peak_index": 8,
+          "scored_tokens": [
+            8
+          ],
+          "max": 121.5,
+          "min": 121.5
+        },
+        {
+          "tag": "Aurora",
+          "filler": "Aurora",
+          "text": "The Aurora records office listed the case number as",
+          "activation": 7.90625,
+          "peak_token": " as",
+          "peak_index": 8,
+          "scored_tokens": [
+            8
+          ],
+          "max": 7.90625,
+          "min": 7.90625
+        },
+        {
+          "tag": "public",
+          "filler": "public",
+          "text": "The public records office listed the case number as",
+          "activation": 0.003387451171875,
+          "peak_token": " as",
+          "peak_index": 8,
+          "scored_tokens": [
+            8
+          ],
+          "max": 0.003387451171875,
+          "min": 0.003387451171875
+        },
+        {
+          "tag": "central",
+          "filler": "central",
+          "text": "The central records office listed the case number as",
+          "activation": -0.0908203125,
+          "peak_token": " as",
+          "peak_index": 8,
+          "scored_tokens": [
+            8
+          ],
+          "max": -0.0908203125,
+          "min": -0.0908203125
+        }
+      ]
+    },
+    {
+      "id": "sweep-003",
+      "kind": "sweep",
+      "title": "Colorado cue before a fixed contact boundary",
+      "rationale": "If Colorado locality drives the response, Denver, Boulder, Aurora and Colorado should raise product at the shared final boundary token 'at' above matched off-region places and generic controls. If the neuron is a pure contact-format detector, all place variants should be similar because the same contact frame is present.",
+      "pole": "positive",
+      "template": "For local service in {slot}, call our office at",
+      "caption": "Native product; token_position, single scoring.",
+      "results": [
+        {
+          "tag": "Denver",
+          "filler": "Denver",
+          "text": "For local service in Denver, call our office at",
+          "activation": 158.0,
+          "peak_token": " at",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 158.0,
+          "min": 158.0
+        },
+        {
+          "tag": "Boulder",
+          "filler": "Boulder",
+          "text": "For local service in Boulder, call our office at",
+          "activation": 130.0,
+          "peak_token": " at",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 130.0,
+          "min": 130.0
+        },
+        {
+          "tag": "Aurora",
+          "filler": "Aurora",
+          "text": "For local service in Aurora, call our office at",
+          "activation": 34.0,
+          "peak_token": " at",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 34.0,
+          "min": 34.0
+        },
+        {
+          "tag": "Colorado",
+          "filler": "Colorado",
+          "text": "For local service in Colorado, call our office at",
+          "activation": 152.0,
+          "peak_token": " at",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 152.0,
+          "min": 152.0
+        },
+        {
+          "tag": "Salt Lake City",
+          "filler": "Salt Lake City",
+          "text": "For local service in Salt Lake City, call our office at",
+          "activation": 0.9453125,
+          "peak_token": " at",
+          "peak_index": 11,
+          "scored_tokens": [
+            11
+          ],
+          "max": 0.9453125,
+          "min": 0.9453125
+        },
+        {
+          "tag": "Fargo",
+          "filler": "Fargo",
+          "text": "For local service in Fargo, call our office at",
+          "activation": -14.3125,
+          "peak_token": " at",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": -14.3125,
+          "min": -14.3125
+        },
+        {
+          "tag": "Phoenix",
+          "filler": "Phoenix",
+          "text": "For local service in Phoenix, call our office at",
+          "activation": 1.1328125,
+          "peak_token": " at",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": 1.1328125,
+          "min": 1.1328125
+        },
+        {
+          "tag": "Seattle",
+          "filler": "Seattle",
+          "text": "For local service in Seattle, call our office at",
+          "activation": -0.90625,
+          "peak_token": " at",
+          "peak_index": 9,
+          "scored_tokens": [
+            9
+          ],
+          "max": -0.90625,
+          "min": -0.90625
+        },
+        {
+          "tag": "the area",
+          "filler": "the area",
+          "text": "For local service in the area, call our office at",
+          "activation": 2.15625,
+          "peak_token": " at",
+          "peak_index": 10,
+          "scored_tokens": [
+            10
+          ],
+          "max": 2.15625,
+          "min": 2.15625
+        },
+        {
+          "tag": "your community",
+          "filler": "your community",
+          "text": "For local service in your community, call our office at",
+          "activation": 3.046875,
+          "peak_token": " at",
+          "peak_index": 10,
+          "scored_tokens": [
+            10
+          ],
+          "max": 3.046875,
+          "min": 3.046875
+        }
+      ]
+    }
+  ]
+}
