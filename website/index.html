@@ -1,14 +1,49 @@
 <!doctype html>
-<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>从证据到解释 · Neuron Microscope Demo</title><link rel="stylesheet" href="replay.css"><link rel="stylesheet" href="demo.css"></head>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>From Evidence to Explanation · Neuron Microscope Demo</title>
+  <link rel="stylesheet" href="replay.css">
+  <link rel="stylesheet" href="demo.css">
+</head>
 <body class="cover-open">
-<header class="topbar"><a class="brand" id="home-link" href="#"><span class="mark">N</span><span>Neuron Microscope</span><span class="demo-word">DEMO</span></a><div class="top-actions"><span class="record-state"><i></i> 已保存运行回放</span><button class="quiet-button" id="about-demo">关于这段记录</button></div></header>
+<header class="topbar">
+  <a class="brand" id="home-link" href="#"><span class="mark">N</span><span>Neuron Microscope</span><span class="demo-word">DEMO</span></a>
+  <div class="top-actions">
+    <span class="record-state"><i></i><span data-i18n="已保存运行回放">Recorded investigation</span></span>
+    <button class="quiet-button" id="about-demo" data-i18n="关于这段记录">About this recording</button>
+    <nav class="language-switch" aria-label="Language"><a href="?lang=en" data-language="en" lang="en" aria-current="page">English</a><a href="?lang=zh" data-language="zh" lang="zh-CN">中文</a></nav>
+  </div>
+</header>
 <section id="cover" class="cover">
-<div class="hero-copy"><p class="eyebrow">NEURON INTERPRETABILITY · RECORDED INVESTIGATION</p><h1>从激活证据，<br>走向可检验的解释。</h1><p class="hero-lede">跟随一个neuron的研究过程，看agent怎样读取样本、设计实验，再依据反例修订解释。</p><div class="hero-actions"><button class="start-button" id="start-demo">开始逐步回放 <span>→</span></button><a class="secondary-link" href="reports/04-published.html" target="_blank" rel="noopener">直接看最终报告 ↗</a></div><p class="hero-case">本次案例：Qwen3-32B · L55/N11703 · Colorado</p></div>
-<div class="hero-document"><div class="hero-document-top"><div class="hero-toggle" role="group" aria-label="选择开场预览"><button aria-pressed="false" data-cover-snapshot="initial">初始数据页</button><button aria-pressed="true" class="active" data-cover-snapshot="published">最终报告</button></div><span>实际HTML快照</span></div><button id="cover-zoom" class="hero-paper-button" aria-label="放大报告截图"><img id="cover-paper" src="screenshots/published.jpg" width="1164" height="655" alt="Colorado最终报告的实际页面"></button><div class="hero-document-bottom"><span id="cover-paper-label">Colorado local-information neuron</span><span>点击放大 ⤢</span></div></div>
-<div class="hero-stages"><button data-jump="agent1"><span class="stage-index">01</span><span><b>初步解释</b><small>从真实样本提出假设</small></span><span class="stage-arrow">↗</span></button><button data-jump="agent2-source"><span class="stage-index">02</span><span><b>实验检验</b><small>用匹配条件区分解释</small></span><span class="stage-arrow">↗</span></button><button data-jump="agent3"><span class="stage-index">03</span><span><b>修订与报告</b><small>把反例带回最终解释</small></span><span class="stage-arrow">↗</span></button></div>
-<p class="cover-note">这是一段实际运行的回放，保留了中断、测量复用和后续刷新；每一步展示当次Prompt节选、关键操作与对应产物。</p>
+  <div class="hero-copy">
+    <p class="eyebrow">NEURON INTERPRETABILITY · RECORDED INVESTIGATION</p>
+    <h1 data-i18n-html="从激活证据，&lt;br&gt;走向可检验的解释。">From activations<br>to testable explanations.</h1>
+    <p class="hero-lede" data-i18n="跟随一个neuron的研究过程，看agent怎样读取样本、设计实验，再依据反例修订解释。">Follow one neuron investigation as agents read evidence, design experiments, and revise their explanation using counterexamples.</p>
+    <div class="hero-actions"><button class="start-button" id="start-demo"><span data-i18n="开始逐步回放">Explore the walkthrough</span><span>→</span></button><a class="secondary-link" href="reports/04-published.html" target="_blank" rel="noopener" data-i18n="直接看最终报告 ↗">Open the final report ↗</a></div>
+    <p class="hero-case" data-i18n="本次案例：Qwen3-32B · L55/N11703 · Colorado">Case study: Qwen3-32B · L55/N11703 · Colorado</p>
+  </div>
+  <div class="hero-document">
+    <div class="hero-document-top"><div class="hero-toggle" role="group" aria-label="Choose a cover preview" data-i18n-aria="选择开场预览"><button aria-pressed="false" data-cover-snapshot="initial" data-i18n="初始数据页">Initial evidence</button><button aria-pressed="true" class="active" data-cover-snapshot="published" data-i18n="最终报告">Final report</button></div><span data-i18n="实际HTML快照">Saved HTML snapshot</span></div>
+    <button id="cover-zoom" class="hero-paper-button" aria-label="Enlarge the report screenshot" data-i18n-aria="放大报告截图"><img id="cover-paper" src="screenshots/published.jpg" width="1164" height="655" alt="Screenshot of the final Colorado report" data-i18n-alt="Colorado最终报告的实际页面"></button>
+    <div class="hero-document-bottom"><span id="cover-paper-label">Colorado local-information neuron</span><span data-i18n="点击放大 ⤢">Click to enlarge ⤢</span></div>
+  </div>
+  <div class="hero-stages">
+    <button data-jump="agent1"><span class="stage-index">01</span><span><b data-i18n="初步解释">Interpretation</b><small data-i18n="从真实样本提出假设">Form a hypothesis from measured samples</small></span><span class="stage-arrow">↗</span></button>
+    <button data-jump="agent2-source"><span class="stage-index">02</span><span><b data-i18n="实验检验">Experiments</b><small data-i18n="用匹配条件区分解释">Test the explanation with matched conditions</small></span><span class="stage-arrow">↗</span></button>
+    <button data-jump="agent3"><span class="stage-index">03</span><span><b data-i18n="修订与报告">Revision and report</b><small data-i18n="把反例带回最终解释">Revise the explanation using counterexamples</small></span><span class="stage-arrow">↗</span></button>
+  </div>
+  <p class="cover-note" data-i18n="这是一段实际运行的回放，保留了中断、测量复用和后续刷新；每一步展示当次Prompt节选、关键操作与对应产物。">Replay a recorded investigation, including an interruption, reused measurements, and a later refresh. Each step shows prompt excerpts, key operations, and their artifacts.</p>
 </section>
-<main id="replay-main"><section class="intro casebar"><div><p class="eyebrow">COLORADO · L55_N11703</p><h1>一次解释是怎样形成的</h1></div><button class="quiet-button" id="back-cover">← 回到开场</button></section><div class="workspace"><aside class="sidebar"><div class="sidebar-head"><span>研究过程</span><span id="step-counter">—</span></div><nav id="step-nav" aria-label="流程步骤"></nav><p class="nav-tip">← → 切换步骤 · Esc关闭阅读窗口</p></aside><div class="detail" id="detail"><div class="loading">正在载入保存的运行记录……</div></div><aside id="preview" class="preview"></aside></div></main>
-<div id="playback-bar" class="playback-bar"><button id="demo-prev" class="demo-prev" aria-label="上一步">←</button><div class="playback-state"><span id="playback-caption">初始化</span><div id="playback-progress" class="playback-progress"></div></div><button id="demo-next" class="demo-next">下一步 →</button></div>
-<dialog id="reading-dialog" aria-labelledby="reading-title"><div class="reading-header"><div><small id="reading-kicker"></small><h2 id="reading-title"></h2></div><div class="reading-actions" id="reading-actions"></div><button id="close-reading" class="close-reading" aria-label="关闭阅读窗口">×</button></div><div id="reading-content" class="reading-content"></div></dialog>
-<footer><span>Neuron Microscope · 保存的研究过程与交互报告。</span><a href="https://github.com/RUC-TrustworthyAI/Neuron-Microscope/blob/main/docs/live-demo.md" target="_blank">演示说明 ↗</a></footer><script src="replay.js"></script></body></html>
+<main id="replay-main">
+  <section class="intro casebar"><div><p class="eyebrow">COLORADO · L55_N11703</p><h1 data-i18n="一次解释是怎样形成的">How an explanation takes shape</h1></div><button class="quiet-button" id="back-cover" data-i18n="← 回到开场">← Back to overview</button></section>
+  <div class="workspace"><aside class="sidebar"><div class="sidebar-head"><span data-i18n="研究过程">Investigation</span><span id="step-counter">—</span></div><nav id="step-nav" aria-label="Investigation steps" data-i18n-aria="流程步骤"></nav><p class="nav-tip" data-i18n="← → 切换步骤 · Esc关闭阅读窗口">← → Navigate steps · Esc closes the reader</p></aside><div class="detail" id="detail"><div class="loading" data-i18n="正在载入保存的运行记录……">Loading the recorded investigation…</div></div><aside id="preview" class="preview"></aside></div>
+</main>
+<div id="playback-bar" class="playback-bar"><button id="demo-prev" class="demo-prev" aria-label="Previous step" data-i18n-aria="上一步">←</button><div class="playback-state"><span id="playback-caption" data-i18n="初始化">Initialization</span><div id="playback-progress" class="playback-progress"></div></div><button id="demo-next" class="demo-next" data-i18n="下一步 →">Next →</button></div>
+<dialog id="reading-dialog" aria-labelledby="reading-title"><div class="reading-header"><div><small id="reading-kicker"></small><h2 id="reading-title"></h2></div><div class="reading-actions" id="reading-actions"></div><button id="close-reading" class="close-reading" aria-label="Close the reader" data-i18n-aria="关闭阅读窗口">×</button></div><div id="reading-content" class="reading-content"></div></dialog>
+<footer><span data-i18n="Neuron Microscope · 保存的研究过程与交互报告。">Neuron Microscope · Recorded investigations and interactive reports.</span><a id="demo-guide" href="https://github.com/RUC-TrustworthyAI/Neuron-Microscope/blob/main/docs/live-demo.md" target="_blank" data-i18n="演示说明 ↗">Demo guide ↗</a></footer>
+<script src="i18n.js"></script>
+<script src="replay.js"></script>
+</body>
+</html>

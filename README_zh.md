@@ -11,7 +11,7 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
-  <a href="docs/live-demo.md"><img src="assets/badges/live-demo.svg" alt="Live Demo: pending"></a>
+  <a href="docs/live-demo_zh.md"><img src="assets/badges/live-demo.svg" alt="Live Demo：待部署"></a>
   <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
 </p>
 
@@ -36,11 +36,11 @@
 
 ## ▶ Live Demo <a id="live-demo"></a>
 
-**[查看逐步演示 →](docs/live-demo.md#中文说明)** · 待部署
+**[查看逐步演示 →](docs/live-demo_zh.md)** · 待部署
 
-跟随一次真实的 Colorado neuron 研究，从初始证据页走完三个 agent 阶段，查看 Prompt 节选、关键操作、实验测量与交互报告。目前可本地预览，组织套餐升级并启用 GitHub Pages 后上线。
+跟随一次真实的 Colorado neuron 研究，从初始证据页走完三个 agent 阶段，查看 Prompt 节选、关键操作、实验测量与交互报告。支持中英切换，默认英语；中文入口和打开方法见演示说明。目前可本地预览，组织套餐升级并启用 GitHub Pages 后上线。
 
-[![Neuron Microscope 逐步演示预览](assets/live-demo-cover.jpg)](docs/live-demo.md#中文说明)
+[![Neuron Microscope 逐步演示预览](assets/live-demo-zh.png)](docs/live-demo_zh.md)
 
 ## ⚗️ 工作流程 <a id="workflow"></a>
 
