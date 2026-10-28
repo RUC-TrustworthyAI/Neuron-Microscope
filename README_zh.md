@@ -48,11 +48,13 @@
 
 ![先准备证据，再运行三个独立 agent 容器；用 JSON/HTML 交接，由宿主工具执行模型测量](assets/workflow.png)
 
-1. **准备证据**：从已有激活按幅度区间抽候选点，各区间最多 40 点，再按候选数量比例保留最多 256 点，交给 DeepSeek 标注语义。此步骤在初步解释之前。
-2. **初步解释**：第一个独立容器只装 interpret skill 和目标 neuron 的 HTML、结构化证据。
+1. **准备证据**：从已有激活档案中按幅度区间抽取 token 位置，保留对应上下文，以及实测 gate、up 和乘积激活值。采样参数由 `settings.json` 配置。
+2. **初步解释与打标**：第一个独立容器加载 `skills/interpret/`，读取目标 neuron 的初始 HTML 和结构化证据，生成初步解释与分桶规则：正向、负向各最多三组，加一个 No visible cue 组。随后由固定工具根据这些规则逐样本打标，打标时隐藏待评样本的实测响应。代码将标签与实测值对应，用于绘图和修订；Activation spectrum 与 Inside the neuron 中的同一样本复用同一标签。
 3. **实验**：第二个独立容器装 experiment skill；agent 设计实验，固定工具在宿主机完成替换、搜索、消融、RelP 归因及其他测量。
-4. **修订**：第三个独立容器装 revise skill，根据测量修订解释、Criticism 和图注；固定代码生成 HTML 与费用章节。
+4. **修订**：第三个独立容器加载 `skills/revise/`，结合实验测量、初步标签与实测响应，修订解释、Criticism 和图注。固定代码生成 HTML 与费用章节。
 5. **发布**：若提供对应原博客的本地快照，发布工具自动加入左右分屏、版块对齐和同步滚动。官方内容只加入展示页，不进入研究 agent 的输入。
+
+公开报告采用500点采样配置。仓库目前默认最多抽取256个 scan 点；复现某份报告时，应使用该报告保存的配置。
 
 **Clusters** 按语义组织已测量的样本。原始 NMF routes 描述归因模式，一个语义组可以跨越多条 route。各组的样本数、归因贡献占比和上游汇总由实测数据计算。
 
@@ -109,7 +111,12 @@ python -m http.server 8000 --directory results/example
 - `--neurons` 后可列多个 neuron。默认前一个第二阶段结束后才启动下一个，第三阶段可与下一个第一阶段重叠。
 - 完整请求、输出、测量、费用和耗时保存在 `runs/`，可按 neuron 和阶段查看。
 
-更多续跑、单阶段和复用测量操作见 [运行说明](docs/running.md)。页面中 Exemplars 与 Clusters 只截短展示上文，计算仍使用采集时完整前缀和明确评分位置。
+更多续跑、单阶段和复用测量操作见 [运行说明](docs/running.md)。展示窗口只影响页面文本：
+
+- **Exemplars 与 Clusters**：默认折叠预览显示圈定 token 及其之前最多32个 token；点击 **Show full context** 展开保存的上下文。
+- **Activation spectrum**：从首个高亮激活前最多128个 token 开始展示，并保留已有后文。若没有 token 达到高亮阈值，则以圈定位置为锚点。
+
+测量使用的输入前缀和评分位置保持不变。
 
 ## 🧪 复现结果 <a id="reproduction-results"></a>
 

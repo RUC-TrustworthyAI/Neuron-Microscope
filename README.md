@@ -48,11 +48,13 @@ See [the demo guide](docs/live-demo.md) for local preview and recording details.
 
 ![Evidence preparation and the three agent containers, with JSON/HTML handoffs and model measurements performed by host tools](assets/workflow.png)
 
-1. **Prepare evidence.** Read the existing activation archive, draw up to 40 candidates per amplitude interval, retain up to 256 scan points in proportion to the candidate counts, and use DeepSeek to label their observed contexts. This happens before the initial explanation.
-2. **Interpret.** A fresh agent container loads `skills/interpret/` and reads only the target neuron's initial HTML and structured evidence.
+1. **Prepare evidence.** Sample token positions across activation intervals from the saved archive and retain their contexts and measured gate, up, and product values. Sampling parameters are set in `settings.json`.
+2. **Interpret and label.** A fresh agent container loads `skills/interpret/` and reads the target neuron's initial HTML and structured evidence. It writes an initial explanation and response rules: up to three positive groups, up to three negative groups, and one No visible cue group. Fixed tools then use those rules to label individual contexts without revealing their measured responses. The labels are joined to the measurements for visualization and revision; shared positions reuse the same label across Activation spectrum and Inside the neuron.
 3. **Experiment.** A fresh container loads `skills/experiment/`. Its tools run replacement sweeps, searches, native interventions, RelP attribution, family measurements, and blind maximum/minimum tests on the host. Saved input prefixes and scoring positions are retained.
-4. **Revise.** A fresh container loads `skills/revise/`, reviews the measurements, and revises the explanation, Criticism, and captions. Fixed code assembles the report and cost records.
+4. **Revise.** A fresh container loads `skills/revise/`, reviews the experiments and the initial labels alongside measured responses, and revises the explanation, Criticism, and captions. Fixed code assembles the report and cost records.
 5. **Publish.** Export the generated report. If a local reference snapshot is available, publication adds a collapsible side-by-side comparison with aligned sections and linked scrolling. Reference content is added only at publication; it is not given to the research agents.
+
+The published reports use a 500-position sampling configuration. The repository default is currently up to 256 scan points; use the configuration saved with a report when reproducing it.
 
 Each agent runs in a separate container with one skill. Host tools handle paths, GPU allocation, accounting, and HTML generation. The default research agent is `deepseek-flash` with `reasoning_effort: high`.
 
@@ -126,7 +128,14 @@ python -m http.server 8000 --directory results/example
 
 Open **http://localhost:8000/**. Replace the example neuron with one present in your archive.
 
-`prepare` freezes source and settings without calling an LLM or running the model. `execute` performs evidence preparation and the three stages using that snapshot. `publish` adds presentation controls while keeping the generated scientific content unchanged. Exemplars and cluster examples display up to 128 saved tokens before the first highlighted activation; the full measured prefix remains in the data.
+`prepare` freezes source and settings without calling an LLM or running the model. `execute` performs evidence preparation and the three stages using that snapshot. `publish` adds presentation controls while keeping the generated scientific content unchanged.
+
+Display windows affect only the rendered text:
+
+- **Exemplars and Clusters:** the collapsed preview shows the marked token and up to 32 preceding tokens. **Show full context** expands the saved context.
+- **Activation spectrum:** text starts up to 128 tokens before the first highlighted activation and retains the saved following text. If no token meets the highlighting threshold, the marked position is used as the anchor.
+
+The measured input prefix and scoring position remain unchanged.
 
 The budget applies to all API calls in that batch and stays in host accounting. The default is USD 2; set `NEURON_PAPER_BUDGET_USD=unlimited` explicitly for no cap. Configure the token prices in settings for your API endpoint. They are not account invoices.
 
