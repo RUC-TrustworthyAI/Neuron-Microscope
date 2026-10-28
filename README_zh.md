@@ -38,7 +38,7 @@
 
 **[浏览神经元报告 →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[查看流程演示 →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)**
 
-报告站收录 20 份交互式神经元报告，有参考页面的报告支持左右对照。双语流程演示展示一次 Colorado neuron 研究记录，从证据整理走完三个 agent 阶段，包含 Prompt 节选、实验测量和保存的报告。两个网站均可公开访问。
+报告站收录交互式神经元报告，有参考页面的报告支持左右对照。双语流程演示展示一次 Colorado neuron 研究记录，从证据整理走完三个 agent 阶段，包含 Prompt 节选、实验测量和保存的报告。两个网站均可公开访问。
 
 [![Neuron Microscope 逐步演示预览](assets/live-demo-zh-hd.png)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)
 

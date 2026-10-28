@@ -38,7 +38,7 @@ Next, we plan to **[FUTURE PLANS]**. We welcome test results and feedback to hel
 
 **[Browse neuron reports →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[Explore the pipeline walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)**
 
-Browse 20 interactive neuron reports, with side-by-side reference comparisons where available. The bilingual walkthrough follows a recorded Colorado neuron investigation through evidence preparation and all three agent stages, including prompt examples, measured experiments and saved reports. Both websites are publicly accessible.
+Browse interactive neuron reports, with side-by-side reference comparisons where available. The bilingual walkthrough follows a recorded Colorado neuron investigation through evidence preparation and all three agent stages, including prompt examples, measured experiments and saved reports. Both websites are publicly accessible.
 
 [![Preview of the Neuron Microscope walkthrough](assets/live-demo-en-hd.png)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
 
