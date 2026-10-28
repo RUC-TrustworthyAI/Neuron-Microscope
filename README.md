@@ -11,7 +11,7 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
-  <a href="docs/live-demo.md"><img src="assets/badges/live-demo.svg" alt="Live Demo: pending"></a>
+  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en"><img src="assets/badges/live-demo.svg" alt="Live Demo: online"></a>
   <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
 </p>
 
@@ -36,11 +36,13 @@ Next, we plan to **[FUTURE PLANS]**. We welcome test results and feedback to hel
 
 ## ▶ Live Demo <a id="live-demo"></a>
 
-**[Explore the recorded walkthrough →](docs/live-demo.md)** · Deployment pending
+**[Browse neuron reports →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[Explore the pipeline walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)**
 
-Follow a real Colorado neuron investigation from its initial evidence page through all three agent stages. Explore prompt examples, key operations, measured experiments and saved interactive reports. The walkthrough opens in English by default, with a Chinese switch. Preview locally now; hosted access will follow once GitHub Pages is enabled.
+Browse 20 interactive neuron reports, with side-by-side reference comparisons where available. The bilingual walkthrough follows a recorded Colorado neuron investigation through evidence preparation and all three agent stages, including prompt examples, measured experiments and saved reports. Both websites are publicly accessible.
 
-[![Preview of the Neuron Microscope walkthrough](assets/live-demo-en-hd.png)](docs/live-demo.md)
+[![Preview of the Neuron Microscope walkthrough](assets/live-demo-en-hd.png)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
+
+See [the demo guide](docs/live-demo.md) for local preview and recording details.
 
 ## ⚗️ How It Works <a id="workflow"></a>
 

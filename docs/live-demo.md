@@ -2,7 +2,9 @@
 
 **English** · [简体中文](live-demo_zh.md)
 
-**Deployment pending.** The demo is ready for local preview. This repository remains private; GitHub Pages can be enabled after the organization upgrades to a plan that supports Pages for private repositories.
+**[Neuron reports](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[Pipeline walkthrough](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)**
+
+Both websites are publicly accessible.
 
 ## Preview locally
 
@@ -26,13 +28,13 @@ The recording includes an interrupted experiment stage, reuse of an earlier comp
 
 The demo includes selected excerpts and report resources. Complete API request/response logs, credentials, model weights and activation archives stay outside this website. Scientific prose, displayed measurements and sample contexts are preserved by the exporter. The report resources omit local provenance paths and a duplicate example collection, and are compressed for static delivery. They load in the browser with `DecompressionStream`.
 
-## Enable GitHub Pages later
+## Optional GitHub Pages hosting
 
-After the organization has an eligible plan:
+For a repository with GitHub Pages available:
 
 1. Open **Settings → Pages** and select **GitHub Actions** as the source.
 2. Open **Actions → Publish live demo → Run workflow**, choose `main`, and run it.
-3. Once deployment succeeds, use the URL shown in the `github-pages` deployment and update the English README demo link to that URL with `?lang=en`, and the Chinese README link with `?lang=zh`.
+3. Open the URL shown in the `github-pages` deployment. Add `?lang=en` for English or `?lang=zh` for Chinese.
 
 The workflow is manual. Committing demo changes does not trigger a deployment.
 

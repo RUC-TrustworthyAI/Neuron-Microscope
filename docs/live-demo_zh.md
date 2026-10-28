@@ -2,7 +2,9 @@
 
 [English](live-demo.md) · **简体中文**
 
-**待部署。** 演示已可在本地预览。仓库保持私有，组织套餐升级后再启用 GitHub Pages。
+**[神经元报告](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[流程演示](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)**
+
+两个网站均可公开访问。
 
 ## 本地预览
 
@@ -28,11 +30,13 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory website
 
 网站包含节选和报告所需资源。完整 API 请求与响应日志、凭证、模型权重和激活存档留在本地。导出程序保留科学文字、展示数值和样本上下文，去掉本机来源路径及重复的样本集合，并压缩报告资源；浏览器通过 `DecompressionStream` 加载报告。
 
-## 升级套餐后上线
+## 可选的 GitHub Pages 托管
+
+仓库具备 GitHub Pages 使用权限时：
 
 1. 打开 **Settings → Pages**，选择 **GitHub Actions** 作为发布来源。
 2. 打开 **Actions → Publish live demo → Run workflow**，选择 `main` 并运行。
-3. 部署成功后，取 `github-pages` 中显示的网址。英文 README 链接附加 `?lang=en`，中文 README 链接附加 `?lang=zh`。
+3. 部署成功后，打开 `github-pages` 中显示的网址。附加 `?lang=en` 查看英语版，附加 `?lang=zh` 查看中文版。
 
 发布配置只支持手动触发，提交代码不会自动部署。
 

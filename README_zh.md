@@ -11,7 +11,7 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
-  <a href="docs/live-demo_zh.md"><img src="assets/badges/live-demo.svg" alt="Live Demo：待部署"></a>
+  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh"><img src="assets/badges/live-demo.svg" alt="Live Demo：在线演示"></a>
   <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
 </p>
 
@@ -36,11 +36,13 @@
 
 ## ▶ Live Demo <a id="live-demo"></a>
 
-**[查看逐步演示 →](docs/live-demo_zh.md)** · 待部署
+**[浏览神经元报告 →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[查看流程演示 →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)**
 
-跟随一次真实的 Colorado neuron 研究，从初始证据页走完三个 agent 阶段，查看 Prompt 节选、关键操作、实验测量与交互报告。支持中英切换，默认英语；中文入口和打开方法见演示说明。目前可本地预览，组织套餐升级并启用 GitHub Pages 后上线。
+报告站收录 20 份交互式神经元报告，有参考页面的报告支持左右对照。双语流程演示展示一次 Colorado neuron 研究记录，从证据整理走完三个 agent 阶段，包含 Prompt 节选、实验测量和保存的报告。两个网站均可公开访问。
 
-[![Neuron Microscope 逐步演示预览](assets/live-demo-zh-hd.png)](docs/live-demo_zh.md)
+[![Neuron Microscope 逐步演示预览](assets/live-demo-zh-hd.png)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)
+
+本地预览方法和记录说明见[演示指南](docs/live-demo_zh.md)。
 
 ## ⚗️ 工作流程 <a id="workflow"></a>
 
