@@ -11,30 +11,30 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh"><img src="assets/badges/live-demo.svg" alt="Live Demo：在线演示"></a>
-  <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
+  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh"><img src="assets/badges/live-demo.svg" alt="Showcase：在线展示"></a>
+  <a href="#installation-and-usage"><img src="assets/badges/quickstart.svg" alt="Usage: install and run"></a>
 </p>
 
 <p align="center"><a href="README.md">English</a> · <b>简体中文</b></p>
 
 <p align="center">
   <a href="#overview">📖 概览</a> ·
-  <a href="#live-demo">▶ Live Demo</a> ·
+  <a href="#reports-and-walkthrough">▶ 报告与流程展示</a> ·
+  <a href="#key-findings">🧪 主要发现</a> ·
   <a href="#workflow">⚗️ 工作流程</a> ·
-  <a href="#quick-start">🚀 快速开始</a> ·
-  <a href="#reproduction-results">🧪 复现结果</a> ·
+  <a href="#installation-and-usage">🚀 安装与使用</a> ·
   <a href="#documentation">📚 文档</a>
 </p>
 
 ## 📖 项目概览 <a id="overview"></a>
 
-我们复现了 [AlreadyClean](https://already-clean.goodfire.com/) 的主要神经元分析与报告生成功能，并通过独立实验考察原博客的发现能否复现。我们通过实验观察到 **【主要发现】**，并得出 **【复现结论】**。详细实验与分析见下文的[复现结果](#reproduction-results)。
+我们复现了 [AlreadyClean](https://already-clean.goodfire.com/) 的主要神经元分析与报告生成功能，并通过独立实验考察原博客的发现能否复现。我们通过实验观察到 **【主要发现】**，并得出 **【复现结论】**。详细实验与分析见下文的[主要发现](#key-findings)。
 
 我们同时开源了完整的三阶段 pipeline，用于研究 dense Qwen3 模型的原生 MLP 神经元。流程覆盖证据整理、初步解释、实验设计与执行、解释修订和交互式 HTML 报告生成，并增加了 **【扩展功能】**，供社区使用和开展进一步研究。
 
 后续，我们计划 **【后续计划】**。欢迎大家提供测试结果与反馈，共同改进神经元解释流程。
 
-## ▶ Live Demo <a id="live-demo"></a>
+## ▶ 报告与流程展示 <a id="reports-and-walkthrough"></a><a id="live-demo"></a>
 
 **[浏览神经元报告 →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[查看流程演示 →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)**
 
@@ -43,6 +43,17 @@
 [![Neuron Microscope 逐步演示预览](assets/live-demo-zh-hd.png)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)
 
 本地预览方法和记录说明见[演示指南](docs/live-demo_zh.md)。
+
+## 🧪 主要发现 <a id="key-findings"></a><a id="reproduction-results"></a>
+
+**[浏览复现报告 →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)**
+
+报告支持与原 neuron paper 左右对照；目录并列展示两份解释，以及1–5分的语义相似度。
+
+【主要对比图：原博客与本项目的复现结果】
+
+- **主要发现：**【主要发现及对应实验】
+- **复现结论：**【原博客的哪些发现已复现、部分复现或未能复现】
 
 ## ⚗️ 工作流程 <a id="workflow"></a>
 
@@ -58,7 +69,7 @@
 
 **Clusters** 按语义组织已测量的样本。原始 NMF routes 描述归因模式，一个语义组可以跨越多条 route。各组的样本数、归因贡献占比和上游汇总由实测数据计算。
 
-## 🚀 快速开始 <a id="quick-start"></a>
+## 🚀 安装与使用 <a id="installation-and-usage"></a><a id="quick-start"></a>
 
 ### 1. 在本地体验报告渲染
 
@@ -78,7 +89,7 @@ python -m http.server 8000 --directory runs/demo
 
 ### 2. 配置真实实验
 
-完整流程需要 Linux、Bash 4+、Docker、Python 3.10+、本地 dense-Qwen3 权重、已有激活和初始报告包，以及 DeepSeek API 凭证。默认 DeepSeek high。GPU 只承担目标模型的测量，四卡共同承载一份模型。
+完整流程需要 Linux、Bash 4+、Docker、Python 3.10+、本地 dense-Qwen3 权重、已有激活和初始报告包，以及 DeepSeek API 凭证。默认使用 `deepseek-v4.1-flash-1017`，`reasoning_effort` 为 `high`。GPU 只承担目标模型的测量，四卡共同承载一份模型。
 
 ```bash
 python -m pip install -r requirements/gpu.txt
@@ -117,13 +128,6 @@ python -m http.server 8000 --directory results/example
 - **Activation spectrum**：从首个高亮激活前最多128个 token 开始展示，并保留已有后文。若没有 token 达到高亮阈值，则以圈定位置为锚点。
 
 测量使用的输入前缀和评分位置保持不变。
-
-## 🧪 复现结果 <a id="reproduction-results"></a>
-
-【主要对比图：原博客与本项目的复现结果】
-
-- **主要发现：**【主要发现及对应实验】
-- **复现结论：**【原博客的哪些发现已复现、部分复现或未能复现】
 
 ## 📚 文档导航 <a id="documentation"></a>
 

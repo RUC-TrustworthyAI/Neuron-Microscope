@@ -11,30 +11,30 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en"><img src="assets/badges/live-demo.svg" alt="Live Demo: online"></a>
-  <a href="#quick-start"><img src="assets/badges/quickstart.svg" alt="Quick start: offline demo"></a>
+  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en"><img src="assets/badges/live-demo.svg" alt="Showcase: online"></a>
+  <a href="#installation-and-usage"><img src="assets/badges/quickstart.svg" alt="Usage: install and run"></a>
 </p>
 
 <p align="center"><b>English</b> · <a href="README_zh.md">简体中文</a></p>
 
 <p align="center">
   <a href="#overview">📖 Overview</a> ·
-  <a href="#live-demo">▶ Live Demo</a> ·
+  <a href="#reports-and-walkthrough">▶ Reports &amp; Walkthrough</a> ·
+  <a href="#key-findings">🧪 Key Findings</a> ·
   <a href="#workflow">⚗️ How It Works</a> ·
-  <a href="#quick-start">🚀 Quick Start</a> ·
-  <a href="#reproduction-results">🧪 Reproduction Results</a> ·
+  <a href="#installation-and-usage">🚀 Installation &amp; Usage</a> ·
   <a href="#documentation">📚 Documentation</a>
 </p>
 
 ## 📖 Overview <a id="overview"></a>
 
-We reproduce the main neuron analysis and report-generation features of [AlreadyClean](https://already-clean.goodfire.com/) and independently investigate whether the original blog's findings can be reproduced. Our experiments show **[KEY FINDINGS]** and lead us to **[REPRODUCTION CONCLUSIONS]**. The supporting experiments and analysis are presented in [Reproduction Results](#reproduction-results).
+We reproduce the main neuron analysis and report-generation features of [AlreadyClean](https://already-clean.goodfire.com/) and independently investigate whether the original blog's findings can be reproduced. Our experiments show **[KEY FINDINGS]** and lead us to **[REPRODUCTION CONCLUSIONS]**. The supporting experiments and analysis are presented in [Key Findings](#key-findings).
 
 We also open-source the complete three-stage pipeline for investigating native MLP neurons in dense Qwen3 models. It covers evidence preparation, initial interpretation, experiment design and execution, explanation revision, and interactive HTML reporting. We add **[ADDITIONAL FEATURES]** for the community to use and build on.
 
 Next, we plan to **[FUTURE PLANS]**. We welcome test results and feedback to help improve the neuron interpretation workflow together.
 
-## ▶ Live Demo <a id="live-demo"></a>
+## ▶ Reports & Walkthrough <a id="reports-and-walkthrough"></a><a id="live-demo"></a>
 
 **[Browse neuron reports →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[Explore the pipeline walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)**
 
@@ -43,6 +43,17 @@ Browse interactive neuron reports, with side-by-side reference comparisons where
 [![Preview of the Neuron Microscope walkthrough](assets/live-demo-en-hd.png)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
 
 See [the demo guide](docs/live-demo.md) for local preview and recording details.
+
+## 🧪 Key Findings <a id="key-findings"></a><a id="reproduction-results"></a>
+
+**[Browse reproduction reports →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)**
+
+Compare each reproduction with its original neuron paper. The directory lists both interpretations and a 1–5 semantic similarity score.
+
+[MAIN COMPARISON FIGURES: ORIGINAL BLOG VS. OUR REPRODUCTION]
+
+- **Findings:** [KEY FINDINGS AND SUPPORTING EXPERIMENTS]
+- **Reproduction conclusions:** [WHICH ORIGINAL FINDINGS WERE REPRODUCED, PARTIALLY REPRODUCED, OR NOT REPRODUCED]
 
 ## ⚗️ How It Works <a id="workflow"></a>
 
@@ -56,11 +67,11 @@ See [the demo guide](docs/live-demo.md) for local preview and recording details.
 
 The published reports use a 500-position sampling configuration. The repository default is currently up to 256 scan points; use the configuration saved with a report when reproducing it.
 
-Each agent runs in a separate container with one skill. Host tools handle paths, GPU allocation, accounting, and HTML generation. The default research agent is `deepseek-flash` with `reasoning_effort: high`.
+Each agent runs in a separate container with one skill. Host tools handle paths, GPU allocation, accounting, and HTML generation. The default research agent is `deepseek-v4.1-flash-1017` with `reasoning_effort: high`.
 
 **Semantic Clusters** group measured examples by meaning. Raw NMF routes describe attribution patterns, and a semantic cluster may span several routes. Counts, attribution-mass shares and upstream summaries are computed from the measured members.
 
-## 🚀 Quick Start <a id="quick-start"></a>
+## 🚀 Installation & Usage <a id="installation-and-usage"></a><a id="quick-start"></a>
 
 ### 1. Try the report renderer locally
 
@@ -158,13 +169,6 @@ runs/example/
 ```
 
 Each run retains its requests, measurements and reports. Fresh interpretations use the target activation evidence without previous explanations or official labels.
-
-## 🧪 Reproduction Results <a id="reproduction-results"></a>
-
-[MAIN COMPARISON FIGURES: ORIGINAL BLOG VS. OUR REPRODUCTION]
-
-- **Findings:** [KEY FINDINGS AND SUPPORTING EXPERIMENTS]
-- **Reproduction conclusions:** [WHICH ORIGINAL FINDINGS WERE REPRODUCED, PARTIALLY REPRODUCED, OR NOT REPRODUCED]
 
 ## 📚 Documentation <a id="documentation"></a>
 
