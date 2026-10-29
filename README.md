@@ -57,7 +57,7 @@ Compare each reproduction with its original neuron paper. The directory lists bo
 
 ## ⚗️ How It Works <a id="workflow"></a>
 
-![Evidence preparation and the three agent containers, with JSON/HTML handoffs and model measurements performed by host tools](assets/workflow.png)
+![Three research agents interpret activation evidence, run experiments on Qwen3-32B, and revise the neuron report](assets/workflow.png)
 
 1. **Prepare evidence.** Sample token positions across activation intervals from the saved archive and retain their contexts and measured gate, up, and product values. Sampling parameters are set in `settings.json`.
 2. **Interpret and label.** A fresh agent container loads `skills/interpret/` and reads the target neuron's initial HTML and structured evidence. It writes an initial explanation and response rules: up to three positive groups, up to three negative groups, and one No visible cue group. Fixed tools then use those rules to label individual contexts without revealing their measured responses. The labels are joined to the measurements for visualization and revision; shared positions reuse the same label across Activation spectrum and Inside the neuron.

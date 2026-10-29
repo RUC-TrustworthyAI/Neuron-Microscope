@@ -57,7 +57,7 @@
 
 ## ⚗️ 工作流程 <a id="workflow"></a>
 
-![先准备证据，再运行三个独立 agent 容器；用 JSON/HTML 交接，由宿主工具执行模型测量](assets/workflow.png)
+![三个研究 agent 依次解释激活证据、在 Qwen3-32B 上开展实验，并修订神经元报告](assets/workflow.png)
 
 1. **准备证据**：从已有激活档案中按幅度区间抽取 token 位置，保留对应上下文，以及实测 gate、up 和乘积激活值。采样参数由 `settings.json` 配置。
 2. **初步解释与打标**：第一个独立容器加载 `skills/interpret/`，读取目标 neuron 的初始 HTML 和结构化证据，生成初步解释与分桶规则：正向、负向各最多三组，加一个 No visible cue 组。随后由固定工具根据这些规则逐样本打标，打标时隐藏待评样本的实测响应。代码将标签与实测值对应，用于绘图和修订；Activation spectrum 与 Inside the neuron 中的同一样本复用同一标签。
