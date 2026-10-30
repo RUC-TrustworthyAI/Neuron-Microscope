@@ -21,7 +21,7 @@
   <a href="#overview">📖 Overview</a> ·
   <a href="#reports-and-walkthrough">▶ Explore the Results</a> ·
   <a href="#key-findings">🧪 Findings &amp; Lessons</a> ·
-  <a href="#next-steps">🤝 Next Steps</a> ·
+  <a href="#future-work">🔭 Future Work</a> ·
   <a href="#related-work">📑 Our Related Work</a> ·
   <a href="#installation-and-usage">🚀 Installation &amp; Usage</a> ·
   <a href="#documentation">📚 Documentation</a>
@@ -141,7 +141,7 @@ These are observed extrema, not bounds on what the neuron can do. A larger range
 
 **Superposition and recursive generalization.** Our initial qualitative impression is that some native-neuron explanations are as clear as, or clearer than, SAE features we have studied. The small set examined so far does not establish a general advantage. We still need matched SAE comparisons and tests of whether apparently different behaviors share a mechanism before drawing conclusions about superposition or recursive generalization.
 
-## 🤝 Next Steps & Collaboration <a id="next-steps"></a>
+## 🔭 Future Work <a id="future-work"></a>
 
 We welcome contributions in three directions:
 

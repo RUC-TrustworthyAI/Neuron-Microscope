@@ -21,7 +21,7 @@
   <a href="#overview">📖 概览</a> ·
   <a href="#reports-and-walkthrough">▶ 结果与流程展示</a> ·
   <a href="#key-findings">🧪 发现与实践经验</a> ·
-  <a href="#next-steps">🤝 后续工作</a> ·
+  <a href="#future-work">🔭 未来工作</a> ·
   <a href="#related-work">📑 我们的相关研究</a> ·
   <a href="#installation-and-usage">🚀 安装与使用</a> ·
   <a href="#documentation">📚 文档</a>
@@ -139,7 +139,7 @@ GPU 工作集中在实验阶段，解释、打标和修订也会消耗 LLM 调�
 
 **关于 superposition 与 recursive generalization。** 初步阅读这些案例时，我们的主观感受是，部分原生神经元的解释与此前研究的 SAE 特征相当清楚，个别案例更清晰。目前观察数量较少，尚不足以得出普遍优势的结论。接下来需要在匹配条件下比较 SAE，并检验表面不同的行为是否共享机制，才能进一步判断叠加与递归泛化。
 
-## 🤝 后续工作与合作 <a id="next-steps"></a>
+## 🔭 未来工作 <a id="future-work"></a>
 
 欢迎从以下三个方向参与：
 
