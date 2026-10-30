@@ -151,12 +151,12 @@ GPU 工作集中在实验阶段，解释、打标和修订也会消耗 LLM 调�
 
 ## 📑 我们的相关研究 <a id="related-work"></a>
 
-团队此前的工作涵盖特征学习、概念分析、解释评估与可解释预测。发表信息也可参阅[王希廷老师的学院主页](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm)。
+团队此前的工作涵盖特征学习、概念分析、解释评估与语言模型安全。发表信息也可参阅[王希廷老师的学院主页](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm)。
 
 - **C²R: Cross-sample Consistency Regularization Mitigates Feature Splitting and Absorption in Sparse Autoencoders** — Haoran Jin 等，**ICML 2026**。通过跨样本的一致性约束，缓解 SAE 中的特征分裂与吸收。[论文](https://arxiv.org/abs/2606.30609) · [代码](https://github.com/hr-jin/Cross-sample-Consistency-Regularization)。
 - **Uncovering Safety Risks of Large Language Models through Concept Activation Vector** — Zhihao Xu 等，**NeurIPS 2024**。利用安全概念激活向量，研究语言模型的安全机制及其脆弱性。[论文](https://arxiv.org/abs/2404.12038) · [代码](https://github.com/SproutNan/AI-Safety_SCAV)。
 - **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li 等，**EMNLP 2024**。形式化概念解释，提出可读性、忠实度的度量方法，并评估这些度量本身。[论文](https://aclanthology.org/2024.emnlp-main.36/) · [代码](https://github.com/hr-jin/Concept-Explanation-Evaluation)。
-- **ProtoTS: Learning Hierarchical Prototypes for Explainable Time Series Forecasting** — Ziheng Peng 等，**ICLR 2026**。通过层次化时间序列原型，解释预测中的整体模式与局部变化。[论文](https://arxiv.org/abs/2509.23159) · [代码](https://github.com/SKURA502/ProtoTS)。
+- **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng 等，**arXiv 2026**。利用 SAE 概念与因果归因，识别会削弱拒答的场景，并分析场景概念之间的交互。[论文](https://arxiv.org/abs/2607.23496)。
 
 ## 🚀 安装与使用 <a id="installation-and-usage"></a><a id="quick-start"></a>
 

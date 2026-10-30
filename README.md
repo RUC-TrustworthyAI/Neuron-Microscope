@@ -153,12 +153,12 @@ Please share a concrete example, experiment, or proposal through [GitHub Issues]
 
 ## 📑 Our Related Work <a id="related-work"></a>
 
-Our team's related work spans feature learning, concept-based analysis, explanation evaluation, and interpretable forecasting. Publication details are also listed on [Xiting Wang's faculty page](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm).
+Our team's related work spans feature learning, concept-based analysis, explanation evaluation, and LLM safety. Publication details are also listed on [Xiting Wang's faculty page](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm).
 
 - **C²R: Cross-sample Consistency Regularization Mitigates Feature Splitting and Absorption in Sparse Autoencoders** — Haoran Jin et al., **ICML 2026**. Encourages consistent latent assignments across samples to reduce feature splitting and absorption in SAEs. [Paper](https://arxiv.org/abs/2606.30609) · [Code](https://github.com/hr-jin/Cross-sample-Consistency-Regularization).
 - **Uncovering Safety Risks of Large Language Models through Concept Activation Vector** — Zhihao Xu et al., **NeurIPS 2024**. Uses safety concept activation vectors to investigate model safety mechanisms and their vulnerabilities. [Paper](https://arxiv.org/abs/2404.12038) · [Code](https://github.com/SproutNan/AI-Safety_SCAV).
 - **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li et al., **EMNLP 2024**. Formalizes concept-based explanations and develops measures of readability and faithfulness, together with a method for evaluating those measures. [Paper](https://aclanthology.org/2024.emnlp-main.36/) · [Code](https://github.com/hr-jin/Concept-Explanation-Evaluation).
-- **ProtoTS: Learning Hierarchical Prototypes for Explainable Time Series Forecasting** — Ziheng Peng et al., **ICLR 2026**. Organizes temporal prototypes hierarchically to explain global patterns and local variations in forecasts. [Paper](https://arxiv.org/abs/2509.23159) · [Code](https://github.com/SKURA502/ProtoTS).
+- **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng et al., **arXiv 2026**. Uses SAE concepts and causal attribution to identify scenarios that suppress refusal, including interactions between scenario concepts. [Paper](https://arxiv.org/abs/2607.23496).
 
 ## 🚀 Installation & Usage <a id="installation-and-usage"></a><a id="quick-start"></a>
 
