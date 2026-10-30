@@ -2,11 +2,11 @@
 
 [Project overview](../README.md) · [Workflow](../docs/method.md) · [Report guide](../docs/reports.md)
 
-The pipeline uses three skills, one per agent stage. The launcher mounts only the selected skill directory into each container.
+These three skills provide task instructions and script clients for the host tools. The launcher mounts only the selected skill directory into each container.
 
 | Skill | Input | Job | Output |
 |---|---|---|---|
-| [Interpret](interpret/SKILL.md) | Target activation-only HTML and structured evidence, including prepared scan labels | Read the observed responses and form an initial explanation | Claim and initial HTML handoff |
+| [Interpret](interpret/SKILL.md) | Target activation-only HTML and structured evidence, with measured extrema and quantile examples | Read the observed responses and form an initial explanation | Claim and initial HTML handoff |
 | [Experiment](experiment/SKILL.md) | Initial explanation, HTML and saved evidence | Plan experiments, invoke measurement tools, organize and annotate results | Measured artifacts, plots and HTML handoff |
 | [Revise](revise/SKILL.md) | Explanation and measured experimental handoff | Revise the claim, Criticism and captions from the evidence | Final prose and HTML, with an independent reading |
 

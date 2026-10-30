@@ -185,7 +185,8 @@ COSTS = r"""
   const money=v=>'$'+Number(v||0).toFixed(4);
   const duration=v=>{const seconds=Math.round(v||0);return seconds?Math.floor(seconds/60)+' min '+String(seconds%60).padStart(2,'0')+' s':'0 s';};
   const timings=$('dl',{class:'ic-timing'});
-  [['GPU Experiment Time','total_gpu_seconds'],['API Streaming Time','total_api_stream_seconds'],['Total Elapsed Time','total_elapsed_seconds']].forEach(([label,key])=>{
+  const execution = C.total_execution_seconds != null;
+  [['GPU Experiment Time','total_gpu_seconds'],['API Streaming Time','total_api_stream_seconds'],[execution?'Total Execution Time':'Total Elapsed Time',execution?'total_execution_seconds':'total_elapsed_seconds']].forEach(([label,key])=>{
     const value=C[key]==null?'—':(key==='total_api_stream_seconds'&&C.api_stream_time_estimated?'≈ ':'')+duration(C[key]);
     timings.append($('div',null,$('dt',null,label),$('dd',null,value)));
   });

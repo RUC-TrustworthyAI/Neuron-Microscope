@@ -82,6 +82,28 @@ def merge_test_fields(previous,current):
 def merge(source, patches):
     bundle, (start,stop) = source_bundle(source)
     bundle.update(patches)
+    exemplars = bundle.get('exemplars') or {}
+    if exemplars.get('bands'):
+        bundle['exemplars'] = {**exemplars, 'bands': {
+            band: sorted(samples, key=lambda sample: -abs(sample.get('activation') or 0))
+            for band, samples in exemplars['bands'].items()
+        }}
+    search = bundle.get('search') or {}
+    regions = search.get('regions', []) + search.get('regions_more', [])
+    if regions:
+        regions = sorted(regions, key=lambda region: -abs(region.get('best') or 0))
+        visible = len(search.get('regions', []))
+        bundle['search'] = {**search, 'regions': regions[:visible], 'regions_more': regions[visible:]}
+    if bundle.get('clusters'):
+        clusters = [{**cluster, 'examples': sorted(cluster.get('examples', []),
+                     key=lambda example: -abs(example.get('activation') or 0))}
+                    for cluster in bundle['clusters']]
+        def cluster_strength(cluster):
+            summary = cluster.get('response_summary') or {}
+            values = [summary.get('min'), summary.get('max')]
+            values.extend(example.get('activation') for example in cluster['examples'])
+            return max(abs(value or 0) for value in values)
+        bundle['clusters'] = sorted(clusters, key=cluster_strength, reverse=True)
     # Route prediction is disabled; retain raw artifacts and leave the report slot empty.
     tests=copy.deepcopy(bundle.get('tests') or {})
     had_route_score=tests.get('route_prediction') is not None

@@ -1,13 +1,13 @@
 # Development and software checks
 
-Use Linux with Bash 4+ and Python 3.10 or newer for the full orchestrator. The offline demo also runs on macOS with Python 3.10+.
+Use Linux and Python 3.10 or newer for the full workflow. The offline demo also runs on macOS with Python 3.10+.
 
 ```bash
 python -m venv .venv
 . .venv/bin/activate
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r requirements/test.txt
-bash -n run.sh
+python -m workflow.run --help
 PYTHONPATH=tools python -m unittest discover -s tests -v
 python -m unittest discover -s analysis -p 'test_*.py' -v
 python examples/demo.py --output .local/demo
@@ -24,12 +24,11 @@ The comparison viewer has a separate test for default opening, compressed-report
 node --test tests/test_comparison_viewer.mjs
 ```
 
-Build the agent image separately:
+Workflow tests cover evidence visibility, explanation refinement, frozen rules, shared plot labels, response reuse and time accounting. To exercise report assembly with an existing activation-only package containing static logit effects and peak censuses, set its local path:
 
 ```bash
-docker build -t neuron-microscope:local .
-docker run --rm --network none neuron-microscope:local \
-  python -c 'import deepseek_harness; import shutil; assert shutil.which("jq"); assert shutil.which("rg")'
+WORKFLOW_TEST_REPORT=/path/to/report PYTHONPATH=tools \
+  python -m unittest discover -s tests -p 'test_workflow*.py' -v
 ```
 
-The image installs the public harness SDK and runtime packages. GPU measurement dependencies run on the host, as described in [running.md](running.md); they are not copied into each agent container.
+These checks render saved evidence and synthetic test conditions without calling an LLM or loading the target model.

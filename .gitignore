@@ -12,6 +12,7 @@ dist/
 *.key
 settings.local.json
 settings.*.local.json
+workflow.local.json
 runs/
 results/
 models/

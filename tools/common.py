@@ -97,6 +97,8 @@ def select_peak(records, reduction):
         return max(records, key=lambda x: (x['product'], -x['position']))
     if reduction == 'min':
         return min(records, key=lambda x: (x['product'], x['position']))
+    if reduction == 'absmax':
+        return max(records, key=lambda x: (abs(x['product']), -x['position']))
     raise ValueError('Unknown reduction')
 
 def tokenize(tokenizer, text, limit):

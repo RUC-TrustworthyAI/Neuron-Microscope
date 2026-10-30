@@ -1,55 +1,59 @@
 # Method and implementation
 
-The subject is a native dense-Qwen3 MLP neuron. The research agent uses a separate DeepSeek model accessed through its API. A GPU group holds one sharded copy of the subject model, not several different models.
+The subject is a native dense-Qwen3 MLP neuron. A separate API model proposes explanations and experimental inputs. Python orchestrates structured requests, selects evidence, performs target-model measurements and renders the report. The entry point is `python -m workflow.run`; configuration is documented in [Workflow](workflow.md#run).
 
-| Operation | Code | Origin of content |
+| Operation | Implementation | Origin of content |
 |---|---|---|
-| Source/configuration snapshot and containers | `run.sh`, `tools/launch_files.py` | Fixed host code |
-| Scan before explanation | `tools/initial_scan.py`, `spectrum_sampling.py`, `anatomy_selection.py` | Saved activations; fixed sampling |
-| Response-group definitions | `skills/interpret/`, `skills/revise/` | Submitted with the initial and revised explanations |
-| Blind response prediction | `tools/blind_anatomy.py` | Independent text-only predictions from a fixed explanation and its groups |
-| Initial explanation | `skills/interpret/` | Agent 1 |
-| On-demand context/statistics | `tools/evidence.py`, `stage_session.py`, `stage_brief.py` | Saved target measurements, section summaries and prediction feedback |
-| Replacement sweeps | `tools/model_tools.py` | Agent designs text; model supplies numbers |
-| Full-prefix scoring and automatic followups | `tools/experiment_defaults.py`, `followups.py` | Fixed selection and saved conditions |
-| Activation search / family / atlas | `tools/paper_sections.py` | Agent plan and measured native responses |
-| Multi-hop attribution and local contributions | `tools/relp.py` | Model derivatives with RelP backward rules |
-| Blind maximum/minimum | `tools/blind_tests.py` | Separate explanation-only writer; model scoring |
-| Semantic Clusters over raw routes | `tools/semantic_clusters.py` | Agent assigns graph members and examples; host derives numerical summaries |
-| Revision and Criticism | `skills/revise/` | Agent 3 from the measured handoff |
-| Independent reader | `tools/paper_reading.py` | Separate LLM reading and classification |
-| HTML structure, plots and costs | `tools/report*.py`, `analysis/report.html` | Fixed rendering of submitted data and prose |
-| Display-only updates | `tools/report_annotations.py` | Saved measurements and submitted caption/selection updates |
-| API requests, tokens and estimates | `tools/api_meter.py` | Host proxy; full request/response records |
+| Scheduling, GPU lock and execution records | `workflow/run.py`, `workflow/state.py` | Fixed Python orchestration |
+| Saved sample and evidence | `workflow/sampling.py`, `workflow/evidence.py` | Saved activations and captured contexts |
+| Initial explanation and one refinement | `workflow/interpretation.py` | LLM sees all sampled measurements, then prediction feedback |
+| Blind response predictions | `workflow/labels.py` | Independent requests with activations hidden |
+| Prompts and output contracts | `workflow/prompts.py`, `workflow/contracts.py` | Defined requests and JSON structures |
+| Activation search and controlled tests | `workflow/measure.py`, `workflow/run.py` | LLM proposes inputs; the target model supplies measurements |
+| Attribution, family and interventions | `tools/relp.py`, `tools/paper_sections.py`, `workflow/interventions.py` | Measured target-model responses and derivatives |
+| Blind maximum/minimum probes | `workflow/run.py`, `workflow/prompts.py` | Separate explanation-only writer and target-model scoring |
+| Report analysis and independent reading | `workflow/revision.py` | LLM analyzes evidence against the frozen explanation |
+| Report fields, plots and costs | `workflow/render.py`, `tools/report*.py` | Fixed rendering of structured prose and measured values |
+| API requests, responses and usage | `workflow/client.py` | Complete per-request records and configured price estimates |
 
-The three skills are files mounted into fresh containers and explicitly named in each short task. The agent loads the instructions and calls their scripts over a Unix socket. Only one skill is present per stage.
-
-Measurements use native BF16 channels, full captured prefixes, explicit score positions and signed response poles. Corpus sample counts are not population semantic coverage. A coherent description, a predictive explanation and a causal account remain different claims.
+Measurements retain native BF16 gate, up and product channels, captured prefixes, explicit score positions and signed response poles. Corpus sample counts alone do not establish population semantic coverage. A coherent description, predictive agreement and a causal account each require evidence.
 
 ## Explanation and prediction
 
-The initial agent reads saved extrema, quantile examples and statistics, then submits an explanation and response groups: at most three positive conditions, three negative conditions, and one No visible cue group. Each directional group describes a textual condition and its anchor position. The fixed prediction prompt is in `tools/blind_anatomy.py`.
+The explanation model receives every sampled position with its measured gate, up and product values and contextual text. It proposes a claim and, by default, at most three positive and three negative response rules. Each rule describes when the explanation predicts a direction. `No visible cue` is added for contexts where neither direction follows clearly from the explanation.
 
-After that submission, an independent predictor receives the fixed explanation, group definitions, complete observed prefixes and anchors. It does not receive measured activations or gate/up values. Fixed code joins predictions to measurements for feedback. Activation spectrum and Inside the neuron reuse the same 500-position pool and initial predictions throughout the experiment and revision stages. The revision agent reads this feedback alongside experimental results before submitting its revised explanation. The plots retain the version they tested; they are not a held-out test of the revised explanation. See [sampling and missing-label handling](data.md#coordinates-and-sampling).
+An independent labeler receives the explanation, rules, full captured prefix through the anchor, and up to ten following tokens. Measured activations are hidden. The continuation supplies linguistic context; the causal target-model response at the anchor depends on its prefix. The labeler considers distant context and implicit relationships as well as nearby words.
 
-Anatomy coordinates and spectrum bins use measured values; colours show predicted response groups. Strong prediction disagreements can challenge the explanation. Values close to zero provide weak evidence about directional selectivity. Semantic Clusters over attribution graphs are a separate grouping described below.
+Fixed code joins these predictions to measurements. The explanation model uses the measured contexts and prediction feedback to refine the explanation and rules once. A second blind labeling pass applies that refined version to the same sample pool. The explanation, rules and final predictions are frozen before experimental design.
+
+Activation spectrum and Inside the neuron share those final predictions and labeled positions. Spectrum bins and scatter coordinates use measured values; colors show predicted response groups. The samples supplied development feedback and therefore do not constitute a held-out evaluation. Independent written probes and controlled experiments test the frozen account on further inputs. See [sampling and missing-label handling](data.md#coordinates-and-sampling).
+
+## Experiments and scoring
+
+The target model is loaded once per measurement stage and retained through search, controlled tests, attribution and interventions. Forward requests are batched according to `batch_size` and `batch_tokens`. Runs using the same physical GPU group share one lock; separate groups can measure different neurons concurrently.
+
+Activation search uses measured feedback to propose further texts, scoring the maximum or minimum native product over each full input. The separate blind writer receives only the frozen claim and writes positive and negative probes without corpus examples or search results. These probes also use full-input maxima and minima.
+
+Controlled tests use the search measurements to design ten conditions covering positive, negative and neutral cases. Each condition stores its complete input separately from its short display label. Tests score the changed span, a common suffix after it, or a specified token. Span scores retain the sign of the largest absolute response. The same scoring rule applies across a contrast. The headline selects a common-frame test with the strongest coverage of both observed corpus poles.
+
+The workflow also measures a natural and written attribution atlas, family responses, three multi-hop graphs, and matched interventions. The three graph roots are selected from the strongest positive search response, the strongest negative search response and the strongest absolute controlled response. These selections describe the measured cases; they do not represent an exhaustive circuit census.
 
 ## RelP and intervention scope
 
 `tools/relp-source.json` pins the Transluce source revision and describes adaptations. Native HF forward values are retained while the backward pass freezes RMS scales and attention Q/K, uses the SiLU identity rule and the gated half rule. Local MLP-to-MLP contributions block intervening MLP outputs. The displayed graph additionally weights a local edge by its receiver's influence on the root.
 
-These are modified-derivative attribution measurements. They are not exact additive causal shares. Separate native zeroing and scaling measurements evaluate the selected neuron at the explicit token position. Family measurements and upstream/downstream tables have their own saved selection and aggregation scope; they do not imply an exhaustive circuit census.
+These modified-derivative measurements provide attribution evidence. They do not give exact additive causal shares. Separate native zeroing and scaling measurements evaluate effects at explicit token positions. Family measurements and upstream/downstream tables retain their own selection and aggregation scope.
 
-## Semantic Clusters and raw routes
+## Report analysis and semantic clusters
 
-NMF components summarize numerical attribution patterns; a shared component is not proof of a shared semantic topic. The experiment skill reads the complete latest natural-training member index after its independent tests, then reads full member contexts by graph ID. It explicitly assigns members to semantic clusters, which may merge or split raw routes. Names and stories must account for the actual text, scored position, activation and measured contributions, including contrary or weak cases.
+After measurements, the analysis request receives the frozen explanation, prediction feedback, measured search and control cases, blind tests, attribution summaries and interventions. It writes section prose, criticism and semantic groupings. The code preserves the frozen claim and response rules. Experimental contradictions remain in the analysis and criticism.
 
-The raw numerical factorization remains intact. Fixed code derives cluster counts, shares of absolute retained contribution mass, pooled upstream summaries and original example values. Unassigned measured members remain visible. The revision skill preserves the submitted grouping unless it supplies a replacement definition; merely changing a route name does not change semantic membership. Regrouping must not hide counterexamples or imply that related text proves a shared mechanism.
+Semantic cluster memberships refer to measured atlas cases, including unresolved cases. Fixed code derives numerical summaries and keeps the underlying measurements. Numerical NMF routes remain separate: a shared numerical component alone does not establish a shared semantic topic or causal mechanism.
 
-## Independent inputs
+An independent reader assesses the account, supported branches and remaining patterns. The renderer then combines this prose with the measured data. Static Promotes/Suppresses values come from the input report's measured logit effects.
 
-Fresh interpretation receives no official neuron description or historical explanation. Reference-style HTML is a presentation format. The independent blind writer receives the frozen explanation, not the natural examples or corpus extremes. Its measured results stay attached to the explanation version it tested. Revision does not run new target-model experiments.
+## Independent inputs and records
 
-## Records and limits
+Interpretation requests contain no official neuron description or historical explanation. Reference snapshots are read only during comparison export, after the investigation is complete.
 
-Every model/API operation retains inputs and outputs. Failed or incomplete measurements remain recorded. Software tests exercise the implementation; scientific evidence comes from the saved measurements.
+Each run saves its configuration, sampled evidence, explanation and prediction versions, complete API requests and outputs, usage estimates, measurements and final artifacts. Failed or incomplete operations remain recorded. Software tests check implementation behavior; scientific evidence comes from the saved measurements.

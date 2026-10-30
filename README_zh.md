@@ -22,7 +22,7 @@
 
 <p align="center">
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="模型：dense Qwen3"></a>
-  <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills：三个阶段"></a>
+  <a href="docs/workflow.md"><img src="assets/badges/pipeline.svg" alt="Pipeline：固定编排"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="报告：交互式 HTML"></a>
   <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh"><img src="assets/badges/live-demo.svg" alt="展示：在线"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="使用：安装与运行"></a>
@@ -32,16 +32,16 @@
 
 Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 中的神经元分析。我们从 **Qwen3-32B** 的原生 MLP 神经元入手，在报告中展示激活证据、假设、受控实验、因果干预、修订过程与尚未解决的失败案例。
 
-**当前提供：** [研究代码与 agent skills](skills/README.md)、[五套语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)，以及 [10 份交互式神经元对比](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
+**当前提供：** [研究代码与提示词](workflow/)、[五套语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)，以及 [10 份交互式神经元对比](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
 > [!IMPORTANT]
-> **本项目独立开展复现。** 研究 agent 在调查过程中不会看到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
+> **本项目独立开展复现。** 研究模型在调查过程中不会看到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
 
 ## 目录
 
 - [交互式双栏报告对比](#side-by-side-interactive-comparisons)
 - [我们检验了哪些 AlreadyClean 主张](#which-alreadyclean-claims-have-we-tested)
-- [三阶段神经元研究流程](#the-three-stage-investigation-pipeline)
+- [神经元研究流程](#the-investigation-pipeline)
 - [如何评估报告中的证据](#evaluating-the-report-evidence)
 - [当前案例中的观察](#observations-from-the-current-comparisons)
 - [安装与使用](#installation-and-usage)
@@ -99,7 +99,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 这张表将随新证据更新。新增证据应对应具体报告、模型、语料、干预或反例。
 
-## 三阶段神经元研究流程 <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a><a id="workflow"></a>
+## 神经元研究流程 <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a><a id="workflow"></a>
 
 ### 跟随一份完整研究记录
 
@@ -115,21 +115,16 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 从证据到报告
 
-<p align="center">
-  <a href="assets/workflow.png">
-    <img src="assets/workflow.png" alt="解释、实验与修订流程" width="100%">
-  </a>
-</p>
+Python 通过结构化 LLM 请求和模型测量组织研究。LLM 按约定的 JSON 格式提出解释、预测和实验输入；代码负责选择证据、执行测量并生成报告。
 
-*图中的数字用于说明步骤。实测输入、评分位置和数值见链接中的报告与研究记录。*
+1. **抽取证据。** 从已有激活归档中抽取 500 个位置，按各激活区间的 log-count 柱高分配数量，保留上下文，以及实测 gate、up 和 product 值。
+2. **解释、检验并冻结。** 解释模型读取全部采样上下文和测量，提出解释，以及正负各最多三条响应规则。独立打标模型在隐藏实测激活的情况下预测这些位置的响应。解释模型结合反馈修订一次解释和规则，再完成一轮盲打标。解释与规则在实验前冻结，两张图使用这次打标的预测。
+3. **执行测量。** 根据实测反馈搜索强响应文本，设计受控实验，并执行仅根据解释编写的最大／最小响应盲测。目标模型在测量期间保持加载，代码批量执行前向计算，以及归因、家族响应和原生干预。同一 GPU 组通过共享锁依次执行测量阶段；不同神经元的解释和报告分析可以并行。
+4. **分析并发布。** LLM 在保留冻结解释与规则的前提下，分析支持证据、反例和尚未解释的现象，再由独立读者评估。固定代码生成交互式报告；提供参考快照时，在研究完成后加入双栏比较。
 
-1. **准备证据。** 从已有激活归档中按激活区间抽取 token 位置，保留上下文，以及实测 gate、up 和 product 值。
-2. **解释与打标。** 新的 agent 容器读取目标神经元的证据，提出初步解释并定义响应分组。固定工具逐样本打标，打标时隐藏待评样本的实测响应。
-3. **实验。** 第二个 agent 设计受控替换、搜索、原生干预、RelP 归因和家族测量。独立的文本生成器仅根据初步解释编写最大／最小响应测试输入，由宿主机工具执行目标模型计算并评分。
-4. **修订。** 第三个 agent 结合初步解释与实测结果，修订解释、批评、不确定性和图注。
-5. **发布。** 固定代码生成交互式报告。如果提供本地参考快照，发布工具在研究结束后加入双栏比较。
+**Activation spectrum 与 Inside the neuron 共用一组样本，以及修订后冻结解释所对应的预测。** 打标模型读取完整上文，并将紧邻后文作为语言背景；解释无法明确预测方向时，归入 No visible cue。由于这些样本参与解释修订，预测一致程度用于提供开发反馈。独立生成的盲测文本与受控实验提供进一步检验。
 
-公开报告默认抽取 **500 个已有位置**，按各激活区间的 log-count 柱高分配数量，再在区间内均匀抽样。Activation spectrum 与 Inside the neuron 复用这些位置及初步标签。修订后，标签仍对应初步解释。具体实现见[方法说明](docs/method.md)、[运行配置](docs/running.md)与[输入数据约定](docs/data.md)。
+具体见[流程说明](docs/workflow.md)、[测量细节](docs/method.md)与[运行配置](docs/running.md)。
 
 ## 如何评估报告中的证据 <a id="evaluating-the-report-evidence"></a> <a id="how-we-evaluate-an-explanation"></a>
 
@@ -183,12 +178,12 @@ RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确
 | --- | --- | --- |
 | **浏览结果** | 查看 10 份交互式神经元对比与一次完整研究记录。 | 浏览器。 |
 | **体验渲染器** | 生成并查看小型合成报告，用于检查软件与界面功能。 | Python；无需 API 密钥、Docker、GPU 或模型下载。 |
-| **开展研究** | 分析已有激活归档中的神经元，发布新报告。 | Linux、Docker、Python 3.10+、CUDA 主机、模型权重、激活数据和 LLM 端点。 |
+| **开展研究** | 分析已有激活归档中的神经元，发布新报告。 | Linux、Python 3.10+、CUDA 主机、模型权重、激活数据和 LLM 端点。 |
 
 ### 1. 体验离线渲染器
 
 ```bash
-git clone https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone --branch hr-structured-pipeline https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope
 
 python3 -m venv .venv
@@ -203,51 +198,28 @@ python -m http.server 8000 --directory runs/demo
 
 ### 2. 配置完整研究
 
-完整 pipeline 当前需要：
-
-- Linux、Bash 4+、Docker 和 Python 3.10+；
-- 支持 CUDA 的主机，以及本地 dense-Qwen3 权重；
-- 符合[输入约定](docs/data.md)的激活归档和各神经元的初始报告包；
-- 用于研究 agent、辅助打标和文本生成的 LLM 端点。
-
-安装宿主机依赖并构建 agent 镜像：
+完整 pipeline 需要 Linux、Python 3.10+、支持 CUDA 的主机、本地 dense-Qwen3 权重、兼容的激活归档、仅含激活证据的报告包，以及 LLM 端点。安装测量依赖：
 
 ```bash
-python -m pip install -r requirements/gpu.txt
 # 安装与 NVIDIA 驱动匹配的 PyTorch CUDA wheel。
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
-
-docker build -t neuron-microscope:local .
-cp settings.json settings.local.json
+python -m pip install -r requirements/gpu.txt
 ```
 
-修改 `settings.local.json` 中的模型、激活归档、初始报告、状态目录和可选参考页面路径，并按可用显卡配置 `gpu_groups`。复现已记录的 LLM 设置时，将 `llm.model` 设为 `deepseek-v4.1-flash-1017`，`llm.reasoning_effort` 设为 `high`，并使用提供该模型的端点。在宿主机环境中提供 `DEEPSEEK_API_KEY`，或通过 `NEURON_PAPER_API_KEY_FILE` 指向本地凭证文件。
-
-然后准备、执行和发布：
+按照[配置示例](docs/workflow.md#run)创建 `workflow.local.json`，填写神经元、模型、激活与报告路径、显卡编号和共享 GPU 锁。配置 `llm.model`、推理级别与端点地址；已记录的模型为 `deepseek-v4.1-flash-1017`，推理级别为 `high`。在环境中提供 `DEEPSEEK_API_KEY`，或通过 `NEURON_PAPER_API_KEY_FILE` 指向本地凭证文件。
 
 ```bash
-NEURON_PAPER_BUDGET_USD=5 ./run.sh prepare \
-  --settings settings.local.json \
-  --output runs/example \
-  --neurons L55_N11703
-
-./run.sh execute --run runs/example
-
-./run.sh publish \
-  --run runs/example \
-  --neuron L55_N11703 \
-  --output results/example
-
-python -m http.server 8000 --directory results/example
+python -m workflow.run --config workflow.local.json --output runs/example
+python -m http.server 8000 --directory runs/example/report
 ```
 
-将示例神经元 ID 替换为输入数据中存在的编号。批量执行时，解释与修订可以并行；同一 GPU 组的完整实验阶段通过锁依次执行。
+添加 `--stop-after interpretation`，即可利用已有激活查看修订后的解释和两张标注图，此时尚未加载目标模型。使用相同配置再次运行时，会复用已完成的 API 响应，以及已保存的采样和测量记录。更改科学输入时，应使用新的输出目录。
 
-完整配置、续跑、单独阶段、测量复用、GPU 分组、预算与发布行为，见[运行说明](docs/running.md)。
+并发、续跑、双栏导出和执行记录见[运行说明](docs/running.md)。
 
 ## 实测耗时与开销 <a id="recorded-runtime-and-cost"></a> <a id="reproducibility-and-cost"></a>
 
-每次研究都会保留冻结的配置、源码快照、API 请求与响应、token 费用估算、中间交接、实验、测量、修订和最终报告。新的解释仅根据目标激活证据形成，输入中不含旧解释或官方标签。
+每次运行都会保留配置、API 请求与响应、token 费用估算、采样证据、解释与预测版本、测量和最终报告。新的解释仅根据目标激活证据形成，输入中不含旧解释或官方标签。
 
 下面是 **2026 年 10 月 29 日 Colorado／Diverse 100M 研究记录**中的数据：
 
@@ -324,7 +296,7 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 | [方法与实现](docs/method.md) | 从流程找到代码，了解测量范围。 |
 | [报告指南](docs/reports.md) | 查找某张图或某个章节的数据来源和生成阶段。 |
 | [开发](docs/development.md) | 运行 CPU 软件检查与离线演示。 |
-| [Agent skills](skills/README.md) | 查看解释、实验与修订阶段的指令。 |
+| [提示词与输出约定](workflow/) | 查看解释、打标、实验设计和报告分析的请求。 |
 
 ## 引用 <a id="citation"></a>
 
@@ -341,7 +313,7 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 
 ## 致谢 <a id="acknowledgements"></a>
 
-报告结构参考 [Goodfire 的神经元报告](https://already-clean.goodfire.com/)。RelP 适配自 [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits)，来源版本记录在 `tools/relp-source.json`。Agent 使用官方 [DeepSeek Harness SDK](https://github.com/deepseek-ai/deepseek-harness/tree/master/python/sdk)。
+报告结构参考 [Goodfire 的神经元报告](https://already-clean.goodfire.com/)。RelP 适配自 [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits)，来源版本记录在 `tools/relp-source.json`。仓库中的 skill 工具使用官方 [DeepSeek Harness SDK](https://github.com/deepseek-ai/deepseek-harness/tree/master/python/sdk)。
 
 ## 许可 <a id="license"></a>
 

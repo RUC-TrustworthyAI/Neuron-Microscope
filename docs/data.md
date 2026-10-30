@@ -4,7 +4,7 @@ The pipeline takes **saved native activations** and local model weights as input
 
 ## A target report package
 
-`paths.reports/Lx_Ny/` contains:
+The workflow configuration’s `report` path points to a target package containing:
 
 | File | Contents |
 |---|---|
@@ -12,12 +12,12 @@ The pipeline takes **saved native activations** and local model weights as input
 | `report.json` | Identity, population statistics, selected positions, full saved documents and three-channel traces |
 | `token-rankings.json` | Six token-selectivity tables, generated from saved activations |
 | `dataset-index.json` | Opaque report case IDs mapped to canonical document/token positions |
-| `effects.json` | Optional existing output-effect measurements |
-| `peak-census.json`, `peak-census-negative.json` | Optional saved censuses; otherwise derived from saved token extrema |
+| `effects.json` | Measured static logit effects used by Promotes/Suppresses |
+| `peak-census.json`, `peak-census-negative.json` | Optional saved censuses for the corresponding report sections |
 
 `report.json` includes `identity` (`id`, `layer`, `neuron`, `model`), `statistics`, `methods`, `examples`, `bands`, `scatter`, `points` and `documents`. Each point identifies its document, token position, and `[gate, value, product]`. Each document contains exact `token_ids`, decoded `tokens`, and aligned `gate`, `value`, `product` arrays. Cases are report-local identifiers; their names are not global token offsets.
 
-The initial stage receives only the target's measurement files and activation-only HTML. Its inputs contain native statistics, extrema and quantile examples. Scan points remain private until the initial explanation is submitted, when feedback samples receive predictions from the frozen explanation. API records and the full activation archive remain on the host.
+The explanation model receives the sampled contexts with their measured gate, up and product values. Independent labeling requests hide those measurements. Prediction feedback supports one explanation refinement, followed by a second blind labeling pass. The refined explanation and rules are frozen before experiments. Official explanations and previous investigation conclusions are excluded from research inputs.
 
 ## Canonical activation archive
 
@@ -87,9 +87,9 @@ Alternatively the report builder accepts `--token-tables --token-cache DIR` to r
 
 The measured activation is `SiLU(gate) * up`, taken from the native model tensor rather than reconstructed from rounded display values. Scatter point colours show blind predictions from a frozen explanation: orange for positive, blue for negative and grey for uncertainty. Stored records keep the prediction, measured activation and explanation version separately.
 
-The host samples 500 positions from saved activations with seed 42. Each bin receives a largest-remainder quota proportional to `log10(full-corpus bin count)`, capped by its population; positions within the bin are sampled uniformly without replacement. Bins with zero log height receive no points. The sample is private until the initial explanation is submitted. The labeler reads the full captured prefix through the anchor, with measured responses hidden.
+The workflow samples 500 positions from saved activations with seed 42. Each bin receives a largest-remainder quota proportional to `log10(full-corpus bin count)`, capped by its population; positions within the bin are sampled uniformly without replacement. Bins with zero log height receive no points. The explanation model sees the full sample with its measurements. For blind labeling, the predictor receives the full captured prefix through each anchor and up to ten following tokens, with measured responses hidden. Following tokens provide linguistic context and are outside the causal prefix at that anchor.
 
-Activation spectrum and Inside the neuron share exactly this sample pool and its initial predictions. Two requests run concurrently, with up to 256 points each. Further rounds request only missing predictions until fewer than 16 points remain; these missing points are excluded from both plots. An explicit uncertain answer stays in No visible cue. The full-corpus histogram retains all token counts. Revision reads the initial prediction feedback and preserves its explanation version; it does not relabel the plots. The sample is not a population density estimate or a held-out evaluation of the revised explanation.
+Activation spectrum and Inside the neuron share this sample pool. The initial explanation is labeled, refined once from prediction feedback, and labeled again. Both plots use the final predictions from the refined explanation, which is frozen before experiments. Each labeling pass runs two concurrent requests with up to 256 points each. Further rounds request missing predictions until fewer than 16 remain; these missing points are excluded from both plots. An explicit uncertain answer stays in No visible cue. The full-corpus histogram retains all token counts. The sample supports explanation development; it is neither a population density estimate nor a held-out evaluation.
 
 All saved contexts used for model experiments preserve the captured prefix through the chosen anchor. The display can show a shorter window without changing the model input or scoring position.
 

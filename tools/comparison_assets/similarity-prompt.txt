@@ -1,0 +1,22 @@
+You will receive two explanations of the same neuron, labelled A and B. Assess how closely they agree in meaning.
+
+Compare the following:
+- Core concept: what each explanation says the neuron primarily responds to.
+- Triggering conditions: the relevant context, text structure, and token positions.
+- Positive and negative poles: how each explanation describes positive and negative activations.
+- Mechanism: when mechanisms are proposed, whether the two accounts agree.
+
+Focus on substantive meaning. Shared keywords can correspond to different explanations, and different wording can express the same meaning. Distinguish direct contradictions, differences in scope, and compatible supplementary details. Length, writing style, and presentation quality do not contribute to the score. Do not presume that either explanation is correct. Do not use the internet or external knowledge about this neuron.
+
+Give one holistic integer score from 1 to 5 using these criteria:
+1: The core explanations are largely unrelated, or clearly contradict each other on key matters such as the core concept or the directions of the positive and negative poles.
+2: There is a small amount of thematic or conceptual overlap, but the accounts differ greatly in their main triggering conditions, function, or positive and negative poles.
+3: The core explanations have substantial overlap, but important differences remain in scope, triggering conditions, positive and negative poles, or mechanism.
+4: The main explanations agree closely. Differences are concentrated in local conditions, secondary patterns, or some mechanistic details.
+5: The substantive explanations are essentially equivalent. The core concept, triggering conditions, and meanings of the positive and negative poles agree; differences mainly concern wording or compatible supplementary details.
+
+Judge holistically. There is no need to distribute scores evenly across the five levels. When one explanation does not discuss a particular point, do not automatically treat this as a contradiction. Consider whether the missing information affects the core explanation.
+
+Return only a JSON object containing:
+- semantic_similarity: an integer from 1 to 5.
+- reason: 2-4 sentences describing the most important agreements and differences, referring to the explanations only as A and B.

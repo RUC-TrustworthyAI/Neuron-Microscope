@@ -22,7 +22,7 @@
 
 <p align="center">
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
-  <a href="skills/README.md"><img src="assets/badges/skills.svg" alt="Agent skills: 3 stages"></a>
+  <a href="docs/workflow.md"><img src="assets/badges/pipeline.svg" alt="Pipeline: structured"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
   <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en"><img src="assets/badges/live-demo.svg" alt="Showcase: online"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="Usage: install and run"></a>
@@ -32,16 +32,16 @@
 
 Neuron Microscope implements an independent workflow to reproduce and test the neuron analyses behind Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/). Starting with native MLP neurons in **Qwen3-32B**, our reports expose activation evidence, hypotheses, controlled tests, causal interventions, revisions, and unresolved failures.
 
-**Available now:** [investigation code and agent skills](skills/README.md), [sources, sampling procedures and readers for five corpora](docs/data.md#corpora-used-in-the-comparisons), and [10 interactive neuron comparisons](https://neuron-microscope-papers.tangysiren10.chatgpt.site/). Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
+**Available now:** [investigation code and prompts](workflow/), [sources, sampling procedures and readers for five corpora](docs/data.md#corpora-used-in-the-comparisons), and [10 interactive neuron comparisons](https://neuron-microscope-papers.tangysiren10.chatgpt.site/). Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
 > [!IMPORTANT]
-> **This is an independent reproduction effort.** The research agents do not see AlreadyClean's explanations while conducting an investigation. The reference report is added only when the final report is published for comparison.
+> **This is an independent reproduction effort.** The research models do not see AlreadyClean's explanations while conducting an investigation. The reference report is added only when the final report is published for comparison.
 
 ## Contents
 
 - [Side-by-side interactive comparisons](#side-by-side-interactive-comparisons)
 - [Which AlreadyClean claims have we tested?](#which-alreadyclean-claims-have-we-tested)
-- [The three-stage investigation pipeline](#the-three-stage-investigation-pipeline)
+- [The investigation pipeline](#the-investigation-pipeline)
 - [Evaluating the report evidence](#evaluating-the-report-evidence)
 - [Observations from the current comparisons](#observations-from-the-current-comparisons)
 - [Installation and usage](#installation-and-usage)
@@ -99,7 +99,7 @@ The original essay contains claims at several levels. We separate what this repo
 
 We intend this table to become a living claims tracker. New evidence should link to a concrete report, model, corpus, intervention, or counterexample.
 
-## The three-stage investigation pipeline <a id="how-an-investigation-works"></a> <a id="workflow"></a>
+## The investigation pipeline <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a> <a id="workflow"></a>
 
 ### Follow a recorded investigation
 
@@ -115,21 +115,16 @@ The walkthrough follows the Colorado investigation from saved activation evidenc
 
 ### From evidence to a report
 
-<p align="center">
-  <a href="assets/workflow.png">
-    <img src="assets/workflow.png" alt="Interpret, experiment, and revise workflow" width="100%">
-  </a>
-</p>
+Python orchestrates the investigation through structured LLM requests and model measurements. The LLM proposes explanations, predictions and experimental inputs in defined JSON formats; code selects the evidence, executes the measurements and assembles the report.
 
-*The diagram uses illustrative numbers. Measured inputs, scoring positions, and values are available in the linked reports and walkthrough.*
+1. **Sample evidence.** Draw 500 saved positions across activation bins, allocating samples in proportion to the bins’ log-count heights. Retain their contexts and measured gate, up and product values.
+2. **Explain, check and freeze.** Give the explanation model all sampled contexts and measurements. It proposes an explanation with at most three positive and three negative response rules. An independent labeler predicts each sampled response with its activation hidden. The explanation model uses this feedback to refine the explanation and rules once. A second blind labeling pass supplies the predictions used in both plots; the explanation and rules are then frozen before experiments.
+3. **Measure.** Search for strong responses with measured feedback, construct controlled tests, and run independent explanation-only maximum/minimum probes. The target model stays loaded while code batches forward measurements and computes attribution, family responses and native interventions. A shared lock serializes measurement stages on each GPU group; explanation and report-analysis requests for different neurons can overlap.
+4. **Analyze and publish.** The LLM analyzes support, counterexamples and unresolved patterns while preserving the frozen explanation and rules. An independent reader assesses the account. Fixed code renders the interactive report and, when a reference snapshot is supplied, adds the side-by-side comparison after research is complete.
 
-1. **Prepare evidence.** Sample token positions across activation intervals from a saved archive and retain their contexts and measured gate, up, and product values.
-2. **Interpret and label.** A fresh agent container reads the target neuron's evidence, proposes an initial explanation, and defines response groups. Fixed tools label individual contexts without revealing their measured responses.
-3. **Experiment.** A second agent designs controlled replacements, searches, native interventions, RelP attribution, and family measurements. A separate writer generates maximum/minimum test inputs from the initial explanation alone. Host tools run and score the model computations.
-4. **Revise.** A third agent reviews the initial explanation alongside the measured results and revises the explanation, criticism, uncertainty, and captions.
-5. **Publish.** Fixed code assembles the interactive report. If a local reference snapshot is available, the publisher adds the side-by-side comparison only after the investigation has finished.
+**Activation spectrum and Inside the neuron share one sample pool and the predictions from the refined, frozen explanation.** The labeler reads the full observed prefix and nearby continuation as linguistic context. It assigns No visible cue when the explanation does not clearly predict either direction. Because these samples inform refinement, their agreement scores provide development feedback. Independent written probes and controlled experiments supply further tests.
 
-The default published procedure samples **500 saved positions**, allocated across activation bins in proportion to their log-count heights, with uniform sampling inside each bin. Activation spectrum and Inside the neuron reuse these positions and their initial labels. The labels remain tied to the initial explanation, including after revision. See [the method](docs/method.md), [run configuration](docs/running.md), and [data contract](docs/data.md) for the precise implementation.
+See [the workflow](docs/workflow.md), [measurement details](docs/method.md), and [run configuration](docs/running.md).
 
 ## Evaluating the report evidence <a id="how-we-evaluate-an-explanation"></a>
 
@@ -183,12 +178,12 @@ There are three current ways to use the project.
 | --- | --- | --- |
 | **Explore** | Inspect 10 interactive neuron comparisons and a recorded investigation. | Browser only. |
 | **Try the renderer** | Generate and view a small synthetic report fixture. This tests the software and interface, not a scientific result. | Python; no API key, Docker, GPU, or model download. |
-| **Run an investigation** | Analyze neurons from an existing activation archive and publish new reports. | Linux, Docker, Python 3.10+, CUDA host, model weights, activation data, and an LLM endpoint. |
+| **Run an investigation** | Analyze neurons from an existing activation archive and publish new reports. | Linux, Python 3.10+, CUDA host, model weights, activation data, and an LLM endpoint. |
 
 ### 1. Try the offline renderer
 
 ```bash
-git clone https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone --branch hr-structured-pipeline https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope
 
 python3 -m venv .venv
@@ -203,51 +198,28 @@ Open <http://localhost:8000/>. The generated content is synthetic and should not
 
 ### 2. Configure a full investigation
 
-The full pipeline currently requires:
-
-- Linux, Bash 4+, Docker, and Python 3.10+;
-- a CUDA-capable host with local dense-Qwen3 weights;
-- an activation archive and per-neuron initial report packages that follow the [input contract](docs/data.md);
-- an LLM endpoint for the research agents and auxiliary labeling/writing calls.
-
-Install the host dependencies and build the agent image:
+The pipeline requires Linux, Python 3.10+, a CUDA host with local dense-Qwen3 weights, compatible saved activations, an activation-only report package, and an LLM endpoint. Install the measurement dependencies:
 
 ```bash
-python -m pip install -r requirements/gpu.txt
 # Choose a PyTorch CUDA wheel compatible with your NVIDIA driver.
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
-
-docker build -t neuron-microscope:local .
-cp settings.json settings.local.json
+python -m pip install -r requirements/gpu.txt
 ```
 
-Edit `settings.local.json` to point to your model, activation archive, initial reports, state directory, and optional reference pages. Configure `gpu_groups` for your available cards. To match the recorded LLM setup, set `llm.model` to `deepseek-v4.1-flash-1017` and `llm.reasoning_effort` to `high`, using an endpoint that provides that model. Supply `DEEPSEEK_API_KEY` in the host environment, or point `NEURON_PAPER_API_KEY_FILE` to a local credential file.
-
-Then prepare, execute, and publish a run:
+Create `workflow.local.json` using the [configuration example](docs/workflow.md#run). Set the neuron, model, activation and report paths, GPU indices, and shared GPU lock. Configure `llm.model`, reasoning effort and endpoint URLs; the recorded model is `deepseek-v4.1-flash-1017` with `high` reasoning. Supply `DEEPSEEK_API_KEY` in the environment, or point `NEURON_PAPER_API_KEY_FILE` to a local credential file.
 
 ```bash
-NEURON_PAPER_BUDGET_USD=5 ./run.sh prepare \
-  --settings settings.local.json \
-  --output runs/example \
-  --neurons L55_N11703
-
-./run.sh execute --run runs/example
-
-./run.sh publish \
-  --run runs/example \
-  --neuron L55_N11703 \
-  --output results/example
-
-python -m http.server 8000 --directory results/example
+python -m workflow.run --config workflow.local.json --output runs/example
+python -m http.server 8000 --directory runs/example/report
 ```
 
-Replace the example neuron ID with one present in your input data. During batch execution, interpretation and revision can run in parallel; a lock serializes entire experiment stages within each GPU group.
+Append `--stop-after interpretation` to inspect the refined explanation and both labeled plots using saved activations before loading the target model. Repeating the command with the same configuration reuses completed API responses and saved sampling and measurement records. Use a new output directory when changing scientific inputs.
 
-See [Running](docs/running.md) for full configuration, continuation, isolated stages, saved-measurement reuse, GPU groups, budgets, and publication behavior.
+The [run guide](docs/running.md) covers concurrency, continuation, comparison export and execution records.
 
 ## Recorded runtime and cost <a id="reproducibility-and-cost"></a>
 
-Every investigation retains its frozen settings, source snapshot, API requests and responses, token-price estimates, intermediate handoffs, experiments, measurements, revisions, and final report. Fresh interpretations use the target activation evidence without previous explanations or official labels.
+Each run retains its configuration, API requests and responses, token-price estimates, sampled evidence, explanation and prediction versions, measurements, and final report. Fresh interpretations use the target activation evidence without previous explanations or official labels.
 
 For the recorded Colorado / Diverse 100M investigation on **29 October 2026**:
 
@@ -324,7 +296,7 @@ Our group's related work spans feature learning, concept-based analysis, explana
 | [Method and implementation](docs/method.md) | Trace the workflow to code and understand the measurement scope. |
 | [Report guide](docs/reports.md) | Find the source and generation stage of a particular plot or section. |
 | [Development](docs/development.md) | Run CPU software checks and the offline demo. |
-| [Agent skills](skills/README.md) | Inspect the interpretation, experiment, and revision instructions. |
+| [Prompts and output contracts](workflow/) | Inspect the explanation, labeling, experimental-design and report-analysis requests. |
 
 ## Citation
 
@@ -341,7 +313,7 @@ If you use Neuron Microscope in academic work, please cite the repository and th
 
 ## Acknowledgements
 
-The report structure follows [Goodfire's neuron reports](https://already-clean.goodfire.com/). RelP adapts [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits), with the source revision recorded in `tools/relp-source.json`. Agents use the official [DeepSeek Harness SDK](https://github.com/deepseek-ai/deepseek-harness/tree/master/python/sdk).
+The report structure follows [Goodfire's neuron reports](https://already-clean.goodfire.com/). RelP adapts [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits), with the source revision recorded in `tools/relp-source.json`. The bundled skill tools use the official [DeepSeek Harness SDK](https://github.com/deepseek-ai/deepseek-harness/tree/master/python/sdk).
 
 ## License
 
