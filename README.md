@@ -97,7 +97,8 @@ The original essay contains claims at several levels. We separate what this repo
 | Does recursive generalization explain apparently mixed behavior? | Evidence that branches share a developmental or causal mechanism. | **Open.** Current reports can generate candidate cases but do not establish the general claim. |
 | Are native neurons more useful than SAE features? | Matched neurons/features, data, tests, intervention budgets, and evaluation criteria. | **Planned.** No general comparison is claimed. |
 
-**We intend this table to become a living claims tracker. New evidence should link to a concrete report, model, corpus, intervention, or counterexample.**
+> [!IMPORTANT]
+> **We intend this table to become a living claims tracker. New evidence should link to a concrete report, model, corpus, intervention, or counterexample.**
 
 ## The investigation pipeline <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a> <a id="workflow"></a>
 

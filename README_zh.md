@@ -97,7 +97,8 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 | 递归泛化能否解释看似混合的行为？ | 不同行为分支共享形成过程或因果机制的证据。 | **尚无结论。** 当前报告可以提供候选案例，尚未确立一般性结论。 |
 | 原生神经元是否比 SAE 特征更有用？ | 匹配神经元与特征、数据、测试、干预预算和评估标准。 | **计划中。** 尚无一般性比较结论。 |
 
-**这张表将随新证据更新。新增证据应对应具体报告、模型、语料、干预或反例。**
+> [!IMPORTANT]
+> **这张表将随新证据更新。新增证据应对应具体报告、模型、语料、干预或反例。**
 
 ## 神经元研究流程 <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a><a id="workflow"></a>
 
