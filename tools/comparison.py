@@ -32,22 +32,24 @@ def install(report, neuron, references=None):
         raise ValueError('Expected neuron ID L<layer>_N<index>')
     references = Path(references) if references else ROOT / 'data/reference-pages'
     reference = references / (neuron + '.html')
-    if not reference.is_file():
-        return False
+    has_reference = reference.is_file()
     report = Path(report)
     folder = report / 'comparison'
     folder.mkdir(exist_ok=True)
     viewer_name = 'viewer.' + hashlib.sha256((ASSETS / 'viewer.js').read_bytes()).hexdigest()[:12] + '.js'
+    style_name = 'style.' + hashlib.sha256((ASSETS / 'style.css').read_bytes()).hexdigest()[:12] + '.css'
     _replace_file(ASSETS / 'viewer.js', folder / viewer_name)
-    _replace_file(ASSETS / 'style.css', folder / 'style.css')
-    _replace_file(reference, folder / 'original.html')
+    _replace_file(ASSETS / 'style.css', folder / style_name)
+    if has_reference:
+        _replace_file(reference, folder / 'original.html')
     page = report / 'index.html'
     source = MARKER.sub('', page.read_text())
     markup = (
         '<!-- neuron-comparison:start -->\n'
-        '<link rel="stylesheet" href="comparison/style.css">\n'
+        '<link rel="stylesheet" href="comparison/' + style_name + '">\n'
         '<script defer src="comparison/' + viewer_name + '" data-neuron="' + html.escape(neuron, quote=True)
-        + '" data-reference="comparison/original.html" data-original="https://already-clean.goodfire.com/neuron-scientist/'
+        + '" data-directory="../" data-reference="' + ('comparison/original.html' if has_reference else '')
+        + '" data-original="https://already-clean.goodfire.com/neuron-scientist/'
         + neuron + '/"></script>\n'
         '<!-- neuron-comparison:end -->\n'
     )
@@ -55,7 +57,7 @@ def install(report, neuron, references=None):
     temporary = page.with_name('index.comparison.tmp')
     temporary.write_text(source.replace('</head>', markup + '</head>', 1))
     temporary.replace(page)
-    return True
+    return has_reference
 
 
 def publish(source, destination, neuron, references=None):

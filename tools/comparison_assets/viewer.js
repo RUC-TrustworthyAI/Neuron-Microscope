@@ -1,9 +1,8 @@
 (() => {
   'use strict';
-  if (window.self !== window.top || document.getElementById('np-compare-toggle')) return;
+  if (window.self !== window.top || document.getElementById('np-report-back')) return;
   const script = document.currentScript;
   const neuron = script.dataset.neuron;
-  const reference = new URL(script.dataset.reference, location.href).href;
   const original = script.dataset.original;
   const make = (tag, attributes = {}, text) => {
     const element = document.createElement(tag);
@@ -11,6 +10,13 @@
     if (text !== undefined) element.textContent = text;
     return element;
   };
+  const directory = new URL(script.dataset.directory || '../', location.href).href;
+  const backLink = id => make('a', {id, class:'np-report-back', href:directory,
+    'aria-label':'Back to neuron reports', title:'Back to neuron reports'}, '\u2190 Back');
+  document.body.append(backLink('np-report-back'));
+  document.documentElement.classList.add('np-report-navigation');
+  if (!script.dataset.reference) return;
+  const reference = new URL(script.dataset.reference, location.href).href;
   const panelIcon = '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="2.2" y="3.5" width="15.6" height="13" rx="2"/><path d="M9 3.5v13"/><path class="np-compare-arrow" d="M4.5 8l2 2-2 2"/></svg>';
   const externalIcon = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M9 2h5v5M14 2 7 9M7 3H3a1 1 0 0 0-1 1v9a1 1 0 0 0 1 1h9a1 1 0 0 0 1-1V9"/></svg>';
   const toggle = make('button', {id:'np-compare-toggle', type:'button', 'aria-label':'Compare reports', 'aria-expanded':'false', 'aria-controls':'np-compare-shell', title:'Compare reports'});
@@ -29,7 +35,7 @@
   document.body.append(toggle);
   const shell = make('div', {id:'np-compare-shell', role:'dialog', 'aria-label':'Compare the same neuron', 'aria-modal':'true', hidden:''});
   const leftHeading = make('div', {id:'np-compare-left-heading', class:'np-compare-heading'});
-  leftHeading.append(make('strong', {}, 'Published report'), make('small', {}, neuron));
+  leftHeading.append(backLink('np-compare-back'), make('strong', {}, 'Published report'), make('small', {}, neuron));
   const link = make('a', {href:original, target:'_blank', rel:'noopener noreferrer', title:'Open published report', 'aria-label':'Open published report'});
   link.innerHTML = externalIcon; leftHeading.append(link);
   const rightHeading = make('div', {id:'np-compare-right-heading', class:'np-compare-heading'});

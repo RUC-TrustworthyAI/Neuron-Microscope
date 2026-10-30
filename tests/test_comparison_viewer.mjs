@@ -73,13 +73,13 @@ class ReportWindow extends Events {
   scrollY=0;
   scrollTo({top}){if(this.scrollY!==top){this.scrollY=top;this.emit('scroll');}}
 }
-function setup({search='',loading=false,embedded=false}={}){
+function setup({search='',loading=false,embedded=false,reference=true,path='/L50_N3507/'}={}){
   const win=new ReportWindow(), doc=new Document(win,true);
   win.top=embedded?{}:win;win.self=win;win.innerWidth=1400;
   doc.readyState=loading?'loading':'complete';
-  doc.currentScript={dataset:{neuron:'L50_N3507',reference:'comparison/original.html',original:'https://already-clean.goodfire.com/neuron-scientist/L50_N3507/'}};
+  doc.currentScript={dataset:{neuron:'L50_N3507',reference:reference?'comparison/original.html':'',original:'https://already-clean.goodfire.com/neuron-scientist/L50_N3507/'}};
   let next=0;const raf=new Map();
-  const context={window:win,document:doc,location:{href:'https://reports.example/L50_N3507/'+search,search},URL,URLSearchParams,
+  const context={window:win,document:doc,location:{href:'https://reports.example'+path+search,search},URL,URLSearchParams,
     requestAnimationFrame:fn=>{const id=++next;raf.set(id,fn);return id;},cancelAnimationFrame:id=>raf.delete(id),
     setTimeout:()=>0,clearTimeout(){},ResizeObserver:class{observe(){}}};
   vm.runInNewContext(viewer,context);
@@ -96,6 +96,7 @@ function checkBothDirections(app){
 
 test('direct links open comparison by default; both panes synchronize',()=>{
   const app=setup();assert.equal(app.doc.getElementById('np-compare-shell').hidden,false);
+  assert.equal(app.doc.getElementById('np-compare-back').getAttribute('href'),'https://reports.example/');
   loadReports(app);assert.equal(app.doc.getElementById('np-compare-shell').dataset.ready,'true');checkBothDirections(app);
 });
 test('gzip loaders must not consume iframe readiness or scroll listeners',()=>{
@@ -115,7 +116,11 @@ test('comparison waits for the outer document and preserves an opt-out',()=>{
   const app=setup({loading:true});assert.equal(app.doc.getElementById('np-compare-shell').hidden,true);
   app.win.emit('load');assert.equal(app.doc.getElementById('np-compare-shell').hidden,false);
   const single=setup({search:'?compare=0'});assert.equal(single.doc.getElementById('np-compare-shell').hidden,true);
+  assert.equal(single.doc.getElementById('np-report-back').getAttribute('href'),'https://reports.example/');
   single.doc.getElementById('np-compare-toggle').emit('click');loadReports(single);checkBothDirections(single);
+  const independent=setup({reference:false,path:'/experiments/run/100m/L50_N3507/index.html',search:'?compare=0'});
+  assert.equal(independent.doc.getElementById('np-compare-shell'),null);
+  assert.equal(independent.doc.getElementById('np-report-back').getAttribute('href'),'https://reports.example/experiments/run/100m/');
 });
 test('new input from the opposite pane wins over a queued scroll; close and reopen work',()=>{
   const app=setup();loadReports(app);const [left,right]=app.frames().map(f=>f.contentWindow);
@@ -125,4 +130,5 @@ test('new input from the opposite pane wins over a queued scroll; close and reop
 });
 test('an embedded report does not open a recursive comparison',()=>{
   const app=setup({embedded:true});assert.equal(app.doc.getElementById('np-compare-shell'),null);
+  assert.equal(app.doc.getElementById('np-report-back'),null);
 });

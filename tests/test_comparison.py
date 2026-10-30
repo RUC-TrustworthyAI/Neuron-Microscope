@@ -23,6 +23,7 @@ class ComparisonTests(unittest.TestCase):
             script=re.search(r'src="(comparison/viewer\.[0-9a-f]{12}\.js)"',(output/'index.html').read_text())
             self.assertIsNotNone(script)
             self.assertTrue((output/script[1]).is_file())
+            self.assertIn('data-directory="../"', (output/'index.html').read_text())
 
     def test_no_reference_still_publishes_independent_report(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -31,8 +32,10 @@ class ComparisonTests(unittest.TestCase):
             (source/'index.html').write_text(html)
             output=root/'published'
             self.assertFalse(publish(source,output,'L1_N2',root/'absent'))
-            self.assertEqual((output/'index.html').read_text(),html)
-            self.assertFalse((output/'comparison').exists())
+            self.assertEqual((source/'index.html').read_text(),html)
+            self.assertIn('synthetic report', (output/'index.html').read_text())
+            self.assertIn('data-directory="../" data-reference=""', (output/'index.html').read_text())
+            self.assertFalse((output/'comparison/original.html').exists())
 
 
 if __name__=='__main__':unittest.main()

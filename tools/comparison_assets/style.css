@@ -7,8 +7,8 @@
 #np-compare-shell{--split:50%;position:fixed;inset:0;z-index:2147483000;background:#fff;color:#24282c;font:13px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;display:grid;grid-template-columns:minmax(0,var(--split)) 5px minmax(0,1fr);grid-template-rows:43px minmax(0,1fr)}
 #np-compare-shell *{box-sizing:border-box}
 .np-compare-heading{display:flex;align-items:center;gap:10px;padding:0 22px;border-bottom:1px solid #dce0e4;min-width:0;background:#f9fafb;white-space:nowrap}
-.np-compare-heading:first-child{padding-left:38px}
-.np-compare-heading strong{font-size:12px;font-weight:600;letter-spacing:.02em}
+.np-compare-heading:first-child{padding-left:12px}
+.np-compare-heading strong{font-size:12px;font-weight:600;letter-spacing:.02em;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .np-compare-heading small{color:#858d96;font-size:11px}
 .np-compare-heading a{margin-left:auto;display:inline-flex;color:#7b8490;text-decoration:none;align-items:center;padding:4px}
 .np-compare-heading a:hover{color:#1d1d1f}
@@ -28,5 +28,12 @@
 .np-compare-loaded .np-compare-loading{display:none}
 .np-compare-dragging .np-compare-pane{pointer-events:none}
 html.np-comparing,html.np-comparing body{overflow:hidden!important}
-@media(max-width:760px){.np-compare-heading{padding:0 8px;gap:5px}.np-compare-heading small{display:none}.np-compare-heading:first-child{padding-left:34px}}
-@media print{#np-compare-shell,#np-compare-toggle{display:none!important}html.np-comparing,html.np-comparing body{overflow:visible!important}}
+@media(max-width:760px){.np-compare-heading{padding:0 8px;gap:5px}.np-compare-heading small{display:none}.np-compare-heading:first-child{padding-left:8px}}
+@media print{#np-compare-shell,#np-compare-toggle,#np-report-back{display:none!important}html.np-comparing,html.np-comparing body{overflow:visible!important}}
+.np-report-back{display:inline-flex;align-items:center;padding:4px 9px;border:1px solid #d9dde1;border-radius:5px;background:#fff;color:#58616c;text-decoration:none;white-space:nowrap;font:500 12px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.np-report-back:hover{color:#1d1d1f;background:#f5f7f9}
+.np-report-back:focus-visible{outline:2px solid #3674bc;outline-offset:2px}
+#np-report-back{position:fixed;left:12px;top:7px;z-index:2147483002}
+html.np-comparing #np-report-back{display:none}
+html.np-report-navigation:not(.np-comparing) .topnav{padding-left:88px}
+#np-compare-left-heading #np-compare-back{margin:0;padding:4px 9px;flex:none;color:#58616c}
