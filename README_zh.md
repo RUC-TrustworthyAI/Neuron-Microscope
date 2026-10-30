@@ -82,7 +82,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
   </a>
 </p>
 
-每一行都可进入完整交互式报告，查看激活证据、样例、搜索、聚类、效应、测试、解释历史和开销记录。
+每一行都可进入完整交互式报告，查看激活证据、样例、搜索、聚类、效应、测试、批评、修订结论和开销记录。
 
 ## 我们检验了哪些 AlreadyClean 主张 <a id="which-alreadyclean-claims-have-we-tested"></a>
 

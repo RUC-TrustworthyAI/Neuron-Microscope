@@ -82,7 +82,7 @@ In our SlimPajama 100M run, the template `Officials in {city} approved the annua
   </a>
 </p>
 
-Each row links to a full interactive report with activation evidence, exemplars, searches, clusters, effects, tests, interpretation history, and cost records.
+Each row links to a full interactive report with activation evidence, exemplars, searches, clusters, effects, tests, criticism, revised conclusions, and cost records.
 
 ## Which AlreadyClean claims have we tested?
 
