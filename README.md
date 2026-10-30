@@ -14,9 +14,9 @@
 
 <p align="center">
   <a href="README_zh.md">中文</a> ·
-  <a href="https://neuron-microscope-papers.tangysiren10.chatgpt.site/">Explore neuron reports</a> ·
-  <a href="https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/">Open the Colorado case</a> ·
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en">Watch the investigation</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">Explore neuron reports</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">Open the Colorado case</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en">Watch the investigation</a> ·
   <a href="#use-neuron-microscope">Run the project</a>
 </p>
 
@@ -24,7 +24,7 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
   <a href="docs/workflow.md"><img src="assets/badges/pipeline.svg" alt="Pipeline: structured"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en"><img src="assets/badges/live-demo.svg" alt="Showcase: online"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en"><img src="assets/badges/live-demo.svg" alt="Showcase: online"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="Usage: install and run"></a>
 </p>
 
@@ -32,7 +32,7 @@
 
 Neuron Microscope implements an independent workflow to reproduce and test the neuron analyses behind Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/). Starting with native MLP neurons in **Qwen3-32B**, our reports expose activation evidence, hypotheses, controlled tests, causal interventions, revisions, and unresolved failures.
 
-**Available now:** [investigation code and prompts](workflow/), [sources, sampling procedures and readers for five corpora](docs/data.md#corpora-used-in-the-comparisons), and [10 interactive neuron comparisons](https://neuron-microscope-papers.tangysiren10.chatgpt.site/). Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
+**Available now:** [investigation code and prompts](workflow/), [sources, sampling procedures and readers for five corpora](docs/data.md#corpora-used-in-the-comparisons), and [10 interactive neuron comparisons](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/). Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
 > [!IMPORTANT]
 > **This is an independent reproduction effort.** The research models do not see AlreadyClean's explanations while conducting an investigation. The reference report is added only when the final report is published for comparison.
@@ -57,10 +57,10 @@ Neuron Microscope implements an independent workflow to reproduce and test the n
 
 Each neuron link opens the original report on the left and our reproduction on the right. Scroll either pane to move both; close the comparison to read the reproduction alone.
 
-[Open the interactive comparison →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/)
+[Open the interactive comparison →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/)
 
 <p align="center">
-  <a href="https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">
     <img src="assets/colorado-comparison.jpg" alt="Original and reproduced reports for the Colorado neuron" width="92%">
   </a>
 </p>
@@ -74,10 +74,10 @@ In our SlimPajama 100M run, the template `Officials in {city} approved the annua
 
 ### Browse all current reports
 
-[Open the report directory →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)
+[Open the report directory →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)
 
 <p align="center">
-  <a href="https://neuron-microscope-papers.tangysiren10.chatgpt.site/">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">
     <img src="assets/report-directory.jpg" alt="Directory of Qwen3-32B neuron comparisons" width="92%">
   </a>
 </p>
@@ -103,10 +103,10 @@ We intend this table to become a living claims tracker. New evidence should link
 
 ### Follow a recorded investigation
 
-[Open the recorded walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
+[Open the recorded walkthrough →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en)
 
 <p align="center">
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en">
     <img src="assets/pipeline-walkthrough-en.jpg" alt="Recorded Neuron Microscope investigation" width="92%">
   </a>
 </p>
@@ -149,12 +149,12 @@ The following four examples from the SlimPajama 100M comparison set share recogn
 
 | Neuron | Shared interpretation | What still differs |
 | --- | --- | --- |
-| [L50_N3507](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L50_N3507/) | A mathematical symbol's role separates the two poles: naming an object versus occupying an expression form. | Exact letter, construction, and steering conditions. |
-| [L52_N24188](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L52_N24188/) | Remnants and things surviving from the past. | Anticipating a remnant word versus responding to the word itself; the weak negative pole. |
-| [L24_N17907](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L24_N17907/) | Firsthand experience presented as necessary, such as “has to be seen.” | How broadly recommendations and unforgettable-experience phrases belong to the concept. |
-| [L15_N10957](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L15_N10957/) | Physical protection and fortification, including safe rooms and storm shelters. | Compound-head specificity and generalization to barriers or armor. |
+| [L50_N3507](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L50_N3507/) | A mathematical symbol's role separates the two poles: naming an object versus occupying an expression form. | Exact letter, construction, and steering conditions. |
+| [L52_N24188](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L52_N24188/) | Remnants and things surviving from the past. | Anticipating a remnant word versus responding to the word itself; the weak negative pole. |
+| [L24_N17907](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L24_N17907/) | Firsthand experience presented as necessary, such as “has to be seen.” | How broadly recommendations and unforgettable-experience phrases belong to the concept. |
+| [L15_N10957](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L15_N10957/) | Physical protection and fortification, including safe rooms and storm shelters. | Compound-head specificity and generalization to barriers or armor. |
 
-Other cases expose larger gaps. For example, [L31_N23558](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L31_N23558/) receives a broad relational-boundary explanation in our run, whereas the original report distinguishes two mathematical frames. These disagreements are useful: they identify where broader corpora, sharper contrasts, and stronger causal tests are needed.
+Other cases expose larger gaps. For example, [L31_N23558](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L31_N23558/) receives a broad relational-boundary explanation in our run, whereas the original report distinguishes two mathematical frames. These disagreements are useful: they identify where broader corpora, sharper contrasts, and stronger causal tests are needed.
 
 ### Observed activation ranges differ across corpora
 
@@ -237,7 +237,7 @@ For the recorded Colorado / Diverse 100M investigation on **29 October 2026**:
 
 GPU time includes model loading. GPU and API work can overlap, so their durations do not sum to stage execution time.
 
-This is one measured case, not a per-neuron average. Costs exclude the earlier activation collection and depend on the configured model endpoint and token prices. The underlying breakdown is available in the [published report](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/reports/04-published.html#interpretation-costs).
+This is one measured case, not a per-neuron average. Costs exclude the earlier activation collection and depend on the configured model endpoint and token prices. The underlying breakdown is available in the [published report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/reports/04-published.html#interpretation-costs).
 
 ## Limitations and future work
 
@@ -259,7 +259,6 @@ This is one measured case, not a per-neuron average. Costs exclude the earlier a
 - [ ] Add matched native-neuron and SAE-feature comparisons under the same evaluation protocol.
 - [ ] Test major AlreadyClean claims at the claim level, including weak-activation ablation and recursive generalization.
 - [ ] Support additional models, layers, languages, and genres.
-- [ ] Replace prototype deployment URLs with a stable project or institutional domain.
 
 ## How to contribute <a id="contribute"></a>
 

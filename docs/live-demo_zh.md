@@ -2,7 +2,7 @@
 
 [English](live-demo.md) · **简体中文**
 
-**[神经元报告](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[流程演示](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)**
+**[神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)** · **[流程演示](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh)**
 
 两个网站均可公开访问。
 

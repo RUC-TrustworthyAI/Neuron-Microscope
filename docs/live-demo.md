@@ -2,7 +2,7 @@
 
 **English** · [简体中文](live-demo_zh.md)
 
-**[Neuron reports](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[Pipeline walkthrough](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)**
+**[Neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)** · **[Pipeline walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en)**
 
 Both websites are publicly accessible.
 

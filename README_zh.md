@@ -14,9 +14,9 @@
 
 <p align="center">
   <a href="README.md">English</a> ·
-  <a href="https://neuron-microscope-papers.tangysiren10.chatgpt.site/">浏览神经元报告</a> ·
-  <a href="https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/">查看 Colorado 案例</a> ·
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh">跟随一次研究</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">浏览神经元报告</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">查看 Colorado 案例</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh">跟随一次研究</a> ·
   <a href="#use-neuron-microscope">运行项目</a>
 </p>
 
@@ -24,7 +24,7 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="模型：dense Qwen3"></a>
   <a href="docs/workflow.md"><img src="assets/badges/pipeline.svg" alt="Pipeline：固定编排"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="报告：交互式 HTML"></a>
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh"><img src="assets/badges/live-demo.svg" alt="展示：在线"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh"><img src="assets/badges/live-demo.svg" alt="展示：在线"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="使用：安装与运行"></a>
 </p>
 
@@ -32,7 +32,7 @@
 
 Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 中的神经元分析。我们从 **Qwen3-32B** 的原生 MLP 神经元入手，在报告中展示激活证据、假设、受控实验、因果干预、修订过程与尚未解决的失败案例。
 
-**当前提供：** [研究代码与提示词](workflow/)、[五套语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)，以及 [10 份交互式神经元对比](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
+**当前提供：** [研究代码与提示词](workflow/)、[五套语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)，以及 [10 份交互式神经元对比](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
 > [!IMPORTANT]
 > **本项目独立开展复现。** 研究模型在调查过程中不会看到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
@@ -57,10 +57,10 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 打开神经元链接后，左侧显示原报告，右侧显示我们的复现。滚动任意一侧会同步移动两份报告；关闭双栏后可以单独阅读复现报告。
 
-[打开交互式对比 →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/)
+[打开交互式对比 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/)
 
 <p align="center">
-  <a href="https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">
     <img src="assets/colorado-comparison.jpg" alt="Colorado 神经元的原报告与复现报告" width="92%">
   </a>
 </p>
@@ -74,10 +74,10 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 浏览当前全部报告
 
-[打开报告目录 →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)
+[打开报告目录 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)
 
 <p align="center">
-  <a href="https://neuron-microscope-papers.tangysiren10.chatgpt.site/">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">
     <img src="assets/report-directory.jpg" alt="Qwen3-32B 神经元对比目录" width="92%">
   </a>
 </p>
@@ -103,10 +103,10 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 跟随一份完整研究记录
 
-[打开研究过程记录 →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)
+[打开研究过程记录 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh)
 
 <p align="center">
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh">
     <img src="assets/pipeline-walkthrough-zh.jpg" alt="Neuron Microscope 研究过程记录" width="92%">
   </a>
 </p>
@@ -149,12 +149,12 @@ RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确
 
 | 神经元 | 两份解释的共同点 | 仍有差异的部分 |
 | --- | --- | --- |
-| [L50_N3507](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L50_N3507/) | 数学符号的角色区分了正负两极：为对象命名，或作为表达形式中的占位符。 | 具体字母、句式和干预条件。 |
-| [L52_N24188](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L52_N24188/) | 残余物与从过去留存至今的事物。 | 是预期即将出现的遗存词，还是响应词本身；较弱的负极。 |
-| [L24_N17907](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L24_N17907/) | 被描述为必要的亲身体验，例如“has to be seen”。 | 推荐语和“难忘体验”等表达是否属于同一概念。 |
-| [L15_N10957](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L15_N10957/) | 物理防护与加固，例如安全屋和风暴避难所。 | 对复合词中心词的依赖，以及能否推广到屏障或盔甲。 |
+| [L50_N3507](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L50_N3507/) | 数学符号的角色区分了正负两极：为对象命名，或作为表达形式中的占位符。 | 具体字母、句式和干预条件。 |
+| [L52_N24188](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L52_N24188/) | 残余物与从过去留存至今的事物。 | 是预期即将出现的遗存词，还是响应词本身；较弱的负极。 |
+| [L24_N17907](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L24_N17907/) | 被描述为必要的亲身体验，例如“has to be seen”。 | 推荐语和“难忘体验”等表达是否属于同一概念。 |
+| [L15_N10957](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L15_N10957/) | 物理防护与加固，例如安全屋和风暴避难所。 | 对复合词中心词的依赖，以及能否推广到屏障或盔甲。 |
 
-另一些案例暴露了更大的差距。例如，我们对 [L31_N23558](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L31_N23558/) 的解释覆盖了宽泛的关系边界，原报告则区分了两类数学表达。这些差异提示我们，需要扩大语料覆盖、设计更能区分候选解释的对照，并加强因果检验。
+另一些案例暴露了更大的差距。例如，我们对 [L31_N23558](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L31_N23558/) 的解释覆盖了宽泛的关系边界，原报告则区分了两类数学表达。这些差异提示我们，需要扩大语料覆盖、设计更能区分候选解释的对照，并加强因果检验。
 
 ### 不同语料呈现不同的激活范围
 
@@ -237,7 +237,7 @@ python -m http.server 8000 --directory runs/example/report
 
 GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时间不能直接相加得到阶段执行时间。
 
-以上来自单次实测，无法代表每个神经元的平均开销。费用不含之前的激活采集，并取决于所配置的模型端点和 token 单价。[已发布报告](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/reports/04-published.html#interpretation-costs)提供了底层明细。
+以上来自单次实测，无法代表每个神经元的平均开销。费用不含之前的激活采集，并取决于所配置的模型端点和 token 单价。[已发布报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/reports/04-published.html#interpretation-costs)提供了底层明细。
 
 ## 局限与未来工作 <a id="limitations-and-future-work"></a>
 
@@ -259,7 +259,6 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 - [ ] 按统一评估流程，比较条件匹配的原生神经元与 SAE 特征。
 - [ ] 逐项检验 AlreadyClean 的主要主张，包括弱激活消融与递归泛化。
 - [ ] 支持更多模型、层、语言和文体。
-- [ ] 将原型部署地址迁移到稳定的项目或机构域名。
 
 ## 如何参与项目 <a id="how-to-contribute"></a> <a id="contribute"></a>
 
