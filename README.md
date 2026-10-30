@@ -93,11 +93,11 @@ The original essay contains claims at several levels. We separate what this repo
 | Can native Qwen3 neurons receive coherent explanations? | Activation coverage, held-out examples, controlled tests, and interventions. | **Preliminary evidence:** several clear cases, several partial or divergent cases. |
 | Do the original neuron interpretations reproduce independently? | Blind reproduction followed by side-by-side comparison. | **Mixed and case-dependent** in the first 10 studies. |
 | Does corpus choice change the visible behavior? | Matched sampling across corpora. | **Different observed ranges** for L51_N20229; isolating the corpus effect requires matched sampling and context handling. |
-| Are weak activations globally unimportant? | Thresholded, whole-network ablations across tasks and layers. | **Not yet tested by this repository.** |
+| Are weak activations globally unimportant? | Thresholded, whole-network ablations across tasks and layers. | **Planned**, with no clear conclusion yet. |
 | Does recursive generalization explain apparently mixed behavior? | Evidence that branches share a developmental or causal mechanism. | **Open.** Current reports can generate candidate cases but do not establish the general claim. |
 | Are native neurons more useful than SAE features? | Matched neurons/features, data, tests, intervention budgets, and evaluation criteria. | **Planned.** No general comparison is claimed. |
 
-We intend this table to become a living claims tracker. New evidence should link to a concrete report, model, corpus, intervention, or counterexample.
+**We intend this table to become a living claims tracker. New evidence should link to a concrete report, model, corpus, intervention, or counterexample.**
 
 ## The investigation pipeline <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a> <a id="workflow"></a>
 
@@ -257,7 +257,8 @@ This is one measured case, not a per-neuron average. Costs exclude the earlier a
 - [ ] Expand from selected examples to a larger, randomized neuron sample.
 - [ ] Measure explanation stability across agent runs, prompts, samples, and corpora.
 - [ ] Add matched native-neuron and SAE-feature comparisons under the same evaluation protocol.
-- [ ] Test major AlreadyClean claims at the claim level, including weak-activation ablation and recursive generalization.
+- [ ] Test the effect of weak activations on global behavior through thresholded, whole-network ablations across tasks and layers.
+- [ ] Test major AlreadyClean claims such as recursive generalization.
 - [ ] Support additional models, layers, languages, and genres.
 
 ## How to contribute <a id="contribute"></a>
