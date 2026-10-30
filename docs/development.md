@@ -18,6 +18,12 @@ Open `http://localhost:8080/`. The demo uses synthetic measurements to exercise 
 
 The software tests cover preserved input prefixes, data selection, native attribution operations, stage isolation and handoff, saved-output reuse, API accounting, report assembly and layout. Passing them does not establish the scientific validity of an explanation.
 
+The comparison viewer has a separate test for default opening, compressed-report loading, and scrolling from either pane. Run it with Node.js 18 or newer:
+
+```bash
+node --test tests/test_comparison_viewer.mjs
+```
+
 Build the agent image separately:
 
 ```bash

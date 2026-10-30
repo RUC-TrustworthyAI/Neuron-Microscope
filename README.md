@@ -30,65 +30,32 @@
 
 <a id="overview"></a>
 
-Neuron Microscope independently reproduces and investigates the neuron analyses behind Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/). Starting with native MLP neurons in **Qwen3-32B**, we expose the activation evidence, hypotheses, controlled tests, causal interventions, agent traces, revisions, and unresolved failures behind every explanation.
+Neuron Microscope implements an independent workflow to reproduce and test the neuron analyses behind Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/). Starting with native MLP neurons in **Qwen3-32B**, our reports expose activation evidence, hypotheses, controlled tests, causal interventions, revisions, and unresolved failures.
 
-**Current release:** 10 side-by-side neuron studies. Our preliminary reading finds close agreement on the core concept in four cases, while other cases reveal partial or substantial differences. These results are an initial audit—not a verdict on the broader AlreadyClean hypothesis.
+**Available now:** [investigation code and agent skills](skills/README.md), [sources, sampling procedures and readers for five corpora](docs/data.md#corpora-used-in-the-comparisons), and [10 interactive neuron comparisons](https://neuron-microscope-papers.tangysiren10.chatgpt.site/). Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
 > [!IMPORTANT]
 > **This is an independent reproduction effort.** The research agents do not see AlreadyClean's explanations while conducting an investigation. The reference report is added only when the final report is published for comparison.
 
 ## Contents
 
-- [What we have found so far](#what-we-have-found-so-far)
-- [Explore the evidence](#explore-the-evidence)
+- [Side-by-side interactive comparisons](#side-by-side-interactive-comparisons)
 - [Which AlreadyClean claims have we tested?](#which-alreadyclean-claims-have-we-tested)
-- [How an investigation works](#how-an-investigation-works)
-- [How we evaluate an explanation](#how-we-evaluate-an-explanation)
-- [Use Neuron Microscope](#use-neuron-microscope)
-- [Reproducibility and cost](#reproducibility-and-cost)
+- [The three-stage investigation pipeline](#the-three-stage-investigation-pipeline)
+- [Evaluating the report evidence](#evaluating-the-report-evidence)
+- [Observations from the current comparisons](#observations-from-the-current-comparisons)
+- [Installation and usage](#installation-and-usage)
+- [Recorded runtime and cost](#recorded-runtime-and-cost)
 - [Limitations and future work](#limitations-and-future-work)
-- [Contribute](#contribute)
-- [Related work from our group](#related-work-from-our-group)
-- [Documentation](#documentation)
+- [How to contribute](#how-to-contribute)
+- [Related research from our group](#related-research-from-our-group)
+- [Setup, data and report guides](#setup-data-and-report-guides)
 
-## What we have found so far <a id="key-findings"></a>
-
-### 1. Agreement is real, but incomplete
-
-In four of the first 10 SlimPajama 100M comparisons, our preliminary reading finds close agreement with the original report on the neuron's core concept:
-
-| Neuron | Shared interpretation | What still differs |
-| --- | --- | --- |
-| [L50_N3507](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L50_N3507/) | A mathematical symbol's role separates the two poles: naming an object versus occupying an expression form. | Exact letter, construction, and steering conditions. |
-| [L52_N24188](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L52_N24188/) | Remnants and things surviving from the past. | Anticipating a remnant word versus responding to the word itself; the weak negative pole. |
-| [L24_N17907](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L24_N17907/) | Firsthand experience presented as necessary, such as “has to be seen.” | How broadly recommendations and unforgettable-experience phrases belong to the concept. |
-| [L15_N10957](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L15_N10957/) | Physical protection and fortification, including safe rooms and storm shelters. | Compound-head specificity and generalization to barriers or armor. |
-
-Other cases expose larger gaps. For example, [L31_N23558](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L31_N23558/) receives a broad relational-boundary explanation in our run, whereas the original report distinguishes two mathematical frames. These disagreements are useful: they identify where broader corpora, sharper contrasts, and stronger causal tests are needed.
-
-### 2. Semantic similarity is not correctness
-
-Two explanations can use related words while making different mechanistic claims. The directory's 1–5 similarity score is an LLM assessment of semantic agreement; it is **not** a correctness or faithfulness score. We therefore retain the underlying contexts, measurements, experiments, interventions, and criticism for inspection.
-
-### 3. Corpus coverage changes the evidence
-
-At approximately the same 100M-token scale, different corpora expose different activation ranges. For L51_N20229, the observed native product spans **−19 to +59** in Common Pile, **−35 to +98** in Diverse, and **−32.75 to +111** in Reasoning Mix. These are observed extrema, not bounds on the neuron's behavior. The corpora also differ in sampling and context handling; their sources and procedures are documented in the [data guide](docs/data.md#corpora-used-in-the-comparisons).
-
-The practical lesson is simple: token count alone does not establish coverage. An explanation should be tested at both activation poles, across additional contexts, and—when possible—across corpora.
-
-<p align="center">
-  <a href="assets/corpus-coverage.svg">
-    <img src="assets/corpus-coverage.svg" alt="Observed activation ranges across corpora" width="90%">
-  </a>
-</p>
-
-### 4. The broad scientific questions remain open
-
-Our initial qualitative impression is that some native-neuron explanations are as clear as, or clearer than, SAE features we have studied. The current sample is too small to establish a general advantage. We still need randomized neuron sampling, matched SAE comparisons, repeated explanation runs, and stronger tests of whether apparently different behaviors share a mechanism.
-
-## Explore the evidence <a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
+## Side-by-side interactive comparisons <a id="explore-the-evidence"></a> <a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
 
 ### A side-by-side case: the Colorado neuron
+
+Each neuron link opens the original report on the left and our reproduction on the right. Scroll either pane to move both; close the comparison to read the reproduction alone.
 
 [Open the interactive comparison →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/)
 
@@ -117,18 +84,6 @@ In our SlimPajama 100M run, the template `Officials in {city} approved the annua
 
 Each row links to a full interactive report with activation evidence, exemplars, searches, clusters, effects, tests, interpretation history, and cost records.
 
-### Follow a complete investigation
-
-[Open the recorded walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
-
-<p align="center">
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en">
-    <img src="assets/pipeline-walkthrough-en.jpg" alt="Recorded Neuron Microscope investigation" width="92%">
-  </a>
-</p>
-
-The walkthrough follows the Colorado investigation from saved activation evidence through interpretation, controlled experiments, revision, and publication. It shows the prompts, tool calls, measurements, intermediate reports, and final criticism. This recording uses Diverse 100M; the comparison above uses SlimPajama 100M.
-
 ## Which AlreadyClean claims have we tested?
 
 The original essay contains claims at several levels. We separate what this repository has directly examined from what remains open.
@@ -144,7 +99,21 @@ The original essay contains claims at several levels. We separate what this repo
 
 We intend this table to become a living claims tracker. New evidence should link to a concrete report, model, corpus, intervention, or counterexample.
 
-## How an investigation works <a id="workflow"></a>
+## The three-stage investigation pipeline <a id="how-an-investigation-works"></a> <a id="workflow"></a>
+
+### Follow a recorded investigation
+
+[Open the recorded walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
+
+<p align="center">
+  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en">
+    <img src="assets/pipeline-walkthrough-en.jpg" alt="Recorded Neuron Microscope investigation" width="92%">
+  </a>
+</p>
+
+The walkthrough follows the Colorado investigation from saved activation evidence through interpretation, controlled experiments, revision, and publication. It shows the prompts, tool calls, measurements, intermediate reports, and final criticism. This recording uses Diverse 100M; the comparison above uses SlimPajama 100M.
+
+### From evidence to a report
 
 <p align="center">
   <a href="assets/workflow.png">
@@ -156,15 +125,15 @@ We intend this table to become a living claims tracker. New evidence should link
 
 1. **Prepare evidence.** Sample token positions across activation intervals from a saved archive and retain their contexts and measured gate, up, and product values.
 2. **Interpret and label.** A fresh agent container reads the target neuron's evidence, proposes an initial explanation, and defines response groups. Fixed tools label individual contexts without revealing their measured responses.
-3. **Experiment.** A second agent designs controlled replacements, searches, native interventions, RelP attribution, family measurements, and blind maximum/minimum tests. Model computation runs through host tools.
+3. **Experiment.** A second agent designs controlled replacements, searches, native interventions, RelP attribution, and family measurements. A separate writer generates maximum/minimum test inputs from the initial explanation alone. Host tools run and score the model computations.
 4. **Revise.** A third agent reviews the initial explanation alongside the measured results and revises the explanation, criticism, uncertainty, and captions.
 5. **Publish.** Fixed code assembles the interactive report. If a local reference snapshot is available, the publisher adds the side-by-side comparison only after the investigation has finished.
 
 The default published procedure samples **500 saved positions**, allocated across activation bins in proportion to their log-count heights, with uniform sampling inside each bin. Activation spectrum and Inside the neuron reuse these positions and their initial labels. The labels remain tied to the initial explanation, including after revision. See [the method](docs/method.md), [run configuration](docs/running.md), and [data contract](docs/data.md) for the precise implementation.
 
-## How we evaluate an explanation
+## Evaluating the report evidence <a id="how-we-evaluate-an-explanation"></a>
 
-A plausible description is only the beginning. Neuron Microscope records several kinds of evidence so that readers can test the explanation rather than accept it as a label.
+The reports provide several ways to examine an explanation. The directory’s 1–5 score measures LLM-assessed semantic agreement with the reference explanation. Correctness and causal claims require the experiments below; similar wording alone does not establish them.
 
 | Dimension | Question | Evidence in the reports |
 | --- | --- | --- |
@@ -177,7 +146,36 @@ A plausible description is only the beginning. Neuron Microscope records several
 
 RelP provides supporting attribution evidence using modified derivatives; its graphs alone do not establish a native causal effect. See [the measurement scope](docs/method.md#relp-and-intervention-scope).
 
-## Use Neuron Microscope <a id="installation-and-usage"></a><a id="quick-start"></a>
+## Observations from the current comparisons <a id="what-we-have-found-so-far"></a> <a id="key-findings"></a>
+
+### Shared concepts can conceal different response conditions
+
+The following four examples from the SlimPajama 100M comparison set share recognizable concepts with the reference reports. These are qualitative readings of individual cases; the remaining differences still need experimental tests.
+
+| Neuron | Shared interpretation | What still differs |
+| --- | --- | --- |
+| [L50_N3507](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L50_N3507/) | A mathematical symbol's role separates the two poles: naming an object versus occupying an expression form. | Exact letter, construction, and steering conditions. |
+| [L52_N24188](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L52_N24188/) | Remnants and things surviving from the past. | Anticipating a remnant word versus responding to the word itself; the weak negative pole. |
+| [L24_N17907](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L24_N17907/) | Firsthand experience presented as necessary, such as “has to be seen.” | How broadly recommendations and unforgettable-experience phrases belong to the concept. |
+| [L15_N10957](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L15_N10957/) | Physical protection and fortification, including safe rooms and storm shelters. | Compound-head specificity and generalization to barriers or armor. |
+
+Other cases expose larger gaps. For example, [L31_N23558](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L31_N23558/) receives a broad relational-boundary explanation in our run, whereas the original report distinguishes two mathematical frames. These disagreements are useful: they identify where broader corpora, sharper contrasts, and stronger causal tests are needed.
+
+### Observed activation ranges differ across corpora
+
+At approximately the same 100M-token scale, different corpora expose different activation ranges. For L51_N20229, the observed native product spans **−19 to +59** in Common Pile, **−35 to +98** in Diverse, and **−32.75 to +111** in Reasoning Mix. These are observed extrema, not bounds on the neuron's behavior. The corpora also differ in sampling and context handling; their sources and procedures are documented in the [data guide](docs/data.md#corpora-used-in-the-comparisons).
+
+Equal token budgets can still expose different contexts and activation tails. Wider extrema alone do not establish a better explanation; the cases at both poles and the responses to controlled tests need inspection.
+
+<p align="center">
+  <a href="assets/corpus-coverage.svg">
+    <img src="assets/corpus-coverage.svg" alt="Observed activation ranges across corpora" width="90%">
+  </a>
+</p>
+
+The current reports leave uncertainty at three points: whether the sampled corpus contains the relevant contexts, whether the agent sees sufficient evidence at the scored position, and whether its explanation predicts further measurements. Repeated runs and matched comparisons are needed to separate these effects.
+
+## Installation and usage <a id="use-neuron-microscope"></a> <a id="quick-start"></a>
 
 There are three current ways to use the project.
 
@@ -247,7 +245,7 @@ Replace the example neuron ID with one present in your input data. During batch 
 
 See [Running](docs/running.md) for full configuration, continuation, isolated stages, saved-measurement reuse, GPU groups, budgets, and publication behavior.
 
-## Reproducibility and cost
+## Recorded runtime and cost <a id="reproducibility-and-cost"></a>
 
 Every investigation retains its frozen settings, source snapshot, API requests and responses, token-price estimates, intermediate handoffs, experiments, measurements, revisions, and final report. Fresh interpretations use the target activation evidence without previous explanations or official labels.
 
@@ -291,7 +289,7 @@ This is one measured case, not a per-neuron average. Costs exclude the earlier a
 - [ ] Support additional models, layers, languages, and genres.
 - [ ] Replace prototype deployment URLs with a stable project or institutional domain.
 
-## Contribute
+## How to contribute <a id="contribute"></a>
 
 We welcome evidence that strengthens, narrows, or contradicts an explanation.
 
@@ -306,7 +304,7 @@ Useful contributions include:
 
 Please open a [GitHub Issue](https://github.com/RUC-TrustworthyAI/Neuron-Microscope/issues) with a concrete neuron ID, context, experiment, result, or proposal. Reproducible examples are especially valuable, including failures and disagreements.
 
-## Related work from our group <a id="related-work"></a>
+## Related research from our group <a id="related-work"></a>
 
 Our group's related work spans feature learning, concept-based analysis, explanation evaluation, and LLM safety. Publication details are also listed on [Xiting Wang's faculty page](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm).
 
@@ -317,7 +315,7 @@ Our group's related work spans feature learning, concept-based analysis, explana
 | **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li et al., EMNLP 2024 | Formalizes concept-based explanations and develops measures of readability and faithfulness. | [Paper](https://aclanthology.org/2024.emnlp-main.36/) · [Code](https://github.com/hr-jin/Concept-Explanation-Evaluation) |
 | **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng et al., arXiv 2026 | Uses SAE concepts and causal attribution to identify scenarios that suppress refusal. | [Paper](https://arxiv.org/abs/2607.23496) |
 
-## Documentation
+## Setup, data and report guides <a id="documentation"></a>
 
 | Guide | Start here when you want to… |
 | --- | --- |

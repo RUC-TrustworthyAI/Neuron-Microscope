@@ -30,65 +30,32 @@
 
 <a id="overview"></a>
 
-Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 中的神经元分析。我们从 **Qwen3-32B** 的原生 MLP 神经元入手，展示解释背后的激活证据、假设、受控实验、因果干预、agent 轨迹、修订过程与尚未解决的失败案例。
+Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 中的神经元分析。我们从 **Qwen3-32B** 的原生 MLP 神经元入手，在报告中展示激活证据、假设、受控实验、因果干预、修订过程与尚未解决的失败案例。
 
-**当前发布：** 10 份神经元双栏对比。初步阅读发现，其中四个案例在核心概念上比较接近，其他案例则存在部分或较大的差异。我们目前只检查了这些案例，尚不足以判断 AlreadyClean 更广泛的假说。
+**当前提供：** [研究代码与 agent skills](skills/README.md)、[五套语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)，以及 [10 份交互式神经元对比](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
 > [!IMPORTANT]
 > **本项目独立开展复现。** 研究 agent 在调查过程中不会看到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
 
 ## 目录
 
-- [目前有哪些发现](#what-we-have-found-so-far)
-- [查看证据](#explore-the-evidence)
+- [交互式双栏报告对比](#side-by-side-interactive-comparisons)
 - [我们检验了哪些 AlreadyClean 主张](#which-alreadyclean-claims-have-we-tested)
-- [一次研究如何进行](#how-an-investigation-works)
-- [如何评估解释](#how-we-evaluate-an-explanation)
-- [使用 Neuron Microscope](#use-neuron-microscope)
-- [复现记录与开销](#reproducibility-and-cost)
+- [三阶段神经元研究流程](#the-three-stage-investigation-pipeline)
+- [如何评估报告中的证据](#evaluating-the-report-evidence)
+- [当前案例中的观察](#observations-from-the-current-comparisons)
+- [安装与使用](#installation-and-usage)
+- [实测耗时与开销](#recorded-runtime-and-cost)
 - [局限与未来工作](#limitations-and-future-work)
-- [参与项目](#contribute)
-- [团队相关研究](#related-work-from-our-group)
-- [文档](#documentation)
+- [如何参与项目](#how-to-contribute)
+- [团队相关研究](#related-research-from-our-group)
+- [环境、数据与报告指南](#setup-data-and-report-guides)
 
-## 目前有哪些发现 <a id="what-we-have-found-so-far"></a><a id="key-findings"></a>
-
-### 1. 部分案例一致，但仍有差异
-
-在首批 10 份 SlimPajama 100M 对比中，我们初步认为以下四个案例与原报告的核心概念比较接近：
-
-| 神经元 | 两份解释的共同点 | 仍有差异的部分 |
-| --- | --- | --- |
-| [L50_N3507](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L50_N3507/) | 数学符号的角色区分了正负两极：为对象命名，或作为表达形式中的占位符。 | 具体字母、句式和干预条件。 |
-| [L52_N24188](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L52_N24188/) | 残余物与从过去留存至今的事物。 | 是预期即将出现的遗存词，还是响应词本身；较弱的负极。 |
-| [L24_N17907](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L24_N17907/) | 被描述为必要的亲身体验，例如“has to be seen”。 | 推荐语和“难忘体验”等表达是否属于同一概念。 |
-| [L15_N10957](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L15_N10957/) | 物理防护与加固，例如安全屋和风暴避难所。 | 对复合词中心词的依赖，以及能否推广到屏障或盔甲。 |
-
-另一些案例暴露了更大的差距。例如，我们对 [L31_N23558](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L31_N23558/) 的解释覆盖了宽泛的关系边界，原报告则区分了两类数学表达。这些差异提示我们，需要扩大语料覆盖、设计更能区分候选解释的对照，并加强因果检验。
-
-### 2. 语义相似度不能证明解释正确
-
-两份解释可以使用相近的词语，同时对机制提出不同的判断。目录中的 1–5 分由 LLM 评估解释的语义一致程度，**不能用来衡量正确性或忠实度**。因此，我们保留具体上下文、测量、实验、干预和批评，供读者检查。
-
-### 3. 语料覆盖会改变可见的证据
-
-即使都在约 100M tokens 的规模，不同语料也会呈现不同的激活范围。L51_N20229 的原生 product 在 Common Pile 中为 **-19 至 +59**，在 Diverse 中为 **-35 至 +98**，在 Reasoning Mix 中为 **-32.75 至 +111**。这些已观测到的极值不能视为神经元的响应边界。各语料的采样和上下文处理方式也有差异，[数据文档](docs/data.md#corpora-used-in-the-comparisons)列出了具体来源与流程。
-
-仅凭 token 数量无法判断覆盖是否充分。实际检验需要同时检查正负两极，增加上下文，并在条件允许时比较其他语料。
-
-<p align="center">
-  <a href="assets/corpus-coverage.svg">
-    <img src="assets/corpus-coverage.svg" alt="不同语料中观测到的激活范围" width="90%">
-  </a>
-</p>
-
-### 4. 更广泛的科学问题仍待回答
-
-我们的初步主观感受是，部分原生神经元的解释与此前研究的 SAE 特征相当清楚，个别案例更清晰。当前样本太少，尚不足以证明普遍优势。接下来需要随机抽取神经元，在匹配条件下比较 SAE，重复运行解释流程，并加强检验表面不同的行为是否共享机制。
-
-## 查看证据 <a id="explore-the-evidence"></a><a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
+## 交互式双栏报告对比 <a id="side-by-side-interactive-comparisons"></a> <a id="explore-the-evidence"></a><a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
 
 ### 双栏案例：Colorado 神经元
+
+打开神经元链接后，左侧显示原报告，右侧显示我们的复现。滚动任意一侧会同步移动两份报告；关闭双栏后可以单独阅读复现报告。
 
 [打开交互式对比 →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/)
 
@@ -117,18 +84,6 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 每一行都可进入完整交互式报告，查看激活证据、样例、搜索、聚类、效应、测试、解释历史和开销记录。
 
-### 跟随一次完整研究
-
-[打开研究过程记录 →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)
-
-<p align="center">
-  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh">
-    <img src="assets/pipeline-walkthrough-zh.jpg" alt="Neuron Microscope 研究过程记录" width="92%">
-  </a>
-</p>
-
-这份记录展示 Colorado 神经元从已有激活证据到解释、受控实验、修订和发布的全过程，包括提示词、工具调用、测量、中间报告和最终批评。该记录使用 Diverse 100M，上面的对比案例使用 SlimPajama 100M。
-
 ## 我们检验了哪些 AlreadyClean 主张 <a id="which-alreadyclean-claims-have-we-tested"></a>
 
 原文讨论了多个层次的主张。下表区分本项目已经检查的内容与尚待回答的问题。
@@ -144,7 +99,21 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 这张表将随新证据更新。新增证据应对应具体报告、模型、语料、干预或反例。
 
-## 一次研究如何进行 <a id="how-an-investigation-works"></a><a id="workflow"></a>
+## 三阶段神经元研究流程 <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a><a id="workflow"></a>
+
+### 跟随一份完整研究记录
+
+[打开研究过程记录 →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)
+
+<p align="center">
+  <a href="https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh">
+    <img src="assets/pipeline-walkthrough-zh.jpg" alt="Neuron Microscope 研究过程记录" width="92%">
+  </a>
+</p>
+
+这份记录展示 Colorado 神经元从已有激活证据到解释、受控实验、修订和发布的全过程，包括提示词、工具调用、测量、中间报告和最终批评。该记录使用 Diverse 100M，上面的对比案例使用 SlimPajama 100M。
+
+### 从证据到报告
 
 <p align="center">
   <a href="assets/workflow.png">
@@ -156,15 +125,15 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 1. **准备证据。** 从已有激活归档中按激活区间抽取 token 位置，保留上下文，以及实测 gate、up 和 product 值。
 2. **解释与打标。** 新的 agent 容器读取目标神经元的证据，提出初步解释并定义响应分组。固定工具逐样本打标，打标时隐藏待评样本的实测响应。
-3. **实验。** 第二个 agent 设计受控替换、搜索、原生干预、RelP 归因、家族测量和盲测最大／最小响应实验。目标模型的计算由宿主机工具执行。
+3. **实验。** 第二个 agent 设计受控替换、搜索、原生干预、RelP 归因和家族测量。独立的文本生成器仅根据初步解释编写最大／最小响应测试输入，由宿主机工具执行目标模型计算并评分。
 4. **修订。** 第三个 agent 结合初步解释与实测结果，修订解释、批评、不确定性和图注。
 5. **发布。** 固定代码生成交互式报告。如果提供本地参考快照，发布工具在研究结束后加入双栏比较。
 
 公开报告默认抽取 **500 个已有位置**，按各激活区间的 log-count 柱高分配数量，再在区间内均匀抽样。Activation spectrum 与 Inside the neuron 复用这些位置及初步标签。修订后，标签仍对应初步解释。具体实现见[方法说明](docs/method.md)、[运行配置](docs/running.md)与[输入数据约定](docs/data.md)。
 
-## 如何评估解释 <a id="how-we-evaluate-an-explanation"></a>
+## 如何评估报告中的证据 <a id="evaluating-the-report-evidence"></a> <a id="how-we-evaluate-an-explanation"></a>
 
-合理的描述只是起点。Neuron Microscope 记录多类证据，供读者进一步检验解释。
+报告提供多种检验解释的方式。目录中的 1–5 分由 LLM 评估与参考解释的语义一致程度。解释是否正确、因果判断是否成立，需要结合以下实验；措辞相似本身不足以证明这些判断。
 
 | 维度 | 问题 | 报告中的证据 |
 | --- | --- | --- |
@@ -177,7 +146,36 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确立原生因果效应。具体见[测量范围](docs/method.md#relp-and-intervention-scope)。
 
-## 使用 Neuron Microscope <a id="use-neuron-microscope"></a><a id="installation-and-usage"></a><a id="quick-start"></a>
+## 当前案例中的观察 <a id="observations-from-the-current-comparisons"></a> <a id="what-we-have-found-so-far"></a><a id="key-findings"></a>
+
+### 概念相近，响应条件仍可能不同
+
+下面四个 SlimPajama 100M 案例与原报告有可辨认的共同概念。这些判断来自对个别案例的定性阅读，剩余差异仍需实验检验。
+
+| 神经元 | 两份解释的共同点 | 仍有差异的部分 |
+| --- | --- | --- |
+| [L50_N3507](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L50_N3507/) | 数学符号的角色区分了正负两极：为对象命名，或作为表达形式中的占位符。 | 具体字母、句式和干预条件。 |
+| [L52_N24188](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L52_N24188/) | 残余物与从过去留存至今的事物。 | 是预期即将出现的遗存词，还是响应词本身；较弱的负极。 |
+| [L24_N17907](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L24_N17907/) | 被描述为必要的亲身体验，例如“has to be seen”。 | 推荐语和“难忘体验”等表达是否属于同一概念。 |
+| [L15_N10957](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L15_N10957/) | 物理防护与加固，例如安全屋和风暴避难所。 | 对复合词中心词的依赖，以及能否推广到屏障或盔甲。 |
+
+另一些案例暴露了更大的差距。例如，我们对 [L31_N23558](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L31_N23558/) 的解释覆盖了宽泛的关系边界，原报告则区分了两类数学表达。这些差异提示我们，需要扩大语料覆盖、设计更能区分候选解释的对照，并加强因果检验。
+
+### 不同语料呈现不同的激活范围
+
+即使都在约 100M tokens 的规模，不同语料也会呈现不同的激活范围。L51_N20229 的原生 product 在 Common Pile 中为 **-19 至 +59**，在 Diverse 中为 **-35 至 +98**，在 Reasoning Mix 中为 **-32.75 至 +111**。这些已观测到的极值不能视为神经元的响应边界。各语料的采样和上下文处理方式也有差异，[数据文档](docs/data.md#corpora-used-in-the-comparisons)列出了具体来源与流程。
+
+相同的 token 预算仍可能覆盖不同的上下文和激活尾部。极值范围更大本身不足以证明解释更好，还需检查正负两极的具体案例和受控测试的响应。
+
+<p align="center">
+  <a href="assets/corpus-coverage.svg">
+    <img src="assets/corpus-coverage.svg" alt="不同语料中观测到的激活范围" width="90%">
+  </a>
+</p>
+
+当前报告仍有三处不确定性：采样语料是否包含相关上下文，agent 是否在评分位置看到足够的证据，以及给出的解释能否预测后续测量。需要重复运行并匹配比较条件，才能区分这些影响。
+
+## 安装与使用 <a id="use-neuron-microscope"></a><a id="installation-and-usage"></a><a id="quick-start"></a>
 
 目前可以通过以下三种方式使用项目。
 
@@ -247,7 +245,7 @@ python -m http.server 8000 --directory results/example
 
 完整配置、续跑、单独阶段、测量复用、GPU 分组、预算与发布行为，见[运行说明](docs/running.md)。
 
-## 复现记录与开销 <a id="reproducibility-and-cost"></a>
+## 实测耗时与开销 <a id="recorded-runtime-and-cost"></a> <a id="reproducibility-and-cost"></a>
 
 每次研究都会保留冻结的配置、源码快照、API 请求与响应、token 费用估算、中间交接、实验、测量、修订和最终报告。新的解释仅根据目标激活证据形成，输入中不含旧解释或官方标签。
 
@@ -291,7 +289,7 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 - [ ] 支持更多模型、层、语言和文体。
 - [ ] 将原型部署地址迁移到稳定的项目或机构域名。
 
-## 参与项目 <a id="contribute"></a>
+## 如何参与项目 <a id="how-to-contribute"></a> <a id="contribute"></a>
 
 欢迎提供支持、限定或反驳某项解释的证据。
 
@@ -306,7 +304,7 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 
 可以通过 [GitHub Issue](https://github.com/RUC-TrustworthyAI/Neuron-Microscope/issues) 提交具体的神经元 ID、上下文、实验、结果或建议。可复现的失败案例与分歧同样有价值。
 
-## 团队相关研究 <a id="related-work-from-our-group"></a><a id="related-work"></a>
+## 团队相关研究 <a id="related-research-from-our-group"></a> <a id="related-work-from-our-group"></a><a id="related-work"></a>
 
 团队相关工作涵盖特征学习、概念分析、解释评估和 LLM 安全。发表信息也可参阅[王希廷老师的学院主页](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm)。
 
@@ -317,7 +315,7 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 | **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li 等，EMNLP 2024 | 形式化概念解释，提出可读性和忠实度的度量方法。 | [论文](https://aclanthology.org/2024.emnlp-main.36/) · [代码](https://github.com/hr-jin/Concept-Explanation-Evaluation) |
 | **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng 等，arXiv 2026 | 利用 SAE 概念与因果归因，识别会削弱拒答的场景。 | [论文](https://arxiv.org/abs/2607.23496) |
 
-## 文档 <a id="documentation"></a>
+## 环境、数据与报告指南 <a id="setup-data-and-report-guides"></a> <a id="documentation"></a>
 
 | 指南 | 用途 |
 | --- | --- |

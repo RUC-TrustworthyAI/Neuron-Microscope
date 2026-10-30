@@ -141,6 +141,8 @@
     const win = frames[index].contentWindow, y = win.scrollY;
     if (expected[index] !== null && Math.abs(y-expected[index]) < 2) { expected[index] = null; return; }
     expected[index] = null;
+    // A new user scroll takes precedence over a queued update from the other pane.
+    cancelAnimationFrame(syncFrames[1-index]);
     cancelAnimationFrame(syncFrames[index]);
     syncFrames[index] = requestAnimationFrame(() => {
       const other = 1-index;
@@ -225,14 +227,20 @@
     shell.dataset.ready='true';
   }
   function loadFrames() {
-    let loaded=0;
+    const loaded = [false, false];
     [reference,location.href].forEach((url,index) => {
       const frame = make('iframe', {title:index===0?'Published report \u00b7 '+neuron:'Replication report \u00b7 '+neuron, src:url});
-      frames[index]=frame;panes[index].prepend(frame);
+      frames[index]=frame;
       frame.addEventListener('load',()=>{
+        const doc = frame.contentDocument;
+        // Hosted reports first load a small gzip loader, then replace its document.
+        // Bind to the completed report, not the loader's first load event.
+        if (loaded[index] || !doc?.getElementById('head') || !doc.getElementById('main')) return;
+        loaded[index]=true;
         panes[index].classList.add('np-compare-loaded');
-        if (++loaded===2) connect();
-      },{once:true});
+        if (loaded.every(Boolean)) connect();
+      });
+      panes[index].prepend(frame);
     });
   }
   function show() {
@@ -275,4 +283,8 @@
     if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();resizeAt(Number(divider.getAttribute('aria-valuenow'))+(event.key==='ArrowLeft'?-2:2));}
     if(event.key==='Home'){event.preventDefault();resizeAt(50);}
   });
+  if (new URLSearchParams(location.search).get('compare') !== '0') {
+    if (document.readyState === 'complete') show();
+    else window.addEventListener('load',show,{once:true});
+  }
 })();
