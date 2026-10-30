@@ -19,45 +19,69 @@
 
 <p align="center">
   <a href="#overview">📖 Overview</a> ·
-  <a href="#reports-and-walkthrough">▶ Reports &amp; Walkthrough</a> ·
-  <a href="#key-findings">🧪 Key Findings</a> ·
-  <a href="#workflow">⚗️ How It Works</a> ·
+  <a href="#reports-and-walkthrough">▶ Explore the Results</a> ·
+  <a href="#key-findings">🧪 Findings &amp; Lessons</a> ·
+  <a href="#next-steps">🤝 Next Steps</a> ·
+  <a href="#related-work">📑 Our Related Work</a> ·
   <a href="#installation-and-usage">🚀 Installation &amp; Usage</a> ·
   <a href="#documentation">📚 Documentation</a>
 </p>
 
 ## 📖 Overview <a id="overview"></a>
 
-We reproduce the main neuron analysis and report-generation features of [AlreadyClean](https://already-clean.goodfire.com/) and independently investigate whether the original blog's findings can be reproduced. Our experiments show **[KEY FINDINGS]** and lead us to **[REPRODUCTION CONCLUSIONS]**. The supporting experiments and analysis are presented in [Key Findings](#key-findings).
+We reproduce the main neuron analysis and report-generation features of [AlreadyClean](https://already-clean.goodfire.com/) and independently investigate whether the original blog's findings can be reproduced.
 
-We also open-source the complete three-stage pipeline for investigating native MLP neurons in dense Qwen3 models. It covers evidence preparation, initial interpretation, experiment design and execution, explanation revision, and interactive HTML reporting. We add **[ADDITIONAL FEATURES]** for the community to use and build on.
+Our investigations focus on native MLP neurons in **Qwen3-32B**. We share three parts of the work:
 
-Next, we plan to **[FUTURE PLANS]**. We welcome test results and feedback to help improve the neuron interpretation workflow together.
+- **Activation evidence:** sampled contexts and measured gate, up, and product values in the reports, with [data formats and reading tools](docs/data.md). Full activation archives do not yet have a public download.
+- **The explanation pipeline and tools:** [three agent skills](skills/README.md) for interpreting evidence, designing experiments, and revising explanations, backed by [measurement and reporting tools](docs/method.md).
+- **Interactive visualization:** [neuron reports](https://neuron-microscope-papers.tangysiren10.chatgpt.site/) that put our results beside AlreadyClean's published reports, and a [recorded pipeline walkthrough](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en).
 
-## ▶ Reports & Walkthrough <a id="reports-and-walkthrough"></a><a id="live-demo"></a>
+We want readers to inspect the evidence, reproduce the process, and help establish how much of a neuron's behavior we can explain. Sharing successful tests, counterexamples, and practical difficulties should make it easier to improve these explanations together.
 
-**[Browse neuron reports →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)** · **[Explore the pipeline walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)**
+## ▶ Explore the Results <a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
 
-Browse interactive neuron reports, with side-by-side reference comparisons where available. The bilingual walkthrough follows a recorded Colorado neuron investigation through evidence preparation and all three agent stages, including prompt examples, measured experiments and saved reports. Both websites are publicly accessible.
+### 1. Compare one neuron with the original report
 
-[![Preview of the Neuron Microscope walkthrough](assets/live-demo-en-hd.png)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
+**[Open the Colorado comparison →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/)**
 
-See [the demo guide](docs/live-demo.md) for local preview and recording details.
+Select **Compare reports** to open the two panes. The original report is on the **left**, and our independent reproduction is on the **right**. Both identify a strong Colorado-related positive response. In our SlimPajama 100M run, replacing the place in a fixed sentence gives **+22.0 to +43.3** at the following token for four Colorado cities, while the six other cities stay at **+4.75 or below**.
 
-## 🧪 Key Findings <a id="key-findings"></a><a id="reproduction-results"></a>
+The agreement is partial: the original explains a gate that opens before a place-specific fill-in value, while our report gives a broader place-and-local-news account. The negative pole remains less clearly explained. The comparison lets readers examine that difference through contexts, controlled tests, and interventions.
 
-**[Browse reproduction reports →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)**
+[![Colorado neuron: original report on the left and reproduction on the right](assets/colorado-comparison.jpg)](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/)
 
-Compare each reproduction with its original neuron paper. The directory lists both interpretations and a 1–5 semantic similarity score.
+### 2. Browse the growing set of neuron comparisons
 
-[MAIN COMPARISON FIGURES: ORIGINAL BLOG VS. OUR REPRODUCTION]
+**[Browse neuron reports →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)**
 
-- **Findings:** [KEY FINDINGS AND SUPPORTING EXPERIMENTS]
-- **Reproduction conclusions:** [WHICH ORIGINAL FINDINGS WERE REPRODUCED, PARTIALLY REPRODUCED, OR NOT REPRODUCED]
+The current SlimPajama 100M comparison set contains **10 neurons**, with further investigations planned. Each directory row links to the full side-by-side report and lists both interpretations. The 1–5 score is an **LLM assessment of semantic similarity**; the experiments in each report provide the evidence for its claims.
 
-## ⚗️ How It Works <a id="workflow"></a>
+Our preliminary reading finds close agreement on the core concept in these four cases, with remaining differences worth testing:
+
+| Neuron | Shared interpretation | What still differs |
+|---|---|---|
+| [L50_N3507](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L50_N3507/) | A mathematical symbol's role separates the two poles: naming an object versus occupying an expression form. | Exact letter, construction, and steering conditions. |
+| [L52_N24188](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L52_N24188/) | Remnants and things surviving from the past. | Anticipating a remnant word versus responding to the word itself; the weak negative pole. |
+| [L24_N17907](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L24_N17907/) | Firsthand experience presented as necessary, such as “has to be seen.” | How broadly recommendations and unforgettable-experience phrases belong to the concept. |
+| [L15_N10957](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L15_N10957/) | Physical protection and fortification, including safe rooms and storm shelters. | Compound-head specificity and generalization to barriers or armor. |
+
+Other cases expose larger gaps. For example, [L31_N23558](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L31_N23558/) receives a broad relational-boundary explanation in our run, whereas the original distinguishes two mathematical frames. These cases motivate better corpus coverage and more discriminating experiments.
+
+[![Directory of SlimPajama 100M neuron comparisons and explanation similarity scores](assets/report-directory.jpg)](https://neuron-microscope-papers.tangysiren10.chatgpt.site/)
+
+### 3. Follow a complete investigation <a id="workflow"></a>
+
+**[Explore the pipeline walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)**
+
+Follow a recorded Colorado investigation from the activation evidence through the three agent stages: **interpret → experiment → revise**. The walkthrough shows the prompts, tools, measured experiments, and final report, so readers can trace how the explanation was reached. This recording uses Diverse 100M; the comparison above uses SlimPajama 100M.
+
+[![Recorded Neuron Microscope pipeline walkthrough](assets/pipeline-walkthrough-en.jpg)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
 
 ![Three research agents interpret activation evidence, run experiments on Qwen3-32B, and revise the neuron report](assets/workflow.png)
+
+<details>
+<summary><strong>How the investigation runs</strong></summary>
 
 1. **Prepare evidence.** Sample token positions across activation intervals from the saved archive and retain their contexts and measured gate, up, and product values. Sampling parameters are set in `settings.json`.
 2. **Interpret and label.** A fresh agent container loads `skills/interpret/` and reads the target neuron's initial HTML and structured evidence. It writes an initial explanation and response rules: up to three positive groups, up to three negative groups, and one No visible cue group. Fixed tools then use those rules to label individual contexts without revealing their measured responses. The labels are joined to the measurements for visualization and revision; shared positions reuse the same label across Activation spectrum and Inside the neuron.
@@ -67,9 +91,72 @@ Compare each reproduction with its original neuron paper. The directory lists bo
 
 The published reports use a 500-position sampling configuration. The repository default is currently up to 256 scan points; use the configuration saved with a report when reproducing it.
 
-Each agent runs in a separate container with one skill. Host tools handle paths, GPU allocation, accounting, and HTML generation. The default research agent is `deepseek-v4.1-flash-1017` with `reasoning_effort: high`.
+Each agent runs in a separate container with one skill. Host tools handle paths, GPU allocation, accounting, and HTML generation. The recorded investigations use `deepseek-v4.1-flash-1017` with `reasoning_effort: high`.
 
 **Semantic Clusters** group measured examples by meaning. Raw NMF routes describe attribution patterns, and a semantic cluster may span several routes. Counts, attribution-mass shares and upstream summaries are computed from the measured members.
+
+</details>
+
+## 🧪 Findings & Practical Lessons <a id="key-findings"></a>
+
+### Cost: what one investigation required
+
+The following example is the **Colorado / Diverse 100M run recorded in the walkthrough on 29 October 2026**. Its [final report](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/reports/04-published.html#interpretation-costs) contains the underlying cost breakdown.
+
+| Setting | Recorded configuration |
+|---|---|
+| Target model | Qwen3-32B |
+| Research and auxiliary LLM calls | deepseek-v4.1-flash-1017, reasoning effort `high` |
+| GPU experiment group | 4 × NVIDIA A100 40 GB |
+| Saved evidence | Diverse 100M; 500 sampled positions, 495 labeled positions plotted |
+
+| Step | GPU experiment time | API streaming time | Stage execution time | API estimate |
+|---|---:|---:|---:|---:|
+| Prepare saved evidence | 0 s | 0 s | 6 s | $0.0000 |
+| Interpret and label | 0 s | 6 min 09 s | 11 min 46 s | $0.1567 |
+| Design and measure experiments | 10 min 48 s | 5 min 38 s | 18 min 43 s | $0.1325 |
+| Revise and review | 0 s | 5 min 36 s | 7 min 03 s | $0.1980 |
+| Render the report | 0 s | 0 s | 23 s | $0.0000 |
+| **Total** | **10 min 48 s** | **17 min 22 s** | **38 min 00 s** | **$0.4871** |
+
+The elapsed time from start to finish was **1 h 59 min 25 s**, including **1 h 21 min 25 s of gaps between recorded stages**. GPU time includes model loading and is expressed as four-GPU equivalent time. API streams and other work can overlap, so GPU and API times do not add up to execution time. Displayed durations and fees are rounded independently. Costs use the run's configured token prices, exclude the earlier activation collection, and are API estimates; this is one measured case, not a per-neuron average.
+
+The experimental stage accounts for the GPU work, while interpretation, labeling, and revision also consume LLM calls and CPU time. For batches, parallel interpretation and revision can overlap with experiments, while a GPU lock lets only one experiment stage use each GPU group at a time.
+
+### Corpus coverage changes the evidence
+
+At approximately the same **100M-token** scale, different corpora expose different activation ranges. For **L51_N20229**, the recorded native product spans **−19 to +59** in Common Pile, **−35 to +98** in Diverse, and **−32.75 to +111** in Reasoning Mix. The figure includes SlimPajama and FineWeb as well.
+
+![Observed minimum and maximum native activation for L51_N20229 across five approximately 100M-token corpora](assets/corpus-coverage.svg)
+
+These are observed extrema, not bounds on what the neuron can do. A larger range alone does not establish a better explanation. The practical lesson is to inspect the text at both poles and test the proposed rule on additional contexts; token count alone does not establish coverage.
+
+### Three sources of uncertainty to investigate
+
+1. **Does the corpus elicit the behavior?** A corpus may contain too few examples of a particular language, genre, or construction. Compare coverage and both activation tails before concluding that a neuron is difficult to interpret.
+2. **Does the agent see the evidence clearly?** Prefix length, scoring position, token coloring, and sample selection affect what can be inferred. Retain the measured context and use the same labeled positions across plots so readers can trace a judgment back to its evidence.
+3. **Can the agent form and test the right explanation?** A broad topic can fit examples while missing the trigger. The Colorado comparison illustrates this gap. Controlled replacements, counterexamples, and blind text tests help separate competing accounts, and repeated runs are needed to measure explanation stability.
+
+**Superposition and recursive generalization.** Our initial qualitative impression is that some native-neuron explanations are as clear as, or clearer than, SAE features we have studied. The small set examined so far does not establish a general advantage. We still need matched SAE comparisons and tests of whether apparently different behaviors share a mechanism before drawing conclusions about superposition or recursive generalization.
+
+## 🤝 Next Steps & Collaboration <a id="next-steps"></a>
+
+We welcome contributions in three directions:
+
+- **Data:** broaden language and genre coverage, share difficult contexts, and prepare reusable activation datasets with clear provenance and redistribution terms.
+- **Explanation and training:** improve explanation methods and investigate how training affects the features that emerge, using measurements and counterexamples to judge progress.
+- **Pipeline uncertainty:** measure the effects of sampling, evidence presentation, prompts, and repeated agent runs, then address the sources that matter most.
+
+Please share a concrete example, experiment, or proposal through [GitHub Issues](https://github.com/RUC-TrustworthyAI/Neuron-Microscope/issues). A neuron ID, the tested context, and the observed behavior help others reproduce and investigate it.
+
+## 📑 Our Related Work <a id="related-work"></a>
+
+Our team's related work spans feature learning, concept-based analysis, explanation evaluation, and interpretable forecasting. Publication details are also listed on [Xiting Wang's faculty page](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm).
+
+- **C²R: Cross-sample Consistency Regularization Mitigates Feature Splitting and Absorption in Sparse Autoencoders** — Haoran Jin et al., **ICML 2026**. Encourages consistent latent assignments across samples to reduce feature splitting and absorption in SAEs. [Paper](https://arxiv.org/abs/2606.30609) · [Code](https://github.com/hr-jin/Cross-sample-Consistency-Regularization).
+- **Uncovering Safety Risks of Large Language Models through Concept Activation Vector** — Zhihao Xu et al., **NeurIPS 2024**. Uses safety concept activation vectors to investigate model safety mechanisms and their vulnerabilities. [Paper](https://arxiv.org/abs/2404.12038) · [Code](https://github.com/SproutNan/AI-Safety_SCAV).
+- **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li et al., **EMNLP 2024**. Formalizes concept-based explanations and develops measures of readability and faithfulness, together with a method for evaluating those measures. [Paper](https://aclanthology.org/2024.emnlp-main.36/) · [Code](https://github.com/hr-jin/Concept-Explanation-Evaluation).
+- **ProtoTS: Learning Hierarchical Prototypes for Explainable Time Series Forecasting** — Ziheng Peng et al., **ICLR 2026**. Organizes temporal prototypes hierarchically to explain global patterns and local variations in forecasts. [Paper](https://arxiv.org/abs/2509.23159) · [Code](https://github.com/SKURA502/ProtoTS).
 
 ## 🚀 Installation & Usage <a id="installation-and-usage"></a><a id="quick-start"></a>
 
@@ -123,7 +210,7 @@ Edit `settings.local.json` to point to your inputs:
 }
 ```
 
-This is an excerpt: keep the other settings in the copied file. Relative paths resolve against that file's directory. The report directory contains `Lx_Ny/` packages; reference snapshots, when used, are named `Lx_Ny.html`.
+This is an excerpt: keep the other settings in the copied file. To match the recorded investigations, set `llm.model` to `deepseek-v4.1-flash-1017` and `llm.reasoning_effort` to `high` for an endpoint that provides this model. Relative paths resolve against that file's directory. The report directory contains `Lx_Ny/` packages; reference snapshots, when used, are named `Lx_Ny.html`.
 
 Supply `DEEPSEEK_API_KEY` through your host environment, or set `NEURON_PAPER_API_KEY_FILE` to a local credential file. Do not put credentials in settings. The agent receives a temporary credential for the host API meter, not the upstream key.
 
