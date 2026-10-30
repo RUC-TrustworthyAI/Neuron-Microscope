@@ -3,7 +3,7 @@
 Read the incoming explanation, saved evidence and /control/settings.json.
 
 1. Identify competing accounts for the observed positive and negative responses. Read complete observed prefixes. Following text is a prediction target.
-2. Define the complete semantic-group catalog from those contexts and submit it together using the full label_spectrum JSON example. A fresh call processes all unique saved report positions; one group is not a small trial. See the API reference for exact-match reuse and resume_from semantics.
+2. Read the incoming response predictions and their frozen rules with scripts/read_evidence.py --section response_predictions. Activation spectrum and Inside the neuron share these saved labels. Use their disagreements with measurements to design tests.
 3. Use the configured search rounds. In the first round, submit controlled hypotheses with explicit scored locations. Read the resulting measurements. In the next round, choose strong counterexamples and matched alternatives that distinguish the surviving accounts.
 4. Reuse prior completed conditions. The host registers new conditions and runs their full-prefix ablations and background RelP automatically.
 5. Choose positive and negative illustrated graphs from the evidence; include an output-logit root where useful. These receive the configured multi-hop graph calculation.

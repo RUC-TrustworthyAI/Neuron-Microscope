@@ -188,6 +188,8 @@ def run(request,output):
     output, report = Path(output), Path(request['report']).resolve()
     source = (report/'index.html').read_text()
     data = read(report/'report.json')
+    from spectrum_sampling import register_contexts
+    register_contexts(data, request.get('sections', []))
     identity = data['identity']
     neuron = {'layer':identity['layer'],'index':identity['neuron']}
     path,config = model_config(request['model'],neuron)
@@ -335,7 +337,8 @@ def run(request,output):
     (output/'index.html').write_text(page)
     write(output/'paper-data.json',{'bundle':bundle})
     # Keep the original local ancillary data for relative links, without copying previous interpretation outputs.
-    for name in ['report.json','dataset-index.json','token-rankings.json','effects.json',
+    write(output/'report.json',data)
+    for name in ['dataset-index.json','token-rankings.json','effects.json',
                  'peak-census.json','peak-census-negative.json','peak-census-absolute.json',
                  'anatomy-scan-evidence.json']:
         if (report/name).is_file():

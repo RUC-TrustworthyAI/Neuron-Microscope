@@ -39,11 +39,11 @@ def prepare_batch(root):
     batch=Path(root)/'batch'
     env={**os.environ,'NEURON_MICROSCOPE_ROOT':str(root),'NEURON_PAPER_PYTHON':sys.executable}
     subprocess.run([str(BASE/'run.sh'),'prepare','--output',str(batch),'--neurons','L3_N7'],env=env,check=True,capture_output=True)
-    manifest=read(batch/'manifest.json');manifest['settings']['anatomy_scan']['enabled']=False
+    manifest=read(batch/'manifest.json');manifest['settings']['spectrum_sampling']['enabled']=False
     write(batch/'manifest.json',manifest)
     for stage,skill in STAGES:
         path=batch/'units/L3_N7'/stage/'host-session.json'
-        cfg=read(path);cfg['settings']['anatomy_scan']['enabled']=False;write(path,cfg)
+        cfg=read(path);cfg['settings']['spectrum_sampling']['enabled']=False;write(path,cfg)
     return batch
 
 

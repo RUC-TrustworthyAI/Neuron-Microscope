@@ -56,12 +56,6 @@
     "max_written_tokens": 512
   },
   "route_prediction": false,
-  "anatomy_scan": {
-    "enabled": true,
-    "label_batch_size": 32,
-    "candidates_per_bin": 40,
-    "total_points": 256
-  },
   "paths": {
     "reports": "data/reports",
     "activations": "data/activations",
@@ -72,7 +66,7 @@
   "execution": {
     "image": "neuron-microscope:local",
     "agent_wall_seconds": 10800,
-    "start_next_after": "02-experiments"
+    "start_next_after": ""
   },
   "llm": {
     "provider": "deepseek-official",
@@ -107,5 +101,9 @@
     ],
     "source": "https://api-docs.deepseek.com/quick_start/pricing/",
     "note": "Configure token prices for your API endpoint. Costs are estimates, not account invoices."
+  },
+  "spectrum_sampling": {
+    "total_points": 500,
+    "label_batch_size": 256
   }
 }

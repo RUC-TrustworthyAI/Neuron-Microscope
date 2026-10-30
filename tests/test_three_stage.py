@@ -2,6 +2,7 @@
 import json
 import os
 import subprocess
+import shutil
 import sys
 import tempfile
 import unittest
@@ -49,12 +50,95 @@ class ThreeStageTests(unittest.TestCase):
         batch=prepare_batch(Path(tmp));driver=Path(tmp)/'fake_stage.py';driver.write_text(DRIVER)
         command=r'''source "$1"
 launch_stage() { "$TASK_PYTHON" "$TEST_DRIVER" "$TEST_BASE" "$1" "$3" "$5" "$TEST_MODE"; }
+STAGE2_LOCK="$TEST_BATCH/stage2.lock"
 execute_unit "$TEST_BATCH" L3_N7
 '''
         env={**os.environ,'NEURON_MICROSCOPE_ROOT':tmp,'NEURON_PAPER_PYTHON':sys.executable,
              'TEST_DRIVER':str(driver),'TEST_BASE':str(BASE),'TEST_MODE':mode,'TEST_BATCH':str(batch)}
         result=subprocess.run(['bash','-c',command,'test',str(BASE/'run.sh')],env=env,capture_output=True,text=True)
         return batch,result
+
+    @unittest.skipUnless(sys.platform.startswith('linux') and shutil.which('flock'), 'Linux stage lock')
+    def test_stage2_lock_keeps_whole_stages_serial_and_other_stages_parallel(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            for unit in ('A','B'):
+                for stage,_ in STAGES:(root/'units'/unit/stage).mkdir(parents=True)
+            driver=root/'stage.py'
+            driver.write_text("""import fcntl,json,pathlib,sys,time
+root,unit,stage=sys.argv[1:];root=pathlib.Path(root)
+def log(event):
+ with (root/'events.jsonl').open('a') as f:
+  fcntl.flock(f,fcntl.LOCK_EX);f.write(json.dumps([unit,stage,event])+'\\n')
+log('start');(root/(unit+'-'+stage+'-start')).touch()
+if stage=='01-interpretation':
+ deadline=time.monotonic()+5
+ while not all((root/(u+'-'+stage+'-start')).exists() for u in ('A','B')):
+  if time.monotonic()>deadline:raise RuntimeError('Interpretations did not overlap')
+  time.sleep(.01)
+elif stage=='02-experiments':time.sleep(.15)
+else:
+ deadline=time.monotonic()+5
+ while not all((root/(u+'-02-experiments-start')).exists() for u in ('A','B')):
+  if time.monotonic()>deadline:raise RuntimeError('Revision retained the experiment lock')
+  time.sleep(.01)
+log('end')
+""")
+            command=r'''source "$1"
+STAGE2_LOCK="$2/stage2.lock"
+files() { :; }
+launch_stage() { "$TASK_PYTHON" "$TEST_DRIVER" "$TEST_ROOT" "$2" "$3"; }
+execute_unit "$2" A &
+a=$!
+execute_unit "$2" B &
+b=$!
+wait "$a"
+wait "$b"
+'''
+            env={**os.environ,'NEURON_PAPER_PYTHON':sys.executable,
+                 'TEST_DRIVER':str(driver),'TEST_ROOT':tmp}
+            result=subprocess.run(['bash','-c',command,'test',str(BASE/'run.sh'),tmp],
+                                  env=env,capture_output=True,text=True,timeout=20)
+            self.assertEqual(result.returncode,0,result.stderr)
+            events=[json.loads(line) for line in (root/'events.jsonl').read_text().splitlines()]
+            stages=[row for row in events if row[1]=='02-experiments']
+            self.assertEqual([row[2] for row in stages],['start','end','start','end'])
+            self.assertEqual(stages[0][0],stages[1][0])
+            self.assertNotEqual(stages[0][0],stages[2][0])
+            self.assertEqual([row[2] for row in events if row[1]=='01-interpretation'][:2],['start','start'])
+
+    @unittest.skipUnless(sys.platform.startswith('linux') and shutil.which('flock'), 'Linux stage lock')
+    def test_cancelling_unit_waits_for_stage_cleanup_before_unlocking(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp);(root/'units/A/02-experiments').mkdir(parents=True)
+            command=r'''source "$1"
+STAGES=(02-experiments:experiment)
+STAGE2_LOCK="$2/stage2.lock"
+files() { :; }
+launch_stage() {
+    child=''
+    cleanup() { kill "$child" 2>/dev/null || true; wait "$child" 2>/dev/null || true; touch "$TEST_ROOT/cleaned"; }
+    trap cleanup EXIT
+    trap 'exit 143' TERM
+    sleep 20 &
+    child=$!
+    touch "$TEST_ROOT/ready"
+    wait "$child"
+    exit 0
+}
+execute_unit "$2" A &
+unit_pid=$!
+for ((i=0;i<100;i++)); do [[ -f "$2/ready" ]] && break; sleep .02; done
+[[ -f "$2/ready" ]]
+kill "$unit_pid"
+wait "$unit_pid" || [[ "$?" == 143 ]]
+[[ -f "$2/cleaned" ]]
+flock -n "$STAGE2_LOCK" true
+'''
+            env={**os.environ,'TEST_ROOT':tmp,'NEURON_PAPER_PYTHON':sys.executable}
+            result=subprocess.run(['bash','-c',command,'test',str(BASE/'run.sh'),tmp],
+                                  env=env,capture_output=True,text=True,timeout=10)
+            self.assertEqual(result.returncode,0,result.stderr)
 
     def test_serial_handoff_json_html_and_measurements(self):
         with tempfile.TemporaryDirectory() as tmp:

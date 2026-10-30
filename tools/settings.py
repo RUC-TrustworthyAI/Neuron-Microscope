@@ -9,6 +9,9 @@ PATH = Path(__file__).resolve().parents[1] / 'settings.json'
 def load():
     path = Path(os.environ.get('NEURON_MICROSCOPE_SETTINGS', PATH)).resolve()
     config = json.loads(path.read_text())
+    groups = os.environ.get('NEURON_PAPER_GPU_GROUPS')
+    if groups:
+        config['gpu_groups'] = json.loads(groups)
     return config
 
 def paths(config):

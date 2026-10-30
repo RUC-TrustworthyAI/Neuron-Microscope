@@ -2,7 +2,7 @@
 
 `neuron-microscope.svg` / `neuron-microscope.png` contain the project banner. `badges/*.svg` are the README navigation badges.
 
-`workflow.png` illustrates the three-agent research workflow using the Colorado neuron: interpreting evidence, running experiments on Qwen3-32B, and revising the report.
+`workflow.png` is a schematic of the three-agent research workflow using the Colorado neuron. Its numerical labels are illustrative. The linked reports and recorded walkthrough supply measured results together with their input templates and scoring positions.
 
 `report-anatomy.svg` / `report-anatomy.png` show the **Inside the neuron** plot for Qwen3-32B L1/N20535. The plot illustrates the report format using selected measured positions.
 

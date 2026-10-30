@@ -173,7 +173,7 @@ To read the current group definitions and counts:
 python scripts/label_spectrum.py --input /workspace/request.json
 ```
 
-The tool returns groups, n_requested, explanation_version, reused, llm_requests and new_model_forwards. It reuses the incoming predictions. Do not submit a new topic taxonomy during this stage. At completion the host predicts new measured contexts under the same explanation, reusing unchanged inputs.
+The tool returns groups, n_requested, explanation_version, reused, llm_requests and new_model_forwards. It reuses the incoming predictions. Do not submit a new topic taxonomy during this stage. Both plots retain the incoming corpus sample and its predictions throughout this stage.
 
 Every spectrum point keeps its observed activation and bin. Colour follows the predicted response group: positive, negative or uncertain. Opposite-sign members are retained as counterexamples. The scatter and spectrum share one prediction for an identical observed prefix and anchor. Full API records are saved by the tools.
 

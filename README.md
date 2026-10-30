@@ -45,7 +45,7 @@ We want readers to inspect the evidence, reproduce the process, and help establi
 
 **[Open the Colorado comparison →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/)**
 
-Select **Compare reports** to open the two panes. The original report is on the **left**, and our independent reproduction is on the **right**. Both identify a strong Colorado-related positive response. In our SlimPajama 100M run, replacing the place in a fixed sentence gives **+22.0 to +43.3** at the following token for four Colorado cities, while the six other cities stay at **+4.75 or below**.
+Select **Compare reports** to open the two panes. The original report is on the **left**, and our independent reproduction is on the **right**. Both identify a strong Colorado-related positive response. In our SlimPajama 100M run, using `Officials in {city} approved the annual budget this week.` and scoring the single token ` approved` gives **+22.0 to +43.3** for four Colorado cities, while the six other cities stay at **+4.75 or below**.
 
 The agreement is partial: the original explains a gate that opens before a place-specific fill-in value, while our report gives a broader place-and-local-news account. The negative pole remains less clearly explained. The comparison lets readers examine that difference through contexts, controlled tests, and interventions.
 
@@ -74,11 +74,13 @@ Other cases expose larger gaps. For example, [L31_N23558](https://neuron-microsc
 
 **[Explore the pipeline walkthrough →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)**
 
-Follow a recorded Colorado investigation from the activation evidence through the three agent stages: **interpret → experiment → revise**. The walkthrough shows the prompts, tools, measured experiments, and final report, so readers can trace how the explanation was reached. This recording uses Diverse 100M; the comparison above uses SlimPajama 100M.
+Follow a recorded Colorado investigation from the activation evidence through the three agent stages: **interpret → experiment → revise**. The walkthrough shows the prompts, tools, measured experiments, and final report, so readers can trace how the explanation was reached. This recording uses [Diverse 100M](docs/data.md#corpora-used-in-the-comparisons); the comparison above uses SlimPajama 100M.
 
 [![Recorded Neuron Microscope pipeline walkthrough](assets/pipeline-walkthrough-en.jpg)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=en)
 
 ![Three research agents interpret activation evidence, run experiments on Qwen3-32B, and revise the neuron report](assets/workflow.png)
+
+*Workflow schematic with illustrative numbers. For measured values, input templates and scoring positions, open the linked reports and walkthrough.*
 
 <details>
 <summary><strong>How the investigation runs</strong></summary>
@@ -89,7 +91,7 @@ Follow a recorded Colorado investigation from the activation evidence through th
 4. **Revise.** A fresh container loads `skills/revise/`, reviews the experiments and the initial labels alongside measured responses, and revises the explanation, Criticism, and captions. Fixed code assembles the report and cost records.
 5. **Publish.** Export the generated report. If a local reference snapshot is available, publication adds a collapsible side-by-side comparison with aligned sections and linked scrolling. Reference content is added only at publication; it is not given to the research agents.
 
-The published reports use a 500-position sampling configuration. The repository default is currently up to 256 scan points; use the configuration saved with a report when reproducing it.
+The default matches the published sampling procedure: 500 saved positions, allocated across activation bins in proportion to their log-count heights, with uniform sampling within each bin. Both plots use this same pool and its initial labels. Labeling uses two concurrent batches of up to 256; missing answers are requested again until fewer than 16 points remain, and only labeled points are plotted. See the [run configuration](docs/running.md#reproduce-the-published-sampling-and-scheduling) and [corpus sources](docs/data.md#corpora-used-in-the-comparisons).
 
 Each agent runs in a separate container with one skill. Host tools handle paths, GPU allocation, accounting, and HTML generation. The recorded investigations use `deepseek-v4.1-flash-1017` with `reasoning_effort: high`.
 
@@ -125,7 +127,7 @@ The experimental stage accounts for the GPU work, while interpretation, labeling
 
 ### Corpus coverage changes the evidence
 
-At approximately the same **100M-token** scale, different corpora expose different activation ranges. For **L51_N20229**, the recorded native product spans **−19 to +59** in Common Pile, **−35 to +98** in Diverse, and **−32.75 to +111** in Reasoning Mix. The figure includes SlimPajama and FineWeb as well.
+At approximately the same **100M-token** scale, different corpora expose different activation ranges. For **L51_N20229**, the recorded native product spans **−19 to +59** in Common Pile, **−35 to +98** in Diverse, and **−32.75 to +111** in Reasoning Mix. The figure includes SlimPajama and FineWeb as well. [Corpus sources, sampling and the Diverse mixture](docs/data.md#corpora-used-in-the-comparisons) define these names and token counts.
 
 ![Observed minimum and maximum native activation for L51_N20229 across five approximately 100M-token corpora](assets/corpus-coverage.svg)
 
@@ -237,7 +239,7 @@ The measured input prefix and scoring position remain unchanged.
 
 The budget applies to all API calls in that batch and stays in host accounting. The default is USD 2; set `NEURON_PAPER_BUDGET_USD=unlimited` explicitly for no cap. Configure the token prices in settings for your API endpoint. They are not account invoices.
 
-For a batch, list several neurons after `--neurons`. By default, the next neuron starts after the previous experiment stage has completed; revision may overlap the next interpretation. `gpu_groups` can list independent GPU groups. See [continuation, isolated stages, and saved-measurement reuse](docs/running.md#start-continue-and-publish).
+For a batch, list several neurons after `--neurons`. By default, interpretation and revision run concurrently across neurons. A stage-level lock serializes the complete experiment stage for the configured GPU group. To use independent groups in parallel, prepare one batch per group with a shared `paths.state`; see the [two-group configuration](docs/running.md#reproduce-the-published-sampling-and-scheduling). See [continuation, isolated stages, and saved-measurement reuse](docs/running.md#start-continue-and-publish).
 
 ### 4. Inspect outputs
 

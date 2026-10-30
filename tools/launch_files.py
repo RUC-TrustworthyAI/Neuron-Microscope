@@ -21,6 +21,9 @@ def make_batch(output,stages,units):
         else:shutil.copy2(source,snapshot/name)
     config=load();resolved=paths(config)
     write(snapshot/'settings.json',config)
+    devices=sorted({device for group in config['gpu_groups'] for device in group})
+    stage2_lock=os.environ.get('NEURON_PAPER_STAGE2_LOCK') or str(
+        Path(resolved['state'])/'gpu-locks'/('stage2-'+'-'.join(map(str,devices))+'.lock'))
     (output/'logs/api').mkdir(parents=True)
     (output/'units.txt').write_text(''.join(u+'\n' for u in units))
     budget=os.environ.get('NEURON_PAPER_BUDGET_USD','2')
@@ -28,7 +31,8 @@ def make_batch(output,stages,units):
     write(output/'manifest.json',{'created_at':now(),'units':units,
           'stages':[s.split(':') for s in stages.split()],
           'settings':config,'paths':resolved,'gpu_pairs':config['gpu_groups'],
-          'start_next_after':os.environ.get('NEURON_PAPER_START_NEXT_AFTER',config.get('execution',{}).get('start_next_after','02-experiments')),'budget_usd':budget,'existing_only':bool(os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS')),
+          'start_next_after':os.environ.get('NEURON_PAPER_START_NEXT_AFTER',config.get('execution',{}).get('start_next_after','')),'budget_usd':budget,'existing_only':bool(os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS')),
+          'stage2_lock':stage2_lock,
           'reuse_measurements':os.environ.get('NEURON_PAPER_EXISTING_MEASUREMENTS') or None,
           'reuse_completed_experiments':bool(os.environ.get('NEURON_PAPER_REUSE_COMPLETED')),
           'image':config.get('execution',{}).get('image','neuron-microscope:local'),
@@ -75,7 +79,7 @@ def make_stage(batch,unit,stage,skill):
             task+=' Use only the supplied measurements and newly labelled spectrum; no new experiments.'
             if cfg['reuse_completed_experiments']:
                 task+=' The handoff includes reused measured GPU experiments and blind predictions from the current initial explanation. Use each experiment\'s recorded method and scoring position. Independent text tests retain the explanation version they originally tested.'
-    (step/'control/task.txt').write_text(task+' Use the skill at /skills/'+skill+'/SKILL.md.\n')
+    (step/'control/task.txt').write_text(task+' Use the skill at /skills/'+skill+'/SKILL.md. The container has an 8 GiB memory limit.\n')
     entry='reuse_saved.py' if stage=='02-experiments' and cfg['reuse_completed_experiments'] else 'agent.py'
     shutil.copy2(batch/'framework-source/tools'/entry,step/'control/agent.py')
     shutil.copy2(batch/'framework-source/tools/output-policy.yml',step/'control/output-policy.yml')
@@ -134,6 +138,7 @@ def stage_input(folder):
     target.mkdir(parents=True,exist_ok=True)
     for name in INITIAL_DATA_FILES:
         if (source/name).is_file():shutil.copyfile(source/name,target/name)
+        elif (target/name).exists():(target/name).unlink()
     (target/'index.html').write_text(initial_html((source/'index.html').read_text(),read(source/'report.json')))
     from initial_scan import prepare
     artifact=prepare(target,cfg,Path(cfg['preparation_activations']),
@@ -164,6 +169,8 @@ def main(args):
         print(read(Path(a[0])/'manifest.json').get('initial_handoffs',{}).get(a[1],''))
     elif op=='start-next-after':
         print(read(Path(a[0])/'manifest.json').get('start_next_after',''))
+    elif op=='stage2-lock':
+        print(read(Path(a[0])/'manifest.json').get('stage2_lock') or '')
     elif op=='state-dir':
         print(read(Path(a[0])/'manifest.json')['paths']['state'])
     elif op=='stages':

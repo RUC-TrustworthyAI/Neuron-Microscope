@@ -45,7 +45,7 @@
 
 **[查看 Colorado 对比 →](https://neuron-microscope-papers.tangysiren10.chatgpt.site/L55_N11703/)**
 
-点击 **Compare reports** 打开双栏后，**左侧**是原博客公布的报告，**右侧**是我们的独立复现。两者都发现了较强的 Colorado 正向响应。在我们的 SlimPajama 100M 实验中，固定句式后替换地名，四个 Colorado 城市在后续 token 上产生 **+22.0 至 +43.3** 的激活，其余六个城市均不超过 **+4.75**。
+点击 **Compare reports** 打开双栏后，**左侧**是原博客公布的报告，**右侧**是我们的独立复现。两者都发现了较强的 Colorado 正向响应。在我们的 SlimPajama 100M 实验中，使用句式 `Officials in {city} approved the annual budget this week.`，在单个 token ` approved` 上评分，四个 Colorado 城市产生 **+22.0 至 +43.3** 的激活，其余六个城市均不超过 **+4.75**。
 
 两份解释仍有差异：原报告提出，gate 会在即将填入地区相关信息的位置打开；我们的解释覆盖了更宽泛的地名与地方新闻上下文。负极的解释也仍不充分。读者可以通过上下文、受控实验和干预结果进一步判断这些差异。
 
@@ -74,11 +74,13 @@
 
 **[查看流程演示 →](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)**
 
-演示记录了一个 Colorado 神经元从激活证据到最终报告的过程，依次经历 **解释 → 实验 → 修订**。读者可以查看提示词、工具与实测结果，追踪解释是怎样形成的。该记录使用 Diverse 100M，上面的对比案例使用 SlimPajama 100M。
+演示记录了一个 Colorado 神经元从激活证据到最终报告的过程，依次经历 **解释 → 实验 → 修订**。读者可以查看提示词、工具与实测结果，追踪解释是怎样形成的。该记录使用 [Diverse 100M](docs/data.md#corpora-used-in-the-comparisons)，上面的对比案例使用 SlimPajama 100M。
 
 [![Neuron Microscope 解释流程的运行记录](assets/pipeline-walkthrough-zh.jpg)](https://neuron-microscope-pipeline.tangysiren10.chatgpt.site/?lang=zh)
 
 ![三个研究 agent 依次解释激活证据、在 Qwen3-32B 上开展实验，并修订神经元报告](assets/workflow.png)
+
+*流程示意图中的数字用于说明步骤。实测数值、输入句式与评分位置见上方链接中的报告和流程记录。*
 
 <details>
 <summary><strong>解释流程的具体步骤</strong></summary>
@@ -89,7 +91,7 @@
 4. **修订**：第三个独立容器加载 `skills/revise/`，结合实验测量、初步标签与实测响应，修订解释、Criticism 和图注。固定代码生成 HTML 与费用章节。
 5. **发布**：若提供对应原博客的本地快照，发布工具自动加入左右分屏、版块对齐和同步滚动。官方内容只加入展示页，不进入研究 agent 的输入。
 
-公开报告采用 500 点采样配置。仓库目前默认最多抽取 256 个 scan 点；复现某份报告时，应使用该报告保存的配置。
+仓库默认采用公开报告的采样流程：按各激活区间的 log-count 柱高分配 500 个位置，再在区间内均匀抽样。两张图使用同一批样本及初步解释产生的标签。打标分两路并行，每批最多 256 点；漏返回的样本继续补评，缺项少于 16 点时仅绘制已标注点。具体见[运行配置](docs/running.md#reproduce-the-published-sampling-and-scheduling)和[语料来源](docs/data.md#corpora-used-in-the-comparisons)。
 
 **Clusters** 按语义组织已测量的样本。原始 NMF routes 描述归因模式，一个语义组可以跨越多条 route。各组的样本数、归因贡献占比和上游汇总由实测数据计算。
 
@@ -123,7 +125,7 @@ GPU 工作集中在实验阶段，解释、打标和修订也会消耗 LLM 调�
 
 ### 语料覆盖会改变可见的证据
 
-即使都在约 **100M tokens** 的规模，不同语料也会呈现不同的激活范围。例如，**L51_N20229** 的原生 product 在 Common Pile 中为 **-19 至 +59**，在 Diverse 中为 **-35 至 +98**，在 Reasoning Mix 中为 **-32.75 至 +111**。下图同时列出了 SlimPajama 和 FineWeb 的结果。
+即使都在约 **100M tokens** 的规模，不同语料也会呈现不同的激活范围。例如，**L51_N20229** 的原生 product 在 Common Pile 中为 **-19 至 +59**，在 Diverse 中为 **-35 至 +98**，在 Reasoning Mix 中为 **-32.75 至 +111**。下图同时列出了 SlimPajama 和 FineWeb 的结果。[数据文档](docs/data.md#corpora-used-in-the-comparisons)列出了各语料的来源、抽样方式及 Diverse 配比。
 
 ![L51_N20229 在五套约 100M-token 语料中的原生激活最小值与最大值](assets/corpus-coverage.svg)
 
@@ -206,7 +208,7 @@ python -m http.server 8000 --directory results/example
 - `execute`：按快照执行准备和三阶段流程。
 - `publish`：保留生成的科学内容，加入统一显示与可选对比功能。
 - 默认整批 API 上限 2 美元；示例设为 5 美元。设 `unlimited` 可取消上限。费用是配置单价计算的估算，不是账户账单。
-- `--neurons` 后可列多个 neuron。默认前一个第二阶段结束后才启动下一个，第三阶段可与下一个第一阶段重叠。
+- 批量运行时，在 `--neurons` 后列出多个神经元。默认允许不同神经元的解释与修订并行；同一 GPU 组的完整实验阶段通过阶段锁依次执行。多组 GPU 并行时，每组准备一批任务，共用 `paths.state`，具体见[双组配置](docs/running.md#reproduce-the-published-sampling-and-scheduling)。续跑、独立阶段和测量复用见[运行文档](docs/running.md#start-continue-and-publish)。
 - 完整请求、输出、测量、费用和耗时保存在 `runs/`，可按 neuron 和阶段查看。
 
 更多续跑、单阶段和复用测量操作见 [运行说明](docs/running.md)。展示窗口只影响页面文本：

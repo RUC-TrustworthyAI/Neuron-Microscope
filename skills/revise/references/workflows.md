@@ -8,7 +8,7 @@ python scripts/write_report.py <<'JSON'
 JSON
 ```
 
-Fill the fields described in the API reference. Submission runs an independent review and response predictions, saves the interpretation and annotations, and renders the measured figures and graphs. Wait for the report path and stop. Use a JSON editor for draft changes before submitting.
+Fill the fields described in the API reference. Submission runs an independent review, saves the revised interpretation and annotations, and renders the measured figures and graphs using the saved initial response predictions. Wait for the report path and stop. Use a JSON editor for draft changes before submitting.
 
 For a subsequent display-only update to an already submitted report:
 

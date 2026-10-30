@@ -5,7 +5,7 @@ The subject is a native dense-Qwen3 MLP neuron. The research agent uses a separa
 | Operation | Code | Origin of content |
 |---|---|---|
 | Source/configuration snapshot and containers | `run.sh`, `tools/launch_files.py` | Fixed host code |
-| Scan before explanation | `tools/initial_scan.py`, `anatomy_scan.py`, `anatomy_selection.py` | Saved activations; fixed sampling |
+| Scan before explanation | `tools/initial_scan.py`, `spectrum_sampling.py`, `anatomy_selection.py` | Saved activations; fixed sampling |
 | Response-group definitions | `skills/interpret/`, `skills/revise/` | Submitted with the initial and revised explanations |
 | Blind response prediction | `tools/blind_anatomy.py` | Independent text-only predictions from a fixed explanation and its groups |
 | Initial explanation | `skills/interpret/` | Agent 1 |
@@ -30,7 +30,7 @@ Measurements use native BF16 channels, full captured prefixes, explicit score po
 
 The initial agent reads saved extrema, quantile examples and statistics, then submits an explanation and response groups: at most three positive conditions, three negative conditions, and one No visible cue group. Each directional group describes a textual condition and its anchor position. The fixed prediction prompt is in `tools/blind_anatomy.py`.
 
-After that submission, an independent predictor receives the fixed explanation, group definitions, complete observed prefixes and anchors. It does not receive measured activations or gate/up values. Fixed code joins predictions to measurements for feedback. The experiment stage reuses predictions for identical inputs and the same explanation, adding predictions for new measured contexts. The revision agent reads this feedback alongside experimental results before submitting its revised explanation. A document-disjoint final set is revealed after submission.
+After that submission, an independent predictor receives the fixed explanation, group definitions, complete observed prefixes and anchors. It does not receive measured activations or gate/up values. Fixed code joins predictions to measurements for feedback. Activation spectrum and Inside the neuron reuse the same 500-position pool and initial predictions throughout the experiment and revision stages. The revision agent reads this feedback alongside experimental results before submitting its revised explanation. The plots retain the version they tested; they are not a held-out test of the revised explanation. See [sampling and missing-label handling](data.md#coordinates-and-sampling).
 
 Anatomy coordinates and spectrum bins use measured values; colours show predicted response groups. Strong prediction disagreements can challenge the explanation. Values close to zero provide weak evidence about directional selectivity. Semantic Clusters over attribution graphs are a separate grouping described below.
 

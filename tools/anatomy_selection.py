@@ -1,4 +1,4 @@
-"""Inside-the-neuron evidence: selected corpus anchors plus measured probes."""
+"""Build the gate/up view from saved, labelled corpus samples."""
 import collections
 import copy
 import html
@@ -7,6 +7,7 @@ from common import read
 
 POLICY='selected-corpus-and-measured-probes-v1'
 SCAN_POLICY='selected-corpus-probes-and-proportional-scan-v2'
+SHARED_POLICY='shared-spectrum-corpus'
 UNLABELLED='unlabelled-probes'
 
 
@@ -26,10 +27,43 @@ def build(bundle,data,request):
     for row in anatomy.get('pairs',[]):
         if row.get('case_id'):keep.add(str(row['case_id']))
     old={str(p['id']):p for p in anatomy.get('points',[]) if str(p['id']) in data['points']}
+    shared=[p for p in spectrum['points'] if p.get('source_family')=='corpus'
+            and p.get('observed_prefix') is not None
+            and all(k in p for k in ('gate','up','activation','document','position'))]
     points=[]
+    occupied=set()
+    for sample in shared:
+        location=(str(sample['document']),sample['position'])
+        if location in occupied:continue
+        occupied.add(location)
+        row={k:copy.deepcopy(sample[k]) for k in ('id','document','position','dataset_token_index',
+            'gate','up','activation','peak_token','observed_prefix','evaluation_split',
+            'predicted_pole','prediction_reason','explanation_version','label_source') if k in sample}
+        row.update(source='corpus:spectrum',source_family='corpus',cluster=sample.get('group','unlabelled'),
+            text=html.escape(sample['observed_prefix']))
+        points.append(row)
+    if shared:
+        quadrants=collections.defaultdict(collections.Counter)
+        for point in points:
+            quadrant=('g+' if point['gate']>0 else 'g-')+('u+' if point['up']>0 else 'u-')
+            quadrants[point['cluster']][quadrant]+=1
+        anatomy.update(points=points,n=len(points),clusters=copy.deepcopy(spectrum.get('groups',[])),
+            semantic_groups=copy.deepcopy(spectrum.get('groups',[])),
+            quadrants={k:dict(v) for k,v in quadrants.items()},
+            group_names={g['id']:g['name'] for g in spectrum.get('groups',[])},
+            colour_mode='predicted_pole',explanation_version=spectrum.get('explanation_version'))
+        anatomy['selection']={'policy':SHARED_POLICY,'corpus_anchors':len(points),
+            'corpus_rule':'Use the spectrum natural-corpus points once per document position.',
+            'labels':'Both views reuse the saved predictions from the fixed initial explanation.',
+            'raw_channels':'Raw pre-SiLU gate, up/value and native product.'}
+        bundle['anatomy']=anatomy
+        return
     for identity in sorted(keep,key=int):
         if identity not in data['points']:continue
         native=data['points'][identity];doc=data['documents'][native['document']];pos=native['position']
+        location=(str(native['document']),pos)
+        if location in occupied:continue
+        occupied.add(location)
         row=copy.deepcopy(old.get(identity,{}))
         row.update(id=identity,gate=native['values'][0],up=native['values'][1],activation=native['values'][2],
             peak_token=html.escape(doc['tokens'][pos]),
@@ -82,12 +116,13 @@ def build(bundle,data,request):
     candidate_counts=None
     if scan_files:
         scan=read(scan_files[-1])
-        occupied={(p.get('document'),p.get('position')) for p in points if p.get('source_family')=='corpus'}
+        occupied={(str(p.get('document')),p.get('position')) for p in points if p.get('source_family')=='corpus'}
         scan_candidates=[]
         for row in scan['points']:
-            if row.get('case_id') in keep or (row.get('document'),row.get('position')) in occupied:continue
+            location=(str(row.get('document')),row.get('position'))
+            if row.get('case_id') in keep or location in occupied:continue
             scan_candidates.append(copy.deepcopy(row))
-            occupied.add((row.get('document'),row.get('position')))
+            occupied.add(location)
         candidate_counts=dict(collections.Counter(p['source'].split(':')[0] for p in points+scan_candidates))
         scan_total=request.get('settings',{}).get('anatomy_scan',{}).get('total_points',256)
         retained,scan_counts=choose(scan_candidates,scan['edges'],scan_total,scan['seed'])

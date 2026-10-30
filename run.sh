@@ -44,6 +44,7 @@ build_container_command() {
     CONTAINER="np-${unit,,}-${stage%%-*}-$(cat /proc/sys/kernel/random/uuid)"
     CMD=(docker run --name "$CONTAINER" --init --network "$NETWORK"
         --add-host "agent-host:$GATEWAY" --cpus 4 --memory 8g
+        -e NODE_OPTIONS=--max-old-space-size=6144
         --cap-drop ALL --security-opt no-new-privileges
         -e DEEPSEEK_API_KEY -e PATH=/control/bin:/usr/local/bin:/usr/bin:/bin
         -e "DEEPSEEK_BASE_URL=http://agent-host:$METER_PORT/$unit/$stage/v1"
@@ -66,9 +67,12 @@ build_container_command() {
           -w /workspace --entrypoint /usr/local/bin/python3 "$IMAGE" /control/agent.py)
 }
 
-launch_stage() (
+# Each stage runs as an asynchronous child; exit triggers cleanup before its parent continues.
+launch_stage() {
     local folder=$1 unit=$2 stage=$3 skill=$4 previous=$5
-    local socket_dir service_pid='' code=0 CONTAINER='' CMD=()
+    local code=0
+    socket_dir='' service_pid='' container_pid='' CONTAINER=''
+    CMD=()
     local state_dir
     state_dir=$(files field "$folder/host-session.json" state_dir)
     mkdir -p "$state_dir/np-sockets"
@@ -77,6 +81,10 @@ launch_stage() (
         if [[ -n "$CONTAINER" ]]; then
             docker stop --time 10 "$CONTAINER" >/dev/null 2>&1 || true
             docker rm "$CONTAINER" >/dev/null 2>&1 || true
+        fi
+        if [[ -n "$container_pid" ]]; then
+            kill "$container_pid" 2>/dev/null || true
+            wait "$container_pid" 2>/dev/null || true
         fi
         if [[ -n "$service_pid" ]]; then
             kill "$service_pid" 2>/dev/null || true
@@ -89,26 +97,47 @@ launch_stage() (
     trap 'exit 130' INT
     trap 'exit 143' TERM
     if [[ "$stage" == 01-interpretation ]]; then
-        files stage-input "$folder" || return $?
+        files stage-input "$folder" || exit $?
     fi
-    files attach "$folder" "$previous" || return $?
-    files record "$folder/status.json" running "stage=$stage" || return $?
+    files attach "$folder" "$previous" || exit $?
+    files record "$folder/status.json" running "stage=$stage" || exit $?
     "$TASK_PYTHON" "$FRAMEWORK_DIR/tools/services.py" session \
         "$folder/host-session.json" "$socket_dir/tool.sock" "$AGENT_WALL" \
         >"$folder/logs/tool-service.log" 2>&1 &
     service_pid=$!
-    wait_for "$socket_dir/tool.sock" "$service_pid" || return 1
+    wait_for "$socket_dir/tool.sock" "$service_pid" || exit 1
     build_container_command "$folder" "$unit" "$stage" "$skill" "$previous" "$socket_dir"
-    files launch "$folder" "$CONTAINER" "${CMD[@]}" || return $?
+    files launch "$folder" "$CONTAINER" "${CMD[@]}" || exit $?
     timeout --foreground --signal=TERM --kill-after=30 "$AGENT_WALL" \
-        "${CMD[@]}" >"$folder/logs/container.log" 2>&1 || code=$?
-    files record "$folder/CONTROL_TERMINAL.json" exited "exit_code=$code" || return $?
-    return "$code"
-)
+        "${CMD[@]}" >"$folder/logs/container.log" 2>&1 &
+    container_pid=$!
+    wait "$container_pid" || code=$?
+    container_pid=''
+    files record "$folder/CONTROL_TERMINAL.json" exited "exit_code=$code" || exit $?
+    exit "$code"
+}
 
 # One neuron: finish and collect each stage before starting the next container.
 execute_unit() {
     local batch=$1 unit=$2 spec stage skill folder previous='' code
+    stage_lock_fd='' stage_pid=''
+    release_stage_lock() {
+        if [[ -n "$stage_lock_fd" ]]; then
+            flock -u "$stage_lock_fd"
+            exec {stage_lock_fd}>&-
+            stage_lock_fd=''
+        fi
+    }
+    cleanup_unit() {
+        if [[ -n "$stage_pid" ]]; then
+            kill "$stage_pid" 2>/dev/null || true
+            wait "$stage_pid" 2>/dev/null || true
+        fi
+        release_stage_lock
+    }
+    trap cleanup_unit EXIT
+    trap 'exit 130' INT
+    trap 'exit 143' TERM
     previous=$(files initial-handoff "$batch" "$unit")
     for spec in "${STAGES[@]}"; do
         stage=${spec%%:*}; skill=${spec#*:}; folder="$batch/units/$unit/$stage"
@@ -117,21 +146,35 @@ execute_unit() {
             previous="$folder/handoff"
             continue
         fi
-        if launch_stage "$folder" "$unit" "$stage" "$skill" "$previous"; then
+        if [[ "$stage" == 02-experiments && -n "${STAGE2_LOCK:-}" ]]; then
+            mkdir -p -- "$(dirname -- "$STAGE2_LOCK")"
+            files record "$folder/status.json" waiting "stage=$stage"
+            exec {stage_lock_fd}>"$STAGE2_LOCK"
+            flock "$stage_lock_fd"
+            files record "$folder/stage-lock-acquired.json" acquired "pid=$BASHPID" "lock=$STAGE2_LOCK"
+        fi
+        code=0
+        launch_stage "$folder" "$unit" "$stage" "$skill" "$previous" &
+        stage_pid=$!
+        if wait "$stage_pid"; then
             if files handoff "$folder" >"$folder/handoff.log" 2>&1; then
                 previous="$folder/handoff"
             else
                 code=$?
                 files record "$batch/units/$unit/PIPELINE_TERMINAL.json" failed \
                     "stage=$stage" "exit_code=$code" "error=Handoff could not be assembled"
-                return "$code"
             fi
         else
             code=$?
             files record "$batch/units/$unit/PIPELINE_TERMINAL.json" failed \
                 "stage=$stage" "exit_code=$code"
-            return "$code"
         fi
+        stage_pid=''
+        if [[ "$stage" == 02-experiments && -n "${STAGE2_LOCK:-}" ]]; then
+            files record "$folder/stage-lock-released.json" released "pid=$BASHPID" "lock=$STAGE2_LOCK"
+            release_stage_lock
+        fi
+        [[ "$code" == 0 ]] || exit "$code"
     done
     if [[ "$previous" == */03-revision/handoff ]]; then
         if files finalize-costs "$batch" "$unit" "$previous"; then
@@ -140,15 +183,18 @@ execute_unit() {
             code=$?
             files record "$batch/units/$unit/PIPELINE_TERMINAL.json" failed \
                 "stage=publication" "exit_code=$code"
-            return "$code"
+            exit "$code"
         fi
     fi
     files finish-unit "$batch/units/$unit" "$previous"
+    exit 0
 }
 
-execute_batch() (
-    local batch=$1 scratch meter_pid='' unit pid code=0
-    local NETWORK='' GATEWAY='' METER_PORT='' IMAGE='' AGENT_WALL='' START_NEXT_AFTER='' pids=()
+execute_batch() {
+    local batch=$1 unit pid code=0
+    scratch='' meter_pid='' NETWORK=''
+    pids=()
+    local GATEWAY='' METER_PORT='' IMAGE='' AGENT_WALL='' START_NEXT_AFTER='' STAGE2_LOCK=''
     local state_dir
     state_dir=$(files state-dir "$batch")
     mkdir -p "$state_dir/np-run"
@@ -167,6 +213,7 @@ execute_batch() (
     trap 'exit 143' TERM
     mapfile -t STAGES < <(files stages "$batch/manifest.json")
     START_NEXT_AFTER=$(files start-next-after "$batch")
+    STAGE2_LOCK=$(files stage2-lock "$batch")
     IMAGE=$(files field "$batch/manifest.json" image)
     AGENT_WALL=$(files field "$batch/manifest.json" agent_wall_seconds)
     "$TASK_PYTHON" "$FRAMEWORK_DIR/tools/services.py" meter "$batch" "$scratch/meter.json" \
@@ -194,8 +241,8 @@ execute_batch() (
     for pid in "${pids[@]}"; do wait "$pid" || code=1; done
     pids=()
     files finish-batch "$batch"
-    return "$code"
-)
+    exit "$code"
+}
 
 main() {
     local command=${1:---help} batch='' output='' through=revise from=interpret initial_handoff='' reuse_measurements='' first=0 last=2 units=()
