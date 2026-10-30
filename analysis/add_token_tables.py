@@ -1,4 +1,4 @@
-"""Add six relative product-by-token tables to copies of saved neuron papers."""
+"""Add six relative product-by-token tables to copies of saved neuron reports."""
 import argparse
 from concurrent.futures import ProcessPoolExecutor, wait, FIRST_COMPLETED
 import datetime as dt

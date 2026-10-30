@@ -281,7 +281,7 @@ const headlineFigure = () => { const Hd = B.headline; if (!has(Hd)) return null;
 
 // Header: eyebrow, title, short lede, headline figure, quiet meta row.
 (() => { const h = document.getElementById('head');
-  const eyebrow = ['Neuron paper', N.model, N.layer != null ? `L${N.layer}/N${N.neuron}` : null, V.n != null ? `v${V.n}` : null].filter(Boolean).join(' · ');
+  const eyebrow = ['Neuron report', N.model, N.layer != null ? `L${N.layer}/N${N.neuron}` : null, V.n != null ? `v${V.n}` : null].filter(Boolean).join(' · ');
   const text = $('div', { class: 'text' }, $('div', { class: 'eyebrow' }, eyebrow), $('h1', null, C.title || N.autointerp_label || N.id || 'Neuron')); const lede = ledeText(); if (lede) text.append($('p', { class: 'lede' }, lede)); h.append(text);
   const hf = headlineFigure(); if (hf) h.append(hf);
   const meta = $('div', { class: 'metarow text' }); if (C.confidence) meta.append($('span', null, 'Confidence ', $('span', { class: 'pill ' + C.confidence }, String(C.confidence))));

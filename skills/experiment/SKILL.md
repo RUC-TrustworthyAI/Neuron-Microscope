@@ -1,6 +1,6 @@
 ---
 name: experiment
-description: Design and measure neuron-paper contrasts, RelP graphs, routes and independent tests.
+description: Design and measure neuron-report contrasts, RelP graphs, routes and independent tests.
 disable-model-invocation: true
 metadata:
   disco-role: operating

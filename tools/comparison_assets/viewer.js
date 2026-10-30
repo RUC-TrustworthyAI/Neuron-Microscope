@@ -1,5 +1,7 @@
 (() => {
   'use strict';
+  const eyebrow = document.querySelector('#head .eyebrow');
+  if (eyebrow) eyebrow.textContent = eyebrow.textContent.replace(/^Neuron paper\b/i, 'Neuron report');
   if (window.self !== window.top || document.getElementById('np-report-back')) return;
   const script = document.currentScript;
   const neuron = script.dataset.neuron;

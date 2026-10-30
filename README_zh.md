@@ -61,7 +61,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 <p align="center">
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">
-    <img src="assets/colorado-comparison.jpg" alt="Colorado 神经元的原报告与复现报告" width="92%">
+    <img src="assets/colorado-comparison.png" alt="Colorado 神经元的原报告与复现报告" width="92%">
   </a>
 </p>
 
@@ -78,7 +78,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 <p align="center">
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">
-    <img src="assets/report-directory.jpg" alt="Qwen3-32B 神经元对比目录" width="92%">
+    <img src="assets/report-directory.png" alt="Qwen3-32B 神经元对比目录" width="92%">
   </a>
 </p>
 

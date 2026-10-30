@@ -6,7 +6,7 @@ from blind_tests import call
 
 GROUP_LABELS = {'one_idea': 'One idea', 'branching': 'One idea, branching', 'unplaced': 'One idea + residual', 'two_related': 'Two related jobs', 'mixture': 'Mixture', 'unresolved': 'Unresolved', 'none': 'No strong firings of its own'}
 
-SYSTEM = """Read a neuron paper and its evidence. Assess the overall organization of this neuron's responses and assess each response pole separately.
+SYSTEM = """Read a neuron report and its evidence. Assess the overall organization of this neuron's responses and assess each response pole separately.
 
 Use these seven classification codes:
 - one_idea: One explanatory principle accounts for the material responses. Small exceptions do not by themselves establish another job.

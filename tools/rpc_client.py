@@ -79,7 +79,7 @@ TOOL_DESCRIPTIONS={
 
 def _arguments(tool):
     import argparse
-    parser=argparse.ArgumentParser(description=TOOL_DESCRIPTIONS.get(tool,'Call a neuron-paper host tool.'),
+    parser=argparse.ArgumentParser(description=TOOL_DESCRIPTIONS.get(tool,'Call a neuron-report host tool.'),
         epilog='Pass a JSON object through stdin, or use --input FILE. Tools wait for completion.')
     source=parser.add_mutually_exclusive_group()
     source.add_argument('--input',metavar='FILE',help='Read JSON from FILE; use - for redirected stdin.')

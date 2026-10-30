@@ -49,6 +49,7 @@ def strip_capture_table(source):
 
 def presentation(source):
     """Shared report layout; short verdict badges, readable challenges and blank Appendix."""
+    source = source.replace("const eyebrow = ['Neuron paper',", "const eyebrow = ['Neuron report',")
     style = """<style id="neuron-paper-layout">
 #criticism .crow > summary .pill{max-width:100%;white-space:nowrap}
 @media(max-width:600px){

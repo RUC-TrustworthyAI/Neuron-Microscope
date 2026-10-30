@@ -61,7 +61,7 @@ Each neuron link opens the original report on the left and our reproduction on t
 
 <p align="center">
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">
-    <img src="assets/colorado-comparison.jpg" alt="Original and reproduced reports for the Colorado neuron" width="92%">
+    <img src="assets/colorado-comparison.png" alt="Original and reproduced reports for the Colorado neuron" width="92%">
   </a>
 </p>
 
@@ -78,7 +78,7 @@ In our SlimPajama 100M run, the template `Officials in {city} approved the annua
 
 <p align="center">
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">
-    <img src="assets/report-directory.jpg" alt="Directory of Qwen3-32B neuron comparisons" width="92%">
+    <img src="assets/report-directory.png" alt="Directory of Qwen3-32B neuron comparisons" width="92%">
   </a>
 </p>
 
