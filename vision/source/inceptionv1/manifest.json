@@ -1,0 +1,12 @@
+{
+  "name": "InceptionV1 / TensorFlow Inception5h (Lucent PyTorch conversion)",
+  "source_repo": "https://github.com/greentfrapp/lucent",
+  "source_commit": "2ccc434d80097e58f53cb2a70c60f72902fe93af",
+  "weights_url": "https://raw.githubusercontent.com/ProGamerGov/pytorch-old-tensorflow-models/master/inception5h.pth",
+  "download_transport": "GitHub contents API with application/vnd.github.raw+json",
+  "weights_sha256": "44f1f1e0734fa77edd0ab948c0d4d5c9ab6f4efce10b02d793fd14ab2d71a73b",
+  "weights_bytes": 28283262,
+  "preprocessing": "RGB float [0,1] * 255 - 117",
+  "num_classes": 1008,
+  "is_goodfire_retrained_checkpoint": false
+}

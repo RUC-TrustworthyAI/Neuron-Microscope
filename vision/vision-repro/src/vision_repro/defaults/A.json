@@ -1,0 +1,25 @@
+[
+  ["A_fft15_color2", "positive", {
+    "size": 224,
+    "view_size": 224,
+    "common_view_size": 224,
+    "color_mode": "fitted",
+    "std": 0.01,
+    "lr": 0.03,
+    "gaussian_sigma": 0.12,
+    "schedule_steps": 768,
+    "initial_band": 0.15,
+    "final_band": 0.45,
+    "unlock_until": 0.7,
+    "blur_start": 2.0,
+    "blur_end": 0.5,
+    "fft_decay_power": 1.5,
+    "logit_chroma_gain": 2.0,
+    "mean_color_weight": 20000,
+    "mean_color": [0.65, 0.70, 0.74],
+    "periphery_mean_weight": 80000,
+    "logit_l2": 0.0,
+    "tv_weight": 0.0,
+    "neighbor_rgb_weight": 0.0
+  }]
+]

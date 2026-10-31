@@ -5,16 +5,17 @@
 <h1 align="center">Neuron Microscope</h1>
 
 <p align="center">
-  <strong>Can native LLM neurons be explained—and can those explanations survive controlled experiments?</strong>
+  <strong>Investigating native neurons in language and vision models.</strong>
 </p>
 
 <p align="center">
-  An open, evidence-first framework for reproducing and stress-testing neuron explanations.
+  An evidence-first framework for reproducing and stress-testing neuron explanations.
 </p>
 
 <p align="center">
   <a href="README_zh.md">中文</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">Explore neuron reports</a> ·
+  <a href="vision/README.md">Explore vision neurons</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">Open the Colorado case</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en">Watch the investigation</a> ·
   <a href="#use-neuron-microscope">Run the project</a>
@@ -30,18 +31,24 @@
 
 <a id="overview"></a>
 
-Neuron Microscope implements an independent workflow to reproduce and test the neuron analyses behind Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/). Starting with native MLP neurons in **Qwen3-32B**, our reports expose activation evidence, hypotheses, controlled tests, causal interventions, revisions, and unresolved failures.
+Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/). The project includes **Qwen3-32B language-model investigations** and **InceptionV1 feature visualization**.
 
-**Available now:** [investigation code and prompts](workflow/), [sources, sampling procedures and readers for five corpora](docs/data.md#corpora-used-in-the-comparisons), and [10 interactive neuron comparisons](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/). Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
+| Model | What you can inspect | Entry point |
+| --- | --- | --- |
+| **Qwen3-32B** | Activation evidence, explanations, controlled tests, interventions and unresolved cases. | [Interactive neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/) · [Investigation code](workflow/) |
+| **InceptionV1 / Lucent Inception5h** | Five visualization objectives, natural-image examples, heatmaps and reference comparisons. | [Vision guide and examples](vision/README.md) · [Optimization code](vision/vision-repro/) |
+
+**Available now:** [LLM investigation code and prompts](workflow/), [sources, sampling procedures and readers for five corpora](docs/data.md#corpora-used-in-the-comparisons), [interactive neuron comparisons](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/), and [vision code with measured visualization examples](vision/README.md). LLM reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
 > [!IMPORTANT]
-> **This is an independent reproduction effort.** The research models do not see AlreadyClean's explanations while conducting an investigation. The reference report is added only when the final report is published for comparison.
+> **This is an independent reproduction effort.** In LLM investigations, the research models do not see AlreadyClean's explanations. The reference report is added only when the final report is published for comparison.
 
 ## Contents
 
 - [Side-by-side interactive comparisons](#side-by-side-interactive-comparisons)
+- [Vision neuron visualizations](#vision-neuron-visualizations)
 - [Which AlreadyClean claims have we tested?](#which-alreadyclean-claims-have-we-tested)
-- [The investigation pipeline](#the-investigation-pipeline)
+- [The LLM investigation pipeline](#the-investigation-pipeline)
 - [Evaluating the report evidence](#evaluating-the-report-evidence)
 - [Observations from the current comparisons](#observations-from-the-current-comparisons)
 - [Installation and usage](#installation-and-usage)
@@ -84,9 +91,28 @@ In our SlimPajama 100M run, the template `Officials in {city} approved the annua
 
 Each row links to a full interactive report with activation evidence, exemplars, searches, clusters, effects, tests, criticism, revised conclusions, and cost records.
 
+## Vision neuron visualizations
+
+The [vision module](vision/README.md) optimizes images for individual InceptionV1 channels and retrieves natural examples from an ImageNet scan. Its catalog contains **12 layers and 5,804 channels**. It implements Positive, Path-guided +, Diversity, Negative and Path-guided − views; the catalog size describes available targets, not the number of completed results.
+
+[Browse vision comparisons →](vision/docs/gallery.md) · [Install and run →](vision/README.md#installation-and-usage)
+
+<table align="center">
+  <tr><th>Positive</th><th>Diversity</th><th>Negative</th></tr>
+  <tr>
+    <td><a href="vision/docs/assets/mixed4c_260/positive.png"><img src="vision/docs/assets/mixed4c_260/positive.png" width="200" alt="InceptionV1 mixed4c:260, optimized positive response"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_260/diversity.png"><img src="vision/docs/assets/mixed4c_260/diversity.png" width="200" alt="InceptionV1 mixed4c:260, four diversity members"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_260/negative.png"><img src="vision/docs/assets/mixed4c_260/negative.png" width="200" alt="InceptionV1 mixed4c:260, optimized signed negative response"></a></td>
+  </tr>
+</table>
+
+These are saved outputs for **mixed4c:260**, using configuration A, 224 × 224 inputs, 1,024 steps and seed 0. Positive maximizes post-ReLU activation; Negative minimizes signed pre-ReLU activation. [Recorded settings and scores](vision/docs/assets/provenance.json) accompany the images.
+
+The implementation uses the historical **Lucent Inception5h checkpoint**, which differs from Goodfire's retrained checkpoint. The [vision method guide](vision/docs/methodology.md) explains the objectives and comparison scope. The vision workflow has its own model and data requirements; the LLM investigation below applies to Qwen3.
+
 ## Which AlreadyClean claims have we tested?
 
-The original essay contains claims at several levels. We separate what this repository has directly examined from what remains open.
+The original essay contains claims at several levels. The table below tracks our language-model investigations and separates what we have directly examined from what remains open.
 
 | Claim or question | Operational evidence needed | Current status |
 | --- | --- | --- |
@@ -100,7 +126,7 @@ The original essay contains claims at several levels. We separate what this repo
 > [!IMPORTANT]
 > **We intend this table to become a living claims tracker. New evidence should link to a concrete report, model, corpus, intervention, or counterexample.**
 
-## The investigation pipeline <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a> <a id="workflow"></a>
+## The LLM investigation pipeline <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a> <a id="workflow"></a>
 
 ### Follow a recorded investigation
 
@@ -129,7 +155,7 @@ See [the workflow](docs/workflow.md), [measurement details](docs/method.md), and
 
 ## Evaluating the report evidence <a id="how-we-evaluate-an-explanation"></a>
 
-The reports provide several ways to examine an explanation. The directory’s 1–5 score measures LLM-assessed semantic agreement with the reference explanation. Correctness and causal claims require the experiments below; similar wording alone does not establish them.
+The Qwen3 reports provide several ways to examine an explanation. The directory’s 1–5 score measures LLM-assessed semantic agreement with the reference explanation. Correctness and causal claims require the experiments below; similar wording alone does not establish them.
 
 | Dimension | Question | Evidence in the reports |
 | --- | --- | --- |
@@ -173,18 +199,19 @@ The current reports leave uncertainty at three points: whether the sampled corpu
 
 ## Installation and usage <a id="use-neuron-microscope"></a> <a id="quick-start"></a>
 
-There are three current ways to use the project.
+Choose an entry point for the model and evidence you want to inspect.
 
 | Mode | What you can do | Requirements |
 | --- | --- | --- |
-| **Explore** | Inspect 10 interactive neuron comparisons and a recorded investigation. | Browser only. |
+| **Explore** | Inspect LLM reports, a recorded investigation and vision comparisons. | Browser only. |
 | **Try the renderer** | Generate and view a small synthetic report fixture. This tests the software and interface, not a scientific result. | Python; no API key, Docker, GPU, or model download. |
-| **Run an investigation** | Analyze neurons from an existing activation archive and publish new reports. | Linux, Python 3.10+, CUDA host, model weights, activation data, and an LLM endpoint. |
+| **Run an LLM investigation** | Analyze neurons from an existing activation archive and publish new reports. | Linux, Python 3.10+, CUDA host, model weights, activation data, and an LLM endpoint. |
+| **Visualize a vision neuron** | Optimize images and export an InceptionV1 viewer. | Python 3.11+, a separate environment, model assets and a CUDA host for optimization; see [vision setup](vision/README.md#installation-and-usage). |
 
 ### 1. Try the offline renderer
 
 ```bash
-git clone --branch hr-structured-pipeline https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone --branch hr-vision-integration https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope
 
 python3 -m venv .venv
@@ -220,7 +247,7 @@ The [run guide](docs/running.md) covers concurrency, continuation, comparison ex
 
 ## Recorded runtime and cost <a id="reproducibility-and-cost"></a>
 
-Each run retains its configuration, API requests and responses, token-price estimates, sampled evidence, explanation and prediction versions, measurements, and final report. Fresh interpretations use the target activation evidence without previous explanations or official labels.
+Each LLM investigation retains its configuration, API requests and responses, token-price estimates, sampled evidence, explanation and prediction versions, measurements, and final report. Fresh interpretations use the target activation evidence without previous explanations or official labels.
 
 For the recorded Colorado / Diverse 100M investigation on **29 October 2026**:
 
@@ -298,6 +325,7 @@ Our group's related work spans feature learning, concept-based analysis, explana
 | [Report guide](docs/reports.md) | Find the source and generation stage of a particular plot or section. |
 | [Development](docs/development.md) | Run CPU software checks and the offline demo. |
 | [Prompts and output contracts](workflow/) | Inspect the explanation, labeling, experimental-design and report-analysis requests. |
+| [Vision setup and examples](vision/README.md) | Install the InceptionV1 module, inspect visualizations and export a viewer. |
 
 ## Citation
 
@@ -318,4 +346,4 @@ The report structure follows [Goodfire's neuron reports](https://already-clean.g
 
 ## License
 
-Code in this repository is released under the [MIT License](LICENSE). Third-party components retain their original licenses.
+The LLM implementation is released under the [MIT License](LICENSE). The imported vision module retains its [source and licensing notice](vision/THIRD_PARTY_NOTICES.md); its original code has no declared upstream license. Third-party components retain their original licenses.

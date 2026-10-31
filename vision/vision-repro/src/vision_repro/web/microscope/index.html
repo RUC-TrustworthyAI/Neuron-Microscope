@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <meta name="description" content="Vision-Neuron-Microscope: InceptionV1 feature visualization, natural examples, and activation maps.">
+  <title>Vision-Neuron-Microscope</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" type="module"></script>
+</head>
+<body>
+  <a class="skip" href="#detail">跳至解释结果</a>
+  <header class="masthead">
+    <a class="brand" href="?layer=mixed4c&neuron=447"><span class="brand-mark" aria-hidden="true">◈</span><span>Vision-Neuron <em>Microscope</em></span></a>
+    <div class="header-right"><span>5,804 neurons · 12 layers</span><a href="https://already-clean.goodfire.com/" target="_blank" rel="noopener">Nick / Goodfire ↗</a></div>
+  </header>
+  <div class="workspace">
+    <aside class="layer-rail" aria-label="模型层">
+      <div class="eyebrow">NETWORK</div><h2>Layers</h2>
+      <nav id="layers"></nav>
+    </aside>
+    <aside class="neuron-rail" aria-label="选择 neuron">
+      <div class="eyebrow">NEURON INDEX</div>
+      <div class="rail-heading"><h2 id="layer-name">mixed4c</h2><span id="channel-count" class="pill"></span></div>
+      <form id="jump-form"><label class="sr-only" for="neuron-input">Neuron 编号</label><input id="neuron-input" type="number" min="0" placeholder="跳转到 neuron…" required><button type="submit" aria-label="跳转">↵</button></form>
+      <p id="jump-error" class="form-error" role="alert"></p>
+      <div id="channel-grid"></div>
+    </aside>
+    <main id="detail" tabindex="-1" aria-live="polite"><div class="loading">正在载入实验档案…</div></main>
+  </div>
+  <dialog id="lightbox" aria-labelledby="lightbox-title"><div class="lightbox-head"><h2 id="lightbox-title"></h2><button id="close-lightbox" aria-label="关闭图片">×</button></div><div id="lightbox-image"></div><p id="lightbox-caption"></p></dialog>
+  <div class="toast" id="toast" role="status"></div>
+</body>
+</html>

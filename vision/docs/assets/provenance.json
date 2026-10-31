@@ -1,0 +1,2814 @@
+{
+  "setting": "A / fft15_color2",
+  "steps": 1024,
+  "seed": 0,
+  "size": 224,
+  "campaign": "full_A_1024_20261027T0927",
+  "common_config": {
+    "size": 224,
+    "steps": 1024,
+    "seed": 0,
+    "color_mode": "fitted",
+    "std": 0.01,
+    "lr": 0.03,
+    "gaussian_sigma": 0.12,
+    "uniform_mix": 0.0,
+    "final_band": 0.45,
+    "initial_band": 0.15,
+    "unlock_until": 0.7,
+    "blur_start": 2.0,
+    "blur_end": 0.5,
+    "logit_l2": 0.0,
+    "mean_color_weight": 20000,
+    "mean_color": [
+      0.65,
+      0.7,
+      0.74
+    ],
+    "mapping": "sigmoid",
+    "mapping_gain": 1.0,
+    "jitter": 4,
+    "rotation": 5.0,
+    "scale_min": 0.95,
+    "scale_max": 1.05,
+    "activation_cap": 0.0,
+    "view_size": 224,
+    "periphery_weight": 0.0,
+    "periphery_sigma": 0.35,
+    "periphery_color": [
+      0.68,
+      0.76,
+      0.79
+    ],
+    "tv_weight": 0.0,
+    "periphery_mean_weight": 80000,
+    "periphery_tv_weight": 0.0,
+    "periphery_power": 2,
+    "common_view_size": 224,
+    "schedule_steps": 768,
+    "save_steps": [
+      256,
+      512,
+      768,
+      1024
+    ],
+    "path_steps": 64,
+    "path_weight_ratio": 1.0,
+    "diversity_weight_ratio": 0.3,
+    "fft_decay_power": 1.5,
+    "logit_chroma_gain": 2.0,
+    "neighbor_rgb_weight": 0.0,
+    "history_every": 16
+  },
+  "images": [
+    {
+      "file": "docs/assets/mixed4c_477/positive.png",
+      "sha256": "b1b43d79573ad878ff1214f539068996d014adcb29f2ea61feffc8b2fc52ae10",
+      "layer": "mixed4c",
+      "channel": 477,
+      "variant": "positive",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_positive_0472_08/items/5",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_pool_reduce_pre_relu_conv",
+        "channel": 29
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "positive"
+      },
+      "scores": {
+        "1024": [
+          8193.458984375
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -40.43323516845703
+        ],
+        "post_relu": [
+          0.031845055520534515
+        ],
+        "score": [
+          0.031845055520534515
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          8193.4580078125
+        ],
+        "post_relu": [
+          8193.458984375
+        ],
+        "score": [
+          8193.458984375
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "dfe3eff687fb3d0572b7daf7ff7cd34e80c631dacb80375924dd6d1dc3796cf6",
+      "source_png_sha256": "04a180772b090c5a24f9fb690bf8365609d9b3ca15c01820c55f90b5bfe1cf11",
+      "pixel_sha256": "9eb57931082fa041831b5b0ab25e78d15e9966958e0c9aa022c4daf30413918b",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/477.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_477/path_positive.png",
+      "sha256": "b2450c462fe9890200bbb35a44bc9d8f69dceaf809d0e66120d219dfca70439a",
+      "layer": "mixed4c",
+      "channel": 477,
+      "variant": "path_positive",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_path_positive_0472_08/items/5",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_pool_reduce_pre_relu_conv",
+        "channel": 29
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "path_positive"
+      },
+      "scores": {
+        "1024": [
+          8187.5205078125
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -40.43323516845703
+        ],
+        "post_relu": [
+          0.031845055520534515
+        ],
+        "score": [
+          0.031845055520534515
+        ],
+        "path_cosine": [
+          0.3280796408653259
+        ],
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          8187.52001953125
+        ],
+        "post_relu": [
+          8187.5205078125
+        ],
+        "score": [
+          8187.5205078125
+        ],
+        "path_cosine": [
+          0.8492981791496277
+        ],
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "6d1006843cb11ea3a558577344dc634eb133bcdc69303791fb231df9fe3a0688",
+      "source_png_sha256": "bc58e2ceed7897febe7cc8b5cc49a071d676d438a678c8448708f0d3e46883da",
+      "pixel_sha256": "1edcebfd38cbbcaeac797cc4b6283732367bbbcae27b6da9ee87d8d33bf8e90e",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/477.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_477/diversity.png",
+      "sha256": "612ffcaf27e918e0b9899f56bf5a5a947c0bd257ed1c7192a5c28c241b06542a",
+      "layer": "mixed4c",
+      "channel": 477,
+      "variant": "diversity",
+      "members": 4,
+      "batchSize": 4,
+      "runId": "continue_A_1024_20261030T0900/batches/mixed4c_diversity_0472_08_missing/items/2",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_pool_reduce_pre_relu_conv",
+        "channel": 29
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "diversity"
+      },
+      "scores": {
+        "1024": [
+          8269.7109375,
+          8045.1298828125,
+          2.385699644946726e-06,
+          7274.27734375
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -40.43394470214844,
+          -37.96818542480469,
+          -37.86251449584961,
+          -39.88604736328125
+        ],
+        "post_relu": [
+          0.0318477600812912,
+          0.016007931903004646,
+          0.01298751961439848,
+          0.023815743625164032
+        ],
+        "score": [
+          0.0318477600812912,
+          0.016007931903004646,
+          0.01298751961439848,
+          0.023815743625164032
+        ],
+        "path_cosine": [
+          0.3280785083770752,
+          0.3447871506214142,
+          0.34228983521461487,
+          0.32606595754623413
+        ],
+        "diversity_cosine": 0.9457769393920898
+      },
+      "final": {
+        "pre_relu": [
+          8269.7099609375,
+          8045.1298828125,
+          -941.775146484375,
+          7274.27734375
+        ],
+        "post_relu": [
+          8269.7109375,
+          8045.1298828125,
+          2.385699644946726e-06,
+          7274.27734375
+        ],
+        "score": [
+          8269.7109375,
+          8045.1298828125,
+          2.385699644946726e-06,
+          7274.27734375
+        ],
+        "path_cosine": [
+          0.8176802396774292,
+          0.8418561220169067,
+          0.19150438904762268,
+          0.7685016393661499
+        ],
+        "diversity_cosine": 0.4158777594566345
+      },
+      "setting": "A",
+      "image_sha256": "cdd7392b9a2b079d5948418ee5779ef97aa4cb297b16e77d1a7e96d1f7a8181a",
+      "source_png_sha256": "63dcf283d18d0266bb2a59fdb49d92ebff2482a6f967baf30c9bdeeeb0966d38",
+      "pixel_sha256": "0bc78a322a85ea07af3c0bfb02671213b9ff205f121824d83da39398203bbc00",
+      "image_size": [
+        448,
+        448
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "2ef412c5f0bcd0eea2002c8acae86de577720038ef903214db6c44f33dda8496",
+        "five_variants.py": "2216d9c2c065142f904a50f7245a48372bb9728324ddd3a44ed3a6ca1a3561f9",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "33d540973d8b24fb443c516ff3710db76a52ec31ff1e658bc5a1f0e0d1a64593",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/477.png",
+      "quality_flags": [
+        "member_2_final_post_relu_activation_near_zero"
+      ]
+    },
+    {
+      "file": "docs/assets/mixed4c_477/negative.png",
+      "sha256": "aee417c01c05818df521a23bf14a87a9f9a6c3640d2d3e9377cbf0ceae6fc319",
+      "layer": "mixed4c",
+      "channel": 477,
+      "variant": "negative",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_negative_0472_08/items/5",
+      "activation": "pre-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_pool_reduce_pre_relu_conv",
+        "channel": 29
+      },
+      "direction": "minimize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "negative"
+      },
+      "scores": {
+        "1024": [
+          -7536.5322265625
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -40.43323516845703
+        ],
+        "post_relu": [
+          0.031845055520534515
+        ],
+        "score": [
+          -40.43323516845703
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          -7536.5322265625
+        ],
+        "post_relu": [
+          4.366505095276807e-07
+        ],
+        "score": [
+          -7536.5322265625
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "00dcd5d8ab1ec995e0434433237d76cbd12501eeab1947ca220c063b92d926d4",
+      "source_png_sha256": "bff3595381d20fefafbbfc2f9bce0c1c1589f21029e9912ce44399db85f16d02",
+      "pixel_sha256": "5caeb403bf391a7911418c1d6397aed975c7a1fbbabf3f23f9e91606cce87613",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/477.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_477/path_negative.png",
+      "sha256": "eb331636244569b6942a8161757027143b99e4019a9ccc75337f4297ebf05166",
+      "layer": "mixed4c",
+      "channel": 477,
+      "variant": "path_negative",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_path_negative_0472_08/items/5",
+      "activation": "pre-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_pool_reduce_pre_relu_conv",
+        "channel": 29
+      },
+      "direction": "minimize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "path_negative"
+      },
+      "scores": {
+        "1024": [
+          -7853.92236328125
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -40.43323516845703
+        ],
+        "post_relu": [
+          0.031845055520534515
+        ],
+        "score": [
+          -40.43323516845703
+        ],
+        "path_cosine": [
+          0.40896931290626526
+        ],
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          -7853.92236328125
+        ],
+        "post_relu": [
+          2.7086334739578888e-05
+        ],
+        "score": [
+          -7853.92236328125
+        ],
+        "path_cosine": [
+          0.8381081819534302
+        ],
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "978e4067a3c253226876f5e51e4c81403b9a74f21d93af640d6730965f59604b",
+      "source_png_sha256": "95dd17aa77fcc758af6a3cdfd8f457c1a4fd2b9afd0fb7ffed7eeb9402f0d2b9",
+      "pixel_sha256": "65f2ab5f5aa40bd9a15d0c0f8c451f788cfa52b58be7b7f817aa378410a72fb6",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/477.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_260/positive.png",
+      "sha256": "6d7e9534550081206255236b0b9c53cdbd7678fdc4a88bee80071a735b4bd85b",
+      "layer": "mixed4c",
+      "channel": 260,
+      "variant": "positive",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_positive_0256_08/items/4",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 132
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "positive"
+      },
+      "scores": {
+        "1024": [
+          6423.6416015625
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -0.9019303321838379
+        ],
+        "post_relu": [
+          2.3146114349365234
+        ],
+        "score": [
+          2.3146114349365234
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          6423.6416015625
+        ],
+        "post_relu": [
+          6423.6416015625
+        ],
+        "score": [
+          6423.6416015625
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "ee897c51d380110e05d1e6f104ed4196b4f707d196cf1a2dfd6001d2ea7a5d35",
+      "source_png_sha256": "952298bf681a626a35448bcddde7bbd4653cfd9f8aee4eef75eec5ebe8e8c89e",
+      "pixel_sha256": "ce0aa4d2d8f4db8b76f580dab744b9a38ea01ee4da22fb8b4a15a0116c6ff3d9",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/260.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_260/path_positive.png",
+      "sha256": "40614fe6ed7d4d57fd7833ac5e9e3515e619c6ac64eacbaddbc68f18bddd9ef3",
+      "layer": "mixed4c",
+      "channel": 260,
+      "variant": "path_positive",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_path_positive_0256_08/items/4",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 132
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "path_positive"
+      },
+      "scores": {
+        "1024": [
+          6415.4326171875
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -0.9019303321838379
+        ],
+        "post_relu": [
+          2.3146114349365234
+        ],
+        "score": [
+          2.3146114349365234
+        ],
+        "path_cosine": [
+          0.3772304654121399
+        ],
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          6415.39599609375
+        ],
+        "post_relu": [
+          6415.4326171875
+        ],
+        "score": [
+          6415.4326171875
+        ],
+        "path_cosine": [
+          0.7552601099014282
+        ],
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "a46bc661882ba8b3155f767fcab0f1ac18c973063defe355f141498710ad410a",
+      "source_png_sha256": "61d30bbfda7ae14d0c1a2ec50612701645c94adc45dcd283ac308d865fbf5f92",
+      "pixel_sha256": "1b070a0710c126d393e4e8d32a9f3ceb7d98c36674d89e52b771bd65faa74e27",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/260.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_260/diversity.png",
+      "sha256": "496ba775f1d1f6610c55bdfae57dd9c4d5049361722c8ccded2a94bac097cf87",
+      "layer": "mixed4c",
+      "channel": 260,
+      "variant": "diversity",
+      "members": 4,
+      "batchSize": 4,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_diversity_0260_02/items/0",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 132
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "diversity"
+      },
+      "scores": {
+        "1024": [
+          6361.91064453125,
+          6410.548828125,
+          6264.580078125,
+          6318.40380859375
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -0.9019303321838379,
+          -2.238677501678467,
+          -3.923220157623291,
+          -3.787752866744995
+        ],
+        "post_relu": [
+          2.3146114349365234,
+          2.520200729370117,
+          2.4309229850769043,
+          1.625575065612793
+        ],
+        "score": [
+          2.3146114349365234,
+          2.520200729370117,
+          2.4309229850769043,
+          1.625575065612793
+        ],
+        "path_cosine": [
+          0.3772304654121399,
+          0.37334057688713074,
+          0.3752763271331787,
+          0.3528646230697632
+        ],
+        "diversity_cosine": 0.9457756876945496
+      },
+      "final": {
+        "pre_relu": [
+          6361.89892578125,
+          6410.548828125,
+          6264.580078125,
+          6318.39697265625
+        ],
+        "post_relu": [
+          6361.91064453125,
+          6410.548828125,
+          6264.580078125,
+          6318.40380859375
+        ],
+        "score": [
+          6361.91064453125,
+          6410.548828125,
+          6264.580078125,
+          6318.40380859375
+        ],
+        "path_cosine": [
+          0.7808222770690918,
+          0.593221127986908,
+          0.7253744602203369,
+          0.5838692784309387
+        ],
+        "diversity_cosine": 0.5819005966186523
+      },
+      "setting": "A",
+      "image_sha256": "a7ccfddfbccdc3077d1a50f2373505425c117daf7e19328ea98492807a76aece",
+      "source_png_sha256": "7f106f21e0316a1831a0b84d0649853303140e64d69f728bbfc8ac53fb56a85d",
+      "pixel_sha256": "d57ad3241783e349646e73617ca605f6bb646aa1a927443b22049af8462c884b",
+      "image_size": [
+        448,
+        448
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/260.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_260/negative.png",
+      "sha256": "b510cf5ef82570c39e405626314b3de2ccbf28d38fb9894d555dbf8336e5c265",
+      "layer": "mixed4c",
+      "channel": 260,
+      "variant": "negative",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_negative_0256_08/items/4",
+      "activation": "pre-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 132
+      },
+      "direction": "minimize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "negative"
+      },
+      "scores": {
+        "1024": [
+          -7017.0087890625
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -0.9019303321838379
+        ],
+        "post_relu": [
+          2.3146114349365234
+        ],
+        "score": [
+          -0.9019303321838379
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          -7017.0087890625
+        ],
+        "post_relu": [
+          0.00582495890557766
+        ],
+        "score": [
+          -7017.0087890625
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "b001abc5ad0e4a9deabaecf9bcc4b4e3e36aec528971927124c6840722c32a21",
+      "source_png_sha256": "98dfc75170667960c214eb99cb00b9463b739f7e7914c9bde27938609c0c3245",
+      "pixel_sha256": "890082ae75eadb948cba48e02d568f7b81adeec32e30cb58425e42edcb6df4c1",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/260.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_260/path_negative.png",
+      "sha256": "e9bd054ac8739b643c7137ebf5b6d1291386f7d7c89e857120e39371e72544a9",
+      "layer": "mixed4c",
+      "channel": 260,
+      "variant": "path_negative",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_path_negative_0256_08/items/4",
+      "activation": "pre-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 132
+      },
+      "direction": "minimize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "path_negative"
+      },
+      "scores": {
+        "1024": [
+          -7029.37060546875
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -0.9019303321838379
+        ],
+        "post_relu": [
+          2.3146114349365234
+        ],
+        "score": [
+          -0.9019303321838379
+        ],
+        "path_cosine": [
+          0.4279480576515198
+        ],
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          -7029.37060546875
+        ],
+        "post_relu": [
+          0.0020192195661365986
+        ],
+        "score": [
+          -7029.37060546875
+        ],
+        "path_cosine": [
+          0.7045632600784302
+        ],
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "037648d0ec81c210a6f317922f8414c9fb9a2199780684de73f11d8f39090d43",
+      "source_png_sha256": "d6467f23429087d8086a95062f6c3bed97b2dd404290c3f1296f18192a5cd8ce",
+      "pixel_sha256": "80ada004bd436e82994a304e25dcdd7dac31860a6c0ee1bd0ce02995c886d951",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/260.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_286/positive.png",
+      "sha256": "0a0269f73516fc1eadee6e0d651ce2a6b86c65429a5c06529258ebf8ccf53edd",
+      "layer": "mixed4c",
+      "channel": 286,
+      "variant": "positive",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_positive_0280_08/items/6",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 158
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "positive"
+      },
+      "scores": {
+        "1024": [
+          8447.763671875
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -53.20037078857422
+        ],
+        "post_relu": [
+          0.04213681071996689
+        ],
+        "score": [
+          0.04213681071996689
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          8447.7626953125
+        ],
+        "post_relu": [
+          8447.763671875
+        ],
+        "score": [
+          8447.763671875
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "a2244785f03f08fdb94f942898d40631349834f861468f5fe85844496a19b5aa",
+      "source_png_sha256": "7d5e93f256511176260d05f13ce6b217f3b2ce00dd944c895687c1c545b06e1f",
+      "pixel_sha256": "e3874d8848ec2a1c769095c1350638c372e372c4241da387ee20644981bcf73c",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/286.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_286/path_positive.png",
+      "sha256": "6076c79b8a0cb11f81dd3db903f6122a40945ff022216c49eeef0a9c77f5289c",
+      "layer": "mixed4c",
+      "channel": 286,
+      "variant": "path_positive",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_path_positive_0280_08/items/6",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 158
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "path_positive"
+      },
+      "scores": {
+        "1024": [
+          8553.8515625
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -53.20037078857422
+        ],
+        "post_relu": [
+          0.04213681071996689
+        ],
+        "score": [
+          0.04213681071996689
+        ],
+        "path_cosine": [
+          0.43545687198638916
+        ],
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          8553.8515625
+        ],
+        "post_relu": [
+          8553.8515625
+        ],
+        "score": [
+          8553.8515625
+        ],
+        "path_cosine": [
+          0.741958737373352
+        ],
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "2c90398a3981b2a179a769460849c44ec2cdc7bc7c43f8feaa156aed2629e2e2",
+      "source_png_sha256": "f95b137b2c4204b06a67f407ea3ccf72737455ecfaa6f37bb79af949c8104e0b",
+      "pixel_sha256": "434e967c141a47e9ba6cd49c1087598fd086a9f2bba4fe3eb886c6f7ce729c49",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/286.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_286/diversity.png",
+      "sha256": "d6b12c1c4655144ae78a38f83654113963d4dbe10a5f187c3c3a03aa49946227",
+      "layer": "mixed4c",
+      "channel": 286,
+      "variant": "diversity",
+      "members": 4,
+      "batchSize": 4,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_diversity_0286_02/items/0",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 158
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "diversity"
+      },
+      "scores": {
+        "1024": [
+          7211.0791015625,
+          7740.07177734375,
+          8724.927734375,
+          8657.2431640625
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -53.20037078857422,
+          -51.82954025268555,
+          -52.111328125,
+          -50.636661529541016
+        ],
+        "post_relu": [
+          0.04213681071996689,
+          0.0401083342730999,
+          0.04647321626543999,
+          0.04168615862727165
+        ],
+        "score": [
+          0.04213681071996689,
+          0.0401083342730999,
+          0.04647321626543999,
+          0.04168615862727165
+        ],
+        "path_cosine": [
+          0.43545687198638916,
+          0.4485597014427185,
+          0.4418404698371887,
+          0.4274287223815918
+        ],
+        "diversity_cosine": 0.9457756876945496
+      },
+      "final": {
+        "pre_relu": [
+          7211.0791015625,
+          7740.07177734375,
+          8724.927734375,
+          8657.2431640625
+        ],
+        "post_relu": [
+          7211.0791015625,
+          7740.07177734375,
+          8724.927734375,
+          8657.2431640625
+        ],
+        "score": [
+          7211.0791015625,
+          7740.07177734375,
+          8724.927734375,
+          8657.2431640625
+        ],
+        "path_cosine": [
+          0.7264376878738403,
+          0.7406264543533325,
+          0.732535719871521,
+          0.7349818348884583
+        ],
+        "diversity_cosine": 0.6315529346466064
+      },
+      "setting": "A",
+      "image_sha256": "d461983bf49c6281951412008fe9822327ff9257ffc33e57ac3cc44fdb57c0ee",
+      "source_png_sha256": "0b7bca429300cc9923513e6e3ae34d3b43886c545c131256319e47921236ea42",
+      "pixel_sha256": "0f76c3ebc1f7e6c4a283e92a41082d33459b0021baf180bb027b01942ddae0a2",
+      "image_size": [
+        448,
+        448
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/286.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_286/negative.png",
+      "sha256": "9fd8d5d6773e82a079f1c505c3a8ab63e44ee26f8becea723a9cc88d68bc1a2a",
+      "layer": "mixed4c",
+      "channel": 286,
+      "variant": "negative",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_negative_0280_08/items/6",
+      "activation": "pre-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 158
+      },
+      "direction": "minimize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "negative"
+      },
+      "scores": {
+        "1024": [
+          -6849.486328125
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -53.20037078857422
+        ],
+        "post_relu": [
+          0.04213681071996689
+        ],
+        "score": [
+          -53.20037078857422
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          -6849.486328125
+        ],
+        "post_relu": [
+          1.0268834103044355e-06
+        ],
+        "score": [
+          -6849.486328125
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "d92f3ff0e197574aa0db67d6207f4ba3f62a3f8a3c072cfe2a7531b2e08de5bb",
+      "source_png_sha256": "aa95a2dc2edc4d55a120e90a7971b101e50f740738b2d539a61e38116c921069",
+      "pixel_sha256": "d88b24e43bf554b976f349369df3805e6c5724d38e958fe64a7e145c7b646834",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/286.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_286/path_negative.png",
+      "sha256": "6b70a5b276e0bc868362d04a8d97cecb5b03816896988dd77bb07184ed0f0ff2",
+      "layer": "mixed4c",
+      "channel": 286,
+      "variant": "path_negative",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_path_negative_0280_08/items/6",
+      "activation": "pre-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 158
+      },
+      "direction": "minimize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "path_negative"
+      },
+      "scores": {
+        "1024": [
+          -7119.0107421875
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -53.20037078857422
+        ],
+        "post_relu": [
+          0.04213681071996689
+        ],
+        "score": [
+          -53.20037078857422
+        ],
+        "path_cosine": [
+          0.3722355365753174
+        ],
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          -7119.0107421875
+        ],
+        "post_relu": [
+          0.0
+        ],
+        "score": [
+          -7119.0107421875
+        ],
+        "path_cosine": [
+          0.7362086176872253
+        ],
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "8d16ead122ca8c9cb0ebee728e0d930c428066ae4b93a4f4a8db1f0e64dd5e12",
+      "source_png_sha256": "fe51a5aba7247303ee89a50d7df34644cd53910288759521fb6975c9dcb9e1f0",
+      "pixel_sha256": "a5a65a374c6dfc9fa9a542ddc7f6f550c89b174887abe8b1d7875ac39b5652cd",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/286.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_212/positive.png",
+      "sha256": "bae7f275945d3d9d82afeabd9287267b2ddb9ec904116288bd96a37dd1415b8c",
+      "layer": "mixed4c",
+      "channel": 212,
+      "variant": "positive",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_positive_0208_08/items/4",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 84
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "positive"
+      },
+      "scores": {
+        "1024": [
+          8142.44970703125
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -10.631701469421387
+        ],
+        "post_relu": [
+          1.530627965927124
+        ],
+        "score": [
+          1.530627965927124
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          8142.408203125
+        ],
+        "post_relu": [
+          8142.44970703125
+        ],
+        "score": [
+          8142.44970703125
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "af13f00740303a614d29643e053d798c89666881e55791a74be339d842b93719",
+      "source_png_sha256": "bae7f275945d3d9d82afeabd9287267b2ddb9ec904116288bd96a37dd1415b8c",
+      "pixel_sha256": "d5067d31fddb370771fd175235b7615caaf0500b4d6d737eb6095a7bfd6a76d1",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/212.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_212/path_positive.png",
+      "sha256": "8abef90bdb9f302eb76dddedb6bbdcc9fdaca08804fa0075a62aff719acd419e",
+      "layer": "mixed4c",
+      "channel": 212,
+      "variant": "path_positive",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_path_positive_0208_08/items/4",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 84
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "path_positive"
+      },
+      "scores": {
+        "1024": [
+          8236.22265625
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -10.631701469421387
+        ],
+        "post_relu": [
+          1.530627965927124
+        ],
+        "score": [
+          1.530627965927124
+        ],
+        "path_cosine": [
+          0.4014849364757538
+        ],
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          8236.2080078125
+        ],
+        "post_relu": [
+          8236.22265625
+        ],
+        "score": [
+          8236.22265625
+        ],
+        "path_cosine": [
+          0.7912323474884033
+        ],
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "4a212ebcc6626c2f90b03af70773ea100c9e7e3046abac67205c30decf846a28",
+      "source_png_sha256": "8abef90bdb9f302eb76dddedb6bbdcc9fdaca08804fa0075a62aff719acd419e",
+      "pixel_sha256": "d75e9148ba81d2ddac352da6a1f8777c5af27243c367d700a9612d6900f3582e",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/212.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_212/diversity.png",
+      "sha256": "c0b94403bf234e219b91dd43fa4b5bb96b35b19d1ce9bfa5563fbdf9359cd538",
+      "layer": "mixed4c",
+      "channel": 212,
+      "variant": "diversity",
+      "members": 4,
+      "batchSize": 4,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_diversity_0212_02/items/0",
+      "activation": "post-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 84
+      },
+      "direction": "maximize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "diversity"
+      },
+      "scores": {
+        "1024": [
+          7862.349609375,
+          7845.48291015625,
+          8200.46484375,
+          8183.3544921875
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -10.631701469421387,
+          -10.846790313720703,
+          -11.312585830688477,
+          -15.628887176513672
+        ],
+        "post_relu": [
+          1.530627965927124,
+          0.08037309348583221,
+          0.6130402684211731,
+          0.10445982217788696
+        ],
+        "score": [
+          1.530627965927124,
+          0.08037309348583221,
+          0.6130402684211731,
+          0.10445982217788696
+        ],
+        "path_cosine": [
+          0.4014849364757538,
+          0.40342313051223755,
+          0.40580296516418457,
+          0.37764686346054077
+        ],
+        "diversity_cosine": 0.9457756876945496
+      },
+      "final": {
+        "pre_relu": [
+          7862.32177734375,
+          7845.3046875,
+          8200.4501953125,
+          8183.328125
+        ],
+        "post_relu": [
+          7862.349609375,
+          7845.48291015625,
+          8200.46484375,
+          8183.3544921875
+        ],
+        "score": [
+          7862.349609375,
+          7845.48291015625,
+          8200.46484375,
+          8183.3544921875
+        ],
+        "path_cosine": [
+          0.728833794593811,
+          0.7711375951766968,
+          0.7955700159072876,
+          0.8028765916824341
+        ],
+        "diversity_cosine": 0.6855248212814331
+      },
+      "setting": "A",
+      "image_sha256": "6fc6d281e6aa3d440a3b2ac6c5c9212881461f2dc78557614ef64b0391aed3f6",
+      "source_png_sha256": "c0b94403bf234e219b91dd43fa4b5bb96b35b19d1ce9bfa5563fbdf9359cd538",
+      "pixel_sha256": "64b1cbad9db8a8fdfc9c071fcbb98b6ff1addfae919641cbd01866775876e244",
+      "image_size": [
+        448,
+        448
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/212.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_212/negative.png",
+      "sha256": "81efdad3feb7f84ea74e4b6a97eb6d38c25ada3cf4536b5a737b2494dc0a9816",
+      "layer": "mixed4c",
+      "channel": 212,
+      "variant": "negative",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_negative_0208_08/items/4",
+      "activation": "pre-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 84
+      },
+      "direction": "minimize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "negative"
+      },
+      "scores": {
+        "1024": [
+          -8389.4404296875
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -10.631701469421387
+        ],
+        "post_relu": [
+          1.530627965927124
+        ],
+        "score": [
+          -10.631701469421387
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          -8389.4404296875
+        ],
+        "post_relu": [
+          0.014348374679684639
+        ],
+        "score": [
+          -8389.4404296875
+        ],
+        "path_cosine": null,
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "00093df8b4776133a95ff2b90c2a118d7f74f8bf4cf819aa92b91c69b4f89725",
+      "source_png_sha256": "81efdad3feb7f84ea74e4b6a97eb6d38c25ada3cf4536b5a737b2494dc0a9816",
+      "pixel_sha256": "12d3388c508398fa740e739feb894ce3596ab9e26d5bf4e2dd346780a96d770e",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/212.png"
+    },
+    {
+      "file": "docs/assets/mixed4c_212/path_negative.png",
+      "sha256": "868038f762bb4f7bd75eb4877c20d0ae6125a6a38f18da4271dea98e92eb2987",
+      "layer": "mixed4c",
+      "channel": 212,
+      "variant": "path_negative",
+      "members": 1,
+      "batchSize": 1,
+      "runId": "full_A_1024_20261027T0927/batches/mixed4c_path_negative_0208_08/items/4",
+      "activation": "pre-ReLU",
+      "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+      "target": {
+        "node": "mixed4c_3x3_pre_relu_conv",
+        "channel": 84
+      },
+      "direction": "minimize",
+      "config": {
+        "size": 224,
+        "steps": 1024,
+        "seed": 0,
+        "color_mode": "fitted",
+        "std": 0.01,
+        "lr": 0.03,
+        "gaussian_sigma": 0.12,
+        "uniform_mix": 0.0,
+        "final_band": 0.45,
+        "initial_band": 0.15,
+        "unlock_until": 0.7,
+        "blur_start": 2.0,
+        "blur_end": 0.5,
+        "logit_l2": 0.0,
+        "mean_color_weight": 20000,
+        "mean_color": [
+          0.65,
+          0.7,
+          0.74
+        ],
+        "mapping": "sigmoid",
+        "mapping_gain": 1.0,
+        "jitter": 4,
+        "rotation": 5.0,
+        "scale_min": 0.95,
+        "scale_max": 1.05,
+        "activation_cap": 0.0,
+        "view_size": 224,
+        "periphery_weight": 0.0,
+        "periphery_sigma": 0.35,
+        "periphery_color": [
+          0.68,
+          0.76,
+          0.79
+        ],
+        "tv_weight": 0.0,
+        "periphery_mean_weight": 80000,
+        "periphery_tv_weight": 0.0,
+        "periphery_power": 2,
+        "layer": "mixed4c",
+        "common_view_size": 224,
+        "schedule_steps": 768,
+        "save_steps": [
+          256,
+          512,
+          768,
+          1024
+        ],
+        "path_steps": 64,
+        "path_weight_ratio": 1.0,
+        "diversity_weight_ratio": 0.3,
+        "fft_decay_power": 1.5,
+        "logit_chroma_gain": 2.0,
+        "neighbor_rgb_weight": 0.0,
+        "history_every": 16,
+        "slot": "path_negative"
+      },
+      "scores": {
+        "1024": [
+          -8478.583984375
+        ]
+      },
+      "initial": {
+        "pre_relu": [
+          -10.631701469421387
+        ],
+        "post_relu": [
+          1.530627965927124
+        ],
+        "score": [
+          -10.631701469421387
+        ],
+        "path_cosine": [
+          0.4253343641757965
+        ],
+        "diversity_cosine": 0.0
+      },
+      "final": {
+        "pre_relu": [
+          -8478.583984375
+        ],
+        "post_relu": [
+          1.3228985835667117e-06
+        ],
+        "score": [
+          -8478.583984375
+        ],
+        "path_cosine": [
+          0.8707597851753235
+        ],
+        "diversity_cosine": 0.0
+      },
+      "setting": "A",
+      "image_sha256": "1d464e7ce6a1c60cf63cb05cc3025ad7ee8d0f1616dc41b7d01239c0079d809c",
+      "source_png_sha256": "868038f762bb4f7bd75eb4877c20d0ae6125a6a38f18da4271dea98e92eb2987",
+      "pixel_sha256": "5b0eeb6b331a4bfca402aac64d3edc5b96cafe000b55508ef45e777e266f0c32",
+      "image_size": [
+        224,
+        224
+      ],
+      "source_hashes": {
+        "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+        "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+        "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+        "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+        "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+        "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+      },
+      "versions": {
+        "torch": "2.10.0+cu130",
+        "cuda": "13.0",
+        "numpy": "1.26.4"
+      },
+      "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/212.png"
+    }
+  ],
+  "model": {
+    "name": "InceptionV1 / TensorFlow Inception5h (Lucent PyTorch conversion)",
+    "source_repo": "https://github.com/greentfrapp/lucent",
+    "source_commit": "2ccc434d80097e58f53cb2a70c60f72902fe93af",
+    "weights_url": "https://raw.githubusercontent.com/ProGamerGov/pytorch-old-tensorflow-models/master/inception5h.pth",
+    "weights_sha256": "44f1f1e0734fa77edd0ab948c0d4d5c9ab6f4efce10b02d793fd14ab2d71a73b",
+    "preprocessing": "RGB float [0,1] * 255 - 117",
+    "num_classes": 1008,
+    "is_goodfire_retrained_checkpoint": false
+  },
+  "runtime_versions": {
+    "torch": "2.10.0+cu130",
+    "cuda": "13.0",
+    "numpy": "1.26.4"
+  },
+  "optimization_source_sha256": {
+    "full_feature_viz.py": "37a83f2062743d00125e89f88c21688301d0c5c46c688ccf323372cfba11f01c",
+    "five_variants.py": "f36df106bff6f1aef35ab4674aaaa812c07e64a27e5976847d8668ff2b91e898",
+    "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+    "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+    "models.py": "35c0a6a33732b15335c5dd2e15a8385c4c3817cb57c3920a70c54cb2b1bacece",
+    "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+  },
+  "showcase_neurons": [
+    "mixed4c:477",
+    "mixed4c:260",
+    "mixed4c:286",
+    "mixed4c:212"
+  ],
+  "publication_release": "site_complete_five_20261031T075409"
+}
