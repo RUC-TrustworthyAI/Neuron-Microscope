@@ -8,7 +8,7 @@
  const response=await fetch('payloads/01-agent1.html.gz');
  if(!response.ok)throw new Error('The report resource is unavailable.');
  const stream=response.body.pipeThrough(new DecompressionStream('gzip'));
- const html=await new Response(stream).text();
+ const html=(await new Response(stream).text()).replace("const eyebrow = ['Neuron paper',", "const eyebrow = ['Neuron report',");
  document.open();document.write(html);document.close();
 }catch(error){document.getElementById('loading').textContent=error.message;}})();
 </script></html>

@@ -17,4 +17,4 @@ Provision [Lucent](https://github.com/greentfrapp/lucent) at commit `2ccc434d800
 
 Existing assets can be reused through an absolute `VNI_MODEL_DIR`; the directory must have the layout above. No command silently downloads weights. Run `vision-microscope doctor` before optimization: it checks the weight hash, source commit and tracked modifications. Loading verifies the weight hash again.
 
-The model uses 1008 output classes and historical `RGB*255-117` preprocessing. It is not interchangeable with torchvision's GoogLeNet weights or Goodfire's retrained InceptionV1 checkpoint. The feature-visualization pipeline stops at the requested intermediate layer; it uses the model's standard 224-pixel input geometry.
+The model uses 1008 output classes and historical `RGB*255-117` preprocessing. The feature-visualization pipeline stops at the requested intermediate layer and uses 224-pixel input geometry. The [AlreadyClean reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) identifies Lucent pretrained weights; its exact checkpoint digest has not been verified against this manifest.

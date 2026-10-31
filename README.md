@@ -38,7 +38,7 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 | **Qwen3-32B** | Activation evidence, explanations, controlled tests, interventions and unresolved cases. | [Interactive neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/) · [Investigation code](workflow/) |
 | **InceptionV1 / Lucent Inception5h** | Five visualization objectives, natural-image examples, heatmaps and reference comparisons. | [Vision guide and examples](vision/README.md) · [Optimization code](vision/vision-repro/) |
 
-**Available now:** [LLM investigation code and prompts](workflow/), [sources, sampling procedures and readers for five corpora](docs/data.md#corpora-used-in-the-comparisons), [interactive neuron comparisons](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/), and [vision code with measured visualization examples](vision/README.md). LLM reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
+**Data:** [Sources, sampling procedures and readers for five LLM corpora](docs/data.md#corpora-used-in-the-comparisons) accompany the comparisons. LLM reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
 > [!IMPORTANT]
 > **This is an independent reproduction effort.** In LLM investigations, the research models do not see AlreadyClean's explanations. The reference report is added only when the final report is published for comparison.
@@ -108,7 +108,7 @@ The [vision module](vision/README.md) optimizes images for individual InceptionV
 
 These are saved outputs for **mixed4c:260**, using configuration A, 224 × 224 inputs, 1,024 steps and seed 0. Positive maximizes post-ReLU activation; Negative minimizes signed pre-ReLU activation. [Recorded settings and scores](vision/docs/assets/provenance.json) accompany the images.
 
-The implementation uses the historical **Lucent Inception5h checkpoint**, which differs from Goodfire's retrained checkpoint. The [vision method guide](vision/docs/methodology.md) explains the objectives and comparison scope. The vision workflow has its own model and data requirements; the LLM investigation below applies to Qwen3.
+The implementation pins a **Lucent Inception5h checkpoint**. The [reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights; exact weight identity has not been verified. The [vision method guide](vision/docs/methodology.md) explains the objectives and sampling differences. The LLM workflow below applies to Qwen3.
 
 ## Which AlreadyClean claims have we tested?
 
@@ -138,9 +138,9 @@ The original essay contains claims at several levels. The table below tracks our
   </a>
 </p>
 
-The walkthrough follows the Colorado investigation from saved activation evidence through interpretation, controlled experiments, revision, and publication. It shows the prompts, tool calls, measurements, intermediate reports, and final criticism. This recording uses Diverse 100M; the comparison above uses SlimPajama 100M.
+Recorded on **29 October 2026**, the walkthrough follows a Colorado investigation using **Diverse 100M**, including revision of the interpretation after experiments. It preserves the prompts, measurements and intermediate reports from that run. The linked Qwen3 comparisons also document runs from 29 October, using SlimPajama 100M. The runnable workflow described below freezes the explanation before experiments and analyzes their results against that frozen explanation.
 
-### From evidence to a report
+### Current runnable workflow
 
 Python orchestrates the investigation through structured LLM requests and model measurements. The LLM proposes explanations, predictions and experimental inputs in defined JSON formats; code selects the evidence, executes the measurements and assembles the report.
 
@@ -319,12 +319,12 @@ Our group's related work spans feature learning, concept-based analysis, explana
 
 | Guide | Start here when you want to… |
 | --- | --- |
-| [Running](docs/running.md) | Install dependencies, configure GPUs and credentials, and run or continue a batch. |
-| [Input data](docs/data.md) | Prepare an activation archive and target report package. |
-| [Method and implementation](docs/method.md) | Trace the workflow to code and understand the measurement scope. |
-| [Report guide](docs/reports.md) | Find the source and generation stage of a particular plot or section. |
-| [Development](docs/development.md) | Run CPU software checks and the offline demo. |
-| [Prompts and output contracts](workflow/) | Inspect the explanation, labeling, experimental-design and report-analysis requests. |
+| [LLM installation and running](docs/running.md) | Install dependencies, configure GPUs and credentials, and run or continue a batch. |
+| [LLM input data](docs/data.md) | Prepare an activation archive and target report package. |
+| [LLM method and implementation](docs/method.md) | Trace the workflow to code and understand the measurement scope. |
+| [LLM report guide](docs/reports.md) | Find the source and generation stage of a particular plot or section. |
+| [LLM development](docs/development.md) | Run CPU software checks and the offline demo. |
+| [LLM prompts and output contracts](workflow/) | Inspect the explanation, labeling, experimental-design and report-analysis requests. |
 | [Vision setup and examples](vision/README.md) | Install the InceptionV1 module, inspect visualizations and export a viewer. |
 
 ## Citation

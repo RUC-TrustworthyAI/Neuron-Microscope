@@ -2,6 +2,8 @@
 
 The exported viewer works on any static file server. For large galleries, `hosting/index.mjs` adds a same-origin R2 media service: static HTML stays small, while images and node records live in object storage.
 
+Run the following commands from `vision/`, with the vision environment activated.
+
 ## 1. Export the viewer
 
 ```bash

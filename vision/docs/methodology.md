@@ -1,62 +1,68 @@
-# 当前优化方法
+# Vision visualization method
 
-## 模型和目标
+**English** · [简体中文](methodology_zh.md)
 
-使用 Lucent 的历史 TensorFlow Inception5h 移植版本，冻结权重。输入为 224 × 224 RGB `[0,1]`，送入模型前转换为 `255*x-117`。它不是 torchvision GoogLeNet，也不是 Goodfire 的重训模型；索引和语义不能仅凭相同模型名字就视为等同。
+## Model and targets
 
-通道目标为归一化 Gaussian 加权激活：
+The implementation freezes a pinned Lucent conversion of TensorFlow Inception5h. Inputs are 224 × 224 RGB values in `[0,1]`, transformed to `255*x-117` before the forward pass. The [reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights. This module records its source revision and checkpoint digest; exact weight identity with the reference has not been verified.
 
-`a(x) = sum_uv G_sigma(u,v) * F_channel(x)[u,v]`。
+The channel objective is a normalized Gaussian-weighted activation:
 
-坐标范围 `[-0.5,0.5]`，中心为零，`sigma=0.12`，权重和为 1。Positive 最大化 post-ReLU；Negative 最小化对应分支的有符号 pre-ReLU。每次求值验证 `relu(pre) == post`，记录通道的具体分支映射。
+`a(x) = sum_uv G_sigma(u,v) * F_channel(x)[u,v]`.
 
-## A 组图像参数化
+Coordinates range over `[-0.5,0.5]`, the Gaussian is centered at zero, `sigma=0.12`, and its weights sum to 1. Positive maximizes post-ReLU activation. Negative minimizes the corresponding branch's signed pre-ReLU activation. Evaluation checks `relu(pre) == post` and records the channel's branch mapping.
 
-- 独立高斯 FFT 系数，初始标准差 0.01；默认 seed 0。
-- 频率尺度 `1/f^1.5`，低频截止比例从 0.15 平滑增加至 0.45。
-- 使用本项目拟合的 RGB 协方差因子：`U*sqrt(lambda)`，按最大列范数归一化。优化坐标去相关，映射回 RGB 后保留自然颜色相关结构。这不是把最终 RGB 图像“白化”。
-- 颜色统计来自 ImageNet 每类 10 张，共 10,000 张、2,560,000 个像素；它与检索的 50k 子集是两个不同过程。
-- logit 色度增益 2，随后 sigmoid 映射到 `[0,1]`；Gaussian blur 从 2 降至 0.5 像素。
-- Adam 初始学习率 0.03；退火时程固定 768 步，后续保持最终频段、模糊和学习率。默认总步数 1024。
-- 优化时应用随机平移、旋转和尺度扰动；评估图不加这些随机扰动。
+## Configuration A
 
-A 组没有 alpha 拼贴、外部生成模型、显示端调色、像素邻域损失、logit L2 或 TV 损失。
+- Independent Gaussian Fourier coefficients start with standard deviation 0.01; the default seed is 0.
+- Frequency scaling uses `1/f^1.5`. The low-pass cutoff increases smoothly from 0.15 to 0.45.
+- The fitted RGB covariance factor is `U*sqrt(lambda)`, normalized by the largest column norm. Decorrelation in optimization coordinates preserves natural RGB correlations when mapped back to the image.
+- Color statistics use 10 images per ImageNet class: 10,000 images and 2,560,000 pixels. This fitting process is separate from the 50,000-image retrieval scan.
+- Logit chroma gain is 2, followed by a sigmoid map to `[0,1]`. Gaussian blur decreases from 2 to 0.5 pixels.
+- Adam starts at learning rate 0.03. The annealing schedule lasts 768 steps; later steps retain its final frequency band, blur and learning rate. The configured run length is 1,024 steps.
+- Optimization applies random translation, rotation and scale changes. Evaluation scores use images without these random transforms.
 
-## 基础损失
+Configuration A uses the Fourier parameterization and the losses below. Its alpha compositing, neighboring-pixel, logit-L2 and TV options are disabled. Saved previews retain the optimizer's RGB output.
 
-每张图的基础损失是：
+## Base loss
 
-`L = sign*a(T(x)) + 20000*mean_RGB((mean_space(x)-c)^2) + 80000*mean_RGB((mean_periphery(x)-b)^2)`。
+For each image:
 
-正向 `sign=-1`，负向 `sign=+1`；`c=(0.65,0.70,0.74)`，`b=(0.68,0.76,0.79)`。外围平均采用平滑径向权重 `(1-exp(-r²/(2*0.35²)))²`。这是约束区域平均颜色，不是要求每个外围像素等于背景色。青蓝倾向部分来自这一显式先验，不能解释成模型天然偏好。
+`L = sign*a(T(x)) + 20000*mean_RGB((mean_space(x)-c)^2) + 80000*mean_RGB((mean_periphery(x)-b)^2)`.
 
-正向目标在尚未激活时允许重定向 ReLU 反向梯度，前向仍然是普通 ReLU。每个 neuron 的全部成员首次具有正激活后，关闭该 neuron 的梯度重定向，之后不重新开启。负向直接使用 pre-ReLU，不用这个预热。它不等同于把完整正向目标替换为 pre-ReLU。
+Positive uses `sign=-1`; negative uses `sign=+1`. The color targets are `c=(0.65,0.70,0.74)` and `b=(0.68,0.76,0.79)`. Peripheral averaging uses the smooth radial weight `(1-exp(-r²/(2*0.35²)))²`. The constraints apply to regional means, so individual peripheral pixels can differ. The explicit prior contributes to the cyan/blue appearance of generated images.
 
-## 五类结果
+While a positive target is inactive, the optimizer can redirect ReLU backward gradients; the forward pass retains ordinary ReLU. Once all members for a channel have positive activation, redirection is disabled for that channel for the remainder of the run. Negative uses pre-ReLU directly. The positive objective itself remains post-ReLU.
 
-| 类型 | 激活目标 | 附加项 |
+## Five views
+
+| View | Activation objective | Additional term |
 | --- | --- | --- |
-| Positive | 最大化 post-ReLU | 无 |
-| Path-guided + | 最大化 post-ReLU | 前 64 步对齐正向自然路径锚点 |
-| Diversity | 最大化 post-ReLU，4 张 | 4 张图之间上一层的 Gaussian 加权 Gram cosine 惩罚 |
-| Negative | 最小化 signed pre-ReLU | 无 |
-| Path-guided − | 最小化 signed pre-ReLU | 前 64 步对齐负向自然路径锚点 |
+| Positive | Maximize post-ReLU | Base loss only |
+| Path-guided + | Maximize post-ReLU | Positive natural-path alignment for the first 64 steps |
+| Diversity | Maximize post-ReLU for four images | Previous-layer Gaussian-weighted Gram-cosine penalty within the four-image group |
+| Negative | Minimize signed pre-ReLU | Base loss only |
+| Path-guided − | Minimize signed pre-ReLU | Negative natural-path alignment for the first 64 steps |
 
-路径表示拼接上一目录层和当前层的 Gaussian 池化向量，当前目标通道置零，各自归一化后拼接并再次归一化。第一层的“上一层”是输入 RGB。锚点使用 50k 子集中 top/min 60 个自然样例，在样例激活峰/谷处池化后取单位均值。引导项为 `1-cos(path,anchor)`，权重为自然 Gaussian 分数绝对值中位数；只作用于前 64 步。
+The path vector concatenates Gaussian-pooled vectors from the previous catalog layer and the current layer, with the target channel zeroed. Each vector is normalized before concatenation, then the concatenation is normalized again. For the first layer, the previous representation is input RGB.
 
-该路径是明确声明的**激活向量代理**，不是像素梯度路径或梯度×激活，也不声称逐项等同于作者未公开实现。Diversity 权重为自然分数尺度的 0.3 倍，不同 neuron 之间不相互施加多样性损失。无有效自然锚点的任务标记为 unavailable，不用随机值替代。
+For each pole, anchors use the top/minimum 60 natural examples in the scan. Pooling is centered on each example's response extremum, and the anchor is the unit-normalized mean. The guidance term is `1-cos(path,anchor)`, weighted by the median absolute natural Gaussian score, and applies only during the first 64 steps.
 
-## 自然样例和可比性
+This is a defined activation-vector proxy. Comparing guided results requires the vector definition, weight and guidance schedule. Diversity weight is 0.3 times the natural score scale; comparisons stay within a channel's four members. Targets with unusable anchors are marked `unavailable`.
 
-扫描每类 50 张、共 50,000 张 ImageNet train 图片。短边缩放至 256，再中心裁剪 224。正向按空间最大 post-ReLU 排序，负向按空间最小 signed pre-ReLU 排序；这与优化的中心 Gaussian 分数不同，网页和运行记录分别标明。
+## Natural examples and comparability
 
-每个 neuron 展示 Top 16、两个额外百分位附近的 8 张样例和最负向 16 张，共 48 个展示位置。热图是模型层原生网格的逐图归一化响应，不是像素 attribution；不同图片热图颜色深浅不能直接比较绝对激活值。
+The scan selects 50 images per class, for 50,000 ImageNet training images. It resizes the short side to 256, then center-crops to 224. Positive examples are ranked by spatial maximum post-ReLU activation; negative examples by spatial minimum signed pre-ReLU activation. Optimization uses a central Gaussian score, so its scores and the retrieval scores have separate definitions.
 
-网页图像为真实优化输出，不做结果端锐化、调色或背景合成。模型、目标、数据子集与超参数均有记录；视觉相似度不能替代模型语义一致性的验证。
+The [reference page](https://already-clean.goodfire.com/microscope/inceptionv1.html) describes positive examples from 50,000 training images and a negative tail over all 1,281,167 training images. This module uses its class-balanced 50,000-image subset for both poles. Natural-example tails therefore depend on both the scan size and the selected images.
 
-## 自然样例的显示范围
+Each channel has 48 display positions: Top 16, two groups of eight examples near additional percentiles, and the negative Top 16. Heatmaps display layer-grid responses normalized per image. Their intensity cannot be used to compare absolute activation across images or establish pixel-level attribution.
 
-感受野按固定历史 InceptionV1 架构递推。对卷积或池化，核宽 `k`、步幅 `s`、左侧 padding `p` 更新：
+The displayed optimization images retain their recorded colors and sharpness. The model, objective, data subset and hyperparameters accompany results. Assessing a channel's function requires its measured responses and controls as well as visual inspection.
+
+## Receptive-field display
+
+Receptive fields are computed from the fixed historical InceptionV1 architecture. For a convolution or pool with kernel width `k`, stride `s` and left padding `p`:
 
 ```text
 r_new = r + (k - 1) * j
@@ -64,6 +70,6 @@ j_new = j * s
 start_new = start + ((k - 1) / 2 - p) * j
 ```
 
-输入像素 0 的中心为 0.5。Inception 拼接层按通道所属分支选择感受野；随后混合输入通道的卷积取输入依赖范围的并集。例如 `conv2d0:0` 为 7，`mixed3a` 三种卷积分支分别为 27、43、59；`mixed4c:447` 为 299，显示时截到 224。
+The center of input pixel 0 is 0.5. Concatenated Inception layers use the field of the channel's branch; convolutions mixing input channels use the union of their dependency ranges. For example, `conv2d0:0` has width 7, the three convolution branches in `mixed3a` have widths 27, 43 and 59, and `mixed4c:447` has width 299, capped at 224 for display.
 
-在空间激活极值处取方形裁剪，边缘处平移框而非补黑边。热图根据真实 feature-cell 中心采样到同一个裁剪坐标系，极值标记同步换算。这个范围描述架构依赖，并非梯度归因；优化目标与样例排序保持原定义。
+Square crops are centered on response extrema and shifted inside the image at boundaries. Heatmaps are sampled using the actual feature-cell centers in the same crop coordinates, and extremum markers are transformed with them. These crops describe architectural dependencies; target scores and example rankings retain their original definitions.

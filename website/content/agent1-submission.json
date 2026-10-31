@@ -1,60 +1,48 @@
 {
   "claim": {
-    "title": "Colorado reference neuron",
-    "lede": "This neuron responds most strongly to Colorado-specific context. At generic spaces, punctuation, or function words just before a Colorado place, team, institution, or local phone number, its product rises steeply; the strongest observed anchor was a space before 303-471-74, with product 364. The neuron also promotes tokens such as ' Boulder', ' Colorado', and ' Denver'. Contexts about other interior-Western or northern-Plains places, especially North Dakota and Utah, produce its weaker negative pole.",
-    "one_paragraph": "The positive pole is sharply localized. Its top anchors sit in passages about Denver, Boulder, Carbondale, Durango, Pikes Peak, Longmont, Aurora, and other Colorado locations, often at a space or punctuation mark before a 303, 720, 719, or 970 telephone number. Across the 30 top positive anchors, gate averaged 18.2 and value 18.3, producing a mean product of 331.4. The distribution is sparse and asymmetric: 32.6% of products are positive, the median is -0.096, and the positive maximum (364.0) is far beyond the negative minimum (-55.25). Token selectivity agrees: above 10% of the maximum product, ' Denver' occurs at 12,438 of 14,277 occurrences (87%), ' Colorado' at 22,011 of 26,215 (84%), and ' Boulder' at 2,902 of 3,905 (74%). The weight-only logit lens raises ' Boulder' by 0.743, ' Colorado' by 0.729, and ' Denver' by 0.722. Ablations alter next-token distributions (median KL 0.112 versus 0.00027 for controls), though positive anchors are stronger and effects vary widely.",
-    "negative_pole": "The negative pole is weaker and broader. Its strongest anchors fall in text about North Dakota, Utah, New Mexico, Nevada, Arizona, and neighboring interior-Western places, often immediately before or inside non-Colorado telephone numbers such as 435, 701, 505, 603, or 928. The minimum product, -55.25, occurred at a '3' in a Utah 435 number; gate stayed positive (9.94) while value was -5.56, so the negative sign comes from the value channel rather than silence. Across the 30 bottom anchors, gate averaged 7.0 but value averaged -7.2, giving mean product -48.4. Negative tokens are less selective: at 10% of the negative extreme, ' BYU' reaches 15.5% of occurrences and ' Dakota' 14.2%, versus 87% for ' Denver' on the positive side.",
-    "what_would_change_my_mind": "Controlled minimal pairs would be decisive: identical sentences where only Colorado versus another state changes, and the same phone number with different area codes. Strong positive products in clearly North Dakota or Utah passages, or no Colorado-token promotion when place names are varied, would undermine the regional explanation.",
-    "confidence": "medium"
+    "title": "Colorado local-context neuron",
+    "lede": "This neuron responds most strongly to Colorado-local context, especially Colorado’s Front Range news, sports, community services and public records. It activates when the surrounding prefix supplies Colorado place names, area codes, venues or institutions, and its output direction raises Colorado, Denver, Boulder, Colo and Broncos. Strong positive products are both large and coherent; negative products are weaker and more heterogeneous.",
+    "one_paragraph": "Across 100 million tokens, product is centered near zero (median -0.029; 99th percentile 1.20) but has a long positive tail to 322 and a shorter negative tail to -73.5. The strongest positive anchors (322, 316, 310, 304, 298) sit in Colorado Front Range text: Longmont event listings, Boulder County farms, Denver sports and C.R.S. district resolutions. The largest examples occur where gate and value are both strongly positive (for example 18.5 × 17.375 = 322), and token selectivity is concentrated on Denver (mean product 89.9), Colorado (87.0) and Boulder (74.7). A +1 product output projection raises “ Boulder” (+0.743), “ Colorado” (+0.729), “ Denver” (+0.722), “ Colo” (+0.652) and “ Broncos” (+0.528). The negative tail is split among Chinese Qinghai provincial news (to -73.5), Highcharts source code such as .data/.x (about -43), and non-Colorado civic or contact records (-40 to -46). Material limitation: negative product is not one opposing concept; moderate negatives are common in ordinary prose and are weak evidence.",
+    "negative_pole": "The negative pole is heterogeneous. The most negative anchor is -73.5 on “(” in a Chinese news dateline mentioning Xining (西宁), followed by Qinghai (青海), county/province (县/省) and newspaper (日报) anchors around -35 to -54. Another cluster is source code, especially .data/.x/.series references in a Highcharts script (about -43), and a third is non-Colorado civic or contact text such as Montana BLM telephone numbers and a North Dakota legislative report (-40 to -46). Thus negative product mostly indicates departure from the Colorado-local pattern rather than a well-defined anti-Colorado entity. Ordinary English prose also yields small negative values, which are weak evidence and often belong to the uncertain group.",
+    "what_would_change_my_mind": "Similar positive products from non-Colorado local news or sports would argue for a broader local-information feature; conversely, Colorado-only text that fails to activate would undercut the entity explanation. A single coherent negative category, instead of the observed Qinghai, code and other-state clusters, would replace the heterogeneous-negative account.",
+    "confidence": "medium-high"
   },
   "criticism": [],
   "response_rules": [
     {
-      "id": "rule_1",
-      "name": "Colorado area-code phone number",
-      "description": "Product is positive at the token immediately before, or within, a telephone number whose area code is 303, 720, 719, or 970 (for example the space before 303-471-74, product 364.0, or a comma before a 720 number, 332.0), especially after 'call', 'at', 'contact', or 'Phone Number:'.",
+      "id": "colorado_front_range_local",
+      "name": "Colorado Front Range local context",
+      "description": "The full prefix establishes a Colorado Front Range locality or Colorado institution through place names (Denver, Boulder, Longmont, Fort Collins, Aurora, Berthoud, Niwot, Minturn, Fruita), area codes 303/720, C.R.S. citations, district resolutions, or local venues. The anchor may be a space, function word, digit, or phone-number fragment inside news, event, service, venue, or public-record text; the Colorado cue often appears earlier in the prefix.",
       "predicted_pole": "positive"
     },
     {
-      "id": "rule_2",
-      "name": "Explicit Colorado place, team, or institution",
-      "description": "Product is positive at a token adjacent to or immediately preceding an explicit Colorado name: Denver, Boulder, Colorado, Colorado Springs, Pueblo, Durango, Aspen, Aurora, Longmont, Carbondale, Pikes Peak, 'CO', CU, Broncos, Nuggets, or Rockies. The effect is strongest when the anchor is a generic separator just before the name.",
+      "id": "colorado_sports",
+      "name": "Colorado sports teams and athletes",
+      "description": "The prefix is a Denver-area or Colorado sports report about the Broncos, Rockies, Nuggets, CU, or local high-school/college teams and athletes, and the anchor introduces a player, team, game, score, or other sports detail. Explicit Colorado wording is not required when team names or the sports context identify the Colorado connection.",
       "predicted_pole": "positive"
     },
     {
-      "id": "rule_3",
-      "name": "Generic boundary inside Colorado context",
-      "description": "Product is positive at a space, comma, hyphen, newline, or function word ('at', 'on', 'with', 'to', 'the', 'all', 'above') when the surrounding local window names Colorado places, teams, or Colorado local institutions and the following continuation is a Colorado location, venue, school, or local number.",
-      "predicted_pole": "positive"
-    },
-    {
-      "id": "rule_4",
-      "name": "Colorado document continuation",
-      "description": "Product is positive when the preceding sentence or heading has established a Colorado locale and the anchor precedes an otherwise ambiguous numeric or capitalised continuation, such as a date, age, school name, or place fragment. This covers anchors that would be uninformative outside the Colorado context.",
-      "predicted_pole": "positive"
-    },
-    {
-      "id": "rule_5",
-      "name": "Non-Colorado state-local area code",
-      "description": "Product is negative at the token immediately before, or within, a state-local telephone number using a non-Colorado area code such as 435 (Utah), 701 (North Dakota), 505 (New Mexico), 603 (New Hampshire), 928 (Arizona), or 801 (Utah), particularly after 'call', 'contact', 'at', or 'Phone:'. Toll-free 800/888 numbers inherit the surrounding state context.",
+      "id": "qinghai_provincial_news",
+      "name": "Qinghai and Tibetan-plateau provincial news",
+      "description": "The full prefix is Chinese-language provincial or local reporting centered on Qinghai, Xining, Yushu, Sanjiangyuan, or Tibetan-plateau counties and institutions. The anchor falls on an administrative or place token (青海, 西宁, 省, 县, 日报, 环, 站长) or an adjacent punctuation or number within that report.",
       "predicted_pole": "negative"
     },
     {
-      "id": "rule_6",
-      "name": "North Dakota, Utah, or other interior-West context",
-      "description": "Product is negative at a generic space, comma, or function word in text whose local window centres on North Dakota (Dakota, ND, Fargo, Bismarck, Minot, Badlands), Utah or the Great Basin (BYU, Salt Lake, St. George, Moose, Tahoe), or another non-Colorado interior-Western state or locality.",
+      "id": "source_code_markup",
+      "name": "Source code and chart markup",
+      "description": "The prefix is dense source code or JavaScript/library markup, especially Highcharts-style property and method chains such as .data, .x, .series, and .point, or similar script fragments. The anchor is a property, method, syntax, digit, or whitespace token inside that code context.",
       "predicted_pole": "negative"
     },
     {
-      "id": "rule_7",
-      "name": "No regional cue near anchor",
-      "description": "Product is uncertain in ordinary prose with no nearby Colorado or other interior-Western place, institution, or phone number; the signed product is typically small and its sign is not predictive of a stable concept.",
-      "predicted_pole": "uncertain"
+      "id": "non_colorado_civic_records",
+      "name": "Non-Colorado civic and contact records",
+      "description": "The full prefix is a U.S. civic, regulatory, or contact-directory passage tied to a state or agency outside Colorado, such as North Dakota legislative material, Montana BLM or ARM notices, or California/Oroville services. The anchor is a telephone-number digit, statutory citation number, address, or contact field, and no Colorado locality is established.",
+      "predicted_pole": "negative"
     },
     {
-      "id": "rule_8",
-      "name": "Conflicting or partial regional cues",
-      "description": "Product is uncertain when Colorado and non-Colorado markers occur in the same local window but neither is adjacent to the anchor, when a toll-free or unlisted area code is the only clue, or when the anchor is an isolated numeric fragment not part of a phone number. Do not infer the pole from the measured sign alone in these boundary cases.",
+      "id": "no-visible-cue",
+      "name": "No visible cue",
+      "description": "The prefix is generic prose, academic or mathematical writing, an ambiguous multilingual passage, or a mixed context in which neither the Colorado-local pattern nor a coherent negative cue can be established. Weak negative values in ordinary text also belong here.",
       "predicted_pole": "uncertain"
     }
   ]

@@ -1,217 +1,383 @@
 {
   "claim": {
-    "title": "Colorado local-information neuron",
-    "lede": "This neuron responds to Colorado local information, not merely to contact formatting. Its strongest products occur at spaces, punctuation, or function words inside Colorado place, team, and local-contact texts; the saved maximum is a space before a 303 number (364.0). It also promotes explicit ' Boulder', ' Colorado', and ' Denver'. A weaker negative pole appears in some off-region public-service, legal, and record contexts, while bare off-region place mentions are inconsistent and often positive.",
-    "one_paragraph": "The product distribution is sparse and asymmetric: 32.6% of one billion tokens are positive, the median is -0.096, and the positive maximum (364.0) far exceeds the negative minimum (-55.25). The new 434-position semantic sample sharpens the poles. All 19 Colorado local-information and all 7 Colorado sports/culture positions are positive; off-region local records (33), government and legal records (20), health and social services (23), sports commentary (22), and off-region place/culture (37) contain most negative values. These are selected-sample counts, not corpus frequencies, and many constituent contexts are mixed. Token-level selectivity is strong: above 10% of the maximum product, ' Denver' occurs at 12,438 of 14,277 occurrences (87%), ' Colorado' at 22,011 of 26,215 (84%), and ' Boulder' at 2,902 of 3,905 (74%). The weight-only lens promotes ' Boulder' (+0.743), ' Colorado' (+0.729), and ' Denver' (+0.722). At the -55.25 Utah 435 anchor, gate is 9.94 and value -5.56, so the negative sign is value-driven. Zeroing is contextual: across 124 follow-up conditions the median KL is 0.00143 versus 0.00034 for controls, while the 364 maximum gives KL 0.547 and lowers the '3' probability from 0.744 to 0.350.",
-    "negative_pole": "The negative pole is weaker and not a general anti-Colorado rule. Its natural minimum is -55.25 at a '3' inside a Utah 435 record; across the 30 bottom anchors gate averages 7.0 and value -7.2, giving mean product -48.4. At the fixed record boundary ' as', North Dakota is -17.0 and Fargo -7.125, but Utah is +2.078 and New Mexico -1.039. At the fixed contact boundary ' at', Salt Lake City (+0.945) and Phoenix (+1.133) are mildly positive. The frozen response predictor also called Acoma Pueblo and Fredonia/Dixon negative (they measured +13.625 and +16.375). The reliable negative condition is therefore a specific off-region public-service, legal, or record boundary, not non-Colorado identity alone.",
-    "what_would_change_my_mind": "Strong negative products at explicit Colorado places without any off-region record frame would undermine the regional account. Conversely, uniformly weak or positive products across matched North Dakota and Utah public-service boundaries would reject the negative-pole description; positive responses to generic contact formatting with no regional cue would reject Colorado specificity.",
+    "title": "Colorado local-contact neuron",
+    "lede": "This neuron responds most strongly to Colorado Front Range local context: event listings, venues, public records, community services and contact lines, especially at a place name or the boundary before a 303/720/970/719 telephone number. Its output direction promotes Colorado, Denver, Boulder, Colo, Broncos and related local tokens. The response is not exclusively Colorado: a smaller token-level component also fires on some non-Colorado place names, numeric boundaries and code fragments.",
+    "one_paragraph": "Across 100 million tokens, product is centered near zero (median -0.029; 99th percentile 1.20), with a long positive tail to 322 and a shorter negative tail to -73.5. The top natural anchors are Longmont event listings, Boulder County farms, Denver sports and C.R.S. district resolutions; at the strongest, gate and value are both large (18.5 × 17.375 = 322). Controlled comparisons support a Colorado-local component: city-plus-303 `call` products were 86.5–126.0 versus 8.75–22.5 for matched out-of-state cities; Colorado venues reached 90.5–144.0 versus 0.87–20.1; Colorado area codes reached 141–191 versus 2.25–11.1. A Colorado venue without a phone still reached 191 at ` Colorado`, and a bare `City offices, 303-` reached 149, so neither cue is strictly necessary. Qualifying this account, 43 of 105 blind-labelled source-code points were positive (maximum 43.25), `大连` averaged 66.9, and some high positive activations occur in Kyrgyz text, so a narrower token/place-boundary component coexists with the Colorado effect.",
+    "negative_pole": "The negative pole is heterogeneous and is best treated as a departure from the Colorado-local contact pattern, not an anti-Colorado concept. The corpus minimum is -73.5 on `(` at the end of a long Chinese news prefix reaching a Xining/Qinghai dateline; the Qinghai `日报` anchor reaches -54 and the blind Qinghai candidate -52.75, with `环`, `省` and `县` also negative. Qinghai templates gave minima -25.9 to -36.8, below matched Xinjiang, Gansu, Sichuan and Beijing controls (-5.8 to -0.3). Highcharts `.data`/`.x` (about -43.5) and Montana or North Dakota civic contact records (-45.75 and -40.5) form separate mechanisms, so code and non-Colorado records do not collapse into one semantic category.",
+    "what_would_change_my_mind": "Non-Colorado local news or sports that reliably match the Colorado positive magnitudes would argue for a general local-information feature; conversely, Colorado venues and contact lines that fail under controlled templates would undercut the local-context account. A single coherent semantic or upstream mechanism shared by Qinghai, code and civic negatives would replace the heterogeneous-negative explanation.",
     "confidence": "medium"
   },
+  "response_rules": [
+    {
+      "id": "colorado_front_range_local",
+      "name": "Colorado Front Range local context",
+      "description": "The full prefix establishes a Colorado Front Range locality or Colorado institution through place names (Denver, Boulder, Longmont, Fort Collins, Aurora, Berthoud, Niwot, Minturn, Fruita), area codes 303/720, C.R.S. citations, district resolutions, or local venues. The anchor may be a space, function word, digit, or phone-number fragment inside news, event, service, venue, or public-record text; the Colorado cue often appears earlier in the prefix.",
+      "predicted_pole": "positive"
+    },
+    {
+      "id": "colorado_sports",
+      "name": "Colorado sports teams and athletes",
+      "description": "The prefix is a Denver-area or Colorado sports report about the Broncos, Rockies, Nuggets, CU, or local high-school/college teams and athletes, and the anchor introduces a player, team, game, score, or other sports detail. Explicit Colorado wording is not required when team names or the sports context identify the Colorado connection.",
+      "predicted_pole": "positive"
+    },
+    {
+      "id": "qinghai_provincial_news",
+      "name": "Qinghai and Tibetan-plateau provincial news",
+      "description": "The full prefix is Chinese-language provincial or local reporting centered on Qinghai, Xining, Yushu, Sanjiangyuan, or Tibetan-plateau counties and institutions. The anchor falls on an administrative or place token (青海, 西宁, 省, 县, 日报, 环, 站长) or an adjacent punctuation or number within that report.",
+      "predicted_pole": "negative"
+    },
+    {
+      "id": "source_code_markup",
+      "name": "Source code and chart markup",
+      "description": "The prefix is dense source code or JavaScript/library markup, especially Highcharts-style property and method chains such as .data, .x, .series, and .point, or similar script fragments. The anchor is a property, method, syntax, digit, or whitespace token inside that code context.",
+      "predicted_pole": "negative"
+    },
+    {
+      "id": "non_colorado_civic_records",
+      "name": "Non-Colorado civic and contact records",
+      "description": "The full prefix is a U.S. civic, regulatory, or contact-directory passage tied to a state or agency outside Colorado, such as North Dakota legislative material, Montana BLM or ARM notices, or California/Oroville services. The anchor is a telephone-number digit, statutory citation number, address, or contact field, and no Colorado locality is established.",
+      "predicted_pole": "negative"
+    },
+    {
+      "id": "no-visible-cue",
+      "name": "No visible cue",
+      "description": "The prefix is generic prose, academic or mathematical writing, an ambiguous multilingual passage, or a mixed context in which neither the Colorado-local pattern nor a coherent negative cue can be established. Weak negative values in ordinary text also belong here.",
+      "predicted_pole": "uncertain"
+    }
+  ],
   "criticism": [
     {
       "round": 1,
-      "attack": "The positive pole may be only a generic contact- or phone-formatting detector; Colorado could be incidental.",
-      "prediction": "If formatting dominates, matched place fillers should give similar products at the same contact frame. If Colorado identity matters, Colorado fillers should be substantially higher.",
-      "result": "The Colorado advantage survived. At the recorded final ' at' in sweep-003 (single-token scoring; position 9 for most fillers, 11 for Salt Lake City, 10 for generic controls), Denver 158.0, Colorado 152.0, Boulder 130.0, and Aurora 34.0 exceeded Salt Lake City 0.945, Phoenix 1.133, Seattle -0.906, Fargo -14.313, and generic controls 2.156 and 3.047. In sweep-001's replacement-span maximum, Colorado fillers were 116.0, 105.5, 100.0, and 28.875 versus -5.656 to 6.906 for off-region fillers. Off-region places are not all negative, but contact formatting alone does not explain the Colorado contrast.",
-      "verdict": "survived",
+      "attack": "The account may mistake a general local-information or contact-directory feature for a Colorado-specific one. If the response is broader, non-Colorado local news, venues and contact lines should approach the Colorado positives.",
+      "prediction": "Under matched local templates, out-of-state city and venue controls should be close to Colorado if the feature is generic; a large Colorado advantage would support specificity.",
+      "result": "Colorado city names at the shared 303 `call` marker measured 86.5–126.0 versus 8.75–22.5 for Billings, Boise, Cheyenne and Salt Lake City; Colorado venues measured 90.5–144.0 versus 0.87–20.1. Colorado area codes also exceeded non-Colorado codes (141–191 versus 2.25–11.1). Controlled English specificity therefore survived, but the claim is narrowed by strong non-Colorado corpus positives: 43 of 105 blind-labelled source-code points were positive, reaching 43.25, and `大连` averaged 66.9. This is a dominant Colorado-local response, not an exclusive Colorado detector.",
+      "verdict": "narrowed",
       "evidence": [
         {
-          "text": "For local service in Denver, call our office at",
-          "activation": 158.0
+          "text": "Community calendar for Longmont, Colorado. The neighborhood recreation center will host an open house on Saturday. For more information call",
+          "activation": 124.5
         },
         {
-          "text": "For local service in Salt Lake City, call our office at",
-          "activation": 0.9453125
+          "text": "Community calendar for Billings, Montana. The neighborhood recreation center will host an open house on Saturday. For more information call",
+          "activation": 8.875
         },
         {
-          "text": "For local service in Fargo, call our office at",
-          "activation": -14.3125
+          "text": "Event notice for the Longmont Public Library, 409 Fourth Avenue, Longmont, Colorado. For more information call",
+          "activation": 144.0
+        },
+        {
+          "text": "this.country_codes.put(\"bo\", \"bol)",
+          "activation": 43.25
         }
       ]
     },
     {
       "round": 2,
-      "attack": "The negative pole is a broad non-Colorado or interior-Western response.",
-      "prediction": "Matched non-Colorado place and record contexts should be consistently negative.",
-      "result": "The broad version failed and needs qualification. At the fixed final ' as' record boundary, North Dakota was -17.0 and Fargo -7.125, but Utah was +2.078 and New Mexico -1.039; at the final ' at' contact boundary Salt Lake City +0.945 and Phoenix +1.133 were mildly positive. The frozen feedback predictor of version de01fabb also called Acoma Pueblo and Fredonia/Dixon negative when they measured +13.625 and +16.375. The negative pole remains measurable in specific off-region public-service, legal, and record contexts but is not a general non-Colorado effect.",
+      "attack": "The positive tail might be a telephone-number or numeric-token effect rather than Colorado local context. If so, a Colorado area code should be sufficient and Colorado place text without a telephone number should be weak.",
+      "prediction": "Area-code-only and number-free probes should discriminate between the explanations: area-only should match city-plus-number if numerics drive the response, while the no-phone venue should be low if a phone is required.",
+      "result": "A bare `City offices, 303-` reached 149.0 over the scored span, below city-plus-number values of 175.0–251.0 but far above the non-Colorado number maxima of 2.25–11.1. Conversely, Longmont Public Library, Colorado, without a telephone number still reached 191.0 at ` Colorado`. Thus numeric contact details and Colorado place context both contribute, but neither alone explains the full pattern; the contact-line account needs qualification rather than replacement.",
       "verdict": "narrowed",
       "evidence": [
         {
-          "text": "The North Dakota records office listed the case number as",
-          "activation": -17.0
+          "text": "Contact details: Longmont Public Library, Colorado",
+          "activation": 191.0
         },
         {
-          "text": "The Utah records office listed the case number as",
-          "activation": 2.078125
+          "text": "Contact details: City offices, 303-",
+          "activation": 149.0
         },
         {
-          "text": "Traditional Acoma Pottery\nby Lisa Little, Acoma Pueblo\nThe Acoma Pueblo of New Mexico is the oldest continually inhabited settlement in the United States.",
-          "activation": 13.625
+          "text": "Contact details: Billings Public Library, Montana",
+          "activation": 6.8125
         },
         {
-          "text": "Town Manager Dan Watson updated the council on Dixon",
-          "activation": 16.375
+          "text": "For more information about the community program, call 303-",
+          "activation": 188.0
         }
       ]
     },
     {
       "round": 3,
-      "attack": "The explanation should generate independent text that reaches the corpus extremes.",
-      "prediction": "A frozen writer using the explanation should approach 364.0 for the positive pole and -55.25 for the negative pole.",
-      "result": "Independent text tests retained explanation version 92a89160e5724aa5ce1f14241a63e14a6bb913493cfba80612a515e13c9ab525. Its best positive candidate, a Denver/Boulder/Colorado contact listing, reached 354.0; its best negative candidate, a North Dakota Fargo property and official-record listing, reached -32.5. Neither beat the saved extreme, though both reproduced the intended Colorado-contact and off-region-record semantics. Route prediction: —.",
-      "verdict": "narrowed",
+      "attack": "The negative tail may be one coherent anti-Colorado or anti-local mechanism. If so, Qinghai news, source code and non-Colorado civic records should share a semantic cue and upstream contributors, and matched non-Qinghai provinces should be indistinguishable.",
+      "prediction": "If the heterogeneous-negative account is right, Qinghai snippets should be more negative than matched other-province controls, while code and civic records should be negative through different local contribution patterns.",
+      "result": "Qinghai snippets produced minima of -25.9 to -36.8, below matched Xinjiang, Gansu, Sichuan and Beijing controls (-5.8 to -0.3), and the blind Qinghai candidate reached -52.75. Highcharts `.data` and the Montana BLM number formed separate negative mechanisms with different upstream units. Zeros or weak values for several other administrative tokens and ordinary prose mean the negative categories are not equally strong, but there is no single opposing concept. The heterogeneous-negative claim survived as written.",
+      "verdict": "survived",
       "evidence": [
         {
-          "text": "Denver-area contacts and Colorado local listings: Denver office, 1550 Wewatta St, Denver, CO 80202, 303-555-0120; Colorado front desk, 720-555-0171; Boulder branch, 1942 Broadway, Boulder, CO 80302, 303-555-0184. Denver County callers use 720-555-0190; Boulder County callers use 303-555-0162; Colorado mountain line 970-555-0148. The listing notes Denver, Boulder, and Colorado addresses with local phone numbers and venue details.",
-          "activation": 354.0
+          "text": "News brief: 青海日报",
+          "activation": -37.0
         },
         {
-          "text": "North Dakota Fargo property listing: 701-555-0133; parcel 02-445-1180; record no. ND-2024-77120; coordinates 46.8772 N, 96.7898 W. Fargo city office, 200 N 3rd St, Fargo, ND 58102. Phone 701-555-0177. Dakota Abstract desk 701-555-0160. Boundary tokens include listing digits, RING, and record-number punctuation. Off-region official record page.",
-          "activation": -32.5
+          "text": "News brief: 甘肃省兰",
+          "activation": -5.84375
+        },
+        {
+          "text": "（西宁）青海日报",
+          "activation": -49.5
+        },
+        {
+          "text": "Highcharts.chart('container', { chart: { type: 'line' }, title: { text: 'Series' }, xAxis: { categories: ['A','B'] }, series: [{ name: 'data', data: [1,2,3], x: 0 }, { name: 'x', data",
+          "activation": -30.375
+        },
+        {
+          "text": "Bureau of Land Management, Interior ... (406) 8",
+          "activation": -45.75
         }
       ]
     },
     {
       "round": 4,
-      "attack": "A non-Colorado area code or a generic off-region function-word boundary is sufficient for a negative prediction.",
-      "prediction": "Independent Phoenix, Boise, and New Mexico contact prompts should score below zero, while Colorado prompts should score above zero.",
-      "result": "This over-broad rule failed and was revised. Frozen version de01fabb predicted negative at the Phoenix desk '(60' anchor (position 7), the Boise ' at' boundary (position 7), and the New Mexico district ' as' boundary (position 8), but the measured products were +7.156, +6.0, and +5.594. Of 38 directional experiment predictions on positive-truth positions, 15 were called negative. Rule 5 now requires an explicit off-region public-service, legal, or record frame rather than an area code alone, and rule 6 is uncertain for bare off-region place mentions.",
-      "verdict": "rejected",
+      "attack": "An adequate explanation should let an independent writer approach both corpus extremes without access to the expected answers. Failure on either pole would show that part of the response is missing from the account.",
+      "prediction": "Blind candidates generated from the initial explanation should reach near the 322.0 positive maximum and the -73.5 negative minimum; a large shortfall would narrow the corresponding pole.",
+      "result": "The blind positive writer reached 312.0, close to the 322.0 corpus maximum, and all six positive candidates were Colorado-local contact texts, supporting the positive account. The blind negative writer reached only -52.75 against -73.5 and did not reproduce the punctuation/Xining extreme. The positive pole is therefore supported, while the negative account remains incomplete and is narrowed to a set of heterogeneous categories. Route prediction was disabled.",
+      "verdict": "narrowed",
       "evidence": [
         {
-          "text": "Contact the Phoenix desk at (60",
-          "activation": 7.15625
+          "text": "Longmont, Colorado — The Longmont Community Services Department and Boulder County will host a Front Range public meeting at the Boulder County Fairgrounds, 9595 Nelson Road, Longmont, Colo. The agenda includes Denver Broncos alumni community updates, Boulder County farm programs, and C.R.S. district resolutions. For records, call",
+          "activation": 312.0
         },
         {
-          "text": "The Boise records office can be reached at",
-          "activation": 6.0
+          "text": "青海省西宁市（青海日报）—— 省、市、县三级会议在西宁召开。青海省海东市、海南州、海北州、黄南州、果洛州、玉树州及各县负责同志参加。青海日报、西宁晚报报道：全省县区要落实省委省政府工作部署。 (西宁) 青海 县 省 日报",
+          "activation": -52.75
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "attack": "The frozen response rules should label the sampled corpus consistently if the Colorado account is complete. High positive products in source code or contexts labelled No visible cue would contradict a narrow Colorado-only reading.",
+      "prediction": "Feedback labels from the initial claim should have high directional coverage and few high-magnitude sign errors; otherwise the explanation needs an explicit qualification.",
+      "result": "Directional coverage was 31.5% (137 of 435 feedback points), with 67.2% accuracy among directional labels. Of actual-positive points, 44 were predicted negative, almost all source code, with positive products reaching 43.25; another 201 actual positives and 97 actual negatives were labelled uncertain. Kivy markup reached 36.0 and Kyrgyz prose reached 85.0 in the no-cue bucket. These are substantial mismatches rather than near-zero sign disagreements, so the revised claim adds a cross-lingual/token-boundary qualification and treats source-code negativity as a boundary case, not a rule.",
+      "verdict": "narrowed",
+      "evidence": [
+        {
+          "text": "Class inheritance with Kivy's RecycleView ... default_size_hint: 1",
+          "activation": 36.0
         },
         {
-          "text": "The New Mexico district office logged the complaint as",
-          "activation": 5.59375
+          "text": "<|im_start|>user\nТилиң тишиңе күбө<|im_end|>\n<|im_start|>assistant\n<think>\n\n</think>\n\n«Сөзүңө бекем тур», «сөзүңө бек бол",
+          "activation": 85.0
+        },
+        {
+          "text": "Highcharts source code at `.data`",
+          "activation": -43.5
         }
       ]
     }
   ],
-  "agent_read": {
-    "group": "two_related",
-    "organized": 4,
-    "understood": 3,
-    "one_line": "A strong Colorado local-information/contact positive job and a narrower, related off-region public-service/legal/record negative job; both are supported, but the negative is context-bound and leaves mixed off-region residuals.",
-    "main_job": "Regional local-information/record-boundary encoding: Colorado local-contact, place, and team information is promoted strongly, while a weaker complementary negative response appears in some off-region public-service, legal, and record contexts.",
-    "remainders": [
-      {
-        "what": "Off-region sports commentary and bare off-region place/culture material are mixed rather than consistently negative.",
-        "evidence": "Sports-commentary typical activation is only about -0.38 and offregion-culture-place about -0.08; North Dakota facts and Bismarck school examples are strongly negative (-49.5, -48.75), while other off-region place mentions are positive or near zero."
-      },
-      {
-        "what": "Matched off-region record/contact boundaries do not all turn negative.",
-        "evidence": "At the fixed ' as' record boundary, North Dakota is -17 and Fargo -7.125, but Utah is +2.078 and New Mexico -1.039; at the ' at' contact boundary Salt Lake City +0.945 and Phoenix +1.133. Phoenix/Boise/New Mexico prompts measured +7.156, +6.0, +5.594."
-      },
-      {
-        "what": "Some positive local/event or contact-like examples lack an explicit Colorado cue.",
-        "evidence": "A travel/outdoor 5k example reaches 334 without a clear Colorado place; generic contact controls are only about 2-3, so this is a residual rather than the main formatting account."
-      },
-      {
-        "what": "The negative sign is value-driven and the exact off-region record feature is unresolved.",
-        "evidence": "At the -55.25 Utah 435 anchor gate is 9.94 and value -5.56; broad area-code/non-Colorado rules failed, so the reliable negative cue is narrower than 'off-region' alone."
-      }
+  "annotations": {
+    "headline_figure_id": "sweep-001",
+    "graph_ids": [
+      "graph-001",
+      "graph-002",
+      "graph-003"
     ],
-    "where_it_branches": [
-      {
-        "branch": "Colorado local-contact/phone/address boundary",
-        "grows_from": "Colorado local information",
-        "path": "Colorado identity or 303/720/970 local-contact cue -> space/punctuation/function word before phone or address -> high positive product."
+    "figures": {
+      "sweep-001": {
+        "title": "Colorado city cue with a fixed 303 contact line",
+        "rationale": "Tests whether Colorado place context adds to a constant 303 contact line. Colorado city names should raise the product at the ` call` marker above matched out-of-state cities, while generic local labels should be weaker.",
+        "caption": "At the shared ` call` marker in a template ending with a 303 number, Longmont, Boulder, Denver and Fort Collins measured 124.5, 100.5, 86.5 and 126.0; matched Billings, Boise, Cheyenne and Salt Lake City measured 8.75–22.5. Generic `local neighborhood` and `community` controls were 0.74 and 1.13. Native product, single-marker scoring."
       },
-      {
-        "branch": "Colorado sports, media, and place identity",
-        "grows_from": "Colorado local information",
-        "path": "Colorado team/venue/place/culture cue -> function-word boundary without a contact block -> positive product."
+      "sweep-002": {
+        "title": "Colorado versus non-Colorado telephone area codes",
+        "rationale": "Tests whether area-code identity alone carries the positive tail. Colorado 303/720/970/719 numbers should yield higher replacement-span maxima than matched 406/701/435/928 numbers, with extension and office controls lower.",
+        "caption": "Within a fixed `call <number>` template, maximum replacement-span products were 188.0, 191.0, 141.0 and 159.0 for 303, 720, 970 and 719 numbers, versus 11.13, 6.03, 2.25 and 6.94 for 406, 701, 435 and 928. Extension and office controls were 0.16 and 0.19. Native product, maximum over the replacement span."
       },
-      {
-        "branch": "Off-region public-service/legal/record boundary",
-        "grows_from": "off-region administrative/record negative pole",
-        "path": "Off-region area code or record/public-service frame -> digit, space, or record punctuation -> negative product."
+      "sweep-003": {
+        "title": "Qinghai news versus matched provincial and record contexts",
+        "rationale": "Tests whether Qinghai provincial reporting is the specific negative cue. Qinghai, Xining, Yushu and Sanjiangyuan snippets should produce lower minimum products than matched Xinjiang, Gansu, Sichuan and Beijing snippets; code and Montana records should not reproduce the same effect.",
+        "caption": "Across a fixed news-brief replacement span, minimum products were -27.75, -27.75, -36.75 and -25.88 for the four Qinghai/Tibetan-plateau snippets, compared with -5.84 to -0.26 for the Xinjiang, Gansu, Sichuan and Beijing controls. A Highcharts control reached -12.38 and a Montana 406 record -27.38. Native product, minimum over the replacement span."
       },
-      {
-        "branch": "Off-region health/social-service and government/legal records",
-        "grows_from": "off-region administrative/record negative pole",
-        "path": "Official health/legal/public-service listing -> contact or record boundary -> negative product."
-      }
-    ],
-    "concerning": [
-      "The negative pole is not a general non-Colorado effect; matched Utah/New Mexico record boundaries and Phoenix/Boise/New Mexico contact prompts can be positive.",
-      "Off-region sports and bare place/culture contexts are inconsistent, so the negative account does not cover all negative material.",
-      "Positive responses can be driven by 303/720/970 phone digits even when the explicit place is absent, so part of the positive pole overlaps generic local-contact formatting.",
-      "Selected semantic-sample counts are not population frequencies, and the exact feature distinguishing negative off-region records from positive off-region places remains unclear."
-    ],
-    "fine": [
-      "Token-level selectivity is strong: Denver 87%, Colorado 84%, Boulder 74% above 10% of the maximum product.",
-      "Matched replacement sweeps show Colorado fillers 100-158 at the same contact frame versus roughly -14 to +1 for off-region fillers and about 2-3 for generic controls.",
-      "Ablation of the neuron changes digit probabilities at the contact boundary, supporting a causal role.",
-      "The positive pole covers explicit Colorado places, local contacts, and Colorado sports/culture as related variants.",
-      "The negative pole has strong bottom anchors in some off-region public-service/legal/record contexts, especially North Dakota/Fargo and Utah record examples."
-    ],
-    "poles": {
-      "positive": {
-        "group": "branching",
-        "notes": "Core Colorado local-information/place/contact encoding. All 19 Colorado local-info and 7 Colorado sports/culture positions are positive; Boulder/Colorado/Denver are promoted; matched sweeps separate Colorado identity from contact formatting. Related variants are local-contact/address boundaries and sports/culture/place mentions without contact. Some non-Colorado local/event positives remain unexplained."
+      "sweep-004": {
+        "title": "Actual Colorado venues versus a mere Colorado mention",
+        "rationale": "Tests whether genuine Front Range venue context raises the ` call` marker. Colorado venues should exceed matched Montana, Idaho, Wyoming and Utah venues, while a Colorado-themed business located in Montana and a location-free center should remain weak.",
+        "caption": "At the common ` call` marker, four Colorado venue descriptions measured 144.0, 90.5, 123.0 and 108.5, while matched Billings, Boise, Cheyenne and Salt Lake City descriptions measured 0.87–20.13. A Colorado-themed restaurant in Billings measured 9.81 and a location-free community center 0.69. Native product, single-marker scoring."
       },
-      "negative": {
-        "group": "branching",
-        "notes": "Narrower off-region public-service/legal/record negative pole. Strong bottom anchors occur at Utah/North Dakota/New Mexico phone and record boundaries, with offregion-local-records and government/legal/health contributing. Branches include local records, government/legal records, and health/social-service listings. Broad non-Colorado or area-code-only accounts failed; matched records vary and off-region sports/culture remain mixed."
+      "sweep-005": {
+        "title": "Colorado area code alone versus Colorado context without a phone",
+        "rationale": "Tests whether a Colorado area code is sufficient and whether local context without a telephone number is weak. Area-code-only, city-plus-code and Colorado-place-without-phone conditions should discriminate between numeric and place-context accounts.",
+        "caption": "Maximum replacement-span products were 216.0, 231.0, 251.0 and 175.0 for four Colorado city-plus-number strings, versus 4.59–50.0 for matched out-of-state strings. A bare `City offices, 303-` reached 149.0, while a Longmont, Colorado, string without a phone reached 191.0 at ` Colorado`. Native product, maximum over the replacement span."
       }
     },
-    "group_name": "Two related jobs"
-  },
-  "response_rules": [
-    {
-      "id": "rule_1",
-      "name": "Colorado local phone or contact boundary",
-      "description": "Product is positive at a space, comma, or hyphen immediately before or within a 303, 720, 719, or 970 telephone number, or before a contact value that the local Colorado prefix establishes as a Colorado number, including anchors after 'call', 'at', 'contact', or 'Phone'.",
-      "predicted_pole": "positive"
+    "graphs": {
+      "graph-001": {
+        "title": "Longmont event listing before a 303 contact line",
+        "why": "Shows the strongest positive anchor (product 322) at the space before 303 in a Longmont event listing, where gate is 18.5 and value is 17.375.",
+        "look_at": [
+          "Root: the space immediately before 303 in the Longmont listing",
+          "Upstream: positive L38_N489 and L14_N489 local contributions",
+          "Reading: Longmont/theatre and ` call` are positive; the root is the boundary before the number"
+        ]
+      },
+      "graph-002": {
+        "title": "Xining dateline negative anchor at `(`",
+        "why": "Shows the corpus minimum (product -73.5) at `(` after a Chinese news prefix reaching a Xining/Qinghai dateline; gate is 9.9375 and value is -7.375.",
+        "look_at": [
+          "Root: `(` after 中新社西宁...日电",
+          "Upstream: negative L50_N2164, L47_N16921 and L14_N8626 local contributions",
+          "The preceding 西宁 token is itself negative (-10.19)"
+        ]
+      },
+      "graph-003": {
+        "title": "Highcharts `.data` negative anchor",
+        "why": "Shows a separate negative mechanism at `.data` in dense Highcharts source, with product -43.5, gate 5.875 and value -7.4375.",
+        "look_at": [
+          "Root: the `.data` property token",
+          "Upstream: negative L53_N3729 and positive L6_N24380/L6_N6972 local contributions",
+          "Do not generalize to code as a whole: many blind-labelled code points were positive"
+        ]
+      },
+      "graph-004": {
+        "title": "Montana BLM contact record with a 406 number",
+        "why": "Shows a non-Colorado civic-contact negative at a 406-number digit, product -45.75, with gate 7.21875 and value -6.34375.",
+        "look_at": [
+          "Root: the area-code digit `8` in the 406 number",
+          "Upstream: negative L38_N8626 and L14_N8626 local contributions",
+          "Contrast with the positive Colorado contact-line graphs"
+        ]
+      }
     },
-    {
-      "id": "rule_2",
-      "name": "Explicit Colorado place, team, or institution",
-      "description": "Product is positive at an explicit Colorado place, team, or institution token such as Denver, Boulder, Colorado, Colorado Springs, Pueblo, Durango, Aspen, Aurora, Longmont, Carbondale, Pikes Peak, CO, CU, Broncos, Nuggets, or Rockies, and at an immediately adjacent separator before such a name.",
-      "predicted_pole": "positive"
+    "routes": {
+      "p1": {
+        "name": "Longmont golf-course contact listing",
+        "description": "A Longmont membership and event listing whose space before a 303 telephone number reaches product 304. Positive local RelP contributions are led by L38_N489 and L14_N489, with smaller positive contributions from L31_N11703 and L6_N25239; this is the clearest positive contact-line member."
+      },
+      "p2": {
+        "name": "Boulder County farm report",
+        "description": "A Boulder County agriculture and Front Range flood report whose selected ` in` reaches product 290. It shares the positive L38_N489/L14_N489 signal but has a stronger L6_N7831 component, showing that the positive route also covers Colorado prose without a telephone number."
+      },
+      "p3": {
+        "name": "Colorado running-club sports profile",
+        "description": "A Colorado Rage running-club and high-school sports profile whose selected ` At` reaches product 294. L14_N489 and L38_N489 are the largest positive contributors, with L49_N12697 and L13_N11715 also positive; this route covers sports and community biography rather than a contact record."
+      },
+      "n1": {
+        "name": "Mixed Qinghai, civic, code and prose negatives",
+        "description": "This negative numerical route contains unlike members: Qinghai `日报` (-54.5), a Montana BLM 406-number digit (-45.75), Highcharts `.data` (-43.5), a Slamdance prose ` more` (-15.625) and a credit-repair period (-4.3125). L14_N8626 and L38_N8626 are negative contributors, while L6_N24380 and L6_N6972 change sign across members. The route is not a semantic class."
+      },
+      "n2": {
+        "name": "Weak math-homework final period",
+        "description": "A single weak negative member: the final period of a math-homework post (-0.578). L6_N24380 and L6_N6972 contribute negatively, but the magnitude is small and the member is too isolated to support a semantic name."
+      },
+      "n3": {
+        "name": "JavaScript polyfill syntax",
+        "description": "One JavaScript URLSearchParams polyfill member at a semicolon (-1.211). L6_N24380 and L6_N6972 contribute negatively and L52_N19157 also appears; the source-markup cue is clear, but the response is much weaker than the Highcharts example."
+      }
     },
-    {
-      "id": "rule_3",
-      "name": "Boundary inside ongoing Colorado local information",
-      "description": "Product is positive at a generic space, comma, hyphen, newline, or function word when the local prefix has established a Colorado locale and the anchor is a boundary before a local continuation such as an address, phone digit, venue, school, team, or listing value.",
-      "predicted_pole": "positive"
+    "clusters": [
+      {
+        "id": "c1",
+        "name": "Colorado Front Range local and sports text",
+        "story": "Membership criterion: positive selected products in Colorado Front Range text. The Longmont golf-course contact line, Boulder County farm report and Colorado running-club profile have different anchors and genres but share positive L38_N489/L14_N489 local contributions. This is a local-context cluster rather than one fixed template; the cross-lingual positives in the wider spectrum remain outside it.",
+        "graph_ids": [
+          "24ba71339742386f4ff3a752d07f904a3603453c057e8300f0f24137182ab2d9",
+          "9fc52b8caee8636bb127e40d3c85128972aa18602e47216a806c35282afbe040",
+          "ed47e3f06005019a518300a43d8281c44866ac97443eb8255975d89bccd006c7"
+        ],
+        "example_graph_ids": [
+          "24ba71339742386f4ff3a752d07f904a3603453c057e8300f0f24137182ab2d9",
+          "9fc52b8caee8636bb127e40d3c85128972aa18602e47216a806c35282afbe040",
+          "ed47e3f06005019a518300a43d8281c44866ac97443eb8255975d89bccd006c7"
+        ]
+      },
+      {
+        "id": "c2",
+        "name": "Qinghai newspaper trailer",
+        "story": "Membership criterion: Chinese-language text whose observed prefix reaches 青海日报 after a long mixed news page. The single member's 日报 anchor is negative, with negative L14_N8626/L38_N8626 and positive L6_N24380/L6_N6972 contributions. One member supports a Qinghai-media association, not a broad Chinese-language rule; matched other-province probes were much weaker.",
+        "graph_ids": [
+          "4a3faa8836a9168f4b3356300d45ee2a388bc35b49fd4f41d669ec305a18e4c8"
+        ],
+        "example_graph_ids": [
+          "4a3faa8836a9168f4b3356300d45ee2a388bc35b49fd4f41d669ec305a18e4c8"
+        ]
+      },
+      {
+        "id": "c3",
+        "name": "Non-Colorado civic contact record",
+        "story": "Membership criterion: a U.S. civic or contact record outside Colorado. The member is a Montana BLM lease notice ending at an out-of-state telephone digit; that digit is strongly negative and shares negative numeric contributions with other English records but not with Chinese text. It remains a distinct non-Colorado civic-contact boundary case, not evidence of an anti-Colorado concept.",
+        "graph_ids": [
+          "9e2d98527f27489069d2063abfab7ae053ab6cea342a6c560240084579bfcc8e"
+        ],
+        "example_graph_ids": [
+          "9e2d98527f27489069d2063abfab7ae053ab6cea342a6c560240084579bfcc8e"
+        ]
+      },
+      {
+        "id": "c4",
+        "name": "Negative code and markup anchors",
+        "story": "Membership criterion: two negative technical anchors, a Highcharts .data property and a JavaScript URLSearchParams semicolon. Their local contribution patterns differ in magnitude, and the wider blind-labelled spectrum contains many positive code points, so these members mark a negative boundary case rather than a general source-code rule.",
+        "graph_ids": [
+          "ff17b0751bf6ecced51c7601cc329a7db954897735aba67fee99acfc7b6abbe7",
+          "f2607b0bae30c3c2608e115b7396d32e77b5c014e1cb887790b0409b19bdcf49"
+        ],
+        "example_graph_ids": [
+          "ff17b0751bf6ecced51c7601cc329a7db954897735aba67fee99acfc7b6abbe7",
+          "f2607b0bae30c3c2608e115b7396d32e77b5c014e1cb887790b0409b19bdcf49"
+        ]
+      },
+      {
+        "id": "c5",
+        "name": "Weak heterogeneous prose negatives",
+        "story": "Membership criterion: remaining weak negative prose without a code, Qinghai or civic-contact account. Slamdance film prose, a credit-repair disclaimer period and a math-homework final period are semantically unrelated; their products are weak and upstream patterns do not identify a shared cue. This unresolved mixed cluster is retained rather than forced into a semantic story.",
+        "graph_ids": [
+          "9628f0a9ef85e747717385ee1ac9a7e2f7c6e6e6140ea83ff35527dd1514eaf9",
+          "7d893d0fdd58f47028fdfe12037f1e1b04649355d45e790a9519aad77cf68152",
+          "d229158caf21de19bf248d84f8d5c335505015fbd47ba1570584e4143a27b524"
+        ],
+        "example_graph_ids": [
+          "9628f0a9ef85e747717385ee1ac9a7e2f7c6e6e6140ea83ff35527dd1514eaf9",
+          "7d893d0fdd58f47028fdfe12037f1e1b04649355d45e790a9519aad77cf68152",
+          "d229158caf21de19bf248d84f8d5c335505015fbd47ba1570584e4143a27b524"
+        ]
+      }
+    ],
+    "units": {
+      "L6_N25239": "Longmont token fragment",
+      "L6_N7831": "Front Range place names",
+      "L13_N11715": "Phone-digit and place-name suppressor",
+      "L14_N489": "Place-name and phone-digit suppressor",
+      "L31_N11703": "Local community phrase detector",
+      "L37_N11715": "Phone-digit boundary suppressor",
+      "L38_N489": "Numeric and place-name suppressor",
+      "L47_N2209": "Negative numeric-token detector",
+      "L49_N12697": "Colorado phone-digit detector",
+      "L54_N2872": "Whitespace and phone-digit suppressor",
+      "L55_N11703": "Colorado local-contact context detector",
+      "L56_N11642": "At-boundary and digit detector",
+      "L56_N25582": "Whitespace and digit suppressor",
+      "L57_N16330": "Negative at-boundary suppressor",
+      "L57_N20833": "Digit and whitespace suppressor",
+      "L58_N16894": "Mixed numeric and boundary detector",
+      "L59_N9433": "Whitespace and number suppressor",
+      "L59_N7793": "At-boundary and place detector",
+      "L62_N21256": "Punctuation and conjunction detector",
+      "L62_N12079": "Negative function-word suppressor",
+      "L63_N8214": "Negative function-word detector"
     },
-    {
-      "id": "rule_4",
-      "name": "Colorado document continuation",
-      "description": "Product is positive when a sustained Colorado document or heading makes an otherwise ambiguous numeric or capitalized continuation local, for example an MLS or listing number, date, age, school name, or place fragment.",
-      "predicted_pole": "positive"
-    },
-    {
-      "id": "rule_5",
-      "name": "Off-region public-service or record contact",
-      "description": "Product is negative only when the anchor sits at a separator or digit inside a non-Colorado official public-service, legal, health, or record contact, such as a county sheriff, licensing, statute, or municipal listing, with the off-region state or locality established nearby. Area code alone is insufficient.",
-      "predicted_pole": "negative"
-    },
-    {
-      "id": "rule_6",
-      "name": "Bare off-region place mention",
-      "description": "Product is uncertain at an off-region place name, generic boundary, or ordinary civic or place-description sentence without a public-service or record-contact frame; these contexts are often near zero and may be positive, as in Acoma Pueblo or a New Mexico press release.",
-      "predicted_pole": "uncertain"
-    },
-    {
-      "id": "rule_7",
-      "name": "No regional cue near anchor",
-      "description": "Product is uncertain in ordinary prose with no nearby Colorado or other regional place, institution, or phone cue; such signed products are typically small and do not define a stable concept.",
-      "predicted_pole": "uncertain"
-    },
-    {
-      "id": "rule_8",
-      "name": "Conflicting or partial regional cues",
-      "description": "Product is uncertain when Colorado and non-Colorado markers occur in the same local window but neither is adjacent to the anchor, when a toll-free or unlisted area code is the only clue, or when the anchor is an isolated numeric fragment not part of a phone number.",
-      "predicted_pole": "uncertain"
+    "sections": {
+      "spectrum": {
+        "summary": "Across 495 blind-labelled spectrum points, the frozen rules assigned 55 Colorado-local, 11 Colorado-sports, 9 Qinghai-news, 105 source-code, 15 non-Colorado-civic and 300 no-visible-cue cases. Colorado-local and sports products were nearly all positive (up to 322), Qinghai uniformly negative (-10.5 to -38.75), while source-code and no-cue points crossed zero and included strong positives."
+      },
+      "search": {
+        "summary": "Two saved search regions were tested. At the ` call` marker, six Colorado local-contact candidates had median product 7.26 (best 18.13) versus -0.22 for matched out-of-state controls. At `发布`, Qinghai candidates had median -4.37 (range -9.31 to 1.17) versus 0.005 for matched other-province controls. Fixed-template sweeps independently produced much larger Colorado city and area-code contrasts."
+      },
+      "clusters": {
+        "summary": "Ten natural members form five display clusters: three positive Colorado Front Range texts, one Qinghai media trailer, one Montana civic contact, two negative code/markup anchors and three weak heterogeneous prose negatives. Route n1 crosses Qinghai, civic, code and prose, so route IDs are not semantic classes; code negativity is a boundary case, not a rule."
+      },
+      "anatomy": {
+        "summary": "The gate-by-value view shows product as gate times value: the largest positive anchors combine strongly positive gate and value, while negative products arise mainly from positive gate and negative value. The selected strip separates the cue tokens, the boundary before the number and the upcoming value.",
+        "strip_caption": "Saved Longmont event-listing trace: gate rises to 18.5 and value to 17.375 on the space immediately before `303`, giving product 322. The preceding ` call` and Longmont tokens are positive; the scored location is the boundary before the upcoming phone number, not a token inside the number."
+      },
+      "ablation": {
+        "summary": "`+1` product raises ` Boulder` (+0.743), ` Colorado` (+0.729) and ` Denver` (+0.722); strongest suppressions are `orbit` (-0.429) and Chinese fragments, not a coherent anti-Colorado set. Across 121 zeroing conditions median KL was 0.00226 versus 0.00039 for random controls; the Longmont phone-boundary case was much more sensitive (KL 4.56)."
+      },
+      "family": {
+        "summary": "Eleven authored inputs showed a controlled gradient: Colorado city plus 303/720/970 lines reached maxima of 186–292, matched out-of-state lines 4.8–29.5, and a Longmont text without a phone 111. A Qinghai-led prefix kept its 303 line negative (-42.25). Upstream units tracked place tokens and phone digits; downstream readers split by sign."
+      },
+      "circuit": {
+        "summary": "Local RelP over fifteen atlas graphs concentrates upstream flow on L38_N489 and L14_N489, with L31_N11703, L49_N12697, L6_N7831 and L6_N25239 recurring. The thirty nominated readers split by sign, led by L62_N21256, L59_N9433 and L57_N16330; these are local associations, not causal routes."
+      },
+      "tests": {
+        "summary": "Blind candidates written from the initial explanation reached 312.0 against the 322.0 corpus maximum; all six positive candidates were Colorado-local contact texts. The negative candidates reached -52.75 against -73.5, led by Qinghai, Highcharts, Montana and North Dakota examples, so the negative extreme was not recovered. Route prediction was disabled."
+      }
     }
-  ]
+  }
 }

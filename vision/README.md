@@ -13,6 +13,8 @@
 
 This module implements feature visualization and natural-image retrieval for **InceptionV1 / Lucent Inception5h**. You can choose a channel, optimize images in five modes, retrieve natural examples and heatmaps, and export an interactive viewer with AlreadyClean reference links.
 
+This module pins a Lucent Inception5h source revision and checkpoint digest. The [AlreadyClean reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights; exact weight identity has not been verified.
+
 The catalog covers **12 layers and 5,804 channels**. This is the target catalog; each exported viewer records which results are actually available. The [LLM investigation workflow](../docs/workflow.md) has a separate environment and entry point.
 
 ## Visual comparisons
@@ -28,7 +30,7 @@ The catalog covers **12 layers and 5,804 channels**. This is the target catalog;
   </tr>
 </table>
 
-**mixed4c:260 · configuration A · 224 × 224 · 1,024 steps · seed 0.** These are saved optimization outputs. The [gallery](docs/gallery.md) shows all five modes beside the reference images for four channels, with [settings and measured scores](docs/assets/provenance.json). One member of the mixed4c:477 Diversity result has near-zero activation; the gallery retains it.
+**mixed4c:260 · configuration A · 224 × 224 · 1,024 steps · seed 0.** These are saved optimization outputs. The [gallery](docs/gallery.md) shows all five modes beside the reference images for four channels, with [settings and measured scores](docs/assets/provenance.json).
 
 The upstream project also links a [hosted interactive viewer](https://ziheng-inception-microscope-a.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=260&compare=1). The bundled comparisons above can be read directly in this repository.
 
@@ -53,7 +55,7 @@ The path representation is a pooled activation-vector proxy. Its definition and 
 
 ### 1. Install the module
 
-Use **Python 3.11+** and a separate environment. Install a CUDA-compatible PyTorch and torchvision build for GPU optimization, then install the package:
+Use **Python 3.11+** and a separate environment. GPU runs and batch campaigns use Linux with a CUDA-compatible PyTorch and torchvision build. Install the package after those dependencies:
 
 ```bash
 git clone --branch hr-vision-integration https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
@@ -71,7 +73,7 @@ The catalog command reads no model weights and needs no GPU. The package declare
 Follow [model setup](source/inceptionv1/README.md) to place the pinned Lucent checkout and weights under `source/inceptionv1/`. Existing assets can be reused through `VNI_MODEL_DIR`.
 
 ```bash
-vision-microscope doctor --model-dir source/inceptionv1
+vision-microscope doctor
 ```
 
 The manifest records the source revision, weight digest and `RGB * 255 - 117` preprocessing. Weights and ImageNet data are acquired separately.
@@ -92,11 +94,11 @@ python -m http.server 8766 --directory vision-repro/outputs/viewer
 
 Open <http://localhost:8766/?layer=mixed4c&neuron=260>. Use a fresh output directory for a changed configuration or viewer export. The [running guide](docs/reproduction.md) covers the ImageNet scan, anchors, all five modes, batch generation and resume.
 
-To include verified reference images, pass `--reference-catalog` in the [documented format](docs/data-format.md#静态导出). Natural samples use `--sample-run`; receptive-field crops additionally use `--rf-snapshot`. Export without these inputs contains the available optimization results and placeholders for missing material.
+To include verified reference images, pass `--reference-catalog` in the [documented format](docs/data-format.md#static-export). Natural samples use `--sample-run`; receptive-field crops additionally use `--rf-snapshot`. Export without these inputs contains the available optimization results and placeholders for missing material.
 
 ## Interpreting the results
 
-- **Checkpoint scope.** These results use the historical Lucent Inception5h conversion. Goodfire's retrained checkpoint is a different model, so matching layer/channel names and visual appearance do not establish semantic equivalence.
+- **Sampling scope.** This module retrieves both poles from a class-balanced 50,000-image subset. The reference site reports positive examples from 50,000 images and a negative tail over all 1,281,167 training images. This changes the examples available for comparison; see the [method guide](docs/methodology.md#natural-examples-and-comparability).
 - **Signed targets.** Positive scores are post-ReLU; negative scores are pre-ReLU. A zero post-ReLU minimum does not measure signed suppression.
 - **Scoring and display.** Optimization uses normalized Gaussian-weighted scores; natural examples are ranked by spatial extrema. Heatmaps are normalized per image and display layer activations.
 - **Image priors.** Configuration A includes mean-color and peripheral-color constraints. These affect image appearance and must be considered when interpreting colors.

@@ -38,7 +38,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 | **Qwen3-32B** | 激活证据、解释、受控测试、干预和尚未解决的案例。 | [交互式神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/) · [研究代码](workflow/) |
 | **InceptionV1／Lucent Inception5h** | 五种可视化目标、自然图像样例、热图和参考对比。 | [视觉模块指南与样例](vision/README_zh.md) · [优化代码](vision/vision-repro/) |
 
-**当前提供：** [LLM 研究代码与提示词](workflow/)、[五套语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)、[交互式神经元对比](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)，以及[视觉代码与带有测量记录的可视化样例](vision/README_zh.md)。LLM 报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
+**数据：** 对比案例附有[五套 LLM 语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)。LLM 报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
 > [!IMPORTANT]
 > **本项目独立开展复现。** 在 LLM 研究中，研究模型不会看到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
@@ -108,7 +108,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 以上是 **mixed4c:260** 的已有输出，使用 A 配置、224 × 224 输入、1,024 步和 seed 0。Positive 最大化 ReLU 后的激活；Negative 最小化 ReLU 前的有符号激活。[参数与分数记录](vision/docs/assets/provenance.json)可用于核对这些图片。
 
-实现使用历史版本的 **Lucent Inception5h 权重**，与 Goodfire 重训的权重存在差异。[视觉方法说明](vision/docs/methodology.md)列出了目标定义和比较范围。视觉模块有独立的模型与数据要求，下文的 LLM 研究流程适用于 Qwen3。
+实现使用固定版本的 **Lucent Inception5h 权重**。[参考站元数据](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json)同样标注 Lucent 预训练权重；精确权重身份尚未核对。[视觉方法说明](vision/docs/methodology_zh.md)列出了目标定义与采样差异。下文的 LLM 研究流程适用于 Qwen3。
 
 ## 我们检验了哪些 AlreadyClean 主张 <a id="which-alreadyclean-claims-have-we-tested"></a>
 
@@ -138,9 +138,9 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
   </a>
 </p>
 
-这份记录展示 Colorado 神经元从已有激活证据到解释、受控实验、修订和发布的全过程，包括提示词、工具调用、测量、中间报告和最终批评。该记录使用 Diverse 100M，上面的对比案例使用 SlimPajama 100M。
+这份记录来自 **2026 年 10 月 29 日**的 Colorado 研究，使用 **Diverse 100M**，包含实验后的解释修订。提示词、测量和中间报告保留了该次运行的内容。链接中的 Qwen3 对比报告同样记录了 10 月 29 日的运行，使用 SlimPajama 100M。下文介绍的可运行流程会在实验前冻结解释，再根据实验结果分析这份冻结解释。
 
-### 从证据到报告
+### 当前可运行流程
 
 Python 通过结构化 LLM 请求和模型测量组织研究。LLM 按约定的 JSON 格式提出解释、预测和实验输入；代码负责选择证据、执行测量并生成报告。
 
@@ -319,12 +319,12 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 
 | 指南 | 用途 |
 | --- | --- |
-| [运行](docs/running.md) | 安装依赖，配置 GPU 与凭证，运行或继续一批实验。 |
-| [输入数据](docs/data.md) | 准备激活归档和目标报告包。 |
-| [方法与实现](docs/method.md) | 从流程找到代码，了解测量范围。 |
-| [报告指南](docs/reports.md) | 查找某张图或某个章节的数据来源和生成阶段。 |
-| [开发](docs/development.md) | 运行 CPU 软件检查与离线演示。 |
-| [提示词与输出约定](workflow/) | 查看解释、打标、实验设计和报告分析的请求。 |
+| [LLM 安装与运行](docs/running.md) | 安装依赖，配置 GPU 与凭证，运行或继续一批实验。 |
+| [LLM 输入数据](docs/data.md) | 准备激活归档和目标报告包。 |
+| [LLM 方法与实现](docs/method.md) | 从流程找到代码，了解测量范围。 |
+| [LLM 报告指南](docs/reports.md) | 查找某张图或某个章节的数据来源和生成阶段。 |
+| [LLM 开发](docs/development.md) | 运行 CPU 软件检查与离线演示。 |
+| [LLM 提示词与输出约定](workflow/) | 查看解释、打标、实验设计和报告分析的请求。 |
 | [视觉模块与样例](vision/README_zh.md) | 安装 InceptionV1 模块，查看可视化结果并导出网页。 |
 
 ## 引用 <a id="citation"></a>

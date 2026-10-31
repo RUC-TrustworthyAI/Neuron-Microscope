@@ -1,0 +1,115 @@
+{
+  "summary": {
+    "feedback": {
+      "n": 435,
+      "directional_predictions": 137,
+      "correct": 92,
+      "coverage": 0.31494252873563217,
+      "accuracy_among_directional": 0.6715328467153284,
+      "confusion": {
+        "positive": {
+          "uncertain": 201,
+          "negative": 44,
+          "positive": 41
+        },
+        "negative": {
+          "negative": 51,
+          "uncertain": 97,
+          "positive": 1
+        }
+      }
+    },
+    "seen": {
+      "n": 65,
+      "directional_predictions": 58,
+      "correct": 57,
+      "coverage": 0.8923076923076924,
+      "accuracy_among_directional": 0.9827586206896551,
+      "confusion": {
+        "positive": {
+          "positive": 24,
+          "uncertain": 1,
+          "negative": 1
+        },
+        "negative": {
+          "uncertain": 6,
+          "negative": 33
+        }
+      }
+    }
+  },
+  "examples": [
+    {
+      "id": "spectrum-45354297",
+      "identity": "06a617fd437d4db22d2e0c58f53a9184efc5af56e5439ab447f5c5c3758ea113",
+      "key": "b057b997b44ff10bff6cec3815f8808f9672d1fb17d9ec0446318bdebe33976f",
+      "group": "source_code_markup",
+      "predicted_pole": "negative",
+      "prediction_status": "complete",
+      "reason": "Java source code.",
+      "activation": 43.25,
+      "true_pole": "positive",
+      "evaluation_split": "feedback",
+      "correct": false,
+      "observed_prefix": "/*\n * Copyright 2018 vasgat.\n *\n * Licensed under the Apache License, Version 2.0 (the \"License\");\n * you may not use this file except in compliance with the License.\n * You may obtain a copy of the License at\n *\n *      http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing, software\n * distributed under the License is distributed on an \"AS IS\" BASIS,\n * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\n * See the License for the specific language governing permissions and\n * limitations under the License.\n */\npackage certh.iti.mklab.music.charts.extraction.framework.chartUtils;\n\nimport java.util.HashMap;\n\n/**\n *\n * @author vasgat\n */\npublic class CountryCodes {\n\n    HashMap<String, String> country_codes;\n\n    public CountryCodes() {\n        this.country_codes = new HashMap();\n        this.country_codes.put(\"ca_ab\", \"alberta\");\n        this.country_codes.put(\"pr\", \"puerto rico\");\n        this.country_codes.put(\"ps\", \"palestinian territory\");\n        this.country_codes.put(\"pt\", \"portugal\");\n        this.country_codes.put(\"pw\", \"palau\");\n        this.country_codes.put(\"py\", \"paraguay\");\n        this.country_codes.put(\"us_ky\", \"kentucky\");\n        this.country_codes.put(\"us_ks\", \"kansas\");\n        this.country_codes.put(\"qa\", \"qatar\");\n        this.country_codes.put(\"us_la\", \"louisiana\");\n        this.country_codes.put(\"ad\", \"andorra\");\n        this.country_codes.put(\"af\", \"afghanistan\");\n        this.country_codes.put(\"ag\", \"antigua and barbuda\");\n        this.country_codes.put(\"ai\", \"anguilla\");\n        this.country_codes.put(\"al\", \"albania\");\n        this.country_codes.put(\"am\", \"armenia\");\n        this.country_codes.put(\"ao\", \"angola\");\n        this.country_codes.put(\"aq\", \"antarctica\");\n        this.country_codes.put(\"ar\", \"argentina\");\n        this.country_codes.put(\"as\", \"american samoa\");\n        this.country_codes.put(\"at\", \"austria\");\n        this.country_codes.put(\"ca_qc\", \"quebec\");\n        this.country_codes.put(\"re\", \"reunion\");\n        this.country_codes.put(\"au\", \"australia\");\n        this.country_codes.put(\"aw\", \"aruba\");\n        this.country_codes.put(\"ax\", \"Aland islands\");\n        this.country_codes.put(\"az\", \"azerbaijan\");\n        this.country_codes.put(\"ro\", \"romania\");\n        this.country_codes.put(\"ba\", \"bosnia and herzegovina\");\n        this.country_codes.put(\"bb\", \"barbados\");\n        this.country_codes.put(\"rs\", \"serbia\");\n        this.country_codes.put(\"us_ms\", \"mississippi\");\n        this.country_codes.put(\"bd\", \"bangladesh\");\n        this.country_codes.put(\"be\", \"belgium\");\n        this.country_codes.put(\"ru\", \"russia\");\n        this.country_codes.put(\"bf\", \"burkina faso\");\n        this.country_codes.put(\"us_mn\", \"minnesota\");\n        this.country_codes.put(\"bg\", \"bulgaria\");\n        this.country_codes.put(\"rw\", \"rwanda\");\n        this.country_codes.put(\"us_mo\", \"missouri\");\n        this.country_codes.put(\"bh\", \"bahrain\");\n        this.country_codes.put(\"bi\", \"burundi\");\n        this.country_codes.put(\"bj\", \"benin\");\n        this.country_codes.put(\"bl\", \"saint bartholemy\");\n        this.country_codes.put(\"bm\", \"bermuda\");\n        this.country_codes.put(\"bn\", \"brunei darussalam\");\n        this.country_codes.put(\"bo\", \"bol",
+      "anchor": {
+        "position": 800,
+        "token": "bol"
+      }
+    },
+    {
+      "id": "spectrum-73150206",
+      "identity": "89c798b93c392dd8054b4572d8d261ee03fc57f5590ca8f41f692f73c3c77f4d",
+      "key": "80d137d1c9c81f149b030fd7709ee8e2e0f98a1d13b734ccc55fcabcc58d73a5",
+      "group": "source_code_markup",
+      "predicted_pole": "negative",
+      "prediction_status": "complete",
+      "reason": "Kivy markup and code context.",
+      "activation": 36.0,
+      "true_pole": "positive",
+      "evaluation_split": "feedback",
+      "correct": false,
+      "observed_prefix": "Class inheritance with Kivy's RecycleView\nI was trying to create a generic RecycleView and inherit from it changing the viewclass, like this:\n<GenericList@RecycleView>:\n    SelectableRecycleBoxLayout:\n        canvas.before:\n            Color:\n                rgba: (.0, 0.9, .5, .8)\n            Rectangle:\n                pos: self.pos\n                size: self.size\n        default_size: None, 30\n        default_size_hint: 1",
+      "anchor": {
+        "position": 103,
+        "token": "1"
+      }
+    },
+    {
+      "id": "spectrum-56317677",
+      "identity": "f186f6311ee221559e654e58014c19ceb9a75a89fb1f255e51bc2cce52bacde4",
+      "key": "35069504f4d38b3555c8645fb10123c9e2821ec7aed5777404d9c9b5749b7522",
+      "group": "source_code_markup",
+      "predicted_pole": "negative",
+      "prediction_status": "complete",
+      "reason": "SQL INSERT statement.",
+      "activation": 35.5,
+      "true_pole": "positive",
+      "evaluation_split": "seen",
+      "correct": false,
+      "observed_prefix": "',96,'sa',FALSE,NULL);\nINSERT INTO arp_npl_grundnutzung_oereb.languagecode_iso639_1 (seq,iliCode,itfCode,dispName,inactive,description) VALUES (NULL,'",
+      "anchor": {
+        "position": 48,
+        "token": ",'"
+      }
+    },
+    {
+      "id": "spectrum-45723656",
+      "identity": "9646ab5570c9db9c0d1cf8f3b87f815c4f8c19532304ad1ae37d5919b6cfe163",
+      "key": "a8eeb8ff255aa2761b58d2ead2e159d47dc2f87262cf24f98b8cb4000a22ffd6",
+      "group": "source_code_markup",
+      "predicted_pole": "negative",
+      "prediction_status": "complete",
+      "reason": "PHP/WordPress source code.",
+      "activation": 23.125,
+      "true_pole": "positive",
+      "evaluation_split": "feedback",
+      "correct": false,
+      "observed_prefix": "_dark_hovercolor',\n\t\t\t\t'default_value' => '',\n\t\t\t\t'label' => esc_html__('Dark Menu Hover Text Color', 'fluid'),\n\t\t\t)\n\t\t);\n\n\t\tfluid_edge_add_admin_field(\n\t\t\tarray(\n\t\t\t\t'parent' => $first_level_row4,\n\t\t\t\t'type' => 'colorsimple',\n\t\t\t\t'name' => 'menu_dark_activecolor',\n\t\t\t\t'default",
+      "anchor": {
+        "position": 83,
+        "token": "efault"
+      }
+    }
+  ]
+}

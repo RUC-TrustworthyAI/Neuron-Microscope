@@ -4,7 +4,7 @@
 
 The following are saved results for four channels, using configuration A, 224 × 224 inputs, 1,024 optimization steps and seed 0. Each row shows Positive, Path-guided +, Diversity, Negative and Path-guided −. Diversity previews contain four members. Click a picture to inspect its original size.
 
-Our results use Lucent's historical Inception5h checkpoint. Reference images are linked from AlreadyClean and use its comparison setup; the checkpoints differ. These panels support visual inspection. They do not establish that the models learned equivalent neuron functions. See the [method](methodology.md) and [recorded configuration and scores](assets/provenance.json).
+Our results use a pinned Lucent Inception5h checkpoint. The [reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights; exact weight identity has not been verified. These panels support visual inspection of the two optimization setups. See the [method](methodology.md) and [recorded configuration and scores](assets/provenance.json) for the objectives and settings.
 
 The local images are optimization outputs, with no display-time recoloring or sharpening. Reference images remain on the original domain.
 

@@ -13,6 +13,8 @@
 
 本模块实现 **InceptionV1／Lucent Inception5h** 的特征可视化与自然图像检索。用户可以选择通道，使用五种目标优化图像，查看自然样例和热图，并导出包含 AlreadyClean 参考链接的交互式网页。
 
+本模块固定了 Lucent Inception5h 的源码版本与权重摘要。[AlreadyClean 参考站元数据](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json)同样标注 Lucent 预训练权重；精确权重身份尚未核对。
+
 目录覆盖 **12 层、5,804 个通道**。这是可选目标的目录，每次网页导出会记录实际已有的结果。[LLM 研究流程](../docs/workflow.md)使用独立环境和入口。
 
 ## 视觉对比 <a id="visual-comparisons"></a>
@@ -28,7 +30,7 @@
   </tr>
 </table>
 
-**mixed4c:260 · A 配置 · 224 × 224 · 1,024 步 · seed 0。** 以上均为已保存的优化输出。[完整对比](docs/gallery.md)列出了四个通道的全部五种结果及原图，[参数和实测分数](docs/assets/provenance.json)可供核对。mixed4c:477 的 Diversity 有一个成员激活接近零，对比页保留了这个结果。
+**mixed4c:260 · A 配置 · 224 × 224 · 1,024 步 · seed 0。** 以上均为已保存的优化输出。[完整对比](docs/gallery.md)列出了四个通道的全部五种结果及原图，[参数和实测分数](docs/assets/provenance.json)可供核对。
 
 上游还提供了[交互式展示站](https://ziheng-inception-microscope-a.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=260&compare=1)。上面的对比图片可以直接在仓库中查看。
 
@@ -47,13 +49,13 @@
 | **Negative** | 最小化 ReLU 前的有符号激活。 | 基础图像参数化与颜色先验。 |
 | **Path-guided −** | 最小化 ReLU 前的有符号激活。 | 前 64 步对齐负向自然样例的激活向量。 |
 
-这里的路径表示使用池化后的激活向量作为代理。[方法说明](docs/methodology.md)给出了具体定义和颜色先验。
+这里的路径表示使用池化后的激活向量作为代理。[方法说明](docs/methodology_zh.md)给出了具体定义和颜色先验。
 
 ## 安装与使用 <a id="installation-and-usage"></a>
 
 ### 1. 安装模块
 
-使用 **Python 3.11+** 和独立环境。GPU 优化需要先安装与 CUDA 兼容的 PyTorch 和 torchvision，再安装本模块：
+使用 **Python 3.11+** 和独立环境。GPU 运行与批量生成使用 Linux，需要先安装与 CUDA 兼容的 PyTorch 和 torchvision，再安装本模块：
 
 ```bash
 git clone --branch hr-vision-integration https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
@@ -71,7 +73,7 @@ vision-microscope catalog
 按[模型配置说明](source/inceptionv1/README.md)，将指定版本的 Lucent 和权重放到 `source/inceptionv1/`。已有资产可以通过 `VNI_MODEL_DIR` 复用。
 
 ```bash
-vision-microscope doctor --model-dir source/inceptionv1
+vision-microscope doctor
 ```
 
 模型清单记录了源码版本、权重摘要和 `RGB * 255 - 117` 预处理。权重与 ImageNet 数据需要单独获取。
@@ -90,13 +92,13 @@ vision-microscope export \
 python -m http.server 8766 --directory vision-repro/outputs/viewer
 ```
 
-打开 <http://localhost:8766/?layer=mixed4c&neuron=260>。更改配置或重新导出网页时使用新目录。[运行指南](docs/reproduction.md)还涵盖 ImageNet 扫描、锚点、五种目标、批量生成和续跑。
+打开 <http://localhost:8766/?layer=mixed4c&neuron=260>。更改配置或重新导出网页时使用新目录。[运行指南](docs/reproduction_zh.md)还涵盖 ImageNet 扫描、锚点、五种目标、批量生成和续跑。
 
-需要参考图时，按[数据格式](docs/data-format.md#静态导出)提供 `--reference-catalog`。自然样例使用 `--sample-run`，感受野裁剪还需 `--rf-snapshot`。导出器仅显示已提供的结果，其余内容显示占位。
+需要参考图时，按[数据格式](docs/data-format_zh.md#静态导出)提供 `--reference-catalog`。自然样例使用 `--sample-run`，感受野裁剪还需 `--rf-snapshot`。导出器仅显示已提供的结果，其余内容显示占位。
 
 ## 如何理解结果 <a id="interpreting-the-results"></a>
 
-- **权重范围。** 这些结果使用 Lucent 的历史 Inception5h 移植版本。Goodfire 使用的重训权重属于不同模型，因此层与通道同名、图片外观接近，都不足以证明语义等同。
+- **采样范围。** 本模块从按类别均衡抽取的 50,000 张图像中检索正负样例。参考站说明，正向样例来自 50,000 张，负向尾部则覆盖全部 1,281,167 张训练图像。两者可用于比较的样例范围有差异，具体见[方法说明](docs/methodology_zh.md#自然样例和可比性)。
 - **有符号目标。** 正向分数来自 ReLU 后，负向分数来自 ReLU 前。ReLU 后的零值无法衡量负向抑制强度。
 - **评分与显示。** 优化采用归一化 Gaussian 加权分数，自然样例按空间极值排序。热图逐图归一化，展示对应层的激活。
 - **图像先验。** A 配置约束了整体与外围的平均颜色。理解图片颜色时，需要考虑这些约束对外观的影响。
@@ -106,9 +108,9 @@ python -m http.server 8766 --directory vision-repro/outputs/viewer
 | 指南 | 用途 |
 | --- | --- |
 | [模型配置](source/inceptionv1/README.md) | 准备指定源码、权重和预处理。 |
-| [运行](docs/reproduction.md) | 扫描数据、建立锚点、优化批次并续跑。 |
-| [方法](docs/methodology.md) | 查看图像参数化、损失和目标定义。 |
-| [数据格式](docs/data-format.md) | 读取运行记录、分数、检查点和网页资产。 |
+| [运行](docs/reproduction_zh.md) | 扫描数据、建立锚点、优化批次并续跑。 |
+| [方法](docs/methodology_zh.md) | 查看图像参数化、损失和目标定义。 |
+| [数据格式](docs/data-format_zh.md) | 读取运行记录、分数、检查点和网页资产。 |
 | [部署](docs/hosting.md) | 托管静态导出，或配置可选的对象存储服务。 |
 | [开发](docs/development.md) | 运行 CPU 测试，检查网页与媒体服务。 |
 

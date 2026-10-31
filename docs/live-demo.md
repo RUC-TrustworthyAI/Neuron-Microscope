@@ -1,10 +1,10 @@
-# Live Demo
+# Recorded LLM investigation
 
 **English** · [简体中文](live-demo_zh.md)
 
-**[Neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)** · **[Pipeline walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en)**
+**[Neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)** · **[Recorded walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en)**
 
-Both websites are publicly accessible.
+The walkthrough records **Qwen3-32B L55/N11703 on 29 October 2026**, using Diverse 100M and 500 sampled positions. It preserves that run's interpretation, labeling, experiments, post-experiment revision and report review. The [current runnable workflow](workflow.md) freezes the explanation before experiments and analyzes the results against it. The saved recording documents its own procedure and measurements.
 
 ## Preview locally
 
@@ -14,36 +14,34 @@ From the repository root:
 python3 -m http.server 8000 --bind 127.0.0.1 --directory website
 ```
 
-Open **http://127.0.0.1:8000/?lang=en** in a current Chrome, Edge, Firefox or Safari browser. English is the default. Use the language switch to select Chinese, or open **http://127.0.0.1:8000/?lang=zh**. The current step is retained when switching languages. The demo uses static HTML, CSS and JavaScript. It needs no API key, model, GPU, Docker or Python packages.
+Open <http://127.0.0.1:8000/?lang=en> in a current Chrome, Edge, Firefox or Safari browser. English is the default; select Chinese with the language switch or `?lang=zh`. Switching languages retains the current step. The static preview needs only Python's HTTP server and a browser.
 
-![Neuron Microscope recorded walkthrough](../assets/live-demo-en-hd.png)
+![Recorded Colorado investigation](../assets/pipeline-walkthrough-en.jpg)
 
-## What the demo shows
+## Read the evidence
 
-Follow a recorded investigation of Qwen3-32B neuron **L55/N11703**, from its initial evidence page through interpretation, experiments, revision and the final interactive report. Each step contains an explanation, saved task and skill instructions, selected prompt examples, key operations, and corresponding artifacts. Screenshots can be enlarged; saved reports retain their plots, hover details and folding controls.
+The six steps cover evidence preparation, interpretation, sample labeling, experiments, revision, and review/publication. Each step links to saved tasks, skill instructions, selected prompts, key operations and corresponding artifacts. Screenshots enlarge on click; saved reports retain their plots, hover details and folding controls.
 
-The walkthrough interface and explanations are bilingual. Recorded prompts, sample contexts, measurements and scientific reports retain their source content.
+The interface and explanations are bilingual. Prompts, sample contexts, measurements and scientific reports retain their source content. The final report plots the 495 labeled positions from the shared 500-position sample.
 
-The recording includes an interrupted experiment stage, reuse of an earlier completed measurement stage, and a later labeling refresh. These events are shown in sequence. It reflects the pipeline version used for that recording.
+`website/` contains the same recorded case as the linked online walkthrough. It includes curated excerpts and report resources. Complete API logs, credentials, weights and activation archives stay outside the website. Report resources are compressed and load through the browser's `DecompressionStream`.
 
-The demo includes selected excerpts and report resources. Complete API request/response logs, credentials, model weights and activation archives stay outside this website. Scientific prose, displayed measurements and sample contexts are preserved by the exporter. The report resources omit local provenance paths and a duplicate example collection, and are compressed for static delivery. They load in the browser with `DecompressionStream`.
-
-## Optional GitHub Pages hosting
+## Host this walkthrough on GitHub Pages
 
 For a repository with GitHub Pages available:
 
-1. Open **Settings → Pages** and select **GitHub Actions** as the source.
-2. Open **Actions → Publish live demo → Run workflow**, choose `main`, and run it.
-3. Open the URL shown in the `github-pages` deployment. Add `?lang=en` for English or `?lang=zh` for Chinese.
+1. In **Settings → Pages**, choose **GitHub Actions** as the source.
+2. Open **Actions → Publish live demo → Run workflow** and select the branch containing these `website/` files.
+3. Open the deployment URL. Add `?lang=en` or `?lang=zh` to select a language.
 
-The workflow is manual. Committing demo changes does not trigger a deployment.
+The workflow publishes the walkthrough in `website/` and is triggered manually. The neuron-report directory and vision viewer have their own export and hosting entries.
 
-## Refresh the recorded case
+## Import a prepared public recording
 
-To export another prepared local recording:
+Use a prepared walkthrough containing `index.html`, its JavaScript and CSS, and the `content/`, `reports/` and `screenshots/` directories:
 
 ```bash
-python3 examples/export_live_demo.py --source /path/to/local-recording
+python3 examples/export_live_demo.py --source /path/to/prepared-walkthrough
 ```
 
-This regenerates the curated files under `website/content/` and compressed report resources under `website/reports/`. The website interface and screenshot selection are maintained separately. The command reads saved material and performs no API calls or model runs.
+The command synchronizes those display assets into `website/`, preserving saved report and measurement bytes. `--output` selects another destination. Preparing the public snapshot includes selecting prompt excerpts, screenshots and report resources; the import step performs no API calls or model measurements.

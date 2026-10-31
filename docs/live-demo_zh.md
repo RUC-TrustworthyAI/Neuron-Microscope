@@ -1,51 +1,47 @@
-# Live Demo
+# LLM 研究过程记录
 
 [English](live-demo.md) · **简体中文**
 
-**[神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)** · **[流程演示](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh)**
+**[神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)** · **[研究过程记录](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh)**
 
-两个网站均可公开访问。
+这份记录来自 **2026 年 10 月 29 日的 Qwen3-32B L55/N11703 研究**，使用 Diverse 100M 和 500 个采样位置。它保留了该次运行的解释、打标、实验、实验后修订和报告评阅。[当前可运行流程](workflow.md)会在实验前冻结解释，再根据实验结果分析该解释。保存的记录呈现其对应的操作与测量。
 
 ## 本地预览
 
-在仓库根目录运行：
+从仓库根目录运行：
 
 ```bash
 python3 -m http.server 8000 --bind 127.0.0.1 --directory website
 ```
 
-用新版 Chrome、Edge、Firefox 或 Safari 打开 **http://127.0.0.1:8000/?lang=zh** 查看中文版。网站默认显示英语，英语入口为 **http://127.0.0.1:8000/?lang=en**。右上角可切换语言，切换时保留当前步骤。
+使用新版 Chrome、Edge、Firefox 或 Safari 打开 <http://127.0.0.1:8000/?lang=zh>。默认语言为英语，可以通过语言按钮或 `?lang=zh` 切换；切换时保留当前步骤。静态预览只需 Python 的 HTTP 服务与浏览器。
 
-演示使用静态 HTML、CSS 和 JavaScript，无需 API key、模型、GPU、Docker 或额外 Python 包。
+![Colorado 研究过程记录](../assets/pipeline-walkthrough-zh.jpg)
 
-![Neuron Microscope 中文演示](../assets/live-demo-zh-hd.png)
+## 阅读证据
 
-## 演示内容
+六个步骤依次展示证据准备、解释、样本打标、实验、修订，以及评阅和发布。每一步都链接到保存的任务、skill 指令、提示词节选、关键操作和对应产物。点击截图可以放大，保存的报告保留图表、悬停详情和折叠功能。
 
-跟随 Qwen3-32B 的 **L55/N11703** neuron，从初始证据页走完初步解释、实验、修订，最后查看交互报告。每一步都有讲解、保存的任务与 skill 指令、Prompt 节选、关键操作和相应产物。截图可以放大；交互报告保留图表、悬停详情和折叠功能。
+界面与讲解支持中英双语。提示词、样本上下文、测量和科学报告保留原文。最终报告绘制了共享 500 点样本中已标注的 495 个位置。
 
-界面和流程讲解支持中英双语。保存的 Prompt、样本上下文、测量和科学报告保留原文。
+`website/` 与线上 walkthrough 展示同一个研究案例，包含整理后的节选与报告资源。完整 API 日志、凭证、权重和激活归档留在网站之外。报告资源经过压缩，由浏览器通过 `DecompressionStream` 加载。
 
-这次记录包含第二阶段中断、复用较早完成的测量，以及后续打标刷新。演示按发生顺序展示这些步骤，并保留当时版本的行为。
-
-网站包含节选和报告所需资源。完整 API 请求与响应日志、凭证、模型权重和激活存档留在本地。导出程序保留科学文字、展示数值和样本上下文，去掉本机来源路径及重复的样本集合，并压缩报告资源；浏览器通过 `DecompressionStream` 加载报告。
-
-## 可选的 GitHub Pages 托管
+## 将这份记录部署到 GitHub Pages
 
 仓库具备 GitHub Pages 使用权限时：
 
-1. 打开 **Settings → Pages**，选择 **GitHub Actions** 作为发布来源。
-2. 打开 **Actions → Publish live demo → Run workflow**，选择 `main` 并运行。
-3. 部署成功后，打开 `github-pages` 中显示的网址。附加 `?lang=en` 查看英语版，附加 `?lang=zh` 查看中文版。
+1. 在 **Settings → Pages** 中选择 **GitHub Actions**。
+2. 打开 **Actions → Publish live demo → Run workflow**，选择包含这些 `website/` 文件的分支。
+3. 打开部署网址，通过 `?lang=en` 或 `?lang=zh` 选择语言。
 
-发布配置只支持手动触发，提交代码不会自动部署。
+这个工作流手动发布 `website/` 中的研究记录。神经元报告目录与视觉展示站各有对应的导出和托管入口。
 
-## 更新演示案例
+## 导入准备好的公开记录
 
-准备好本地记录后运行：
+准备包含 `index.html`、JavaScript、CSS，以及 `content/`、`reports/`、`screenshots/` 的 walkthrough 目录，然后运行：
 
 ```bash
-python3 examples/export_live_demo.py --source /path/to/local-recording
+python3 examples/export_live_demo.py --source /path/to/prepared-walkthrough
 ```
 
-该命令重新生成 `website/content/` 中的节选，以及 `website/reports/` 中的压缩报告。界面与截图单独维护。导出只读取保存的材料，不发起 API 请求或模型运行。
+命令将展示资产同步到 `website/`，保留报告和测量文件的原始字节；`--output` 可以指定其他目录。公开快照需要先选定提示词节选、截图和报告资源。导入步骤不调用 API 或执行模型测量。
