@@ -14,8 +14,8 @@
 
 <p align="center">
   <a href="README.md">English</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">浏览神经元报告</a> ·
-  <a href="vision/README_zh.md">浏览视觉神经元</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">语言模型报告</a> ·
+  <a href="vision/README_zh.md">视觉模型可视化</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">查看 Colorado 案例</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh">跟随一次研究</a> ·
   <a href="#use-neuron-microscope">运行项目</a>
@@ -45,8 +45,8 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ## 目录
 
-- [交互式双栏报告对比](#side-by-side-interactive-comparisons)
-- [视觉神经元可视化](#vision-neuron-visualizations)
+- [语言模型神经元报告](#language-model-neuron-reports)
+- [视觉模型神经元可视化](#vision-model-neuron-visualizations)
 - [我们检验了哪些 AlreadyClean 主张](#which-alreadyclean-claims-have-we-tested)
 - [LLM 神经元研究流程](#the-investigation-pipeline)
 - [如何评估报告中的证据](#evaluating-the-report-evidence)
@@ -58,7 +58,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 - [团队相关研究](#related-research-from-our-group)
 - [环境、数据与报告指南](#setup-data-and-report-guides)
 
-## 交互式双栏报告对比 <a id="side-by-side-interactive-comparisons"></a> <a id="explore-the-evidence"></a><a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
+## 语言模型神经元报告 <a id="language-model-neuron-reports"></a> <a id="side-by-side-interactive-comparisons"></a> <a id="explore-the-evidence"></a><a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
 
 ### 双栏案例：Colorado 神经元
 
@@ -91,7 +91,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 每一行都可进入完整交互式报告，查看激活证据、样例、搜索、聚类、效应、测试、批评、修订结论和开销记录。
 
-## 视觉神经元可视化 <a id="vision-neuron-visualizations"></a>
+## 视觉模型神经元可视化 <a id="vision-model-neuron-visualizations"></a> <a id="vision-neuron-visualizations"></a>
 
 [视觉模块](vision/README_zh.md)针对 InceptionV1 的单个通道优化图像，并从 ImageNet 扫描中检索自然样例。目录包含 **12 层、5,804 个通道**，实现了 Positive、Path-guided +、Diversity、Negative 和 Path-guided − 五种视图。目录规模表示可选目标数量，完成情况需查看具体结果。
 

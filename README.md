@@ -14,8 +14,8 @@
 
 <p align="center">
   <a href="README_zh.md">中文</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">Explore neuron reports</a> ·
-  <a href="vision/README.md">Explore vision neurons</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">Language model reports</a> ·
+  <a href="vision/README.md">Vision model visualizations</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">Open the Colorado case</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en">Watch the investigation</a> ·
   <a href="#use-neuron-microscope">Run the project</a>
@@ -45,8 +45,8 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 
 ## Contents
 
-- [Side-by-side interactive comparisons](#side-by-side-interactive-comparisons)
-- [Vision neuron visualizations](#vision-neuron-visualizations)
+- [Language model neuron reports](#language-model-neuron-reports)
+- [Vision model neuron visualizations](#vision-model-neuron-visualizations)
 - [Which AlreadyClean claims have we tested?](#which-alreadyclean-claims-have-we-tested)
 - [The LLM investigation pipeline](#the-investigation-pipeline)
 - [Evaluating the report evidence](#evaluating-the-report-evidence)
@@ -58,7 +58,7 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 - [Related research from our group](#related-research-from-our-group)
 - [Setup, data and report guides](#setup-data-and-report-guides)
 
-## Side-by-side interactive comparisons <a id="explore-the-evidence"></a> <a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
+## Language model neuron reports <a id="side-by-side-interactive-comparisons"></a> <a id="explore-the-evidence"></a> <a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
 
 ### A side-by-side case: the Colorado neuron
 
@@ -91,7 +91,7 @@ In our SlimPajama 100M run, the template `Officials in {city} approved the annua
 
 Each row links to a full interactive report with activation evidence, exemplars, searches, clusters, effects, tests, criticism, revised conclusions, and cost records.
 
-## Vision neuron visualizations
+## Vision model neuron visualizations <a id="vision-neuron-visualizations"></a>
 
 The [vision module](vision/README.md) optimizes images for individual InceptionV1 channels and retrieves natural examples from an ImageNet scan. Its catalog contains **12 layers and 5,804 channels**. It implements Positive, Path-guided +, Diversity, Negative and Path-guided − views; the catalog size describes available targets, not the number of completed results.
 
