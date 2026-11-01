@@ -99,6 +99,12 @@ The [vision module](vision/README.md) publishes all **12 layers and 5,804 Incept
 
 [Open interactive viewer →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1) · [Five-view comparisons →](vision/README.md#reproduction-results) · [Install and run →](vision/README.md#quick-start)
 
+<p align="center">
+  <a href="https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&amp;neuron=477&amp;compare=1">
+    <img src="vision/docs/assets/viewer-screenshot.png" alt="InceptionV1 Microscope: reference comparison, five visualization modes and top-activating images" width="92%">
+  </a>
+</p>
+
 <table align="center">
   <tr><th>Positive</th><th>Path-guided +</th><th>Diversity</th><th>Negative</th><th>Path-guided −</th></tr>
   <tr>
