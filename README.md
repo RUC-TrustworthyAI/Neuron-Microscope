@@ -128,9 +128,11 @@ The model uses a pinned **Lucent Inception5h checkpoint**. The [method guide](vi
 
 ## 💡 Key findings <a id="key-findings"></a> <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="what-we-have-found-so-far"></a> <a id="observations-from-the-current-comparisons"></a>
 
+For most of the 50 Qwen3-32B neurons we examined, strongly activating texts showed clear semantic, syntactic, or word-form patterns. We still struggle to use these patterns to explain weak activations or predict exactly which token in a sentence will activate strongly.
+
 ### 1. Native neurons often have recognizable semantics at strong activations
 
-We were encouraged to find clear concepts and patterns in many of the neurons we inspected, at large absolute activations on their positive and negative poles. Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars). Their legibility resembles what we look for in SAE latents. These findings encourage us to devote more research effort to native neurons.
+Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars). Their legibility resembles what we look for in SAE latents. These findings encourage us to devote more research effort to native neurons.
 
 ### 2. We cannot yet claim to fully understand neurons
 

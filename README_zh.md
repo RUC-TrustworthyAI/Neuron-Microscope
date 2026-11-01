@@ -128,9 +128,11 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ## 💡 主要发现 <a id="key-findings"></a> <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="我们检验了哪些-alreadyclean-主张"></a> <a id="observations-from-the-current-comparisons"></a> <a id="what-we-have-found-so-far"></a> <a id="当前案例中的观察"></a>
 
+在我们观察的 50 个 Qwen3-32B 神经元中，绝大多数的强激活文本都呈现出清楚的语义、语法或词形规律。但这些规律仍难解释弱激活，也难以准确预测一句话中强激活会落在哪个 token 上。
+
 ### 1. 原生神经元的强激活往往呈现清楚的语义
 
-我们欣喜地发现，在检查过的许多神经元中，正负两极的高绝对值激活呈现了清楚的概念或模式。例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，鼓励我们把更多研究精力投入原生神经元。
+例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，鼓励我们把更多研究精力投入原生神经元。
 
 ### 2. 我们仍难以声称完全理解了神经元
 
