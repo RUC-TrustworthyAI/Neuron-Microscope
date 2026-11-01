@@ -100,9 +100,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 [打开交互网页 →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1) · [五类结果对比 →](vision/README_zh.md#reproduction-results) · [安装与运行 →](vision/README_zh.md#quick-start)
 
 <p align="center">
-  <a href="https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&amp;neuron=477&amp;compare=1">
-    <img src="vision/docs/assets/viewer-screenshot.png" alt="InceptionV1 Microscope：原始结果对比、五类可视化与最高激活样例" width="92%">
-  </a>
+  <img src="vision/docs/assets/viewer-screenshot.png" alt="InceptionV1 Microscope：原始结果对比、五类可视化与最高激活样例" width="92%">
 </p>
 
 <table align="center">
