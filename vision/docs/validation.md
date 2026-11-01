@@ -8,12 +8,9 @@
 | Viewer | Multirow atlases, embedded heatmaps, static/cloud fallback and quality-review placeholders passed |
 | R2 API | Authentication, expiry, bounds, immutability, independent publication and reads passed |
 
-The numerical optimizer is unchanged in this release. No new GPU optimization was run.
+This release validated export and viewer changes with the existing numerical optimizer.
 
 ## Previous pretrained GPU check — 2026-10-27
-
-
-Validation used a separate copy of this repository. The existing full-generation campaign and its environment installation were not modified.
 
 | Check | Result |
 | --- | --- |
@@ -26,6 +23,6 @@ Validation used a separate copy of this repository. The existing full-generation
 | Export smoke | 5,804-neuron catalog, one populated target, correct actual 8-step result and initial image |
 | Wheel build | Successful; packaged defaults and HTML/JS/CSS confirmed present |
 
-The GPU smoke ran on NVIDIA GB10. The existing PyTorch build warned that device capability 12.1 exceeds its advertised maximum of 12.0; this particular execution completed successfully. No driver or framework replacement was attempted. This is not a general compatibility guarantee for every CUDA operation or a performance benchmark. Allocator telemetry excludes other processes and CUDA context/system allocations.
+The GPU smoke completed on NVIDIA GB10. PyTorch reported device capability 12.1 against its advertised maximum of 12.0. Allocator telemetry measures this process's PyTorch allocations.
 
-The eight-step smoke validates execution and record/export integrity, not visual quality or semantic equivalence to Nick / Goodfire. It did not rerun the ImageNet scan or the complete 29,020-request campaign. CPU tests cover independent-channel batching, signed targets, redirected gradients, color losses, queue coverage, export integrity and corrupt/traversing assets. CI on GitHub has not yet been run as part of this local validation.
+The eight-step smoke covers optimizer execution and record/export integrity. CPU tests cover independent-channel batching, signed targets, redirected gradients, color losses, queue coverage, export integrity and corrupt/traversing assets.

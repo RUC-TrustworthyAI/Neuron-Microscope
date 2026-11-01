@@ -19,8 +19,8 @@ def source_bundle(source):
     bootstrap = source[start:stop]
     if 'const B = (() => {' in bootstrap:
         if "one_paragraph: '—'" not in bootstrap or 'saved.native' in bootstrap:
-            raise ValueError('Unknown report bootstrap; refusing to resurrect hidden interpretations')
-        # Match the effective activation-only view rather than its hidden historical bundle prose.
+            raise ValueError('Unsupported activation-only report bootstrap')
+        # Initialize the activation-only claim from the saved population statistics.
         bundle['neuron']['autointerp_label'] = None
         bundle['neuron']['autointerp_description'] = None
         tokens = bundle['distribution']['n_tokens']
@@ -64,7 +64,7 @@ def presentation(source):
     return source
 
 def readable_data_scripts(source):
-    """Keep self-contained HTML data readable without single-line multi-MB tool output."""
+    """Format embedded JSON data with indentation."""
     def pretty(match):
         data=json.loads(match.group(2))
         body=json.dumps(data,ensure_ascii=False,indent=2).replace('<',r'\u003c')
@@ -138,7 +138,7 @@ def merge(source, patches):
     source = source[:match.start(2)]+encoded+source[match.end(2):]
     if 'claim' in patches:
         source = re.sub(r'<title>.*?</title>','<title>'+html.escape(patches['claim']['title'])+'</title>',source,count=1,flags=re.S)
-    # Historical interpretation adapters must not override the now-explicit final bundle.
+    # Remove embedded interpretation scripts after merging the final bundle.
     for sid in ['paper-review-data','paper-review-full-data','saved-interpretation','interpretation-adapter']:
         source = re.sub(r'<script\b(?=[^>]*\bid=["\x27]'+sid+r'["\x27])[^>]*>.*?</script>','',source,flags=re.S)
     graphs = bundle.get('graphs_curated') or {}

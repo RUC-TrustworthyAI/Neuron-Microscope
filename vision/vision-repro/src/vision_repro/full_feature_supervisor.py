@@ -18,7 +18,7 @@ from .profile_full_concurrency import projected_memory_mib, stop_owned_children
 def supervise(root, workers):
     root = root.resolve()
     lock = (root/'supervisor.lock').open('a')
-    # A second heartbeat must never start another copy of the production queue.
+    # Hold an exclusive lock for this queue's supervisor.
     fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
     protocol = json.loads((root/'protocol.json').read_text())
     batch = protocol['batch_images']
@@ -51,7 +51,7 @@ def supervise(root, workers):
                     stop_owned_children([child])
                     pressure_stops += 1
                     next_launch = time.monotonic()+60
-                    # Repeated pressure: lower only our concurrency, not anyone else's.
+                    # Reduce this supervisor's worker count after repeated memory pressure.
                     if pressure_stops >= 2:
                         workers = max(1, workers-1)
                 elif len(children) < workers and time.monotonic() >= next_launch:

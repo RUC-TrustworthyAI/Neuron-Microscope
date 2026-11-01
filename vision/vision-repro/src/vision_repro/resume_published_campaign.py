@@ -38,7 +38,7 @@ def exclude_published(root, catalog_path):
             previous = con.execute('SELECT digest, report FROM publication_resume').fetchone()
             if previous:
                 if previous['digest'] != digest:
-                    raise ValueError('Refusing to change the published baseline of an initialized campaign')
+                    raise ValueError('Published baseline differs from the initialized campaign')
                 report = json.loads(previous['report'])
             else:
                 rows = con.execute('SELECT * FROM jobs ORDER BY rowid').fetchall()

@@ -47,7 +47,7 @@ def export(output, runs=(), sample_run=None, reference_catalog=None, rf_snapshot
         raise ValueError('--rf-snapshot requires --sample-run for full-input atlases')
     output = Path(output)
     if output.exists():
-        raise FileExistsError('Use a new export directory; existing sites are never overwritten')
+        raise FileExistsError('Export directory already exists; choose a new directory')
     output.mkdir(parents=True)
     template = Path(__file__).parent/'web/microscope'
     for name in ('index.html','app.js','style.css'):

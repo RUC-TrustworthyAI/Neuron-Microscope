@@ -33,7 +33,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 | **Qwen3-32B** | 激活证据、解释、受控测试、干预和尚未解决的案例。 | [交互式神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [研究代码](language/) |
 | **InceptionV1／Lucent Inception5h** | 五种可视化目标、自然图像样例、热图和参考对比。 | [视觉模块指南与样例](vision/README_zh.md) · [优化代码](vision/vision-repro/) |
 
-**数据：** 当前 50 份报告均使用 **Reasoning Mix 100M**。[数据指南](docs/data.md)介绍了语料来源、激活格式和读取工具。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
+**数据：** 当前 50 份报告均使用 **Reasoning Mix 100M**。[数据指南](language/docs/data.md)介绍了语料来源、激活格式和读取工具。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
 > [!IMPORTANT]
 > **本项目独立开展复现。** 在 LLM 研究中，研究模型不会看到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
@@ -192,7 +192,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 **Activation spectrum 与 Inside the neuron 共用一组样本，以及修订后冻结解释所对应的预测。** 打标模型读取完整上文，并将紧邻后文作为语言背景；解释无法明确预测方向时，归入 No visible cue。由于这些样本参与解释修订，预测一致程度用于提供开发反馈。独立生成的盲测文本与受控实验提供进一步检验。
 
-具体见[流程说明](docs/workflow.md)、[测量细节](docs/method.md)与[运行配置](docs/running.md)。
+具体见[流程说明](language/docs/workflow.md)、[测量细节](language/docs/method.md)与[运行配置](language/docs/running.md)。
 
 ## 🔬 视觉神经元研究流程 <a id="the-vision-investigation-pipeline"></a> <a id="视觉神经元研究流程"></a>
 
@@ -218,7 +218,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 | 稳定性 | 换样本、提示词或独立运行，解释是否仍成立？ | 在匹配条件下比较解释与测量结果。 |
 | 不确定性 | 哪些现象仍未解释，或证据不足以区分？ | 明确的批评、替代解释、弱响应极和失败测试。 |
 
-RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确立原生因果效应。具体见[测量范围](docs/method.md#relp-and-intervention-scope)。
+RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确立原生因果效应。具体见[测量范围](language/docs/method.md#relp-and-intervention-scope)。
 
 ## 📦 安装与使用 <a id="use-neuron-microscope"></a><a id="installation-and-usage"></a><a id="quick-start"></a> <a id="安装与使用"></a>
 
@@ -234,7 +234,7 @@ RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确
 ### 1. 体验离线渲染器
 
 ```bash
-git clone --branch hr-language-refactor https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope
 
 python3 -m venv .venv
@@ -279,7 +279,7 @@ python -m http.server 8000 --directory runs/example/report
 
 添加 `--stop-after interpretation`，即可利用已有激活查看修订后的解释和两张标注图，此时尚未加载目标模型。使用相同配置再次运行时，会复用已完成的 API 响应，以及已保存的采样和测量记录。更改科学输入时，应使用新的输出目录。
 
-并行研究多个神经元时，为每个运行分别准备配置和输出目录；共用 GPU 组的运行应使用相同的 `gpu_lock`。`NEURON_MICROSCOPE_GPU_WORKER=1` 启用共享常驻模型。随附配置的 `llm.max_concurrent_requests: null` 不设置应用层 API 并发上限。继续执行、双栏导出和执行记录见[运行说明](docs/running.md)。
+并行研究多个神经元时，为每个运行分别准备配置和输出目录；共用 GPU 组的运行应使用相同的 `gpu_lock`。`NEURON_MICROSCOPE_GPU_WORKER=1` 启用共享常驻模型。随附配置的 `llm.max_concurrent_requests: null` 不设置应用层 API 并发上限。继续执行、双栏导出和执行记录见[运行说明](language/docs/running.md)。
 
 ## ⏱️ 实测耗时与开销 <a id="recorded-runtime-and-cost"></a> <a id="reproducibility-and-cost"></a> <a id="实测耗时与开销"></a>
 
@@ -349,11 +349,11 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 
 | 指南 | 用途 |
 | --- | --- |
-| [LLM 安装与运行](docs/running.md) | 安装依赖，配置 GPU 与凭证，运行或继续一批实验。 |
-| [LLM 输入数据](docs/data.md) | 准备激活归档和目标报告包。 |
-| [LLM 方法与实现](docs/method.md) | 从流程找到代码，了解测量范围。 |
-| [LLM 报告指南](docs/reports.md) | 查找某张图或某个章节的数据来源和生成阶段。 |
-| [LLM 开发](docs/development.md) | 运行 CPU 软件检查与离线演示。 |
+| [LLM 安装与运行](language/docs/running.md) | 安装依赖，配置 GPU 与凭证，运行或继续一批实验。 |
+| [LLM 输入数据](language/docs/data.md) | 准备激活归档和目标报告包。 |
+| [LLM 方法与实现](language/docs/method.md) | 从流程找到代码，了解测量范围。 |
+| [LLM 报告指南](language/docs/reports.md) | 查找某张图或某个章节的数据来源和生成阶段。 |
+| [LLM 开发](language/docs/development.md) | 运行 CPU 软件检查与离线演示。 |
 | [LLM 提示词与输出约定](language/workflow/) | 查看解释、打标、实验设计和报告分析的请求。 |
 | [视觉模块与样例](vision/README_zh.md) | 安装 InceptionV1 模块，查看可视化结果并导出网页。 |
 

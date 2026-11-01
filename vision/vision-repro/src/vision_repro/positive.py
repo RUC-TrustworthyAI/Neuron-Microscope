@@ -259,7 +259,7 @@ def main():
     parser.add_argument("--relu-gradient-mode", choices=["standard", "lucid_redirect"])
     parser.add_argument("--relu-redirect-steps", type=int)
     parser.add_argument(
-        "--init-image", type=Path, help="Optional synthetic warm start; recorded, never implicit"
+        "--init-image", type=Path, help="Optional synthetic warm-start image, saved in the run record"
     )
     args = parser.parse_args()
     config = yaml.safe_load(args.config.read_text())
@@ -472,7 +472,7 @@ def main():
                 raise RuntimeError("Explicit synthetic initialization has no valid target gradient")
         else:
             raise RuntimeError(
-                "All random initializations inactive: refusing to silently optimize a dead post-ReLU or substitute pre-ReLU"
+                "All random initializations have zero post-ReLU activation"
             )
         (run / "initialization.json").write_text(json.dumps(attempts, indent=2))
         save_image(parameter(cutoff, sigma), run / "initial_scheduled.png")
@@ -596,7 +596,7 @@ def main():
                 save_image(image, run / "warmup_end.png")
                 if not all(value > 0 for value in checks):
                     raise RuntimeError(
-                        "Fixed warmup did not robustly activate post-ReLU; refusing a silent continuation"
+                        "Post-ReLU activation must be positive in every evaluation after warmup"
                     )
         with torch.no_grad():
             final_image = parameter(1, config["blur_end"])

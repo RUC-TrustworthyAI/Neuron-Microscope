@@ -50,7 +50,7 @@ Path guidance uses pooled activation-vector anchors. See the [method guide](docs
 Use Python 3.11+ in a dedicated environment with CUDA-compatible PyTorch.
 
 ```bash
-git clone --branch hr-language-refactor https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope/vision
 python -m pip install -e './vision-repro[dev]'
 ```

@@ -114,7 +114,7 @@ def main():
     if config["parameterization"] not in ("fft", "pixel"):
         parser.error("parameterization must be fft or pixel")
     if args.device.startswith("cuda") and not torch.cuda.is_available():
-        raise RuntimeError("CUDA unavailable; refusing an accidental CPU fallback")
+        raise RuntimeError("CUDA is required for the selected device but is unavailable")
     random.seed(config["seed"])
     np.random.seed(config["seed"])
     torch.manual_seed(config["seed"])

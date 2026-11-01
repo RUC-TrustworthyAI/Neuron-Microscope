@@ -382,7 +382,6 @@ def render(source):
         'const familyUnits = items => [...(items || [])].sort((a,b) => '
         'Math.abs(b.abs_sum ?? b.weight ?? 0)-Math.abs(a.abs_sum ?? a.weight ?? 0)).slice(0,30); '
         'const up = familyUnits(F.upstream), dn = familyUnits(F.downstream);')
-    # These are layout changes to the shared renderer, never to an individual result.
     source=re.sub(r'const headlineFigure = \(\) => \{.*?return wrap.children.length \? wrap : null; \};',
                   lambda m:HEADLINE_RENDER,source,count=1,flags=re.S)
     source=source.replace("A.headline.slice(0, 2).map(s => $('div', null, bars3(s)))",

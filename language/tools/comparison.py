@@ -1,4 +1,4 @@
-"""Human-only original/independent report comparison, added at publication time."""
+"""Export side-by-side reference and reproduction reports."""
 import argparse
 import hashlib
 import html
@@ -65,7 +65,7 @@ def _extrema_score(reproduced, reference):
 
 
 def install(report, neuron, references=None, directory='../'):
-    """Never call inside an agent stage or copy the reference into agent handoffs."""
+    """Install comparison controls in an exported report."""
     if not re.fullmatch(r'L\d+_N\d+', neuron):
         raise ValueError('Expected neuron ID L<layer>_N<index>')
     references = Path(references) if references else ROOT / 'data/reference-pages'
@@ -106,7 +106,7 @@ def install(report, neuron, references=None, directory='../'):
 
 
 def publish(source, destination, neuron, references=None, directory='../'):
-    """Add display controls only to the exported copy, never to model-facing artifacts."""
+    """Create an exported report with comparison controls."""
     source, destination = Path(source), Path(destination)
     shutil.copytree(source, destination, copy_function=_copy)
     from exemplar_display import render as render_exemplars

@@ -60,7 +60,7 @@ def model_geometry(source):
 
 
 def crop_box(field, location, image_size=224, mode="fit", scale=1., minimum=0):
-    """Return requested and actually sampled boxes; never hide the policy difference.
+    """Return the requested receptive field and the sampled crop box.
 
     intersect: true RF intersected with valid pixels, potentially rectangular.
     fit: cap side to image size, shift the square inside the input at boundaries.

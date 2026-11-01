@@ -50,7 +50,7 @@ Vision Neuron Microscope 用于探索 InceptionV1 神经元学到的视觉特征
 使用 Python 3.11+，在独立环境中安装与 GPU 兼容的 CUDA PyTorch。
 
 ```bash
-git clone --branch hr-language-refactor https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope/vision
 python -m pip install -e './vision-repro[dev]'
 ```

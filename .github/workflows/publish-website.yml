@@ -1,4 +1,4 @@
-name: Publish live demo
+name: Publish documentation site
 
 on:
   workflow_dispatch:

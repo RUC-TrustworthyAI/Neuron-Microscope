@@ -33,7 +33,7 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 | **Qwen3-32B** | Activation evidence, explanations, controlled tests, interventions and unresolved cases. | [Interactive neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [Investigation code](language/) |
 | **InceptionV1 / Lucent Inception5h** | Five visualization objectives, natural-image examples, heatmaps and reference comparisons. | [Vision guide and examples](vision/README.md) · [Optimization code](vision/vision-repro/) |
 
-**Data:** The current 50 reports use **Reasoning Mix 100M**. The [data guide](docs/data.md) describes the corpus sources, saved activation format and readers. Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
+**Data:** The current 50 reports use **Reasoning Mix 100M**. The [data guide](language/docs/data.md) describes the corpus sources, saved activation format and readers. Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
 > [!IMPORTANT]
 > **This is an independent reproduction effort.** In LLM investigations, the research models do not see AlreadyClean's explanations. The reference report is added only when the final report is published for comparison.
@@ -192,7 +192,7 @@ The code in `language/` orchestrates direct LLM API calls and target-model measu
 
 **Activation spectrum and Inside the neuron share one sample pool and the predictions from the refined, frozen explanation.** The labeler reads the full observed prefix and nearby continuation as linguistic context. It assigns No visible cue when the explanation does not clearly predict either direction. Because these samples inform refinement, their agreement scores provide development feedback. Independent written probes and controlled experiments supply further tests.
 
-See [the workflow](docs/workflow.md), [measurement details](docs/method.md), and [run configuration](docs/running.md).
+See [the workflow](language/docs/workflow.md), [measurement details](language/docs/method.md), and [run configuration](language/docs/running.md).
 
 ## 🔬 The vision investigation pipeline <a id="the-vision-investigation-pipeline"></a>
 
@@ -218,7 +218,7 @@ The current directory reports **Blind score** and **Search score**. For each, av
 | Stability | Does the interpretation persist across samples, prompts and independent runs? | Comparisons of explanations and measurements under matched conditions. |
 | Uncertainty | What remains unexplained or underdetermined? | Explicit criticism, alternative accounts, weak poles, and failed tests. |
 
-RelP provides supporting attribution evidence using modified derivatives; its graphs alone do not establish a native causal effect. See [the measurement scope](docs/method.md#relp-and-intervention-scope).
+RelP provides supporting attribution evidence using modified derivatives; its graphs alone do not establish a native causal effect. See [the measurement scope](language/docs/method.md#relp-and-intervention-scope).
 
 ## 📦 Installation and usage <a id="use-neuron-microscope"></a> <a id="quick-start"></a> <a id="installation-and-usage"></a>
 
@@ -234,7 +234,7 @@ Choose an entry point for the model and evidence you want to inspect.
 ### 1. Try the offline renderer
 
 ```bash
-git clone --branch hr-language-refactor https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope
 
 python3 -m venv .venv
@@ -279,7 +279,7 @@ python -m http.server 8000 --directory runs/example/report
 
 Append `--stop-after interpretation` to inspect the refined explanation and both labeled plots using saved activations before loading the target model. Repeating the command with the same configuration reuses completed API responses and saved sampling and measurement records. Use a new output directory when changing scientific inputs.
 
-For concurrent neurons, use separate configurations and output directories, with the same `gpu_lock` for runs sharing a GPU group. `NEURON_MICROSCOPE_GPU_WORKER=1` enables the shared resident model. The supplied `llm.max_concurrent_requests: null` places no application-level API concurrency cap. The [run guide](docs/running.md) covers continuation, comparison export and execution records.
+For concurrent neurons, use separate configurations and output directories, with the same `gpu_lock` for runs sharing a GPU group. `NEURON_MICROSCOPE_GPU_WORKER=1` enables the shared resident model. The supplied `llm.max_concurrent_requests: null` places no application-level API concurrency cap. The [run guide](language/docs/running.md) covers continuation, comparison export and execution records.
 
 ## ⏱️ Recorded runtime and cost <a id="reproducibility-and-cost"></a> <a id="recorded-runtime-and-cost"></a>
 
@@ -349,11 +349,11 @@ Our group's related work spans feature learning, concept-based analysis, explana
 
 | Guide | Start here when you want to… |
 | --- | --- |
-| [LLM installation and running](docs/running.md) | Install dependencies, configure GPUs and credentials, and run or continue a batch. |
-| [LLM input data](docs/data.md) | Prepare an activation archive and target report package. |
-| [LLM method and implementation](docs/method.md) | Trace the workflow to code and understand the measurement scope. |
-| [LLM report guide](docs/reports.md) | Find the source and generation stage of a particular plot or section. |
-| [LLM development](docs/development.md) | Run CPU software checks and the offline demo. |
+| [LLM installation and running](language/docs/running.md) | Install dependencies, configure GPUs and credentials, and run or continue a batch. |
+| [LLM input data](language/docs/data.md) | Prepare an activation archive and target report package. |
+| [LLM method and implementation](language/docs/method.md) | Trace the workflow to code and understand the measurement scope. |
+| [LLM report guide](language/docs/reports.md) | Find the source and generation stage of a particular plot or section. |
+| [LLM development](language/docs/development.md) | Run CPU software checks and the offline demo. |
 | [LLM prompts and output contracts](language/workflow/) | Inspect the explanation, labeling, experimental-design and report-analysis requests. |
 | [Vision setup and examples](vision/README.md) | Install the InceptionV1 module, inspect visualizations and export a viewer. |
 

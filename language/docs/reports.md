@@ -1,6 +1,6 @@
 # Reading a neuron report
 
-[Home](../README.md) · [Method](method.md) · [Run guide](running.md) · [Data format](data.md)
+[Home](../../README.md) · [Method](method.md) · [Run guide](running.md) · [Data format](data.md)
 
 A report presents the frozen explanation, its supporting measurements, counterexamples and remaining uncertainty. Code assembles the HTML from measured data and structured LLM outputs.
 
@@ -18,28 +18,28 @@ The initial explanation and two revisions each receive blind labels. Among versi
 
 | Report section | Evidence and computation | Main implementation |
 |---|---|---|
-| The claim in detail | Explanation refined using sampled measurements and prediction feedback, then frozen before experiments | [interpretation.py](../language/workflow/interpretation.py) |
-| Figures for this neuron | Controlled contrasts with complete input texts, short condition labels and native response traces | [measure.py](../language/workflow/measure.py), [report_layout.py](../language/tools/report_layout.py) |
-| Three graphs | RelP graphs at the strongest positive search case, strongest negative search case and strongest absolute control case | [run.py](../language/workflow/run.py), [relp.py](../language/tools/relp.py) |
-| Activation distribution, exemplars and Peak census | Saved token and document extrema, corpus statistics and sampled quantile bands | [build_reports.py](../language/analysis/build_reports.py), [saved_display.py](../language/tools/saved_display.py) |
-| Token selectivity | Six rankings based on fractions of each neuron's positive or negative extreme; minimum token frequency 50 | [report_token_fields.py](../language/analysis/report_token_fields.py), [token_tables.js](../language/analysis/token_tables.js) |
-| Activation spectrum | Measured bins and the final independent predictions from the refined explanation | [sampling.py](../language/workflow/sampling.py), [labels.py](../language/workflow/labels.py) |
-| Activation search | LLM-proposed texts, successive measured feedback and full-input extrema | [run.py](../language/workflow/run.py), [measure.py](../language/workflow/measure.py) |
-| Clusters | Semantic memberships over measured natural and written atlas cases; unassigned cases remain in an unresolved group | [revision.py](../language/workflow/revision.py), [render.py](../language/workflow/render.py) |
-| Inside the neuron | Measured gate/up coordinates and the same labeled positions and frozen predictions as Activation spectrum | [labels.py](../language/workflow/labels.py) |
-| What it does | Saved static logit effects plus selected native interventions and controls | [interventions.py](../language/workflow/interventions.py), [model_tools.py](../language/tools/model_tools.py) |
-| Where it sits | Selected neighbours and joint responses on the same inputs | [paper_sections.py](../language/tools/paper_sections.py) |
-| Circuit | Local RelP contributions pooled over the selected attribution atlas | [relp.py](../language/tools/relp.py), [paper_sections.py](../language/tools/paper_sections.py) |
-| Blind maximum / minimum | Independent explanation-only writer produces probes; the target model scores full-input extrema | [run.py](../language/workflow/run.py), [prompts.py](../language/workflow/prompts.py) |
-| Criticism | Experimental support, contradictions and unresolved patterns with links to measured cases | [revision.py](../language/workflow/revision.py), [render.py](../language/workflow/render.py) |
-| Interpretation costs | Execution intervals, model operations and recorded API usage | [state.py](../language/workflow/state.py), [render.py](../language/workflow/render.py) |
-| An agent's read, in full | Independent LLM assessment of the frozen account and its experimental evidence | [revision.py](../language/workflow/revision.py) |
+| The claim in detail | Explanation refined using sampled measurements and prediction feedback, then frozen before experiments | [interpretation.py](../workflow/interpretation.py) |
+| Figures for this neuron | Controlled contrasts with complete input texts, short condition labels and native response traces | [measure.py](../workflow/measure.py), [report_layout.py](../tools/report_layout.py) |
+| Three graphs | RelP graphs at the strongest positive search case, strongest negative search case and strongest absolute control case | [run.py](../workflow/run.py), [relp.py](../tools/relp.py) |
+| Activation distribution, exemplars and Peak census | Saved token and document extrema, corpus statistics and sampled quantile bands | [build_reports.py](../analysis/build_reports.py), [saved_display.py](../tools/saved_display.py) |
+| Token selectivity | Six rankings based on fractions of each neuron's positive or negative extreme; minimum token frequency 50 | [report_token_fields.py](../analysis/report_token_fields.py), [token_tables.js](../analysis/token_tables.js) |
+| Activation spectrum | Measured bins and the final independent predictions from the refined explanation | [sampling.py](../workflow/sampling.py), [labels.py](../workflow/labels.py) |
+| Activation search | LLM-proposed texts, successive measured feedback and full-input extrema | [run.py](../workflow/run.py), [measure.py](../workflow/measure.py) |
+| Clusters | Semantic memberships over measured natural and written atlas cases; unassigned cases remain in an unresolved group | [revision.py](../workflow/revision.py), [render.py](../workflow/render.py) |
+| Inside the neuron | Measured gate/up coordinates and the same labeled positions and frozen predictions as Activation spectrum | [labels.py](../workflow/labels.py) |
+| What it does | Saved static logit effects plus selected native interventions and controls | [interventions.py](../workflow/interventions.py), [model_tools.py](../tools/model_tools.py) |
+| Where it sits | Selected neighbours and joint responses on the same inputs | [paper_sections.py](../tools/paper_sections.py) |
+| Circuit | Local RelP contributions pooled over the selected attribution atlas | [relp.py](../tools/relp.py), [paper_sections.py](../tools/paper_sections.py) |
+| Blind maximum / minimum | Independent explanation-only writer produces probes; the target model scores full-input extrema | [run.py](../workflow/run.py), [prompts.py](../workflow/prompts.py) |
+| Criticism | Experimental support, contradictions and unresolved patterns with links to measured cases | [revision.py](../workflow/revision.py), [render.py](../workflow/render.py) |
+| Interpretation costs | Execution intervals, model operations and recorded API usage | [state.py](../workflow/state.py), [render.py](../workflow/render.py) |
+| An agent's read, in full | Independent LLM assessment of the frozen account and its experimental evidence | [revision.py](../workflow/revision.py) |
 
 Appendix remains unfilled. The final layout places Criticism before Interpretation costs, then Appendix, with the full independent reading last.
 
-Publication adds a local original/report comparison through [comparison.py](../language/tools/comparison.py) when a reference snapshot is available. It opens in side-by-side mode by default, with the published reference on the left and the reproduction on the right. Scrolling either pane synchronizes both reports. Close the comparison, or use `?compare=0`, to read the reproduction alone. The headline, independent reading, Peak census column headings, Top/Bottom examples, quantile samples and other matching sections have independent alignment anchors. The [shared display helper](../language/tools/exemplar_display.py) limits preceding context for exemplars and cluster examples without changing measured prefixes. Reference pages are supplied separately and used only in the published export.
+Publication adds a local original/report comparison through [comparison.py](../tools/comparison.py) when a reference snapshot is available. It opens in side-by-side mode by default, with the published reference on the left and the reproduction on the right. Scrolling either pane synchronizes both reports. Close the comparison, or use `?compare=0`, to read the reproduction alone. The headline, independent reading, Peak census column headings, Top/Bottom examples, quantile samples and other matching sections have independent alignment anchors. The [shared display helper](../tools/exemplar_display.py) limits preceding context for exemplars and cluster examples without changing measured prefixes. Reference pages are supplied separately and used only in the published export.
 
-The [display helper](../language/tools/report_density.js) initially shows three custom figures, eight cluster cards and eight Criticism rounds, with additional entries expandable. Quadrant tables initially show eight groups. Circuit and family neighbourhoods display up to thirty units per side. Top, Bottom and quantile examples initially show five, four and five examples respectively; each cluster displays up to three selected examples. Full saved records remain available in the report artifacts.
+The [display helper](../tools/report_density.js) initially shows three custom figures, eight cluster cards and eight Criticism rounds, with additional entries expandable. Quadrant tables initially show eight groups. Circuit and family neighbourhoods display up to thirty units per side. Top, Bottom and quantile examples initially show five, four and five examples respectively; each cluster displays up to three selected examples. Full saved records remain available in the report artifacts.
 
 Exemplars and cluster examples preview the outlined anchor with up to 32 preceding tokens and expand to the saved context. Activation spectrum examples show up to 128 tokens before the first highlighted activation, or before the anchor for weak responses. These display windows do not change measured prefixes. Search and cluster activation badges use saturated sign colours; token shading represents activation magnitude. Spectrum and anatomy group colours represent the frozen explanation's predicted positive, negative or uncertain response. Cluster colours summarize the measured responses of their members.
 

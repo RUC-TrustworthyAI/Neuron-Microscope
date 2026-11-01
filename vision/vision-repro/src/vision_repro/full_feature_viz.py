@@ -205,7 +205,7 @@ class BatchRunner:
         identity = {'layer': layer, 'channels': channels, 'slot': slot, 'config': config}
         if (output / 'job.json').exists():
             if json.loads((output/'job.json').read_text()) != identity:
-                raise ValueError('Refusing to change an existing batch configuration')
+                raise ValueError('Configuration differs from the existing batch configuration')
             if (output/'complete.json').exists():
                 return json.loads((output/'complete.json').read_text())
         else:

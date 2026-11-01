@@ -14,9 +14,9 @@ python language/examples/demo.py --output .local/demo
 python -m http.server 8080 --directory .local/demo
 ```
 
-Open `http://localhost:8080/`. The demo uses synthetic measurements to exercise report generation and interaction; it is not a neuron interpretation or a scientific result. No downloaded model, GPU, API credential or paid request is needed for these checks. RelP tests instantiate a tiny random model on CPU.
+Open `http://localhost:8080/`. The offline demo uses synthetic measurements to exercise report generation and interaction. RelP tests instantiate a tiny random model on CPU.
 
-The software tests cover preserved input prefixes, data selection, native attribution operations, frozen explanations, saved-output reuse, API accounting, report assembly and layout. Passing them does not establish the scientific validity of an explanation.
+The software tests cover preserved input prefixes, data selection, native attribution operations, frozen explanations, saved-output reuse, API accounting, report assembly and layout.
 
 The comparison viewer has a separate test for default opening, compressed-report loading, and scrolling from either pane. Run it with Node.js 18 or newer:
 
@@ -31,4 +31,4 @@ WORKFLOW_TEST_REPORT=/path/to/report PYTHONPATH=language/tools \
   python -m unittest discover -s language/tests -p 'test_workflow*.py' -v
 ```
 
-These checks render saved evidence and synthetic test conditions without calling an LLM or loading the target model.
+These checks render saved evidence and synthetic test conditions on CPU.

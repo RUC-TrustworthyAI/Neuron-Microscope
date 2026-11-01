@@ -1,4 +1,4 @@
-"""Portable entry points. Dataset, model and hosting downloads are never implicit."""
+"""Command-line entry points for vision optimization, data preparation and export."""
 import argparse
 import hashlib
 import json
