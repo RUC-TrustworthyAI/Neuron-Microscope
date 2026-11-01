@@ -133,17 +133,19 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 1. 原生神经元的强激活往往呈现清楚的语义
 
-我们欣喜地发现，在检查过的许多神经元中，正负两极的高绝对值激活呈现了清楚的概念或模式。例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=1)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=1)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，也在一定程度上说服了我们：值得重新把更多研究精力投入原生神经元本身。
+我们欣喜地发现，在检查过的许多神经元中，正负两极的高绝对值激活呈现了清楚的概念或模式。例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，也在一定程度上说服了我们：值得重新把更多研究精力投入原生神经元本身。
 
 ### 2. 如果要求预测具体激活位置，高可解释比例仍显乐观
 
 [AlreadyClean 原文](https://already-clean.goodfire.com/)估计，在 Qwen3-32B 神经元的正、负两极中，约 **90% 各有一个主要功能**，另有约 7% 具有两个相关功能；脚注还提到，在部分较小、检查较细的样本中，如果只考虑强激活，非任意混合的比例接近 **97%**。原文也说明，这些估计依赖激活阈值和对“一个功能”的定义。按我们对解释一个神经元的要求衡量，这一高比例仍显乐观：**一份好的解释，应当能够比较准确地预测神经元在文本的哪些具体位置激活。**
 
-[Colorado 报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)体现了这种覆盖度上的差距。强正激活的上文往往包含 Colorado 相关信息，但高激活只出现在其中一部分位置，响应也没有局限在几个固定 token 上。我们常能预判一句话可能包含强响应，却仍难以准确预测它出现在哪个 token，以及其他位置为什么没有激活。当前的理解往往能在整条文本的粗粒度上提供判断，精确到位置的响应预测仍困难得多。
+[Colorado 报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)体现了这种覆盖度上的差距。强正激活的上文往往包含 Colorado 相关信息，但高激活只出现在其中一部分位置，响应也没有局限在几个固定 token 上。我们常能预判一句话可能包含强响应，却仍难以准确预测它出现在哪个 token，以及其他位置为什么没有激活。当前的理解往往能在整条文本的粗粒度上提供判断，精确到位置的响应预测仍困难得多。
 
 ### 3. Superposition 可能仍然存在
 
 以我们目前的观察，**原生表示中可能仍然存在 superposition**。至少，我们无法轻易地将一个神经元激活的所有文本，都归入同一个更宽泛的语义解释。两极的强响应样例可以呈现清楚的含义，但较弱响应所处的文本，与这些含义之间的联系仍可能不明。
+
+一个具体例子是 [L55_N14892 的 Exemplars](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#exemplars)：Ada 属性说明达到 **+57**，OpenSSH 文档达到 **-72.5**，强响应的程序语境较清楚。但在同一报告的 [Activation spectrum](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#spectrum) 中，磷酸酶释义在空格处达到 **+11.5625**，正态分布解题在 `1` 处达到 **+11**。这两例约为正极语料最高值的五分之一，它们与当前以 Ada／SQL 为中心的正极解释有何联系，仍不清楚。在 Spectrum 中选择 **No visible cue** 与 **8…16** 激活区间，即可查看这两个样例。
 
 原博客的 V-shaped feature 案例说明，某种共同模式有时可以统一看起来互不相关的图像。然而，在我们检查的许多神经元中，尚难通过肉眼迅速找到同样清楚的模式，将强弱响应统一起来。即使两端的强激活具有清楚的语义，这个神经元在其他上下文中还承载了什么信息，仍是一个开放问题。
 
@@ -151,9 +153,9 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 4. 数据集会改变解释所依据的证据
 
-[L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=1)提供了一个直接的对照。在 Reasoning Mix 100M 中，书目条目在标题后的换行处反复出现强负响应，两篇样例分别达到 **-37 和 -36**；原报告的语料最低值为 **-11.8125**，其中最强负例主要呈现配置块和代码声明上下文。我们观察到的更强负极，让书目标题边界在解释中更加突出。
+[L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=0#exemplars)提供了一个直接的对照。在 Reasoning Mix 100M 中，书目条目在标题后的换行处反复出现强负响应，两篇样例分别达到 **-37 和 -36**；原报告的语料最低值为 **-11.8125**，其中最强负例主要呈现配置块和代码声明上下文。我们观察到的更强负极，让书目标题边界在解释中更加突出。
 
-相反的情况也会出现。[L26_N8504](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L26_N8504/?compare=1) 在我们的语料中范围为 **-4.15625 至 +11.8125**，原报告为 **-7.5 至 +21.25**，两端绝对值都只达到原报告的约 55%。我们的解释仍较零散，包括字母片段和空白；原报告则聚焦于具体的空白对齐模式。语料中的强响应样例不足，可能是这种差异的原因之一。
+相反的情况也会出现。[L26_N8504](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L26_N8504/?compare=0#distribution) 在我们的语料中范围为 **-4.15625 至 +11.8125**，原报告为 **-7.5 至 +21.25**，两端绝对值都只达到原报告的约 55%。我们的解释仍较零散，包括字母片段和空白；原报告则聚焦于具体的空白对齐模式。语料中的强响应样例不足，可能是这种差异的原因之一。
 
 对 **L51_N20229** 分别进行约 100M token 的扫描，也会观察到不同的激活范围：
 
