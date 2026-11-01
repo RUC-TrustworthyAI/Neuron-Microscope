@@ -48,8 +48,8 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 - [🚧 Limitations](#limitations-and-future-work)
 - [🚀 Future work](#future-work)
 - [🤝 How to contribute](#how-to-contribute)
-- [📚 Related research from our group](#related-research-from-our-group)
 - [📖 Setup, data and report guides](#setup-data-and-report-guides)
+- [📚 Related research from our group](#related-research-from-our-group)
 
 ## 💬 Language model neuron reports <a id="side-by-side-interactive-comparisons"></a> <a id="explore-the-evidence"></a> <a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a> <a id="language-model-neuron-reports"></a>
 
@@ -336,17 +336,6 @@ Useful contributions include:
 
 Please open a [GitHub Issue](https://github.com/RUC-TrustworthyAI/Neuron-Microscope/issues) with a concrete neuron ID, context, experiment, result, or proposal. Reproducible examples are especially valuable, including failures and disagreements.
 
-## 📚 Related research from our group <a id="related-work"></a> <a id="related-research-from-our-group"></a>
-
-Our group's related work spans feature learning, concept-based analysis, explanation evaluation, and LLM safety. Publication details are also listed on [Xiting Wang's homepage](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm).
-
-| Work | Connection | Links |
-| --- | --- | --- |
-| **C²R: Cross-sample Consistency Regularization Mitigates Feature Splitting and Absorption in Sparse Autoencoders** — Haoran Jin et al., ICML 2026 | Encourages consistent latent assignments across samples to reduce feature splitting and absorption in SAEs. | [Paper](https://arxiv.org/abs/2606.30609) · [Code](https://github.com/hr-jin/Cross-sample-Consistency-Regularization) |
-| **Uncovering Safety Risks of Large Language Models through Concept Activation Vector** — Zhihao Xu et al., NeurIPS 2024 | Uses safety concept activation vectors to investigate model safety mechanisms and vulnerabilities. | [Paper](https://arxiv.org/abs/2404.12038) · [Code](https://github.com/SproutNan/AI-Safety_SCAV) |
-| **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li et al., EMNLP 2024 | Formalizes concept-based explanations and develops measures of readability and faithfulness. | [Paper](https://aclanthology.org/2024.emnlp-main.36/) · [Code](https://github.com/hr-jin/Concept-Explanation-Evaluation) |
-| **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng et al., arXiv 2026 | Uses SAE concepts and causal attribution to identify scenarios that suppress refusal. | [Paper](https://arxiv.org/abs/2607.23496) |
-
 ## 📖 Setup, data and report guides <a id="documentation"></a> <a id="setup-data-and-report-guides"></a>
 
 | Guide | Start here when you want to… |
@@ -358,6 +347,17 @@ Our group's related work spans feature learning, concept-based analysis, explana
 | [LLM development](language/docs/development.md) | Run CPU software checks and the offline demo. |
 | [LLM prompts and output contracts](language/workflow/) | Inspect the explanation, labeling, experimental-design and report-analysis requests. |
 | [Vision setup and examples](vision/README.md) | Install the InceptionV1 module, inspect visualizations and export a viewer. |
+
+## 📚 Related research from our group <a id="related-work"></a> <a id="related-research-from-our-group"></a>
+
+Our group's related work spans feature learning, concept-based analysis, explanation evaluation, and LLM safety. Publication details are also listed on [Xiting Wang's homepage](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm).
+
+| Work | Connection | Links |
+| --- | --- | --- |
+| **C²R: Cross-sample Consistency Regularization Mitigates Feature Splitting and Absorption in Sparse Autoencoders** — Haoran Jin et al., ICML 2026 | Encourages consistent latent assignments across samples to reduce feature splitting and absorption in SAEs. | [Paper](https://arxiv.org/abs/2606.30609) · [Code](https://github.com/hr-jin/Cross-sample-Consistency-Regularization) |
+| **Uncovering Safety Risks of Large Language Models through Concept Activation Vector** — Zhihao Xu et al., NeurIPS 2024 | Uses safety concept activation vectors to investigate model safety mechanisms and vulnerabilities. | [Paper](https://arxiv.org/abs/2404.12038) · [Code](https://github.com/SproutNan/AI-Safety_SCAV) |
+| **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li et al., EMNLP 2024 | Formalizes concept-based explanations and develops measures of readability and faithfulness. | [Paper](https://aclanthology.org/2024.emnlp-main.36/) · [Code](https://github.com/hr-jin/Concept-Explanation-Evaluation) |
+| **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng et al., arXiv 2026 | Uses SAE concepts and causal attribution to identify scenarios that suppress refusal. | [Paper](https://arxiv.org/abs/2607.23496) |
 
 ## 📝 Citation <a id="citation"></a>
 
