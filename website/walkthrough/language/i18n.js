@@ -3,6 +3,7 @@
 const language = new URLSearchParams(location.search).get('lang') === 'zh' ? 'zh' : 'en';
 document.documentElement.lang = language === 'zh' ? 'zh-CN' : 'en';
 const t = (zh, en) => language === 'zh' ? zh : en;
+document.title = t('语言模型研究流程 · Neuron Microscope', 'Language Model Walkthrough · Neuron Microscope');
 function updateLanguageLinks() {
   document.querySelectorAll('[data-language]').forEach(a => {
     const url = new URL(location.href); url.searchParams.set('lang', a.dataset.language); a.href = url.href;

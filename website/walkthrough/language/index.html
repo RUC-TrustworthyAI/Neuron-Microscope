@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Language Model Walkthrough · Neuron Microscope</title>
+  <link rel="stylesheet" href="replay.css?v=b40610ad5c">
+  <link rel="stylesheet" href="demo.css?v=bad8ff5db1">
+  <link rel="stylesheet" href="walkthrough.css?v=c3a05b8dff">
+</head>
+<body class="cover-open">
+<header class="topbar">
+  <a class="brand" id="home-link" href="#"><span class="mark">N</span><span>Neuron Microscope</span><span class="demo-word" data-zh="语言模型" data-en="LANGUAGE MODEL">LANGUAGE MODEL</span></a>
+  <div class="top-actions">
+    <a class="secondary-link" href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/" data-zh="神经元报告" data-en="Neuron reports">Neuron reports</a>
+    <span class="record-state"><i></i><span data-zh="语言模型研究流程" data-en="Language model walkthrough">Language model walkthrough</span></span>
+    <button class="quiet-button" id="about-demo" data-zh="关于这段记录" data-en="About this recording">About this recording</button>
+    <nav class="language-switch" aria-label="Language"><a href="?lang=en" data-language="en" lang="en">English</a><a href="?lang=zh" data-language="zh" lang="zh-CN">中文</a></nav>
+  </div>
+</header>
+<section id="cover" class="cover">
+  <div class="hero-copy">
+    <p class="eyebrow">LANGUAGE MODEL · RECORDED INVESTIGATION</p>
+    <h1 data-zh="从激活证据，<br>走向可检验的解释。" data-en="From activations<br>to testable explanations." data-html>From activations<br>to testable explanations.</h1>
+    <p class="hero-lede" data-zh="跟随一个神经元，从初步解释、盲标与修订，到冻结解释，再用新文本和GPU测量检验它。" data-en="Follow one neuron from an initial explanation through blind labeling and refinement, then test the frozen explanation with new texts and model measurements.">Follow one neuron from an initial explanation through blind labeling and refinement, then test the frozen explanation with new texts and model measurements.</p>
+    <div class="hero-actions"><button class="start-button" id="start-demo"><span data-zh="开始逐步回放" data-en="Explore the walkthrough">Explore the walkthrough</span><span>→</span></button><a class="secondary-link" href="reports/final.html" target="_blank" rel="noopener" data-zh="直接看最终报告 ↗" data-en="Open the final report ↗">Open the final report ↗</a></div>
+    <p class="hero-case">Qwen3-32B · Reasoning Mix 100M · L55_N11703 · Colorado</p>
+  </div>
+  <div class="hero-document">
+    <div class="hero-document-top"><div class="hero-toggle" role="group" aria-label="Report preview"><button aria-pressed="false" data-cover-snapshot="evidence" data-zh="初始证据" data-en="Initial evidence">Initial evidence</button><button aria-pressed="true" class="active" data-cover-snapshot="final" data-zh="最终报告" data-en="Final report">Final report</button></div><span data-zh="实际交互HTML" data-en="Recorded interactive HTML">Recorded interactive HTML</span></div>
+    <div class="hero-frame-wrap"><iframe id="cover-paper" src="reports/final.html" title="Recorded Colorado neuron report" loading="lazy"></iframe></div>
+    <div class="hero-document-bottom"><span>Colorado · L55_N11703</span><button class="quiet-button" id="cover-zoom" data-zh="展开阅读 ↗" data-en="Open report ↗">Open report ↗</button></div>
+  </div>
+  <div class="hero-stages">
+    <button data-jump="initial"><span class="stage-index">01</span><span><b data-zh="解释与盲标" data-en="Explain and predict">Explain and predict</b><small data-zh="比较三个解释版本及其预测" data-en="Compare three explanations and their predictions">Compare three explanations and their predictions</small></span><span class="stage-arrow">↗</span></button>
+    <button data-jump="freeze"><span class="stage-index">02</span><span><b data-zh="选择并冻结" data-en="Select and freeze">Select and freeze</b><small data-zh="根据方向准确率和覆盖率选择" data-en="Select by directional accuracy and coverage">Select by directional accuracy and coverage</small></span><span class="stage-arrow">↗</span></button>
+    <button data-jump="experiments"><span class="stage-index">03</span><span><b data-zh="实验与报告" data-en="Measure and report">Measure and report</b><small data-zh="构造新文本，测量响应和干预" data-en="Write new inputs and measure responses and interventions">Write new inputs and measure responses and interventions</small></span><span class="stage-arrow">↗</span></button>
+  </div>
+  <p class="cover-note" data-zh="页面展示这次运行保存的输入节选、完整任务提示、模型输出和实测图表。" data-en="Explore saved input excerpts, complete task instructions, model outputs and measured plots from this investigation.">Explore saved input excerpts, complete task instructions, model outputs and measured plots from this investigation.</p>
+</section>
+<main id="replay-main">
+  <section class="intro casebar"><div><p class="eyebrow">COLORADO · REASONING MIX 100M</p><h1 data-zh="一次解释是怎样形成的" data-en="How an explanation takes shape">How an explanation takes shape</h1></div><button class="quiet-button" id="back-cover" data-zh="← 回到开场" data-en="← Back to overview">← Back to overview</button></section>
+  <div class="workspace"><aside class="sidebar"><div class="sidebar-head"><span data-zh="研究过程" data-en="Investigation">Investigation</span><span id="step-counter">—</span></div><nav id="step-nav" aria-label="Investigation steps"></nav><p class="nav-tip" data-zh="← → 切换步骤 · Esc关闭阅读窗口" data-en="← → Navigate · Esc closes the reader">← → Navigate · Esc closes the reader</p></aside><div class="detail" id="detail"><div class="loading" data-zh="正在读取研究记录……" data-en="Loading the recorded investigation…">Loading the recorded investigation…</div></div><aside id="preview" class="preview"></aside></div>
+</main>
+<div id="playback-bar" class="playback-bar"><button id="demo-prev" class="demo-prev" aria-label="Previous step">←</button><div class="playback-state"><span id="playback-caption"></span><div id="playback-progress" class="playback-progress"></div></div><button id="demo-next" class="demo-next"></button></div>
+<dialog id="reading-dialog" aria-labelledby="reading-title"><div class="reading-header"><div><small id="reading-kicker"></small><h2 id="reading-title"></h2></div><div class="reading-actions" id="reading-actions"></div><button id="close-reading" class="close-reading" aria-label="Close the reader">×</button></div><div id="reading-content" class="reading-content"></div></dialog>
+<footer><span data-zh="Neuron Microscope · 保存的研究过程与交互报告。" data-en="Neuron Microscope · Recorded investigations and interactive reports.">Neuron Microscope · Recorded investigations and interactive reports.</span><a href="https://github.com/RUC-TrustworthyAI/Neuron-Microscope/tree/hr-language-refactor/language" target="_blank" rel="noopener" data-zh="源代码 ↗" data-en="Source code ↗">Source code ↗</a></footer>
+<script src="i18n.js?v=d3509ac523"></script><script src="replay.js?v=a57a2b2262"></script>
+</body></html>
