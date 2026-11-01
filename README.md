@@ -66,12 +66,6 @@ Each neuron link opens the original report on the left and our reproduction on t
 
 [Open the interactive comparison →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)
 
-<p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">
-    <img src="assets/colorado-comparison.svg" alt="Original and reproduced Colorado explanations with measured Reasoning Mix 100M contact tests" width="92%">
-  </a>
-</p>
-
 Both reports identify a strong Colorado-related positive response, but they make different claims about what the neuron computes:
 
 - **Published report:** the gate opens before a place-specific fill-in value, while the up projection carries signed place identity.
@@ -134,12 +128,6 @@ The original essay contains claims at several levels. The table below tracks our
 
 [Open the recorded language model walkthrough →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en)
 
-<p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en">
-    <img src="assets/pipeline-walkthrough-en.svg" alt="Recorded language model workflow from evidence through frozen explanation to experiments and report" width="92%">
-  </a>
-</p>
-
 The walkthrough follows **L55_N11703 on Reasoning Mix 100M** from saved evidence to the final report. It presents the task prompts, excerpts of their inputs, structured responses, all three explanation-and-labeling versions, measured experiments and costs. The selected explanation is frozen before text construction and GPU experiments.
 
 ### Current runnable workflow
@@ -190,12 +178,6 @@ L45_N16800 illustrates why the shared topic alone is insufficient. Its saved cor
 For Colorado, the Reasoning Mix 100M corpus spans **-44.5 to +308**. Search reaches **-44.25 to +296**, the selected head figure **-26.5 to +352**, and Blind **-47 to +278**. The head figure scores the replacement span, while Search and Blind use full-input extrema. These measurements answer different questions and should be read with their texts and scoring rules.
 
 Corpus extrema describe the saved scan and can be exceeded by constructed texts. A high written response shows that the test reached a strong activation; the controlled contrasts and interventions are needed to assess the proposed explanation.
-
-<p align="center">
-  <a href="assets/colorado-activation-ranges.svg">
-    <img src="assets/colorado-activation-ranges.svg" alt="Colorado corpus, Search, head figure and Blind activation ranges on Reasoning Mix 100M" width="90%">
-  </a>
-</p>
 
 The current reports leave uncertainty at three points: whether the corpus contains the relevant contexts, whether the explanation captures their response conditions, and whether the writer constructs strong tests from that explanation. Matched comparisons are needed to separate these effects.
 

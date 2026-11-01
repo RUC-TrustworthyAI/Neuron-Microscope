@@ -66,12 +66,6 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 [打开交互式对比 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)
 
-<p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">
-    <img src="assets/colorado-comparison.svg" alt="Colorado 原报告与新版解释，以及 Reasoning Mix 100M 研究中的联系信息测试" width="92%">
-  </a>
-</p>
-
 两份报告都发现了较强的 Colorado 正向响应，但对神经元具体计算什么提出了不同解释：
 
 - **原报告：** gate 会在即将填入地区相关信息的位置打开，up 投影承载带符号的地区身份。
@@ -134,12 +128,6 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 [打开语言模型研究过程记录 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh)
 
-<p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh">
-    <img src="assets/pipeline-walkthrough-zh.svg" alt="语言模型研究流程：准备证据、解释与盲标、选择并冻结、实验及报告" width="92%">
-  </a>
-</p>
-
 这份记录展示了 **Reasoning Mix 100M 上的 L55_N11703** 从已有证据到最终报告的过程，包括各步提示词、输入节选、结构化输出、三版解释与盲标结果、实测实验和开销。选中的解释在构造文本和 GPU 实验前冻结。
 
 ### 当前可运行流程
@@ -190,12 +178,6 @@ L45_N16800 说明，仅有共同主题还不够。我们的语料最高值为 **
 Colorado 在 Reasoning Mix 100M 中的语料范围为 **-44.5 至 +308**。Search 达到 **-44.25 至 +296**，选中的头图达到 **-26.5 至 +352**，Blind 达到 **-47 至 +278**。头图测替换片段，Search 和 Blind 取全文极值；这些测量回答的问题不同，需要结合具体文本和评分规则阅读。
 
 语料极值描述的是已有扫描，构造文本可以超过该范围。构造文本的高响应表明测试触及了较强激活；判断解释是否成立，还需查看受控对比和干预。
-
-<p align="center">
-  <a href="assets/colorado-activation-ranges.svg">
-    <img src="assets/colorado-activation-ranges.svg" alt="Reasoning Mix 100M 研究中 Colorado 的语料、Search、头图与 Blind 激活范围" width="90%">
-  </a>
-</p>
 
 当前报告仍有三处不确定性：语料是否包含相关上下文，解释是否抓住了响应条件，以及写作模型能否依据解释构造强响应测试。需要匹配比较条件，才能区分这些影响。
 
