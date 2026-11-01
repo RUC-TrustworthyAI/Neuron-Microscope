@@ -146,14 +146,13 @@ def publish_catalog(out,entries,complete):
 def build_one(unit):
     began=time.monotonic();out=OUTPUT/unit["id"]
     assert not out.exists(),"Refuse to overwrite an existing report"
-    assert shutil.disk_usage(OUTPUT).free>100000000000
     out.mkdir()
     hist,quad,extremes,bands,records,token_fields=scan_neuron(unit)
     np.savez(out/"histograms.npz",counts=hist,gate_value_sign_counts=quad)
     core.write(out/"extremes.json",extremes)
     core.write(out/"band-anchors.json",bands)
     view=NeuronView(records,unit["part_column"])
-    identity={k:unit[k] for k in ("id","layer","neuron")};identity["model"]="Qwen3-32B"
+    identity={k:unit[k] for k in ("id","layer","neuron")};identity["model"]=API.manifest.get("model_name","Qwen3-32B")
     data=core.package(records,view,hist,quad,extremes,bands,INPUTS,TOKENIZER,identity,PLAN,SEED,API.manifest["documents"])
     batch.check_report(data,hist)
     for key,point in data["points"].items():

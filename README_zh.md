@@ -247,9 +247,9 @@ python -m http.server 8000 --directory runs/demo
 
 打开 <http://localhost:8000/>。
 
-### 2. 配置完整研究
+### 2. 采集激活证据
 
-完整 pipeline 需要 Linux、Python 3.10+、支持 CUDA 的主机、本地 dense-Qwen3 权重、兼容的激活归档、仅含激活证据的报告包，以及 LLM 端点。安装测量依赖：
+使用 Linux、Python 3.10+、CUDA 主机和本地 dense-Qwen3 权重。安装采集与测量依赖：
 
 ```bash
 # 安装与 NVIDIA 驱动匹配的 PyTorch CUDA wheel。
@@ -257,14 +257,29 @@ python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/
 python -m pip install -r language/requirements/gpu.txt
 ```
 
-使用配置生成器创建 `workflow.local.json`，填写神经元、本地模型、仅含激活证据的报告包、激活归档和显卡编号：
+从本地 JSONL 或 Parquet 文件采集 100M tokens。JSONL 每条记录应包含字符串字段 `text`，其他字段名可用 `--text-column` 指定。`--corpus` 可以传入文件、加引号的通配符或目录。
+
+```bash
+python -m language.collection \
+  --model /path/to/Qwen3-32B \
+  --corpus /path/to/reasoning-mix \
+  --neurons L55_N11703 L57_N2065 L24_N17907 L50_N3507 \
+  --tokens 100000000 --gpus 0 1 2 3 \
+  --output data/reasoning-mix-100m
+```
+
+命令用种子 42 打乱文档顺序，每篇取开头最多 4,096 个 token，并裁剪最后一篇的前缀以达到预算。程序保存原生 gate、up、product 激活、对应的 token ID、文档位置、直方图和索引，然后在 `data/reasoning-mix-100m/reports/<neuron-id>/` 生成带有 token 统计表和静态 logit 效应的初始报告。100M tokens 的三个 BF16 通道每个神经元约占 600 MB，此外还需保存输入数据和报告。相同命令再次运行时，会复用已完成的输入准备、激活分片和报告。输出目录和批次设置见[数据指南](language/docs/data.md#collect-activations-from-local-text)。
+
+### 3. 配置 LLM 研究
+
+使用生成的归档和目标神经元的初始报告，创建 `workflow.local.json`：
 
 ```bash
 python language/examples/configure.py \
   --neuron L55_N11703 \
-  --model /path/to/model \
-  --report /path/to/activation-only/report \
-  --activations /path/to/activation/archive \
+  --model /path/to/Qwen3-32B \
+  --report data/reasoning-mix-100m/reports/L55_N11703 \
+  --activations data/reasoning-mix-100m \
   --gpus 0 1 2 3 \
   --output workflow.local.json
 ```

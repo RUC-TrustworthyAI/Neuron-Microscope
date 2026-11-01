@@ -1,6 +1,32 @@
 # Input data
 
-The pipeline takes **saved native activations** and local model weights as inputs. Activation archives can contain any number of tokens, provided they follow the format below.
+The investigation workflow reads **saved native activations** and local model weights. The collection command below creates the archive from local text; its token budget is configurable.
+
+## Collect activations from local text
+
+Run `python -m language.collection --help` for the collection entry point. It accepts local JSONL and Parquet files with a string column, a local dense-Qwen3 model, target neuron coordinates and a token budget. The [Usage example](../../README.md#2-collect-activation-evidence) collects 100M tokens and then configures an investigation using its outputs.
+
+Documents are permuted with a fixed seed. The collector uses the first `--max-document-tokens` tokens of each selected document, without added special tokens, and trims the final prefix to the remaining budget. Each document has its own causal context. Parquet text is temporarily cached in memory-mapped Arrow files for random access; the cache is removed after token preparation.
+
+The default prefix limit is 4,096 tokens. `--batch-size` defaults to 4, `--batch-tokens` to 8,192 padded tokens and `--shard-tokens` to 262,144. Whole document prefixes stay within one shard. `--tokens` may be reduced for a small run. The model runs in BF16 with SDPA; hooks capture raw gate, raw up/value and the native input to `down_proj`.
+
+The output contains:
+
+```text
+collection/
+  dataset.json, neurons.json, verification.json
+  token_ids.npy, documents.parquet
+  inputs/block-NNNNNN.ids.u32.npy
+  inputs/block-NNNNNN.offsets.u64.npy
+  inputs/block-NNNNNN.documents.json
+  part-0/shard-NNNNNN.npy
+  part-0/histogram.npy
+  indices/extremes.npz, indices/statistics.parquet
+  effects/<neuron-id>.json
+  reports/<neuron-id>/
+```
+
+`reports/<neuron-id>/` contains the files listed below, including `effects.json` and `token-rankings.json`. Use the collection directory as `--activations` and the neuron's report directory as `--report` when creating a workflow configuration. The command uses the existing saved-data renderer for report construction. Repeating it with the same inputs resumes committed shards and completed reports. `status.json` records progress.
 
 ## A target report package
 

@@ -247,9 +247,9 @@ python -m http.server 8000 --directory runs/demo
 
 Open <http://localhost:8000/>.
 
-### 2. Configure a full investigation
+### 2. Collect activation evidence
 
-The pipeline requires Linux, Python 3.10+, a CUDA host with local dense-Qwen3 weights, compatible saved activations, an activation-only report package, and an LLM endpoint. Install the measurement dependencies:
+Use Linux, Python 3.10+, a CUDA host and local dense-Qwen3 weights. Install the collection and measurement dependencies:
 
 ```bash
 # Choose a PyTorch CUDA wheel compatible with your NVIDIA driver.
@@ -257,14 +257,29 @@ python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/
 python -m pip install -r language/requirements/gpu.txt
 ```
 
-Create `workflow.local.json` with the configuration generator. Supply the neuron, local model, activation-only report package, activation archive and GPU indices:
+Collect 100M tokens from local JSONL or Parquet files. JSONL records should contain a `text` string; `--text-column` selects another field. `--corpus` accepts files, quoted globs or a directory.
+
+```bash
+python -m language.collection \
+  --model /path/to/Qwen3-32B \
+  --corpus /path/to/reasoning-mix \
+  --neurons L55_N11703 L57_N2065 L24_N17907 L50_N3507 \
+  --tokens 100000000 --gpus 0 1 2 3 \
+  --output data/reasoning-mix-100m
+```
+
+The command shuffles documents with seed 42, takes up to 4,096 tokens from each document's beginning and trims the final prefix to reach the token budget. It saves native gate, up and product activations, aligned token IDs and document positions, histograms and indices. It then builds initial reports with token tables and static logit effects in `data/reasoning-mix-100m/reports/<neuron-id>/`. BF16 activations take approximately 600 MB per neuron at 100M tokens, plus input data and reports. Repeating the same command resumes completed input preparation, activation shards and reports. See the [data guide](language/docs/data.md#collect-activations-from-local-text) for the output layout and batch settings.
+
+### 3. Configure an LLM investigation
+
+Use the generated archive and the chosen neuron's initial report to create `workflow.local.json`:
 
 ```bash
 python language/examples/configure.py \
   --neuron L55_N11703 \
-  --model /path/to/model \
-  --report /path/to/activation-only/report \
-  --activations /path/to/activation/archive \
+  --model /path/to/Qwen3-32B \
+  --report data/reasoning-mix-100m/reports/L55_N11703 \
+  --activations data/reasoning-mix-100m \
   --gpus 0 1 2 3 \
   --output workflow.local.json
 ```

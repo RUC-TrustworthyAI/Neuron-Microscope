@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class EntrypointTests(unittest.TestCase):
     def test_repository_root_commands_load_without_model_or_credentials(self):
-        for module in ('language', 'language.workflow.run', 'language.workflow.gpu_worker'):
+        for module in ('language', 'language.collection', 'language.workflow.run', 'language.workflow.gpu_worker'):
             result = subprocess.run([sys.executable, '-m', module, '--help'],
                                     cwd=ROOT, capture_output=True, text=True, check=True)
             self.assertIn('usage:', result.stdout)
