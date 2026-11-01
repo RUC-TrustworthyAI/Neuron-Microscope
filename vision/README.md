@@ -1,121 +1,153 @@
-<h1 align="center">Neuron Microscope · Vision</h1>
+<h1 align="center">
+  Vision Neuron Microscope<br>
+  <sub>🔬 Exploring vision neurons with feature visualization</sub>
+</h1>
 
 <p align="center">
-  <strong>Inspect what activates an InceptionV1 neuron, then compare the visual evidence.</strong>
+  <a href="source/inceptionv1/README.md"><img src="docs/assets/badges/model.svg" alt="Model: InceptionV1"></a>
+  <a href="#overview"><img src="docs/assets/badges/neurons.svg" alt="Neurons: 5,804"></a>
+  <a href="#reproduction-results"><img src="docs/assets/badges/modes.svg" alt="Modes: 5 visualizations"></a>
+  <a href="https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&amp;neuron=477&amp;compare=1"><img src="docs/assets/badges/viewer.svg" alt="Viewer: interactive HTML"></a>
 </p>
-
+<p align="center"><b>English</b> · <a href="README_zh.md">简体中文</a></p>
 <p align="center">
-  <a href="../README.md">Project home</a> ·
-  <a href="README_zh.md">中文</a> ·
-  <a href="docs/gallery.md">Visual comparisons</a> ·
-  <a href="#installation-and-usage">Install and run</a>
+  <a href="#overview">📖 Overview</a> ·
+  <a href="#workflow">⚗️ How It Works</a> ·
+  <a href="#quick-start">🚀 Quick Start</a> ·
+  <a href="#reproduction-results">🧪 Results</a> ·
+  <a href="#documentation">📚 Documentation</a>
 </p>
 
-This module implements feature visualization and natural-image retrieval for **InceptionV1 / Lucent Inception5h**. You can choose a channel, optimize images in five modes, retrieve natural examples and heatmaps, and export an interactive viewer with AlreadyClean reference links.
+## 📖 Overview <a id="overview"></a>
 
-This module pins a Lucent Inception5h source revision and checkpoint digest. The [AlreadyClean reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights; exact weight identity has not been verified.
+Vision Neuron Microscope explores the visual features learned by InceptionV1. Inspired by [AlreadyClean](https://already-clean.goodfire.com/), it combines optimized images, natural-image retrieval, activation heatmaps, and side-by-side comparisons in one viewer.
 
-The catalog covers **12 layers and 5,804 channels**. This is the target catalog; each exported viewer records which results are actually available. The [LLM investigation workflow](../docs/workflow.md) has a separate environment and entry point.
+The catalog covers **12 layers and 5,804 neurons**, with **Positive, Path-guided +, Diversity, Negative, and Path-guided −**. The default **A** configuration uses **224 × 224 inputs and 1,024 optimization steps**.
 
-## Visual comparisons
+**[Open the interactive microscope ↗](https://ziheng-inception-microscope-a.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=447&compare=1)**
 
-[Browse all bundled comparisons →](docs/gallery.md)
+## ⚗️ How It Works <a id="workflow"></a>
 
-<table align="center">
-  <tr><th>Positive</th><th>Diversity</th><th>Negative</th></tr>
-  <tr>
-    <td><a href="docs/assets/mixed4c_260/positive.png"><img src="docs/assets/mixed4c_260/positive.png" width="220" alt="mixed4c:260 positive visualization"></a></td>
-    <td><a href="docs/assets/mixed4c_260/diversity.png"><img src="docs/assets/mixed4c_260/diversity.png" width="220" alt="mixed4c:260 four diversity members"></a></td>
-    <td><a href="docs/assets/mixed4c_260/negative.png"><img src="docs/assets/mixed4c_260/negative.png" width="220" alt="mixed4c:260 signed negative visualization"></a></td>
-  </tr>
-</table>
+1. **Choose a neuron.** Load the pinned Lucent Inception5h model and select a layer and channel.
+2. **Prepare natural examples.** Scan 50,000 ImageNet training images to retrieve Top 16, Additional Examples, activation heatmaps, and path anchors. Display the strongest locations with branch-specific receptive-field crops.
+3. **Optimize images.** Optimize Fourier coefficients with a fitted color basis, progressive frequency unlocking, blur annealing, and a Gaussian-weighted activation objective.
+4. **Compare results.** Export an HTML viewer with five visualization modes, optimization checkpoints, and Nick / Goodfire references.
 
-**mixed4c:260 · configuration A · 224 × 224 · 1,024 steps · seed 0.** These are saved optimization outputs. The [gallery](docs/gallery.md) shows all five modes beside the reference images for four channels, with [settings and measured scores](docs/assets/provenance.json).
+| Mode | Objective |
+|---|---|
+| Positive | Maximize post-ReLU activation |
+| Path-guided + | Positive with early natural-example path guidance |
+| Diversity | Four positive images with a diversity objective |
+| Negative | Minimize signed pre-ReLU activation |
+| Path-guided − | Negative with early natural-example path guidance |
 
-The upstream project also links a [hosted interactive viewer](https://ziheng-inception-microscope-a.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=260&compare=1). The bundled comparisons above can be read directly in this repository.
+Path guidance uses pooled activation-vector anchors. See the [method guide](docs/methodology.md) for losses, color priors, and target definitions.
 
-## How the vision workflow works
+## 🚀 Quick Start <a id="quick-start"></a>
 
-1. **Select the target.** Load the pinned Inception5h weights and choose a layer and channel. The target definition records its branch, spatial aggregation and pre/post-ReLU activation.
-2. **Retrieve natural examples.** Scan 50 images per ImageNet class, for 50,000 training images. Save response extrema, examples and activation heatmaps, then build anchors for the guided objectives.
-3. **Optimize images.** Optimize Fourier coefficients using the A configuration, fitted color statistics, frequency and blur schedules, and a Gaussian-weighted activation objective.
-4. **Inspect and export.** Export completed runs, optional natural examples, receptive-field crops and a verified reference catalog into an HTML viewer. Inspect configuration, scores and checkpoints alongside the images.
+### 1. Install and prepare the model
 
-| View | Activation objective | Additional constraint |
-| --- | --- | --- |
-| **Positive** | Maximize post-ReLU activation. | Base image parameterization and color prior. |
-| **Path-guided +** | Maximize post-ReLU activation. | Align with positive natural-example activation vectors during the first 64 steps. |
-| **Diversity** | Maximize post-ReLU activation for four images. | Penalize similarity within the group using the previous layer. |
-| **Negative** | Minimize signed pre-ReLU activation. | Base image parameterization and color prior. |
-| **Path-guided −** | Minimize signed pre-ReLU activation. | Align with negative natural-example activation vectors during the first 64 steps. |
-
-The path representation is a pooled activation-vector proxy. Its definition and the fitted color prior are described in the [method guide](docs/methodology.md).
-
-## Installation and usage
-
-### 1. Install the module
-
-Use **Python 3.11+** and a separate environment. GPU runs and batch campaigns use Linux with a CUDA-compatible PyTorch and torchvision build. Install the package after those dependencies:
+Use Python 3.11+ in a dedicated environment with CUDA-compatible PyTorch.
 
 ```bash
-git clone --branch hr-vision-integration https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone --branch hr-language-refactor https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope/vision
-python3 -m venv .venv
-source .venv/bin/activate
 python -m pip install -e './vision-repro[dev]'
+```
+
+Follow [model setup](source/inceptionv1/README.md) to place Lucent and the weights in `source/inceptionv1/`, then check:
+
+```bash
+vision-microscope doctor --model-dir source/inceptionv1
 vision-microscope catalog
 ```
 
-The catalog command reads no model weights and needs no GPU. The package declares its dependency ranges in [pyproject.toml](vision-repro/pyproject.toml).
+For an existing model directory elsewhere, set `VNI_MODEL_DIR` to its absolute path.
 
-### 2. Provision the model
-
-Follow [model setup](source/inceptionv1/README.md) to place the pinned Lucent checkout and weights under `source/inceptionv1/`. Existing assets can be reused through `VNI_MODEL_DIR`.
+### 2. Generate and view a result
 
 ```bash
-vision-microscope doctor
-```
-
-The manifest records the source revision, weight digest and `RGB * 255 - 117` preprocessing. Weights and ImageNet data are acquired separately.
-
-### 3. Optimize a channel and export its viewer
-
-From the `vision/` directory:
-
-```bash
-vision-microscope optimize --layer mixed4c --neurons 260 \
+vision-microscope optimize --layer mixed4c --neurons 447 \
   --variant positive --steps 1024 \
-  --output vision-repro/outputs/mixed4c_260_positive
+  --output vision-repro/outputs/mixed4c_447_positive
 vision-microscope export \
-  --runs vision-repro/outputs/mixed4c_260_positive \
+  --runs vision-repro/outputs/mixed4c_447_positive \
   --output vision-repro/outputs/viewer
 python -m http.server 8766 --directory vision-repro/outputs/viewer
 ```
 
-Open <http://localhost:8766/?layer=mixed4c&neuron=260>. Use a fresh output directory for a changed configuration or viewer export. The [running guide](docs/reproduction.md) covers the ImageNet scan, anchors, all five modes, batch generation and resume.
+Open [localhost:8766](http://localhost:8766/?layer=mixed4c&neuron=447&compare=1). Use a new output directory for each configuration.
 
-To include verified reference images, pass `--reference-catalog` in the [documented format](docs/data-format.md#static-export). Natural samples use `--sample-run`; receptive-field crops additionally use `--rf-snapshot`. Export without these inputs contains the available optimization results and placeholders for missing material.
+### 3. Generate all five modes
 
-## Interpreting the results
+The [running guide](docs/reproduction.md) covers ImageNet scanning, anchor preparation, all-neuron queues, concurrency, and resume. Path-guided modes and Diversity use anchors from the natural-image scan. Export accepts `--sample-run` for examples and heatmaps, `--rf-snapshot` for receptive-field crops, and `--reference-catalog` for official comparisons. Large galleries can use the optional [R2 media service](docs/hosting.md).
 
-- **Sampling scope.** This module retrieves both poles from a class-balanced 50,000-image subset. The reference site reports positive examples from 50,000 images and a negative tail over all 1,281,167 training images. This changes the examples available for comparison; see the [method guide](docs/methodology.md#natural-examples-and-comparability).
-- **Signed targets.** Positive scores are post-ReLU; negative scores are pre-ReLU. A zero post-ReLU minimum does not measure signed suppression.
-- **Scoring and display.** Optimization uses normalized Gaussian-weighted scores; natural examples are ranked by spatial extrema. Heatmaps are normalized per image and display layer activations.
-- **Image priors.** Configuration A includes mean-color and peripheral-color constraints. These affect image appearance and must be considered when interpreting colors.
+## 🧪 Reproduction Results <a id="reproduction-results"></a>
 
-## Methods and developer guides
+Four neurons, five modes. **Ours: A · 224 × 224 · 1,024 steps · default seed 0.** Diversity shows four images. Click an image to enlarge it.
 
-| Guide | Use it to… |
-| --- | --- |
-| [Model setup](source/inceptionv1/README.md) | Provision the exact source, checkpoint and preprocessing. |
-| [Running](docs/reproduction.md) | Scan data, build anchors, optimize batches and resume work. |
-| [Method](docs/methodology.md) | Inspect the parameterization, losses and target definitions. |
-| [Data format](docs/data-format.md) | Read run records, scores, checkpoints and viewer assets. |
-| [Hosting](docs/hosting.md) | Serve a static export or use the optional object-storage service. |
-| [Development](docs/development.md) | Run CPU tests and check the viewer and media service. |
+### mixed4c · 477
 
-The Python package is in `vision-repro/src/vision_repro/`; browser assets are in its `web/microscope/` directory. Generated runs belong under `vision-repro/outputs/` and stay outside Git. Full model assets and ImageNet archives are also excluded.
+| | Positive | Path-guided + | Diversity | Negative | Path-guided − |
+|---|---|---|---|---|---|
+| Nick | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/477.png" width="144" alt="Nick 477 Positive"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/477.png" width="144" alt="Nick 477 Path-guided +"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/477.png" width="144" alt="Nick 477 Diversity"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/477.png" width="144" alt="Nick 477 Negative"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/477.png" width="144" alt="Nick 477 Path-guided −"></a> |
+| Ours | <a href="docs/assets/mixed4c_477/positive.png"><img src="docs/assets/mixed4c_477/positive.png" width="144" alt="Ours 477 Positive"></a> | <a href="docs/assets/mixed4c_477/path_positive.png"><img src="docs/assets/mixed4c_477/path_positive.png" width="144" alt="Ours 477 Path-guided +"></a> | <a href="docs/assets/mixed4c_477/diversity.png"><img src="docs/assets/mixed4c_477/diversity.png" width="144" alt="Ours 477 Diversity"></a> | <a href="docs/assets/mixed4c_477/negative.png"><img src="docs/assets/mixed4c_477/negative.png" width="144" alt="Ours 477 Negative"></a> | <a href="docs/assets/mixed4c_477/path_negative.png"><img src="docs/assets/mixed4c_477/path_negative.png" width="144" alt="Ours 477 Path-guided −"></a> |
 
-## Sources and attribution
+477 Diversity: the lower-left image uses seed 1 (post-ReLU activation 8,031.94); the other three retain seed 0.
 
-The vision module comes from [Vision-Neuron-Microscope, branch merge](https://github.com/RUC-TrustworthyAI/Vision-Neuron-Microscope/tree/72ea2d06094473d2d4368eb79338f5a428ffd636/vision), maintained by the upstream contributors. It builds on [AlreadyClean](https://already-clean.goodfire.com/), [Lucent](https://github.com/greentfrapp/lucent) and [Lucid](https://github.com/tensorflow/lucid). See [source and licensing terms](THIRD_PARTY_NOTICES.md).
+### mixed4c · 260
+
+| | Positive | Path-guided + | Diversity | Negative | Path-guided − |
+|---|---|---|---|---|---|
+| Nick | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/260.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/260.png" width="144" alt="Nick 260 Positive"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/260.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/260.png" width="144" alt="Nick 260 Path-guided +"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/260.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/260.png" width="144" alt="Nick 260 Diversity"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/260.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/260.png" width="144" alt="Nick 260 Negative"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/260.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/260.png" width="144" alt="Nick 260 Path-guided −"></a> |
+| Ours | <a href="docs/assets/mixed4c_260/positive.png"><img src="docs/assets/mixed4c_260/positive.png" width="144" alt="Ours 260 Positive"></a> | <a href="docs/assets/mixed4c_260/path_positive.png"><img src="docs/assets/mixed4c_260/path_positive.png" width="144" alt="Ours 260 Path-guided +"></a> | <a href="docs/assets/mixed4c_260/diversity.png"><img src="docs/assets/mixed4c_260/diversity.png" width="144" alt="Ours 260 Diversity"></a> | <a href="docs/assets/mixed4c_260/negative.png"><img src="docs/assets/mixed4c_260/negative.png" width="144" alt="Ours 260 Negative"></a> | <a href="docs/assets/mixed4c_260/path_negative.png"><img src="docs/assets/mixed4c_260/path_negative.png" width="144" alt="Ours 260 Path-guided −"></a> |
+
+### mixed4c · 286
+
+| | Positive | Path-guided + | Diversity | Negative | Path-guided − |
+|---|---|---|---|---|---|
+| Nick | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/286.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/286.png" width="144" alt="Nick 286 Positive"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/286.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/286.png" width="144" alt="Nick 286 Path-guided +"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/286.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/286.png" width="144" alt="Nick 286 Diversity"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/286.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/286.png" width="144" alt="Nick 286 Negative"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/286.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/286.png" width="144" alt="Nick 286 Path-guided −"></a> |
+| Ours | <a href="docs/assets/mixed4c_286/positive.png"><img src="docs/assets/mixed4c_286/positive.png" width="144" alt="Ours 286 Positive"></a> | <a href="docs/assets/mixed4c_286/path_positive.png"><img src="docs/assets/mixed4c_286/path_positive.png" width="144" alt="Ours 286 Path-guided +"></a> | <a href="docs/assets/mixed4c_286/diversity.png"><img src="docs/assets/mixed4c_286/diversity.png" width="144" alt="Ours 286 Diversity"></a> | <a href="docs/assets/mixed4c_286/negative.png"><img src="docs/assets/mixed4c_286/negative.png" width="144" alt="Ours 286 Negative"></a> | <a href="docs/assets/mixed4c_286/path_negative.png"><img src="docs/assets/mixed4c_286/path_negative.png" width="144" alt="Ours 286 Path-guided −"></a> |
+
+### mixed4c · 212
+
+| | Positive | Path-guided + | Diversity | Negative | Path-guided − |
+|---|---|---|---|---|---|
+| Nick | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/212.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/212.png" width="144" alt="Nick 212 Positive"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/212.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/212.png" width="144" alt="Nick 212 Path-guided +"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/212.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/212.png" width="144" alt="Nick 212 Diversity"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/212.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/212.png" width="144" alt="Nick 212 Negative"></a> | <a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/212.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/212.png" width="144" alt="Nick 212 Path-guided −"></a> |
+| Ours | <a href="docs/assets/mixed4c_212/positive.png"><img src="docs/assets/mixed4c_212/positive.png" width="144" alt="Ours 212 Positive"></a> | <a href="docs/assets/mixed4c_212/path_positive.png"><img src="docs/assets/mixed4c_212/path_positive.png" width="144" alt="Ours 212 Path-guided +"></a> | <a href="docs/assets/mixed4c_212/diversity.png"><img src="docs/assets/mixed4c_212/diversity.png" width="144" alt="Ours 212 Diversity"></a> | <a href="docs/assets/mixed4c_212/negative.png"><img src="docs/assets/mixed4c_212/negative.png" width="144" alt="Ours 212 Negative"></a> | <a href="docs/assets/mixed4c_212/path_negative.png"><img src="docs/assets/mixed4c_212/path_negative.png" width="144" alt="Ours 212 Path-guided −"></a> |
+
+[Image settings and provenance](docs/assets/provenance.json) · [Original microscope](https://already-clean.goodfire.com/microscope/inceptionv1.html?layer=mixed4c&neuron=477)
+
+## 📚 Documentation <a id="documentation"></a>
+
+| Guide | Contents |
+|---|---|
+| [Model setup](source/inceptionv1/README.md) | Source revision, weights, and preprocessing |
+| [Running](docs/reproduction.md) | Optimization, natural examples, batch generation, and export |
+| [Method](docs/methodology.md) | Image parameterization and the five objectives |
+| [Data format](docs/data-format.md) | Run records, checkpoints, and viewer assets |
+| [Hosting](docs/hosting.md) | Immutable media snapshots, upload resume, and publication |
+| [Validation](docs/validation.md) | Tests and GPU checks |
+
+<details>
+<summary><strong>Repository layout</strong></summary>
+
+```text
+vision-repro/
+  src/vision_repro/     Optimization, retrieval, queue, and CLI
+    defaults/          A configuration and fitted color statistics
+    web/microscope/    HTML viewer
+  tests/               Unit tests
+  outputs/             Generated runs (not tracked)
+source/inceptionv1/    Model manifest and setup
+hosting/              Optional R2 media API and tests
+docs/                 Guides and example figures
+```
+
+</details>
+
+Run `pytest vision-repro/tests`, `node vision-repro/tests/test_viewer.mjs`, and `node hosting/test-media.mjs`.
+
+## 🙏 Acknowledgements <a id="acknowledgements"></a>
+
+This project builds on [Nick / Goodfire's AlreadyClean](https://already-clean.goodfire.com/), [Lucent](https://github.com/greentfrapp/lucent), and [Lucid](https://github.com/tensorflow/lucid). README structure follows [Neuron-Microscope](https://github.com/RUC-TrustworthyAI/Neuron-Microscope). See [sources and third-party terms](THIRD_PARTY_NOTICES.md).

@@ -90,22 +90,43 @@ Each row links to a full interactive report with activation evidence, exemplars,
 
 ## Vision model neuron visualizations <a id="vision-neuron-visualizations"></a>
 
-The [vision module](vision/README.md) optimizes images for individual InceptionV1 channels and retrieves natural examples from an ImageNet scan. Its catalog contains **12 layers and 5,804 channels**. It implements Positive, Path-guided +, Diversity, Negative and Path-guided − views; the catalog size describes available targets, not the number of completed results.
+The [vision module](vision/README.md) publishes all **12 layers and 5,804 InceptionV1 neurons** in five views: Positive, Path-guided +, Diversity, Negative and Path-guided − — **29,020 result groups and 46,432 optimized images**. Each neuron also has Top 16, Additional Examples and negative samples retrieved from 50,000 ImageNet training images, with receptive-field crops and activation heatmaps.
 
-[Browse vision comparisons →](vision/docs/gallery.md) · [Install and run →](vision/README.md#installation-and-usage)
+[Open interactive viewer →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1)
+
+<p align="center">
+  <img src="vision/docs/assets/viewer-screenshot.png" alt="InceptionV1 Microscope: reference comparison, five visualization modes and top-activating images" width="92%">
+</p>
+
+[Five-view comparisons →](vision/README.md#reproduction-results)
 
 <table align="center">
-  <tr><th>Positive</th><th>Diversity</th><th>Negative</th></tr>
-  <tr>
-    <td><a href="vision/docs/assets/mixed4c_260/positive.png"><img src="vision/docs/assets/mixed4c_260/positive.png" width="200" alt="InceptionV1 mixed4c:260, optimized positive response"></a></td>
-    <td><a href="vision/docs/assets/mixed4c_260/diversity.png"><img src="vision/docs/assets/mixed4c_260/diversity.png" width="200" alt="InceptionV1 mixed4c:260, four diversity members"></a></td>
-    <td><a href="vision/docs/assets/mixed4c_260/negative.png"><img src="vision/docs/assets/mixed4c_260/negative.png" width="200" alt="InceptionV1 mixed4c:260, optimized signed negative response"></a></td>
-  </tr>
+  <thead>
+    <tr><th scope="col">Source</th><th scope="col">Positive</th><th scope="col">Path-guided +</th><th scope="col">Diversity</th><th scope="col">Negative</th><th scope="col">Path-guided −</th></tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row"><a href="https://already-clean.goodfire.com/microscope/inceptionv1.html?layer=mixed4c&amp;neuron=477">Nick / Goodfire</a></th>
+      <td><a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/positive/mixed4c/477.png" width="144" alt="Nick / Goodfire mixed4c:477, Positive"></a></td>
+      <td><a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_positive/mixed4c/477.png" width="144" alt="Nick / Goodfire mixed4c:477, Path-guided +"></a></td>
+      <td><a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/477.png" width="144" alt="Nick / Goodfire mixed4c:477, Diversity"></a></td>
+      <td><a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/negative/mixed4c/477.png" width="144" alt="Nick / Goodfire mixed4c:477, Negative"></a></td>
+      <td><a href="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/477.png"><img src="https://already-clean.goodfire.com/microscope/inceptionv1/fv/path_negative/mixed4c/477.png" width="144" alt="Nick / Goodfire mixed4c:477, Path-guided −"></a></td>
+    </tr>
+    <tr>
+      <th scope="row">Ours</th>
+      <td><a href="vision/docs/assets/mixed4c_477/positive.png"><img src="vision/docs/assets/mixed4c_477/positive.png" width="144" alt="Ours mixed4c:477, Positive"></a></td>
+      <td><a href="vision/docs/assets/mixed4c_477/path_positive.png"><img src="vision/docs/assets/mixed4c_477/path_positive.png" width="144" alt="Ours mixed4c:477, Path-guided +"></a></td>
+      <td><a href="vision/docs/assets/mixed4c_477/diversity.png"><img src="vision/docs/assets/mixed4c_477/diversity.png" width="144" alt="Ours mixed4c:477, Diversity"></a></td>
+      <td><a href="vision/docs/assets/mixed4c_477/negative.png"><img src="vision/docs/assets/mixed4c_477/negative.png" width="144" alt="Ours mixed4c:477, Negative"></a></td>
+      <td><a href="vision/docs/assets/mixed4c_477/path_negative.png"><img src="vision/docs/assets/mixed4c_477/path_negative.png" width="144" alt="Ours mixed4c:477, Path-guided −"></a></td>
+    </tr>
+  </tbody>
 </table>
 
-These are saved outputs for **mixed4c:260**, using configuration A, 224 × 224 inputs, 1,024 steps and seed 0. Positive maximizes post-ReLU activation; Negative minimizes signed pre-ReLU activation. [Recorded settings and scores](vision/docs/assets/provenance.json) accompany the images.
+**mixed4c · 477**. Our results use configuration A, 224 × 224 inputs and 1,024 steps. Positive maximizes post-ReLU activation; Negative minimizes signed pre-ReLU activation. Diversity contains four images.
 
-The implementation pins a **Lucent Inception5h checkpoint**. The [reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights; exact weight identity has not been verified. The [vision method guide](vision/docs/methodology.md) explains the objectives and sampling differences. The LLM workflow below applies to Qwen3.
+The model uses a pinned **Lucent Inception5h checkpoint**. The [method guide](vision/docs/methodology.md) explains the objectives, color priors and natural-example sampling. [Install and run](vision/README.md#quick-start) the vision module to reproduce these results.
 
 ## Which AlreadyClean claims have we tested?
 
@@ -197,7 +218,7 @@ Choose an entry point for the model and evidence you want to inspect.
 | **Explore** | Inspect LLM reports, a recorded investigation and vision comparisons. | Browser only. |
 | **Try the renderer** | Generate and view a small synthetic report fixture. This tests the software and interface, not a scientific result. | Python; no API key, Docker, GPU, or model download. |
 | **Run an LLM investigation** | Analyze neurons from an existing activation archive and publish new reports. | Linux, Python 3.10+, CUDA host, model weights, activation data, and an LLM endpoint. |
-| **Visualize a vision neuron** | Optimize images and export an InceptionV1 viewer. | Python 3.11+, a separate environment, model assets and a CUDA host for optimization; see [vision setup](vision/README.md#installation-and-usage). |
+| **Visualize a vision neuron** | Optimize images and export an InceptionV1 viewer. | Python 3.11+, a separate environment, model assets and a CUDA host for optimization; see [vision setup](vision/README.md#quick-start). |
 
 ### 1. Try the offline renderer
 

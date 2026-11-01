@@ -1,68 +1,64 @@
-# Vision visualization method
+# Optimization method
 
-**English** · [简体中文](methodology_zh.md)
+## Model and target
 
-## Model and targets
-
-The implementation freezes a pinned Lucent conversion of TensorFlow Inception5h. Inputs are 224 × 224 RGB values in `[0,1]`, transformed to `255*x-117` before the forward pass. The [reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights. This module records its source revision and checkpoint digest; exact weight identity with the reference has not been verified.
+We use Lucent's PyTorch port of the historical TensorFlow Inception5h model with frozen weights. Inputs are 224 × 224 RGB images in `[0,1]`, transformed to `255*x-117` before the model. This checkpoint is distinct from torchvision GoogLeNet and Goodfire's retrained models; channel identities depend on the checkpoint.
 
 The channel objective is a normalized Gaussian-weighted activation:
 
-`a(x) = sum_uv G_sigma(u,v) * F_channel(x)[u,v]`.
+`a(x) = sum_uv G_sigma(u,v) * F_channel(x)[u,v]`
 
-Coordinates range over `[-0.5,0.5]`, the Gaussian is centered at zero, `sigma=0.12`, and its weights sum to 1. Positive maximizes post-ReLU activation. Negative minimizes the corresponding branch's signed pre-ReLU activation. Evaluation checks `relu(pre) == post` and records the channel's branch mapping.
+Spatial coordinates span `[-0.5,0.5]`. The Gaussian is centered at zero, uses `sigma=0.12`, and sums to 1. Positive maximizes post-ReLU activation. Negative minimizes the corresponding branch's signed pre-ReLU activation. Evaluation checks `relu(pre) == post` and records the channel's branch mapping.
 
-## Configuration A
+## Configuration A: image parameterization
 
-- Independent Gaussian Fourier coefficients start with standard deviation 0.01; the default seed is 0.
-- Frequency scaling uses `1/f^1.5`. The low-pass cutoff increases smoothly from 0.15 to 0.45.
-- The fitted RGB covariance factor is `U*sqrt(lambda)`, normalized by the largest column norm. Decorrelation in optimization coordinates preserves natural RGB correlations when mapped back to the image.
-- Color statistics use 10 images per ImageNet class: 10,000 images and 2,560,000 pixels. This fitting process is separate from the 50,000-image retrieval scan.
-- Logit chroma gain is 2, followed by a sigmoid map to `[0,1]`. Gaussian blur decreases from 2 to 0.5 pixels.
-- Adam starts at learning rate 0.03. The annealing schedule lasts 768 steps; later steps retain its final frequency band, blur and learning rate. The configured run length is 1,024 steps.
-- Optimization applies random translation, rotation and scale changes. Evaluation scores use images without these random transforms.
+- Initialize independent Gaussian Fourier coefficients with standard deviation 0.01 and default seed 0.
+- Scale frequencies by `1/f^1.5` and smoothly increase the low-pass cutoff ratio from 0.15 to 0.45.
+- Map decorrelated optimization coordinates into RGB using a fitted covariance factor, `U*sqrt(lambda)`, normalized by its largest column norm. This preserves natural RGB correlations in the rendered image; it does not whiten the final RGB pixels.
+- Fit color statistics from 10 ImageNet images per class: 10,000 images and 2,560,000 pixels. This is separate from the 50,000-image retrieval scan.
+- Apply a logit chroma gain of 2, then sigmoid to map into `[0,1]`. Anneal Gaussian blur from 2 to 0.5 pixels.
+- Optimize with Adam, starting at learning rate 0.03. The annealing schedule lasts 768 steps; subsequent steps retain the final frequency band, blur and learning rate. The default run lasts 1,024 steps.
+- Apply random translation, rotation and scale during optimization. Evaluate saved images without these random transforms.
 
-Configuration A uses the Fourier parameterization and the losses below. Its alpha compositing, neighboring-pixel, logit-L2 and TV options are disabled. Saved previews retain the optimizer's RGB output.
+Configuration A uses no alpha compositing, external generative model, display-time color correction, local pixel-similarity loss, logit L2 penalty or total-variation loss.
 
 ## Base loss
 
 For each image:
 
-`L = sign*a(T(x)) + 20000*mean_RGB((mean_space(x)-c)^2) + 80000*mean_RGB((mean_periphery(x)-b)^2)`.
+`L = sign*a(T(x)) + 20000*mean_RGB((mean_space(x)-c)^2) + 80000*mean_RGB((mean_periphery(x)-b)^2)`
 
-Positive uses `sign=-1`; negative uses `sign=+1`. The color targets are `c=(0.65,0.70,0.74)` and `b=(0.68,0.76,0.79)`. Peripheral averaging uses the smooth radial weight `(1-exp(-r²/(2*0.35²)))²`. The constraints apply to regional means, so individual peripheral pixels can differ. The explicit prior contributes to the cyan/blue appearance of generated images.
+Here, `T` is the random image transform, `sign=-1` for positive objectives and `sign=+1` for negative objectives. The color targets are `c=(0.65,0.70,0.74)` and `b=(0.68,0.76,0.79)`. The peripheral mean uses smooth radial weights `(1-exp(-r²/(2*0.35²)))²`. These terms constrain regional mean colors rather than individual pixel colors. The cyan-blue appearance partly reflects this explicit prior.
 
-While a positive target is inactive, the optimizer can redirect ReLU backward gradients; the forward pass retains ordinary ReLU. Once all members for a channel have positive activation, redirection is disabled for that channel for the remainder of the run. Negative uses pre-ReLU directly. The positive objective itself remains post-ReLU.
+For positive objectives, inactive targets can redirect the ReLU backward gradient while retaining the standard ReLU forward pass. Once all members of a neuron group have positive activation, gradient redirection is disabled for that neuron and is not re-enabled. Negative objectives use pre-ReLU directly without this warm-up. Gradient redirection therefore differs from replacing the positive objective with pre-ReLU activation throughout optimization.
 
-## Five views
+## Five visualization modes
 
-| View | Activation objective | Additional term |
+| Mode | Activation objective | Additional term |
 | --- | --- | --- |
-| Positive | Maximize post-ReLU | Base loss only |
-| Path-guided + | Maximize post-ReLU | Positive natural-path alignment for the first 64 steps |
-| Diversity | Maximize post-ReLU for four images | Previous-layer Gaussian-weighted Gram-cosine penalty within the four-image group |
-| Negative | Minimize signed pre-ReLU | Base loss only |
-| Path-guided − | Minimize signed pre-ReLU | Negative natural-path alignment for the first 64 steps |
+| Positive | Maximize post-ReLU | None |
+| Path-guided + | Maximize post-ReLU | Align with positive natural-example path anchors for the first 64 steps |
+| Diversity | Maximize post-ReLU for four images | Penalize Gaussian-weighted Gram cosine similarity in the preceding layer across the four images |
+| Negative | Minimize signed pre-ReLU | None |
+| Path-guided − | Minimize signed pre-ReLU | Align with negative natural-example path anchors for the first 64 steps |
 
-The path vector concatenates Gaussian-pooled vectors from the previous catalog layer and the current layer, with the target channel zeroed. Each vector is normalized before concatenation, then the concatenation is normalized again. For the first layer, the previous representation is input RGB.
+The path representation combines Gaussian-pooled activation vectors from the preceding catalog layer and the target layer. Set the target channel to zero, normalize each vector, concatenate them, and normalize again. For the first layer, the preceding representation is the RGB input.
 
-For each pole, anchors use the top/minimum 60 natural examples in the scan. Pooling is centered on each example's response extremum, and the anchor is the unit-normalized mean. The guidance term is `1-cos(path,anchor)`, weighted by the median absolute natural Gaussian score, and applies only during the first 64 steps.
+Anchors use the top or bottom 60 natural examples from the 50,000-image subset. Pool at each example's activation maximum or minimum, then normalize the mean vector. The guidance term is `1-cos(path,anchor)`, weighted by the median absolute natural-example Gaussian score and applied only during the first 64 steps.
 
-This is a defined activation-vector proxy. Comparing guided results requires the vector definition, weight and guidance schedule. Diversity weight is 0.3 times the natural score scale; comparisons stay within a channel's four members. Targets with unusable anchors are marked `unavailable`.
+This implementation uses activation vectors as a path proxy, rather than pixel-gradient paths or gradient × activation. The Diversity weight is 0.3 times the natural-example score scale; diversity is enforced within each neuron's four-image group. Tasks without valid natural anchors are marked unavailable.
 
-## Natural examples and comparability
+## Natural examples and activation maps
 
-The scan selects 50 images per class, for 50,000 ImageNet training images. It resizes the short side to 256, then center-crops to 224. Positive examples are ranked by spatial maximum post-ReLU activation; negative examples by spatial minimum signed pre-ReLU activation. Optimization uses a central Gaussian score, so its scores and the retrieval scores have separate definitions.
+Scan 50 ImageNet training images per class, for 50,000 images total. Resize the shorter side to 256 pixels and take a 224 × 224 center crop. Rank positive examples by spatial maximum post-ReLU activation and negative examples by spatial minimum signed pre-ReLU activation. These ranking scores differ from the central Gaussian score used for optimization.
 
-The [reference page](https://already-clean.goodfire.com/microscope/inceptionv1.html) describes positive examples from 50,000 training images and a negative tail over all 1,281,167 training images. This module uses its class-balanced 50,000-image subset for both poles. Natural-example tails therefore depend on both the scan size and the selected images.
+Each neuron displays 48 sample positions: Top 16, eight examples near each of two additional percentiles, and the 16 most negative examples. Heatmaps show the native layer response, normalized separately for each image. They are not pixel attribution maps, and their color intensity does not compare absolute activation across images.
 
-Each channel has 48 display positions: Top 16, two groups of eight examples near additional percentiles, and the negative Top 16. Heatmaps display layer-grid responses normalized per image. Their intensity cannot be used to compare absolute activation across images or establish pixel-level attribution.
+The viewer displays optimization outputs without extra sharpening, color grading or background compositing. Runs retain their model, target, data subset and hyperparameters so visual comparisons can be traced to their settings.
 
-The displayed optimization images retain their recorded colors and sharpness. The model, objective, data subset and hyperparameters accompany results. Assessing a channel's function requires its measured responses and controls as well as visual inspection.
+## Receptive-field crops
 
-## Receptive-field display
-
-Receptive fields are computed from the fixed historical InceptionV1 architecture. For a convolution or pool with kernel width `k`, stride `s` and left padding `p`:
+Receptive fields are propagated through the fixed historical InceptionV1 architecture. For a convolution or pooling operation with kernel width `k`, stride `s` and left padding `p`:
 
 ```text
 r_new = r + (k - 1) * j
@@ -70,6 +66,8 @@ j_new = j * s
 start_new = start + ((k - 1) / 2 - p) * j
 ```
 
-The center of input pixel 0 is 0.5. Concatenated Inception layers use the field of the channel's branch; convolutions mixing input channels use the union of their dependency ranges. For example, `conv2d0:0` has width 7, the three convolution branches in `mixed3a` have widths 27, 43 and 59, and `mixed4c:447` has width 299, capped at 224 for display.
+Here, `r` is receptive-field width, `j` is the spacing between adjacent feature-cell centers in input coordinates, and `start` is the first cell's center. Input pixel 0 is centered at 0.5. Inception concatenations select the receptive field of each channel's branch. Later convolutions that mix channels use the union of their input dependencies.
 
-Square crops are centered on response extrema and shifted inside the image at boundaries. Heatmaps are sampled using the actual feature-cell centers in the same crop coordinates, and extremum markers are transformed with them. These crops describe architectural dependencies; target scores and example rankings retain their original definitions.
+For example, `conv2d0:0` has a receptive-field width of 7 pixels. The three convolution branches of `mixed3a` have widths 27, 43 and 59. The width for `mixed4c:447` is 299, capped at 224 for display.
+
+Take a square crop around the activation extremum. At image boundaries, shift the crop inside the image instead of adding black padding. Sample the heatmap using the actual feature-cell centers in the same crop coordinate system, and transform the extremum marker accordingly. Cropping changes the display region; the optimization objective and sample-ranking definitions stay the same.
