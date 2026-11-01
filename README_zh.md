@@ -350,7 +350,7 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 
 ## 📚 团队相关研究 <a id="related-research-from-our-group"></a> <a id="related-work-from-our-group"></a><a id="related-work"></a> <a id="团队相关研究"></a>
 
-团队相关工作涵盖特征学习、概念分析、解释评估和 LLM 安全。发表信息也可参阅[王希廷老师的学院主页](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm)。
+团队相关工作涵盖特征学习、概念分析、解释评估和 LLM 安全。发表信息也可参阅[王希廷老师的主页](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm)。
 
 | 工作 | 研究关联 | 链接 |
 | --- | --- | --- |

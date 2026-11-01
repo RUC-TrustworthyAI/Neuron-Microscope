@@ -350,7 +350,7 @@ Please open a [GitHub Issue](https://github.com/RUC-TrustworthyAI/Neuron-Microsc
 
 ## 📚 Related research from our group <a id="related-work"></a> <a id="related-research-from-our-group"></a>
 
-Our group's related work spans feature learning, concept-based analysis, explanation evaluation, and LLM safety. Publication details are also listed on [Xiting Wang's faculty page](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm).
+Our group's related work spans feature learning, concept-based analysis, explanation evaluation, and LLM safety. Publication details are also listed on [Xiting Wang's homepage](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm).
 
 | Work | Connection | Links |
 | --- | --- | --- |
