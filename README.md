@@ -293,25 +293,18 @@ For concurrent neurons, use separate configurations and output directories, with
 
 ## ⏱️ Recorded runtime and cost <a id="reproducibility-and-cost"></a> <a id="recorded-runtime-and-cost"></a>
 
-Each LLM investigation retains its configuration, API requests and responses, token-price estimates, sampled evidence, explanation and prediction versions, measurements, and final report. Fresh interpretations use the target activation evidence without previous explanations or official labels.
+The table shows **per-neuron arithmetic means across all 50 published Qwen3-32B reports on Reasoning Mix 100M**, calculated from their Interpretation Costs records.
 
-For the Colorado / **Reasoning Mix 100M** investigation shown in the language model walkthrough:
-
-| Item | Recorded value |
+| Metric | Mean per neuron |
 | --- | --- |
-| Target model | Qwen3-32B |
-| Saved evidence | Reasoning Mix 100M; 500 sampled positions; 498 labeled positions in the selected version |
-| Research and auxiliary calls | `deepseek-v4.1-flash-1017`, high reasoning effort |
-| GPU group | 4 × NVIDIA A100 40 GB |
-| Measured execution time | 25 min 59 s |
-| GPU experiment time | 5 min 15 s of recorded GPU work; 0.351 GPU card-hours |
-| API streaming time | 19 min 25 s |
-| Estimated API cost | $0.6181 across 26 completed requests |
-| Recorded elapsed time | 25 min 59 s |
+| Execution time | 1 h 13 min 45 s |
+| GPU experiment time | 5 min 9 s |
+| GPU usage | 0.343 GPU card-hours |
+| API streaming time | 23 min 52 s |
+| API requests | 27.46 |
+| Estimated API cost | $0.7821 |
 
-GPU time includes recorded model loading and operations. API streaming time counts overlapping streams once. GPU and API work can overlap, so their durations do not sum to execution time.
-
-These values describe one measured case. Costs exclude activation collection and depend on the configured model endpoint and token prices. The underlying breakdown is available in the [published report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#interpretation-costs) and [walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en#report).
+Execution time includes GPU queueing; GPU time includes model loading and measurements. API streaming time counts overlapping responses once. GPU work and API streams can overlap. These figures exclude activation collection. Individual breakdowns are available in the [50 reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/).
 
 ## 🚧 Limitations <a id="limitations-and-future-work"></a> <a id="limitations"></a>
 

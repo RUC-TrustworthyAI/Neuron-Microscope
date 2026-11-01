@@ -293,25 +293,18 @@ python -m http.server 8000 --directory runs/example/report
 
 ## ⏱️ 实测耗时与开销 <a id="recorded-runtime-and-cost"></a> <a id="reproducibility-and-cost"></a> <a id="实测耗时与开销"></a>
 
-每次 LLM 研究都会保留配置、API 请求与响应、token 费用估算、采样证据、解释与预测版本、测量和最终报告。新的解释仅根据目标激活证据形成，输入中不含旧解释或官方标签。
+统计来自当前发布的 **50 份 Reasoning Mix 100M／Qwen3-32B 报告**中的 Interpretation Costs 记录。表中为每个神经元的算术平均值。
 
-下面是语言模型 walkthrough 中 **Colorado／Reasoning Mix 100M** 研究的记录：
-
-| 项目 | 记录值 |
+| 项目 | 每个神经元平均值 |
 | --- | --- |
-| 被解释模型 | Qwen3-32B |
-| 已有证据 | Reasoning Mix 100M；抽取 500 个位置，选中版本标注了 498 个位置 |
-| 研究与辅助调用 | `deepseek-v4.1-flash-1017`，推理级别 `high` |
-| GPU 组 | 4 × NVIDIA A100 40 GB |
-| 实测执行时间 | 25 分 59 秒 |
-| GPU 实验时间 | 实录 GPU 工作 5 分 15 秒；0.351 GPU 卡时 |
-| API 流式响应时间 | 19 分 25 秒 |
-| API 费用估算 | $0.6181，共 26 次完成的请求 |
-| 记录中的总耗时 | 25 分 59 秒 |
+| 执行耗时 | 1 小时 13 分 45 秒 |
+| GPU 实验时间 | 5 分 9 秒 |
+| GPU 使用量 | 0.343 GPU 卡时 |
+| API 流式响应时间 | 23 分 52 秒 |
+| API 请求数 | 27.46 次 |
+| API 费用估算 | $0.7821 |
 
-GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区间只计算一次。GPU 与 API 工作可能重叠，因此两者时间不能直接相加得到执行时间。
-
-以上来自单次实测。费用不含激活采集，并取决于所配置的模型端点和 token 单价。[已发布报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#interpretation-costs)与 [walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh#report) 提供了具体记录。
+执行耗时包含 GPU 排队等待，GPU 时间包含模型加载和测量。API 并发响应时，重叠时间只计一次。GPU 与 API 任务可以重叠，激活采集开销另计。各项明细见 [50 份报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/)。
 
 ## 🚧 当前局限 <a id="limitations-and-future-work"></a> <a id="局限与未来工作"></a> <a id="当前局限"></a>
 
