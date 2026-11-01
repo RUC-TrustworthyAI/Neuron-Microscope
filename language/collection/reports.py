@@ -86,4 +86,3 @@ def build(root, workers=2):
     builder.publish_catalog(report_root, entries, True)
     write(report_root / 'complete.json', {'complete': True, 'neurons': len(entries),
                                         'tokens_per_neuron': manifest['tokens'], 'documents': manifest['documents']})
-
