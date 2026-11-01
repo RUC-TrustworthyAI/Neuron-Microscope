@@ -362,7 +362,7 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 ```bibtex
 @software{ruc_trustworthyai_neuron_microscope_2026,
   author = {Haoran Jin and Ziheng Peng and Xiting Wang},
-  title = {Neuron Microscope: Reproducing and Stress-Testing Native Neuron Explanations},
+  title = {Neuron Microscope: Investigating native neurons in language and vision models.},
   year = {2026},
   url = {https://github.com/RUC-TrustworthyAI/Neuron-Microscope}
 }
