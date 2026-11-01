@@ -335,7 +335,7 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 
 ```bibtex
 @software{ruc_trustworthyai_neuron_microscope_2026,
-  author = {{RUC-TrustworthyAI}},
+  author = {Haoran Jin and Ziheng Peng and Xiting Wang},
   title = {Neuron Microscope: Reproducing and Stress-Testing Native Neuron Explanations},
   year = {2026},
   url = {https://github.com/RUC-TrustworthyAI/Neuron-Microscope}
