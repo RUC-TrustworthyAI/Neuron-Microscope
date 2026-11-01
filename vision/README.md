@@ -3,7 +3,12 @@
   <sub>🔬 Exploring vision neurons with feature visualization</sub>
 </h1>
 
-<p align="center">InceptionV1 · 5,804 neurons · 5 visualization modes · Interactive HTML</p>
+<p align="center">
+  <a href="source/inceptionv1/README.md"><img src="docs/assets/badges/model.svg" alt="Model: InceptionV1"></a>
+  <a href="#overview"><img src="docs/assets/badges/neurons.svg" alt="Neurons: 5,804"></a>
+  <a href="#reproduction-results"><img src="docs/assets/badges/modes.svg" alt="Modes: 5 visualizations"></a>
+  <a href="https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&amp;neuron=477&amp;compare=1"><img src="docs/assets/badges/viewer.svg" alt="Viewer: interactive HTML"></a>
+</p>
 <p align="center"><b>English</b> · <a href="README_zh.md">简体中文</a></p>
 <p align="center">
   <a href="#overview">📖 Overview</a> ·
