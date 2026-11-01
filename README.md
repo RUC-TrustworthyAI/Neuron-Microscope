@@ -35,7 +35,8 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 
 **Data:** The current 50 reports use **Reasoning Mix 100M**. The [data guide](language/docs/data.md) describes the corpus sources, saved activation format and readers. Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
-**Key takeaways:** For most of the 50 Qwen3-32B neurons we examined, strongly activating texts showed clear semantic, syntactic, or word-form patterns. We still struggle to use these patterns to explain weak activations or predict exactly which token in a sentence will activate strongly.
+> [!NOTE]
+> **Key takeaways:** For most of the 50 Qwen3-32B neurons we examined, strongly activating texts showed clear semantic, syntactic, or word-form patterns. We still struggle to use these patterns to explain weak activations or predict exactly which token in a sentence will activate strongly.
 
 ## 📑 Contents <a id="contents"></a>
 
