@@ -81,7 +81,7 @@ In our SlimPajama 100M run, the template `Officials in {city} approved the annua
 
 ### Browse all current reports
 
-Explore **50 Qwen3-32B neurons on Reasoning Mix 100M**, with Head, Blind and Search scores alongside each report.
+Explore **50 Qwen3-32B neurons on Reasoning Mix 100M**, with Blind and Search scores alongside each report.
 
 [Open the report directory →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/)
 
