@@ -17,11 +17,11 @@ The workflow configuration’s `report` path points to a target package containi
 
 `report.json` includes `identity` (`id`, `layer`, `neuron`, `model`), `statistics`, `methods`, `examples`, `bands`, `scatter`, `points` and `documents`. Each point identifies its document, token position, and `[gate, value, product]`. Each document contains exact `token_ids`, decoded `tokens`, and aligned `gate`, `value`, `product` arrays. Cases are report-local identifiers; their names are not global token offsets.
 
-The explanation model receives the sampled contexts with their measured gate, up and product values. Independent labeling requests hide those measurements. Prediction feedback supports one explanation refinement, followed by a second blind labeling pass. The refined explanation and rules are frozen before experiments. Official explanations and previous investigation conclusions are excluded from research inputs.
+The explanation model receives sampled contexts with measured product values, together with extreme tokens, document exemplars, quantile cases, token selectivity, peak statistics and direct logit effects. Gate and up channels remain saved but are excluded from explanation requests. Blind labeling hides all measured activations. Two explanation revisions and three labeling passes precede version selection and freezing. Official explanations and previous investigation conclusions are excluded from research inputs.
 
 ## Canonical activation archive
 
-The bundled adapter is `tools/dataset_reader.py`. A dataset-local `reader.py` can implement the same interface and is treated as trusted executable input.
+The bundled adapter is `language/tools/dataset_reader.py`. A dataset-local `reader.py` can implement the same interface and is treated as trusted executable input.
 
 ```text
 archive/
@@ -65,10 +65,10 @@ The scan uses `histogram`, `iter_neuron`, document rows and token IDs. The optio
 
 ## Generate initial reports from an existing archive
 
-`analysis/build_dataset_reports.py` builds initial reports from saved activations. It expects the original token-input sidecars (`block-NNNNNN.ids.u32.npy`, `.offsets.u64.npy`, `.documents.json`) and capture metadata in the archive manifest: `model`, `model_snapshot`, `capture`, `selection`, `documents` and `neuron_count`.
+`language/analysis/build_dataset_reports.py` builds initial reports from saved activations. It expects the original token-input sidecars (`block-NNNNNN.ids.u32.npy`, `.offsets.u64.npy`, `.documents.json`) and capture metadata in the archive manifest: `model`, `model_snapshot`, `capture`, `selection`, `documents` and `neuron_count`.
 
 ```bash
-python analysis/build_dataset_reports.py \
+python language/analysis/build_dataset_reports.py \
   --dataset /path/to/archive --inputs /path/to/input-sidecars \
   --tokenizer /path/to/model/tokenizer.json \
   --existing /path/to/existing-reports --output /path/to/new-reports \
@@ -78,7 +78,7 @@ python analysis/build_dataset_reports.py \
 Omit `--existing` if there are no reports to reuse. This is a CPU saved-data scan. Add token tables to copies with the separate saved-data command:
 
 ```bash
-python analysis/add_token_tables.py --help
+python language/analysis/add_token_tables.py --help
 ```
 
 Alternatively the report builder accepts `--token-tables --token-cache DIR` to reuse the token-count/label cache in the same scan. The full argument list is available with `--help`.
@@ -87,9 +87,9 @@ Alternatively the report builder accepts `--token-tables --token-cache DIR` to r
 
 The measured activation is `SiLU(gate) * up`, taken from the native model tensor rather than reconstructed from rounded display values. Scatter point colours show blind predictions from a frozen explanation: orange for positive, blue for negative and grey for uncertainty. Stored records keep the prediction, measured activation and explanation version separately.
 
-The workflow samples 500 positions from saved activations with seed 42. Each bin receives a largest-remainder quota proportional to `log10(full-corpus bin count)`, capped by its population; positions within the bin are sampled uniformly without replacement. Bins with zero log height receive no points. The explanation model sees the full sample with its measurements. For blind labeling, the predictor receives the full captured prefix through each anchor and up to ten following tokens, with measured responses hidden. Following tokens provide linguistic context and are outside the causal prefix at that anchor.
+The workflow divides 500 positions equally among nonempty activation bins. If the complete corpus population of a bin cannot fill its quota, the remaining quota is shared among other nonempty bins. Positions are selected at evenly spaced ranks within each bin’s full corpus population. The explanation model sees the full sample with product measurements. For blind labeling, the predictor receives the full captured prefix through each anchor and up to ten following tokens, with measured responses hidden. Following tokens provide linguistic context and are outside the causal prefix at that anchor.
 
-Activation spectrum and Inside the neuron share this sample pool. The initial explanation is labeled, refined once from prediction feedback, and labeled again. Both plots use the final predictions from the refined explanation, which is frozen before experiments. Each labeling pass runs two concurrent requests with up to 256 points each. Further rounds request missing predictions until fewer than 16 remain; these missing points are excluded from both plots. An explicit uncertain answer stays in No visible cue. The full-corpus histogram retains all token counts. The sample supports explanation development; it is neither a population density estimate nor a held-out evaluation.
+Activation spectrum and Inside the neuron share this sample pool. The initial explanation and two revisions each receive a blind labeling pass, with five concurrent requests of up to 100 positions. Among versions with directional accuracy >90%, select the highest coverage; if none qualifies, select the highest accuracy. Both plots use the selected version’s own predictions, frozen before experiments. Further requests fill missing predictions until fewer than 16 remain; these missing positions are excluded from both plots. An explicit uncertain answer stays in No visible cue. The full-corpus histogram retains all token counts. These samples provide development feedback; they do not estimate population density or serve as a held-out evaluation.
 
 All saved contexts used for model experiments preserve the captured prefix through the chosen anchor. The display can show a shorter window without changing the model input or scoring position.
 

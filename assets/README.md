@@ -2,26 +2,13 @@
 
 `neuron-microscope.svg` / `neuron-microscope.png` contain the project banner. `badges/*.svg` are the README navigation badges.
 
-`workflow.png` is a schematic of the recorded Colorado investigation. Its numerical labels are illustrative. The linked reports and recorded walkthrough supply measured results together with their input templates and scoring positions. The current runnable procedure is described in [the LLM workflow guide](../docs/workflow.md).
+The figures linked from the main READMEs use the current Reasoning Mix 100M reports:
 
-`report-anatomy.svg` / `report-anatomy.png` show the **Inside the neuron** plot for Qwen3-32B L1/N20535. The plot illustrates the report format using selected measured positions.
+- `colorado-comparison.svg` summarizes the published and reproduced Colorado explanations. Its contact-test values come from L55_N11703: six Colorado institutions reach +188 to +352; a generic clinic with a 720 area code reaches +165. This is a summary illustration.
+- `report-directory.png` previews the 50-report directory with Blind and Search scores, their means and medians.
+- `pipeline-walkthrough-en.svg` and `pipeline-walkthrough-zh.svg` outline the six steps in the language model walkthrough: evidence, initial explanation, blind labels and two revisions, selection and freezing, experiments, and report analysis.
+- `colorado-activation-ranges.svg` plots L55_N11703 extrema: corpus [-44.5, 308], Search [-44.25, 296], head figure [-26.5, 352], and Blind [-47, 278]. The head figure scores the replacement span; Search and Blind score complete inputs.
 
-`colorado-comparison.png` and `report-directory.png` are screenshots from the SlimPajama 100M reports. The comparison shows the original AlreadyClean report on the left and our independent report on the right. The directory image previews the comparison collection. Readers can open the [Colorado report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/) or [report directory](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/) to inspect the full pages.
+The [Colorado report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1), [report directory](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) and [language model walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en) provide the complete explanations, texts and measurements.
 
-`pipeline-walkthrough-en.jpg` and `pipeline-walkthrough-zh.jpg` show the experiment stage of the [recorded walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en#agent2), captured on 30 October 2026 from the published site build. This recording follows a Colorado investigation using Diverse 100M.
-
-`corpus-coverage.svg` plots the observed native product extrema, `SiLU(gate) × up`, for Qwen3-32B neuron L51_N20229. Values come from the saved corpus statistics used for the 29 October 2026 comparison runs, each with approximately 100M tokens: SlimPajama [-23.625, 56.25], FineWeb [-15.1875, 61.25], Common Pile [-19, 59], Diverse [-35, 98], and Reasoning Mix [-32.75, 111]. The endpoints describe those corpus scans, not theoretical activation bounds.
-
-With Node.js and `sharp` installed, save the following as a `.cjs` script and run it from the repository root:
-
-```javascript
-const sharp = require('sharp');
-
-async function main() {
-  await sharp('assets/neuron-microscope.svg').png().toFile('assets/neuron-microscope.png');
-  await sharp('assets/report-anatomy.svg', { density: 144 })
-    .flatten({ background: '#fff' }).png().toFile('assets/report-anatomy.png');
-}
-
-main().catch(error => { console.error(error); process.exitCode = 1; });
-```
+`report-anatomy.svg` / `report-anatomy.png` illustrate the Inside the neuron format using selected measured positions for Qwen3-32B L1/N20535.

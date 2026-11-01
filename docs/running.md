@@ -9,7 +9,7 @@ python3 -m venv .venv
 source .venv/bin/activate
 # Choose a CUDA wheel compatible with your NVIDIA driver.
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install -r requirements/gpu.txt
+python -m pip install -r language/requirements/gpu.txt
 ```
 
 The measurement adapter shards complete dense-Qwen3 layers over the configured GPU group. Required memory depends on model size, captured prefixes and backward storage.
@@ -18,19 +18,19 @@ The measurement adapter shards complete dense-Qwen3 layers over the configured G
 
 Create `workflow.local.json` from the [configuration example](workflow.md#run). Supply a local model, a canonical activation archive and a target activation-only report package as described in [Input data](data.md). The report package must contain measured static logit effects in `effects.json`.
 
-The configuration selects the neuron, GPU indices, shared GPU lock, shared API slot directory, sampling settings and measurement batch sizes. `llm` specifies the endpoint, model, reasoning effort, output capacity, concurrency and token pricing. To use the recorded API model, configure `deepseek-v4.1-flash-1017` with `high` reasoning and an endpoint that provides that identifier.
+The configuration generator sets the neuron, GPU group, shared GPU lock, API slot directory and measurement batch sizes. It also sets five rules per pole, two revisions and three Search rounds. `language/settings.json` supplies sampling and API settings, including `deepseek-flash`, `high` reasoning, endpoint URLs and token-price estimates. Reports identify the recorded model as `deepseek-v4.1-flash-1017`. Review the model identifier and prices for your endpoint.
 
 Set `DEEPSEEK_API_KEY` in the environment or point `NEURON_PAPER_API_KEY_FILE` to a local credential file. Keep credentials out of configuration files and Git. API records omit authentication headers.
 
 ```bash
-python -m workflow.run --config workflow.local.json --output runs/example
+python -m language --config workflow.local.json --output runs/example
 python -m http.server 8000 --directory runs/example/report
 ```
 
 To inspect the refined explanation and both labeled plots before experiments:
 
 ```bash
-python -m workflow.run --config workflow.local.json --output runs/example \
+python -m language --config workflow.local.json --output runs/example \
   --stop-after interpretation
 ```
 
@@ -38,9 +38,9 @@ This step uses saved activations and LLM requests without loading the target mod
 
 ## Concurrency and continuation
 
-Launch each neuron with its own configuration and output directory. Runs on the same physical GPU group must use the same `gpu_lock` path. The lock covers loading the target model and the complete measurement phase; the model stays loaded throughout that phase. Use disjoint groups to measure neurons concurrently. Explanation and report-analysis requests can overlap across runs.
+Launch each neuron with its own configuration and output directory. Runs on the same physical GPU group must use the same `gpu_lock` path. Set `NEURON_MICROSCOPE_GPU_WORKER=1` to keep one model resident per group and queue GPU operations across runs. API calls can overlap with other runs’ GPU operations. Without this flag, one run holds the group lock for its complete measurement phase. Use disjoint groups to measure concurrently.
 
-Runs sharing an API concurrency allowance on one host must use the same `api_slots` directory and `llm.max_concurrent_requests` value. Labeling uses two concurrent batches of at most 256 positions within that allowance.
+The supplied `llm.max_concurrent_requests: null` imposes no application-level API concurrency cap. If a numeric cap is configured, runs on one host share an `api_slots` directory and the same cap. Labeling uses five concurrent batches of at most 100 positions within any configured allowance.
 
 A run saves `config.json` and rejects a different configuration in the same output directory. Repeating a command with the same configuration reuses completed API responses, sampling files and available measurement records. Failed requests and partial labels remain saved for inspection and continuation. An optional `saved_sample` points to a workflow's `sample/` directory to reuse its exact positions and contexts. Use a new output directory when changing scientific inputs.
 
@@ -57,8 +57,8 @@ The [report guide](reports.md) explains display windows and section contents. Di
 | `config.json` | The run's input and execution settings |
 | `status.json`, `failure.json` when present | Current phase and failure details |
 | `sample/`, `evidence.json` | Sampled positions, saved contexts and measured interpretation input |
-| `initial-labels/`, `refined-labels/` | Independent predictions and partial-label checkpoints |
-| `interpretation.json`, `predictions.json` | Refined explanation and frozen final predictions |
+| `initial-labels/`, `refined-labels/`, `refined-labels-2/` | Independent predictions and partial-label checkpoints for all three versions |
+| `interpretation-history.json`, `interpretation.json`, `predictions.json` | Version metrics, selected explanation and its frozen predictions |
 | `api/` | Complete requests, raw streams, reasoning, structured outputs, usage, estimated cost and timing |
 | `measurements/`, `atlas/`, `graphs/` | Model measurements and attribution results |
 | `gpu-queue.json` | GPU wait duration and assigned devices |

@@ -6,29 +6,29 @@ Use Linux and Python 3.10 or newer for the full workflow. The offline demo also 
 python -m venv .venv
 . .venv/bin/activate
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cpu
-python -m pip install -r requirements/test.txt
-python -m workflow.run --help
-PYTHONPATH=tools python -m unittest discover -s tests -v
-python -m unittest discover -s analysis -p 'test_*.py' -v
-python examples/demo.py --output .local/demo
+python -m pip install -r language/requirements/test.txt
+python -m language --help
+PYTHONPATH=language/tools python -m unittest discover -s language/tests -v
+python -m unittest discover -s language/analysis -p 'test_*.py' -v
+python language/examples/demo.py --output .local/demo
 python -m http.server 8080 --directory .local/demo
 ```
 
 Open `http://localhost:8080/`. The demo uses synthetic measurements to exercise report generation and interaction; it is not a neuron interpretation or a scientific result. No downloaded model, GPU, API credential or paid request is needed for these checks. RelP tests instantiate a tiny random model on CPU.
 
-The software tests cover preserved input prefixes, data selection, native attribution operations, stage isolation and handoff, saved-output reuse, API accounting, report assembly and layout. Passing them does not establish the scientific validity of an explanation.
+The software tests cover preserved input prefixes, data selection, native attribution operations, frozen explanations, saved-output reuse, API accounting, report assembly and layout. Passing them does not establish the scientific validity of an explanation.
 
 The comparison viewer has a separate test for default opening, compressed-report loading, and scrolling from either pane. Run it with Node.js 18 or newer:
 
 ```bash
-node --test tests/test_comparison_viewer.mjs
+node --test language/tests/test_comparison_viewer.mjs
 ```
 
 Workflow tests cover evidence visibility, explanation refinement, frozen rules, shared plot labels, response reuse and time accounting. To exercise report assembly with an existing activation-only package containing static logit effects and peak censuses, set its local path:
 
 ```bash
-WORKFLOW_TEST_REPORT=/path/to/report PYTHONPATH=tools \
-  python -m unittest discover -s tests -p 'test_workflow*.py' -v
+WORKFLOW_TEST_REPORT=/path/to/report PYTHONPATH=language/tools \
+  python -m unittest discover -s language/tests -p 'test_workflow*.py' -v
 ```
 
 These checks render saved evidence and synthetic test conditions without calling an LLM or loading the target model.

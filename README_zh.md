@@ -16,8 +16,8 @@
   <a href="README.md">English</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">语言模型报告</a> ·
   <a href="vision/README_zh.md">视觉模型可视化</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">查看 Colorado 案例</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh">跟随一次研究</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">查看 Colorado 案例</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh">跟随一次研究</a> ·
   <a href="#use-neuron-microscope">运行项目</a>
 </p>
 
@@ -25,7 +25,7 @@
   <a href="docs/method.md"><img src="assets/badges/model.svg" alt="模型：dense Qwen3"></a>
   <a href="docs/workflow.md"><img src="assets/badges/pipeline.svg" alt="Pipeline：固定编排"></a>
   <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="报告：交互式 HTML"></a>
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh"><img src="assets/badges/live-demo.svg" alt="展示：在线"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh"><img src="assets/badges/live-demo.svg" alt="展示：在线"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="使用：安装与运行"></a>
 </p>
 
@@ -35,10 +35,10 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 | 模型 | 可以查看的内容 | 入口 |
 | --- | --- | --- |
-| **Qwen3-32B** | 激活证据、解释、受控测试、干预和尚未解决的案例。 | [交互式神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [研究代码](workflow/) |
+| **Qwen3-32B** | 激活证据、解释、受控测试、干预和尚未解决的案例。 | [交互式神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [研究代码](language/) |
 | **InceptionV1／Lucent Inception5h** | 五种可视化目标、自然图像样例、热图和参考对比。 | [视觉模块指南与样例](vision/README_zh.md) · [优化代码](vision/vision-repro/) |
 
-**数据：** 对比案例附有[五套 LLM 语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)。LLM 报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
+**数据：** 当前 50 份报告均使用 **Reasoning Mix 100M**。[数据指南](docs/data.md)介绍了语料来源、激活格式和读取工具。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
 > [!IMPORTANT]
 > **本项目独立开展复现。** 在 LLM 研究中，研究模型不会看到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
@@ -64,20 +64,20 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 打开神经元链接后，左侧显示原报告，右侧显示我们的复现。滚动任意一侧会同步移动两份报告；关闭双栏后可以单独阅读复现报告。
 
-[打开交互式对比 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/)
+[打开交互式对比 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)
 
 <p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">
-    <img src="assets/colorado-comparison.png" alt="Colorado 神经元的原报告与复现报告" width="92%">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">
+    <img src="assets/colorado-comparison.svg" alt="Colorado 原报告与新版解释，以及 Reasoning Mix 100M 研究中的联系信息测试" width="92%">
   </a>
 </p>
 
 两份报告都发现了较强的 Colorado 正向响应，但对神经元具体计算什么提出了不同解释：
 
 - **原报告：** gate 会在即将填入地区相关信息的位置打开，up 投影承载带符号的地区身份。
-- **我们的复现：** 神经元广泛响应 Colorado 的地名、机构和地方新闻上下文。
+- **我们的复现：** 正极响应与 Colorado 地名、机构名有关，出现在地方政府、教育、医疗、联系信息和新闻上下文中。负极解释限于部分非 Colorado 机构的行政联系信息与引文格式。
 
-在 SlimPajama 100M 实验中，使用句式 `Officials in {city} approved the annual budget this week.`，在单个 token ` approved` 上评分，四个 Colorado 城市产生 **+22.0 至 +43.3** 的激活，其余六个城市均不超过 **+4.75**。对比页提供了上下文、受控替换、归因结果、干预，以及仍未充分解释的负极。
+在 Reasoning Mix 100M 研究中，`Contact block: {slot} End of contact.` 中的六组 Colorado 机构联系信息达到 **+188 至 +352**。每组取替换片段内绝对值最大的有符号响应，这六组的峰值都落在空格上。三组外州机构的响应为 **-26.5 至 +42.75**，使用 Colorado `720` 区号的通用诊所仍达到 **+165**。这些结果支持 Colorado 相关响应，但机构名、区号和格式各自的作用仍需分开检验。报告保留了完整文本、归因结果、干预和反例。
 
 ### 浏览当前全部报告
 
@@ -91,7 +91,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
   </a>
 </p>
 
-每一行都可进入完整交互式报告，查看激活证据、样例、搜索、聚类、效应、测试、批评、修订结论和开销记录。
+每一行都可进入完整交互式报告，查看激活证据、样例、搜索、聚类、效应、测试、批评、独立评阅和开销记录。两列各有 49 个有效分数：**Blind 均值为 0.864，中位数为 0.891；Search 均值为 0.782，中位数为 0.808**。导航页也在列标题中展示这些统计值。
 
 ## 视觉模型神经元可视化 <a id="vision-model-neuron-visualizations"></a> <a id="vision-neuron-visualizations"></a>
 
@@ -118,9 +118,9 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 | 主张或问题 | 需要的实验证据 | 当前状态 |
 | --- | --- | --- |
-| 能否为 Qwen3 原生神经元给出连贯解释？ | 激活覆盖、留出样例、受控测试与干预。 | **初步证据：** 有些案例较清楚，有些只有部分一致或存在明显偏差。 |
-| 原报告的解释能否独立复现？ | 独立盲测后再进行双栏比较。 | 首批 10 个案例中，**结果因案例而异**。 |
-| 语料选择是否改变可见行为？ | 在不同语料间匹配采样条件。 | L51_N20229 的**观测范围存在差异**；分离语料本身的影响仍需匹配采样与上下文处理。 |
+| 能否为 Qwen3 原生神经元给出连贯解释？ | 激活覆盖、独立构造的盲测文本、受控测试与干预。 | **初步证据：** Reasoning Mix 100M 的 50 份报告中，有些案例较清楚，有些部分一致，有些存在明显偏差。 |
+| 原报告的解释能否独立复现？ | 独立盲测后再进行双栏比较。 | **结果因案例而异。** 50 份报告的目录列出了双方解释，以及 Blind 和 Search 结果。 |
+| 语料选择是否改变可见行为？ | 在不同语料间匹配采样条件。 | 当前 50 份报告均使用 **Reasoning Mix 100M**，仅凭这组结果无法分离语料本身的影响。 |
 | 弱激活对全局行为是否不重要？ | 跨任务、跨层的全网络阈值消融。 | **计划中**，尚无明确结论。 |
 | 递归泛化能否解释看似混合的行为？ | 不同行为分支共享形成过程或因果机制的证据。 | **尚无结论。** 当前报告可以提供候选案例，尚未确立一般性结论。 |
 | 原生神经元是否比 SAE 特征更有用？ | 匹配神经元与特征、数据、测试、干预预算和评估标准。 | **计划中。** 尚无一般性比较结论。 |
@@ -132,23 +132,23 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 跟随一份完整研究记录
 
-[打开研究过程记录 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh)
+[打开语言模型研究过程记录 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh)
 
 <p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh">
-    <img src="assets/pipeline-walkthrough-zh.jpg" alt="Neuron Microscope 研究过程记录" width="92%">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh">
+    <img src="assets/pipeline-walkthrough-zh.svg" alt="语言模型研究流程：准备证据、解释与盲标、选择并冻结、实验及报告" width="92%">
   </a>
 </p>
 
-这份记录来自 **2026 年 10 月 29 日**的 Colorado 研究，使用 **Diverse 100M**，包含实验后的解释修订。提示词、测量和中间报告保留了该次运行的内容。案例链接中的早期 SlimPajama 100M 对比报告记录了 10 月 29 日的运行。下文介绍的可运行流程会在实验前冻结解释，再根据实验结果分析这份冻结解释。
+这份记录展示了 **Reasoning Mix 100M 上的 L55_N11703** 从已有证据到最终报告的过程，包括各步提示词、输入节选、结构化输出、三版解释与盲标结果、实测实验和开销。选中的解释在构造文本和 GPU 实验前冻结。
 
 ### 当前可运行流程
 
-Python 通过结构化 LLM 请求和模型测量组织研究。LLM 按约定的 JSON 格式提出解释、预测和实验输入；代码负责选择证据、执行测量并生成报告。
+`language/` 中的代码直接调用 LLM API，并组织目标模型测量。LLM 按约定的 JSON 格式返回解释、预测和实验输入；Python 负责选择证据、执行测量并生成 HTML。配置生成器提供下述设置。
 
-1. **抽取证据。** 从已有激活归档中抽取 500 个位置，按各激活区间的 log-count 柱高分配数量，保留上下文，以及实测 gate、up 和 product 值。
-2. **解释、检验并冻结。** 解释模型读取全部采样上下文和测量，提出解释，以及正负各最多三条响应规则。独立打标模型在隐藏实测激活的情况下预测这些位置的响应。解释模型结合反馈修订一次解释和规则，再完成一轮盲打标。解释与规则在实验前冻结，两张图使用这次打标的预测。
-3. **执行测量。** 根据实测反馈搜索强响应文本，设计受控实验，并执行仅根据解释编写的最大／最小响应盲测。目标模型在测量期间保持加载，代码批量执行前向计算，以及归因、家族响应和原生干预。同一 GPU 组通过共享锁依次执行测量阶段；不同神经元的解释和报告分析可以并行。
+1. **抽取证据。** 将 500 个位置均分到非空激活区间，并在各区间对应的完整语料中取样。只有某区间的全部位置仍不够配额时，才把余量分给其他区间。归档保留 gate、up 和 product 三个通道；解释模型只看 product 值，并结合上下文、极值 token、不同文档的代表样例、分位样本、token 选择性、峰值统计和直接 logit 效应。
+2. **解释、检验并冻结。** 正负极各最多提出五条规则，规则说明与正文共同表达同一份解释。盲标模型在隐藏实测值的情况下预测采样位置，每批最多 100 点，五路并行。模型修订两次，每次读取紧前一版解释、500 点实测上下文和重点错误反馈，再完成一轮盲标。三版中，优先从方向准确率 **>90%** 的版本里选择覆盖率最高的；均未达标时，选择准确率最高的。解释及其对应标签一起冻结。某一极证据不足时，可以保留为未解释。
+3. **执行测量。** Search 根据实测反馈进行三轮搜索，每轮请求六个区域，每区 16 条文本。模型设计四组受控测试，每组十个条件，测量后改进一次测试设计；头图来自这些受控测试。独立的 Blind 写作模型只看冻结解释与规则，为每个有解释支持的方向构造六条文本。Search 和 Blind 取全文最高或最低激活；受控测试测替换片段、共同后缀或指定 token。GPU 还批量执行归因、家族响应和干预。启用共享 worker 后，同一份常驻模型按队列服务多个运行，期间各运行的 API 请求可以并行。
 4. **分析并发布。** LLM 在保留冻结解释与规则的前提下，分析支持证据、反例和尚未解释的现象，再由独立读者评估。固定代码生成交互式报告；提供参考快照时，在研究完成后加入双栏比较。
 
 **Activation spectrum 与 Inside the neuron 共用一组样本，以及修订后冻结解释所对应的预测。** 打标模型读取完整上文，并将紧邻后文作为语言背景；解释无法明确预测方向时，归入 No visible cue。由于这些样本参与解释修订，预测一致程度用于提供开发反馈。独立生成的盲测文本与受控实验提供进一步检验。
@@ -157,7 +157,7 @@ Python 通过结构化 LLM 请求和模型测量组织研究。LLM 按约定的 
 
 ## 如何评估报告中的证据 <a id="evaluating-the-report-evidence"></a> <a id="how-we-evaluate-an-explanation"></a>
 
-Qwen3 报告提供多种检验解释的方式。目录中的 1–5 分由 LLM 评估与参考解释的语义一致程度。解释是否正确、因果判断是否成立，需要结合以下实验；措辞相似本身不足以证明这些判断。
+当前目录展示 **Blind score** 和 **Search score**。两者均计算复现最高值／原报告最高值，以及 |复现最低值／原报告最低值|，再对可用比值求平均。分数可以超过 1；汇总均值和中位数时排除缺失值。Blind 使用仅根据冻结解释编写的文本，Search 则使用实测反馈。这些极值用于衡量相对原报告的响应强度；因果判断仍需结合以下实验。
 
 | 维度 | 问题 | 报告中的证据 |
 | --- | --- | --- |
@@ -165,7 +165,7 @@ Qwen3 报告提供多种检验解释的方式。目录中的 1–5 分由 LLM �
 | 特异性 | 能否识别具体触发条件，并与周围主题区分？ | 受控替换、反例、搜索和盲测。 |
 | 预测能力 | 能否预测形成解释时未使用的输入？ | 独立的最大／最小响应盲测仅根据解释生成候选文本，受控模板与家族测量提供补充证据。 |
 | 因果相关性 | 改变神经元或输入，是否产生预期影响？ | 原生干预、消融、受控输入修改和输出测量。 |
-| 稳定性 | 换语料、样本或 agent 运行，解释是否仍成立？ | 跨语料比较，以及计划中的重复运行研究。 |
+| 稳定性 | 换样本、提示词或独立运行，解释是否仍成立？ | 在匹配条件下比较解释与测量结果。 |
 | 不确定性 | 哪些现象仍未解释，或证据不足以区分？ | 明确的批评、替代解释、弱响应极和失败测试。 |
 
 RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确立原生因果效应。具体见[测量范围](docs/method.md#relp-and-intervention-scope)。
@@ -174,30 +174,30 @@ RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确
 
 ### 概念相近，响应条件仍可能不同
 
-下面四个 SlimPajama 100M 案例与原报告有可辨认的共同概念。这些判断来自对个别案例的定性阅读，剩余差异仍需实验检验。
+以下案例来自当前 **Reasoning Mix 100M** 结果。结合解释与实验，可以同时看到共同概念和适用范围上的差异。
 
 | 神经元 | 两份解释的共同点 | 仍有差异的部分 |
 | --- | --- | --- |
-| [L50_N3507](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L50_N3507/) | 数学符号的角色区分了正负两极：为对象命名，或作为表达形式中的占位符。 | 具体字母、句式和干预条件。 |
-| [L52_N24188](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L52_N24188/) | 残余物与从过去留存至今的事物。 | 是预期即将出现的遗存词，还是响应词本身；较弱的负极。 |
-| [L24_N17907](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L24_N17907/) | 被描述为必要的亲身体验，例如“has to be seen”。 | 推荐语和“难忘体验”等表达是否属于同一概念。 |
-| [L15_N10957](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L15_N10957/) | 物理防护与加固，例如安全屋和风暴避难所。 | 对复合词中心词的依赖，以及能否推广到屏障或盔甲。 |
+| [L50_N3507](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=1) | 数学对象标签和变量引入可以产生正响应；有理数分式表达可以产生负响应。 | 我们将负极限于有理数、分式表达；原报告还推广到其他形式占位符，并强调几何对象的名称。 |
+| [L24_N17907](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=1) | “Has/must be seen or experienced to be believed” 表达必须亲身体验。 | 我们的负极说明包括子词与异质残余效应；原报告将浅负极视为 token 偏移。 |
+| [L57_N2065](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L57_N2065/?compare=1) | 算术相关段落可以产生正响应，部分研究机构署名产生负响应。 | 我们还纳入证明与定理上下文；原报告强调上下文中积累的算术信息，并区分多个负极模式。 |
+| [L45_N16800](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L45_N16800/?compare=1) | 明确的双关表达可以产生正响应。 | 我们侧重双关旁注；原报告要求文本呈现词的双重读法，也覆盖名称来源清晰可见的情况。 |
 
-另一些案例暴露了更大的差距。例如，我们对 [L31_N23558](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L31_N23558/) 的解释覆盖了宽泛的关系边界，原报告则区分了两类数学表达。这些差异提示我们，需要扩大语料覆盖、设计更能区分候选解释的对照，并加强因果检验。
+L45_N16800 说明，仅有共同主题还不够。我们的语料最高值为 **95**，高于原报告语料最高值 **71.5**，但 Blind 最高值仅为 **9.125**，原报告为 **50.75**。这处差距提示我们，需要用对照实验区分双关标记与上下文中实际出现的双重读法。
 
-### 不同语料呈现不同的激活范围
+### 用语料极值衡量构造文本的响应
 
-即使都在约 100M tokens 的规模，不同语料也会呈现不同的激活范围。L51_N20229 的原生 product 在 Common Pile 中为 **-19 至 +59**，在 Diverse 中为 **-35 至 +98**，在 Reasoning Mix 中为 **-32.75 至 +111**。这些已观测到的极值不能视为神经元的响应边界。各语料的采样和上下文处理方式也有差异，[数据文档](docs/data.md#corpora-used-in-the-comparisons)列出了具体来源与流程。
+Colorado 在 Reasoning Mix 100M 中的语料范围为 **-44.5 至 +308**。Search 达到 **-44.25 至 +296**，选中的头图达到 **-26.5 至 +352**，Blind 达到 **-47 至 +278**。头图测替换片段，Search 和 Blind 取全文极值；这些测量回答的问题不同，需要结合具体文本和评分规则阅读。
 
-相同的 token 预算仍可能覆盖不同的上下文和激活尾部。极值范围更大本身不足以证明解释更好，还需检查正负两极的具体案例和受控测试的响应。
+语料极值描述的是已有扫描，构造文本可以超过该范围。构造文本的高响应表明测试触及了较强激活；判断解释是否成立，还需查看受控对比和干预。
 
 <p align="center">
-  <a href="assets/corpus-coverage.svg">
-    <img src="assets/corpus-coverage.svg" alt="不同语料中观测到的激活范围" width="90%">
+  <a href="assets/colorado-activation-ranges.svg">
+    <img src="assets/colorado-activation-ranges.svg" alt="Reasoning Mix 100M 研究中 Colorado 的语料、Search、头图与 Blind 激活范围" width="90%">
   </a>
 </p>
 
-当前报告仍有三处不确定性：采样语料是否包含相关上下文，agent 是否在评分位置看到足够的证据，以及给出的解释能否预测后续测量。需要重复运行并匹配比较条件，才能区分这些影响。
+当前报告仍有三处不确定性：语料是否包含相关上下文，解释是否抓住了响应条件，以及写作模型能否依据解释构造强响应测试。需要匹配比较条件，才能区分这些影响。
 
 ## 安装与使用 <a id="use-neuron-microscope"></a><a id="installation-and-usage"></a><a id="quick-start"></a>
 
@@ -213,14 +213,14 @@ RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确
 ### 1. 体验离线渲染器
 
 ```bash
-git clone --branch hr-vision-integration https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone --branch hr-language-refactor https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope
 
 python3 -m venv .venv
 source .venv/bin/activate
-python -m pip install -r requirements/cpu.txt
+python -m pip install -r language/requirements/cpu.txt
 
-python examples/demo.py --output runs/demo
+python language/examples/demo.py --output runs/demo
 python -m http.server 8000 --directory runs/demo
 ```
 
@@ -233,59 +233,72 @@ python -m http.server 8000 --directory runs/demo
 ```bash
 # 安装与 NVIDIA 驱动匹配的 PyTorch CUDA wheel。
 python -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
-python -m pip install -r requirements/gpu.txt
+python -m pip install -r language/requirements/gpu.txt
 ```
 
-按照[配置示例](docs/workflow.md#run)创建 `workflow.local.json`，填写神经元、模型、激活与报告路径、显卡编号和共享 GPU 锁。配置 `llm.model`、推理级别与端点地址；已记录的模型为 `deepseek-v4.1-flash-1017`，推理级别为 `high`。在环境中提供 `DEEPSEEK_API_KEY`，或通过 `NEURON_PAPER_API_KEY_FILE` 指向本地凭证文件。
+使用配置生成器创建 `workflow.local.json`，填写神经元、本地模型、仅含激活证据的报告包、激活归档和显卡编号：
 
 ```bash
-python -m workflow.run --config workflow.local.json --output runs/example
+python language/examples/configure.py \
+  --neuron L55_N11703 \
+  --model /path/to/model \
+  --report /path/to/activation-only/report \
+  --activations /path/to/activation/archive \
+  --gpus 0 1 2 3 \
+  --output workflow.local.json
+```
+
+核对生成配置中的 `llm.model`、推理级别、端点地址和 token 单价。随附配置使用 `deepseek-flash` 和 `high` 推理；报告中的模型标识为 `deepseek-v4.1-flash-1017`。在环境中提供 `DEEPSEEK_API_KEY`，或通过 `NEURON_PAPER_API_KEY_FILE` 指向本地凭证文件。
+
+```bash
+NEURON_MICROSCOPE_GPU_WORKER=1 python -m language \
+  --config workflow.local.json --output runs/example
 python -m http.server 8000 --directory runs/example/report
 ```
 
 添加 `--stop-after interpretation`，即可利用已有激活查看修订后的解释和两张标注图，此时尚未加载目标模型。使用相同配置再次运行时，会复用已完成的 API 响应，以及已保存的采样和测量记录。更改科学输入时，应使用新的输出目录。
 
-并发、续跑、双栏导出和执行记录见[运行说明](docs/running.md)。
+并行研究多个神经元时，为每个运行分别准备配置和输出目录；共用 GPU 组的运行应使用相同的 `gpu_lock`。`NEURON_MICROSCOPE_GPU_WORKER=1` 启用共享常驻模型。随附配置的 `llm.max_concurrent_requests: null` 不设置应用层 API 并发上限。继续执行、双栏导出和执行记录见[运行说明](docs/running.md)。
 
 ## 实测耗时与开销 <a id="recorded-runtime-and-cost"></a> <a id="reproducibility-and-cost"></a>
 
 每次 LLM 研究都会保留配置、API 请求与响应、token 费用估算、采样证据、解释与预测版本、测量和最终报告。新的解释仅根据目标激活证据形成，输入中不含旧解释或官方标签。
 
-下面是 **2026 年 10 月 29 日 Colorado／Diverse 100M 研究记录**中的数据：
+下面是语言模型 walkthrough 中 **Colorado／Reasoning Mix 100M** 研究的记录：
 
 | 项目 | 记录值 |
 | --- | --- |
 | 被解释模型 | Qwen3-32B |
-| 已有证据 | Diverse 100M；抽取 500 个位置，绘制其中已标注的 495 个位置 |
+| 已有证据 | Reasoning Mix 100M；抽取 500 个位置，选中版本标注了 498 个位置 |
 | 研究与辅助调用 | `deepseek-v4.1-flash-1017`，推理级别 `high` |
 | GPU 组 | 4 × NVIDIA A100 40 GB |
-| 实测阶段执行时间 | 38 分 00 秒 |
-| GPU 实验时间 | 10 分 48 秒，换算为四卡等效时间 |
-| API 流式响应时间 | 17 分 22 秒 |
-| API 费用估算 | $0.4871 |
-| 从开始到完成 | 1 小时 59 分 25 秒，其中包含 1 小时 21 分 25 秒的阶段间隔 |
+| 实测执行时间 | 25 分 59 秒 |
+| GPU 实验时间 | 实录 GPU 工作 5 分 15 秒；0.351 GPU 卡时 |
+| API 流式响应时间 | 19 分 25 秒 |
+| API 费用估算 | $0.6181，共 26 次完成的请求 |
+| 记录中的总耗时 | 25 分 59 秒 |
 
-GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时间不能直接相加得到阶段执行时间。
+GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区间只计算一次。GPU 与 API 工作可能重叠，因此两者时间不能直接相加得到执行时间。
 
-以上来自单次实测，无法代表每个神经元的平均开销。费用不含之前的激活采集，并取决于所配置的模型端点和 token 单价。[已发布报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/reports/04-published.html#interpretation-costs)提供了底层明细。
+以上来自单次实测。费用不含激活采集，并取决于所配置的模型端点和 token 单价。[已发布报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#interpretation-costs)与 [walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh#report) 提供了具体记录。
 
 ## 局限与未来工作 <a id="limitations-and-future-work"></a>
 
 ### 当前局限
 
-- 首批对比仅包含 10 个神经元，无法作为对 Qwen3-32B 的随机抽样评估。
+- 当前集合包含 50 个已有原报告的神经元，结果尚无法推广到 Qwen3-32B 的全部神经元。
 - 完整激活归档尚无公开下载入口，外部用户目前需要提供兼容的输入数据。
 - 离线演示使用合成内容，不能用于复现已发布的科学结果。
-- 语料覆盖、提示词选择、证据展示与 agent 随机性都可能改变解释。
-- 目录中的 1–5 分衡量语义一致程度，不能证明机制解释正确。
+- 语料覆盖、提示词选择、证据展示与 LLM 随机性都可能改变解释。
+- Blind 和 Search 分数比较激活极值，无法证明机制解释正确；对可用方向求平均时，也可能只包含单极。
 - 负极和弱激活的解释往往不如强正向响应清楚。
 - 我们尚未完成条件匹配的原生神经元与 SAE 比较。
 
 ### 未来工作 <a id="future-work"></a>
 
 - [ ] 发布小型真实神经元证据包，让用户无需完整模型或激活归档即可重新生成一份科学报告。
-- [ ] 从选定案例扩展到更大规模的随机神经元样本。
-- [ ] 衡量解释在不同 agent 运行、提示词、样本与语料间的稳定性。
+- [ ] 从已有原报告的神经元扩展到模型中更广泛的随机样本。
+- [ ] 系统衡量解释在独立运行、提示词、样本与语料间的稳定性。
 - [ ] 按统一评估流程，比较条件匹配的原生神经元与 SAE 特征。
 - [ ] 跨任务、跨层开展全网络阈值消融，检验弱激活对全局行为的影响。
 - [ ] 检验递归泛化等 AlreadyClean 主要主张。
@@ -326,7 +339,7 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 | [LLM 方法与实现](docs/method.md) | 从流程找到代码，了解测量范围。 |
 | [LLM 报告指南](docs/reports.md) | 查找某张图或某个章节的数据来源和生成阶段。 |
 | [LLM 开发](docs/development.md) | 运行 CPU 软件检查与离线演示。 |
-| [LLM 提示词与输出约定](workflow/) | 查看解释、打标、实验设计和报告分析的请求。 |
+| [LLM 提示词与输出约定](language/workflow/) | 查看解释、打标、实验设计和报告分析的请求。 |
 | [视觉模块与样例](vision/README_zh.md) | 安装 InceptionV1 模块，查看可视化结果并导出网页。 |
 
 ## 引用 <a id="citation"></a>
@@ -344,7 +357,7 @@ GPU 时间包含模型加载。GPU 与 API 工作可能重叠，因此两者时�
 
 ## 致谢 <a id="acknowledgements"></a>
 
-报告结构参考 [Goodfire 的神经元报告](https://already-clean.goodfire.com/)。RelP 适配自 [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits)，来源版本记录在 `tools/relp-source.json`。仓库中的 skill 工具使用官方 [DeepSeek Harness SDK](https://github.com/deepseek-ai/deepseek-harness/tree/master/python/sdk)。
+报告结构参考 [Goodfire 的神经元报告](https://already-clean.goodfire.com/)。RelP 适配自 [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits)，来源版本记录在 [`language/tools/relp-source.json`](language/tools/relp-source.json)。
 
 ## 许可 <a id="license"></a>
 

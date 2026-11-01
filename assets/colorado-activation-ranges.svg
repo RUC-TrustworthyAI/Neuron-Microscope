@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+  "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg xmlns:xlink="http://www.w3.org/1999/xlink" width="756pt" height="273.6pt" viewBox="0 0 756 273.6" xmlns="http://www.w3.org/2000/svg" version="1.1">
+ <metadata>
+  <rdf:RDF xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+   <cc:Work>
+    <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage"/>
+    <dc:format>image/svg+xml</dc:format>
+    <dc:creator>
+     <cc:Agent>
+      <dc:title>Matplotlib v3.9.4, https://matplotlib.org/</dc:title>
+     </cc:Agent>
+    </dc:creator>
+   </cc:Work>
+  </rdf:RDF>
+ </metadata>
+ <defs>
+  <style type="text/css">*{stroke-linejoin: round; stroke-linecap: butt}</style>
+ </defs>
+ <g id="figure_1">
+  <g id="patch_1">
+   <path d="M 0 273.6 
+L 756 273.6 
+L 756 0 
+L 0 0 
+z
+" style="fill: #ffffff"/>
+  </g>
+  <g id="axes_1">
+   <g id="patch_2">
+    <path d="M 136.08 218.88 
+L 665.28 218.88 
+L 665.28 60.192 
+L 136.08 60.192 
+z
+" style="fill: #ffffff"/>
+   </g>
+   <g id="matplotlib.axis_1">
+    <g id="xtick_1">
+     <g id="line2d_1">
+      <path d="M 226.156596 218.88 
+L 226.156596 60.192 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #eaeef2; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_2"/>
+     <g id="text_1">
+      <text style="fill: #656d76; font: 13px 'Arial Unicode MS'; text-anchor: middle" x="226.156596" y="231.685156" transform="rotate(-0 226.156596 231.685156)">0</text>
+     </g>
+    </g>
+    <g id="xtick_2">
+     <g id="line2d_3">
+      <path d="M 338.75234 218.88 
+L 338.75234 60.192 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #eaeef2; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_4"/>
+     <g id="text_2">
+      <text style="fill: #656d76; font: 13px 'Arial Unicode MS'; text-anchor: middle" x="338.75234" y="231.685156" transform="rotate(-0 338.75234 231.685156)">100</text>
+     </g>
+    </g>
+    <g id="xtick_3">
+     <g id="line2d_5">
+      <path d="M 451.348085 218.88 
+L 451.348085 60.192 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #eaeef2; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_6"/>
+     <g id="text_3">
+      <text style="fill: #656d76; font: 13px 'Arial Unicode MS'; text-anchor: middle" x="451.348085" y="231.685156" transform="rotate(-0 451.348085 231.685156)">200</text>
+     </g>
+    </g>
+    <g id="xtick_4">
+     <g id="line2d_7">
+      <path d="M 563.94383 218.88 
+L 563.94383 60.192 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #eaeef2; stroke-width: 0.7; stroke-linecap: square"/>
+     </g>
+     <g id="line2d_8"/>
+     <g id="text_4">
+      <text style="fill: #656d76; font: 13px 'Arial Unicode MS'; text-anchor: middle" x="563.94383" y="231.685156" transform="rotate(-0 563.94383 231.685156)">300</text>
+     </g>
+    </g>
+    <g id="text_5">
+     <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: middle" x="400.68" y="246.282656" transform="rotate(-0 400.68 246.282656)">Signed native product activation</text>
+    </g>
+   </g>
+   <g id="matplotlib.axis_2">
+    <g id="ytick_1">
+     <g id="line2d_9"/>
+     <g id="text_6">
+      <text style="fill: #656d76; font: 13px 'Arial Unicode MS'; text-anchor: end" x="132.58" y="84.759797" transform="rotate(-0 132.58 84.759797)">Corpus</text>
+     </g>
+    </g>
+    <g id="ytick_2">
+     <g id="line2d_10"/>
+     <g id="text_7">
+      <text style="fill: #656d76; font: 13px 'Arial Unicode MS'; text-anchor: end" x="132.58" y="124.352578" transform="rotate(-0 132.58 124.352578)">Search</text>
+     </g>
+    </g>
+    <g id="ytick_3">
+     <g id="line2d_11"/>
+     <g id="text_8">
+      <text style="fill: #656d76; font: 13px 'Arial Unicode MS'; text-anchor: end" x="132.58" y="164.103797" transform="rotate(-0 132.58 164.103797)">Head figure</text>
+     </g>
+    </g>
+    <g id="ytick_4">
+     <g id="line2d_12"/>
+     <g id="text_9">
+      <text style="fill: #656d76; font: 13px 'Arial Unicode MS'; text-anchor: end" x="132.58" y="203.696578" transform="rotate(-0 132.58 203.696578)">Blind</text>
+     </g>
+    </g>
+   </g>
+   <g id="line2d_13">
+    <path d="M 176.051489 80.028 
+L 226.156596 80.028 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #2073b8; stroke-width: 8"/>
+   </g>
+   <g id="line2d_14">
+    <path d="M 226.156596 80.028 
+L 572.951489 80.028 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #df4408; stroke-width: 8"/>
+   </g>
+   <g id="line2d_15">
+    <path d="M 176.332979 119.7 
+L 226.156596 119.7 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #2073b8; stroke-width: 8"/>
+   </g>
+   <g id="line2d_16">
+    <path d="M 226.156596 119.7 
+L 559.44 119.7 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #df4408; stroke-width: 8"/>
+   </g>
+   <g id="line2d_17">
+    <path d="M 196.318723 159.372 
+L 226.156596 159.372 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #2073b8; stroke-width: 8"/>
+   </g>
+   <g id="line2d_18">
+    <path d="M 226.156596 159.372 
+L 622.493617 159.372 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #df4408; stroke-width: 8"/>
+   </g>
+   <g id="line2d_19">
+    <path d="M 173.236596 199.044 
+L 226.156596 199.044 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #2073b8; stroke-width: 8"/>
+   </g>
+   <g id="line2d_20">
+    <path d="M 226.156596 199.044 
+L 539.172766 199.044 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #df4408; stroke-width: 8"/>
+   </g>
+   <g id="line2d_21">
+    <path d="M 226.156596 218.88 
+L 226.156596 60.192 
+" clip-path="url(#p87955ad9ea)" style="fill: none; stroke: #8c959f; stroke-width: 0.8; stroke-linecap: square"/>
+   </g>
+   <g id="text_10">
+    <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: end" x="170.421702" y="82.869094" transform="rotate(-0 170.421702 82.869094)">-44.5</text>
+   </g>
+   <g id="text_11">
+    <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: start" x="578.581277" y="82.869094" transform="rotate(-0 578.581277 82.869094)">308</text>
+   </g>
+   <g id="text_12">
+    <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: end" x="170.703191" y="122.541094" transform="rotate(-0 170.703191 122.541094)">-44.25</text>
+   </g>
+   <g id="text_13">
+    <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: start" x="565.069787" y="122.541094" transform="rotate(-0 565.069787 122.541094)">296</text>
+   </g>
+   <g id="text_14">
+    <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: end" x="190.688936" y="162.213094" transform="rotate(-0 190.688936 162.213094)">-26.5</text>
+   </g>
+   <g id="text_15">
+    <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: start" x="628.123404" y="162.213094" transform="rotate(-0 628.123404 162.213094)">352</text>
+   </g>
+   <g id="text_16">
+    <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: end" x="167.606809" y="201.885094" transform="rotate(-0 167.606809 201.885094)">-47</text>
+   </g>
+   <g id="text_17">
+    <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: start" x="544.802553" y="201.885094" transform="rotate(-0 544.802553 201.885094)">278</text>
+   </g>
+  </g>
+  <g id="text_18">
+   <text style="fill: #1f2328; font: 700 17px 'Arial Unicode MS'; text-anchor: start" x="26.46" y="24.624" transform="rotate(-0 26.46 24.624)">Colorado activation ranges</text>
+  </g>
+  <g id="text_19">
+   <text style="fill: #656d76; font: 11px 'Arial Unicode MS'; text-anchor: start" x="26.46" y="46.512" transform="rotate(-0 26.46 46.512)">L55_N11703  ·  Reasoning Mix 100M</text>
+  </g>
+  <g id="text_20">
+   <text style="fill: #656d76; font: 10px 'Arial Unicode MS'; text-anchor: start" x="26.46" y="262.656" transform="rotate(-0 26.46 262.656)">Head figure: replacement span. Search and Blind: full-input extrema.</text>
+  </g>
+ </g>
+ <defs>
+  <clipPath id="p87955ad9ea">
+   <rect x="136.08" y="60.192" width="529.2" height="158.688"/>
+  </clipPath>
+ </defs>
+</svg>
