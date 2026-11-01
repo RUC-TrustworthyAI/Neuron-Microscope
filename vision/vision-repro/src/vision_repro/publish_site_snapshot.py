@@ -20,20 +20,6 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
         return None
 
 
-def verified_existing(records, request, workers=8):
-    """Reuse only objects whose stored size and digest the server verified."""
-    def check(batch):
-        result = request('/api/import/verify', {'objects': batch})
-        keys = {r['key'] for r in batch}
-        bad = set(result['bad'])
-        if result['checked'] != len(batch) or not bad.issubset(keys):
-            raise ValueError('Invalid existing-object verification receipt')
-        return [r for r in batch if r['key'] not in bad]
-    batches = [records[i:i+100] for i in range(0, len(records), 100)]
-    with ThreadPoolExecutor(max_workers=workers) as pool:
-        return [record for batch in pool.map(check, batches) for record in batch]
-
-
 def main(argv=None):
     p = argparse.ArgumentParser()
     p.add_argument('root', type=Path)
@@ -41,9 +27,8 @@ def main(argv=None):
     p.add_argument('--workers', type=int, default=8)
     p.add_argument('--available-only', action='store_true', help='Upload files already copied; never activate an incomplete release.')
     p.add_argument('--manifest', default='upload-manifest.json')
-    p.add_argument('--reuse-existing', action='store_true', help='Verify cloud objects and skip already stored identical content.')
     args = p.parse_args(argv)
-    if not 1 <= args.workers <= 32:p.error('--workers must be between 1 and 32')
+    if not 1 <= args.workers <= 16:p.error('--workers must be between 1 and 16')
     parsed=urlsplit(args.origin)
     if parsed.scheme!='https' or not parsed.hostname or parsed.username or parsed.password or parsed.path not in ('','/') or parsed.query or parsed.fragment:
         p.error('--origin must be an HTTPS origin without credentials, path or query')
@@ -103,13 +88,6 @@ def main(argv=None):
         raise RuntimeError('Upload retry limit reached')
     assert request('/api/import/verify', {'objects': []}) == {'checked': 0, 'bad': []}
     ack_file = args.root / 'upload-ack.jsonl'
-    if args.reuse_existing:
-        print(json.dumps({'phase': 'check_existing', 'objects': len(records)}), flush=True)
-        existing = verified_existing(records, request, workers=min(args.workers,16))
-        with ack_file.open('a') as log:
-            for record in existing:
-                log.write(json.dumps({**record, 'origin': origin}) + '\n')
-        print(json.dumps({'phase': 'reused', 'objects': len(existing)}), flush=True)
     acknowledged = set()
     if ack_file.exists():
         for line in ack_file.read_text().splitlines():
@@ -155,7 +133,7 @@ def main(argv=None):
     def verify(batch):
         result = request('/api/import/verify', {'objects': batch})
         assert result['checked'] == len(batch) and result['bad'] == [], result
-    with ThreadPoolExecutor(max_workers=min(args.workers,16)) as pool:
+    with ThreadPoolExecutor(max_workers=4) as pool:
         list(pool.map(verify, [records[i:i+100] for i in range(0, len(records), 100)]))
     if len(records) != len(manifest['objects']):
         print(json.dumps({'phase': 'partial_upload_verified', 'objects': len(records), 'total': len(manifest['objects'])}), flush=True)

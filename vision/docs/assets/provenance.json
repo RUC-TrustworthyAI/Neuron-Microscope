@@ -323,13 +323,13 @@
     },
     {
       "file": "docs/assets/mixed4c_477/diversity.png",
-      "sha256": "612ffcaf27e918e0b9899f56bf5a5a947c0bd257ed1c7192a5c28c241b06542a",
+      "sha256": "0add912506348d10c9f078c6a0d6ad2e0f90485553fe45580b31121e586b2823",
       "layer": "mixed4c",
       "channel": 477,
       "variant": "diversity",
       "members": 4,
       "batchSize": 4,
-      "runId": "continue_A_1024_20261030T0900/batches/mixed4c_diversity_0472_08_missing/items/2",
+      "runId": "showcase/tower477_diversity_member_replacement_20261101",
       "activation": "post-ReLU",
       "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
       "target": {
@@ -340,7 +340,7 @@
       "config": {
         "size": 224,
         "steps": 1024,
-        "seed": 0,
+        "seed": null,
         "color_mode": "fitted",
         "std": 0.01,
         "lr": 0.03,
@@ -399,7 +399,7 @@
         "1024": [
           8269.7109375,
           8045.1298828125,
-          2.385699644946726e-06,
+          8031.9443359375,
           7274.27734375
         ]
       },
@@ -407,60 +407,59 @@
         "pre_relu": [
           -40.43394470214844,
           -37.96818542480469,
-          -37.86251449584961,
+          -33.34766387939453,
           -39.88604736328125
         ],
         "post_relu": [
           0.0318477600812912,
           0.016007931903004646,
-          0.01298751961439848,
+          0.04772903770208359,
           0.023815743625164032
         ],
         "score": [
           0.0318477600812912,
           0.016007931903004646,
-          0.01298751961439848,
+          0.04772903770208359,
           0.023815743625164032
         ],
         "path_cosine": [
           0.3280785083770752,
           0.3447871506214142,
-          0.34228983521461487,
+          0.34428274631500244,
           0.32606595754623413
         ],
-        "diversity_cosine": 0.9457769393920898
+        "diversity_cosine": null
       },
       "final": {
         "pre_relu": [
           8269.7099609375,
           8045.1298828125,
-          -941.775146484375,
+          8031.943359375,
           7274.27734375
         ],
         "post_relu": [
           8269.7109375,
           8045.1298828125,
-          2.385699644946726e-06,
+          8031.9443359375,
           7274.27734375
         ],
         "score": [
           8269.7109375,
           8045.1298828125,
-          2.385699644946726e-06,
+          8031.9443359375,
           7274.27734375
         ],
         "path_cosine": [
           0.8176802396774292,
           0.8418561220169067,
-          0.19150438904762268,
+          0.8243688941001892,
           0.7685016393661499
         ],
-        "diversity_cosine": 0.4158777594566345
+        "diversity_cosine": null
       },
       "setting": "A",
-      "image_sha256": "cdd7392b9a2b079d5948418ee5779ef97aa4cb297b16e77d1a7e96d1f7a8181a",
-      "source_png_sha256": "63dcf283d18d0266bb2a59fdb49d92ebff2482a6f967baf30c9bdeeeb0966d38",
-      "pixel_sha256": "0bc78a322a85ea07af3c0bfb02671213b9ff205f121824d83da39398203bbc00",
+      "image_sha256": "0add912506348d10c9f078c6a0d6ad2e0f90485553fe45580b31121e586b2823",
+      "pixel_sha256": "1fb1cc844b9ad7b8cf44bea9e37852e981b564aa335229dab7838f63a2b477cc",
       "image_size": [
         448,
         448
@@ -479,9 +478,318 @@
         "numpy": "1.26.4"
       },
       "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/477.png",
-      "quality_flags": [
-        "member_2_final_post_relu_activation_near_zero"
-      ]
+      "quality_flags": [],
+      "member_seeds": [
+        0,
+        0,
+        1,
+        0
+      ],
+      "assembly": "Mixed-seed showcase: original seed-0 members 0, 1, 3; lower-left uses seed-1 member 1. The displayed quartet was not jointly optimized.",
+      "member_sources": [
+        {
+          "display_member": 0,
+          "runId": "continue_A_1024_20261030T0900/batches/mixed4c_diversity_0472_08_missing/items/2",
+          "source_member": 0,
+          "seed": 0,
+          "pixel_sha256": "66a5999c8118d0c7444f752b7e854d7d3eda7582e16f65529f5851a8bfd29814",
+          "initial_score": 0.0318477600812912,
+          "final_score": 8269.7109375
+        },
+        {
+          "display_member": 1,
+          "runId": "continue_A_1024_20261030T0900/batches/mixed4c_diversity_0472_08_missing/items/2",
+          "source_member": 1,
+          "seed": 0,
+          "pixel_sha256": "42d6f3d4bcee0d572e84a3e47099959f688aacf3a5139f17644d0c6df474b309",
+          "initial_score": 0.016007931903004646,
+          "final_score": 8045.1298828125
+        },
+        {
+          "display_member": 2,
+          "runId": "tower477_diversity_seed1_20261101T0642/items/0",
+          "source_member": 1,
+          "seed": 1,
+          "pixel_sha256": "0340e88bc9677f19f98e33a092ec51fc40736a94f1a0178bab3781204d25ba27",
+          "initial_score": 0.04772903770208359,
+          "final_score": 8031.9443359375
+        },
+        {
+          "display_member": 3,
+          "runId": "continue_A_1024_20261030T0900/batches/mixed4c_diversity_0472_08_missing/items/2",
+          "source_member": 3,
+          "seed": 0,
+          "pixel_sha256": "fff8e27c55a1f97d443ded6a6522402fc8201d22dc008e7a9e05a887fad21af2",
+          "initial_score": 0.023815743625164032,
+          "final_score": 7274.27734375
+        }
+      ],
+      "replacement": {
+        "date": "2026-11-01",
+        "display_member": 2,
+        "source_member": 1,
+        "seed": 1,
+        "original_score": 2.385699644946726e-06,
+        "new_score": 8031.9443359375,
+        "source_png_sha256": "791ec1855a9f5d97120ad12ccfd4d2ac4527af453339842b82476d63036c3b7c",
+        "config": {
+          "size": 224,
+          "steps": 1024,
+          "seed": 1,
+          "color_mode": "fitted",
+          "std": 0.01,
+          "lr": 0.03,
+          "gaussian_sigma": 0.12,
+          "uniform_mix": 0.0,
+          "final_band": 0.45,
+          "initial_band": 0.15,
+          "unlock_until": 0.7,
+          "blur_start": 2.0,
+          "blur_end": 0.5,
+          "logit_l2": 0.0,
+          "mean_color_weight": 20000,
+          "mean_color": [
+            0.65,
+            0.7,
+            0.74
+          ],
+          "mapping": "sigmoid",
+          "mapping_gain": 1.0,
+          "jitter": 4,
+          "rotation": 5.0,
+          "scale_min": 0.95,
+          "scale_max": 1.05,
+          "activation_cap": 0.0,
+          "view_size": 224,
+          "periphery_weight": 0.0,
+          "periphery_sigma": 0.35,
+          "periphery_color": [
+            0.68,
+            0.76,
+            0.79
+          ],
+          "tv_weight": 0.0,
+          "periphery_mean_weight": 80000,
+          "periphery_tv_weight": 0.0,
+          "periphery_power": 2,
+          "layer": "mixed4c",
+          "common_view_size": 224,
+          "schedule_steps": 768,
+          "save_steps": [
+            256,
+            512,
+            768,
+            1024
+          ],
+          "path_steps": 64,
+          "path_weight_ratio": 1.0,
+          "diversity_weight_ratio": 0.3,
+          "fft_decay_power": 1.5,
+          "logit_chroma_gain": 2.0,
+          "neighbor_rgb_weight": 0.0,
+          "history_every": 16,
+          "slot": "diversity"
+        },
+        "source_hashes": {
+          "full_feature_viz.py": "2ef412c5f0bcd0eea2002c8acae86de577720038ef903214db6c44f33dda8496",
+          "five_variants.py": "2216d9c2c065142f904a50f7245a48372bb9728324ddd3a44ed3a6ca1a3561f9",
+          "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+          "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+          "models.py": "33d540973d8b24fb443c516ff3710db76a52ec31ff1e658bc5a1f0e0d1a64593",
+          "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+        },
+        "model": {
+          "name": "InceptionV1 / TensorFlow Inception5h (Lucent PyTorch conversion)",
+          "source_repo": "https://github.com/greentfrapp/lucent",
+          "source_commit": "2ccc434d80097e58f53cb2a70c60f72902fe93af",
+          "weights_url": "https://raw.githubusercontent.com/ProGamerGov/pytorch-old-tensorflow-models/master/inception5h.pth",
+          "download_transport": "GitHub contents API with application/vnd.github.raw+json",
+          "weights_sha256": "44f1f1e0734fa77edd0ab948c0d4d5c9ab6f4efce10b02d793fd14ab2d71a73b",
+          "weights_bytes": 28283262,
+          "preprocessing": "RGB float [0,1] * 255 - 117",
+          "num_classes": 1008,
+          "is_goodfire_retrained_checkpoint": false
+        },
+        "versions": {
+          "torch": "2.10.0+cu130",
+          "cuda": "13.0",
+          "numpy": "1.26.4"
+        },
+        "source_initial_scores": [
+          0.034020282328128815,
+          0.04772903770208359,
+          0.03601022809743881,
+          0.01596326008439064
+        ],
+        "source_final_scores": [
+          5400.06005859375,
+          8031.9443359375,
+          0.0002450328611303121,
+          7581.34716796875
+        ],
+        "original_provenance": {
+          "file": "docs/assets/mixed4c_477/diversity.png",
+          "sha256": "612ffcaf27e918e0b9899f56bf5a5a947c0bd257ed1c7192a5c28c241b06542a",
+          "layer": "mixed4c",
+          "channel": 477,
+          "variant": "diversity",
+          "members": 4,
+          "batchSize": 4,
+          "runId": "continue_A_1024_20261030T0900/batches/mixed4c_diversity_0472_08_missing/items/2",
+          "activation": "post-ReLU",
+          "aggregation": "normalized Gaussian, coordinates [-.5,.5]",
+          "target": {
+            "node": "mixed4c_pool_reduce_pre_relu_conv",
+            "channel": 29
+          },
+          "direction": "maximize",
+          "config": {
+            "size": 224,
+            "steps": 1024,
+            "seed": 0,
+            "color_mode": "fitted",
+            "std": 0.01,
+            "lr": 0.03,
+            "gaussian_sigma": 0.12,
+            "uniform_mix": 0.0,
+            "final_band": 0.45,
+            "initial_band": 0.15,
+            "unlock_until": 0.7,
+            "blur_start": 2.0,
+            "blur_end": 0.5,
+            "logit_l2": 0.0,
+            "mean_color_weight": 20000,
+            "mean_color": [
+              0.65,
+              0.7,
+              0.74
+            ],
+            "mapping": "sigmoid",
+            "mapping_gain": 1.0,
+            "jitter": 4,
+            "rotation": 5.0,
+            "scale_min": 0.95,
+            "scale_max": 1.05,
+            "activation_cap": 0.0,
+            "view_size": 224,
+            "periphery_weight": 0.0,
+            "periphery_sigma": 0.35,
+            "periphery_color": [
+              0.68,
+              0.76,
+              0.79
+            ],
+            "tv_weight": 0.0,
+            "periphery_mean_weight": 80000,
+            "periphery_tv_weight": 0.0,
+            "periphery_power": 2,
+            "layer": "mixed4c",
+            "common_view_size": 224,
+            "schedule_steps": 768,
+            "save_steps": [
+              256,
+              512,
+              768,
+              1024
+            ],
+            "path_steps": 64,
+            "path_weight_ratio": 1.0,
+            "diversity_weight_ratio": 0.3,
+            "fft_decay_power": 1.5,
+            "logit_chroma_gain": 2.0,
+            "neighbor_rgb_weight": 0.0,
+            "history_every": 16,
+            "slot": "diversity"
+          },
+          "scores": {
+            "1024": [
+              8269.7109375,
+              8045.1298828125,
+              2.385699644946726e-06,
+              7274.27734375
+            ]
+          },
+          "initial": {
+            "pre_relu": [
+              -40.43394470214844,
+              -37.96818542480469,
+              -37.86251449584961,
+              -39.88604736328125
+            ],
+            "post_relu": [
+              0.0318477600812912,
+              0.016007931903004646,
+              0.01298751961439848,
+              0.023815743625164032
+            ],
+            "score": [
+              0.0318477600812912,
+              0.016007931903004646,
+              0.01298751961439848,
+              0.023815743625164032
+            ],
+            "path_cosine": [
+              0.3280785083770752,
+              0.3447871506214142,
+              0.34228983521461487,
+              0.32606595754623413
+            ],
+            "diversity_cosine": 0.9457769393920898
+          },
+          "final": {
+            "pre_relu": [
+              8269.7099609375,
+              8045.1298828125,
+              -941.775146484375,
+              7274.27734375
+            ],
+            "post_relu": [
+              8269.7109375,
+              8045.1298828125,
+              2.385699644946726e-06,
+              7274.27734375
+            ],
+            "score": [
+              8269.7109375,
+              8045.1298828125,
+              2.385699644946726e-06,
+              7274.27734375
+            ],
+            "path_cosine": [
+              0.8176802396774292,
+              0.8418561220169067,
+              0.19150438904762268,
+              0.7685016393661499
+            ],
+            "diversity_cosine": 0.4158777594566345
+          },
+          "setting": "A",
+          "image_sha256": "cdd7392b9a2b079d5948418ee5779ef97aa4cb297b16e77d1a7e96d1f7a8181a",
+          "source_png_sha256": "63dcf283d18d0266bb2a59fdb49d92ebff2482a6f967baf30c9bdeeeb0966d38",
+          "pixel_sha256": "0bc78a322a85ea07af3c0bfb02671213b9ff205f121824d83da39398203bbc00",
+          "image_size": [
+            448,
+            448
+          ],
+          "source_hashes": {
+            "full_feature_viz.py": "2ef412c5f0bcd0eea2002c8acae86de577720038ef903214db6c44f33dda8496",
+            "five_variants.py": "2216d9c2c065142f904a50f7245a48372bb9728324ddd3a44ed3a6ca1a3561f9",
+            "positive.py": "08a0eed42e7b4ab3918b30721f0b2c87b0454a320d2f03d1330ffe7cdc4a0736",
+            "rgb_explore.py": "ab63861bf982205e4648b3ccbcd8a5ed8fb009a146c0c26a5d567ff7bfe70a3e",
+            "models.py": "33d540973d8b24fb443c516ff3710db76a52ec31ff1e658bc5a1f0e0d1a64593",
+            "color_statistics.py": "c3fc1d0a3e6ccf7a99b2272997b38d0034d53f1a768f90bdbc8835a7d9a3a922"
+          },
+          "versions": {
+            "torch": "2.10.0+cu130",
+            "cuda": "13.0",
+            "numpy": "1.26.4"
+          },
+          "reference_url": "https://already-clean.goodfire.com/microscope/inceptionv1/fv/diversity/mixed4c/477.png",
+          "quality_flags": [
+            "member_2_final_post_relu_activation_near_zero"
+          ]
+        }
+      }
     },
     {
       "file": "docs/assets/mixed4c_477/negative.png",
@@ -2810,5 +3118,6 @@
     "mixed4c:286",
     "mixed4c:212"
   ],
-  "publication_release": "site_complete_five_20261031T075409"
+  "publication_release": "site_complete_five_20261031T075409",
+  "seed_note": "Default seed is 0. The mixed4c:477 Diversity showcase uses per-member seeds [0, 0, 1, 0]; see member_sources."
 }

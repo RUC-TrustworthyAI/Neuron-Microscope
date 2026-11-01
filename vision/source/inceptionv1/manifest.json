@@ -7,5 +7,6 @@
   "weights_sha256": "44f1f1e0734fa77edd0ab948c0d4d5c9ab6f4efce10b02d793fd14ab2d71a73b",
   "weights_bytes": 28283262,
   "preprocessing": "RGB float [0,1] * 255 - 117",
-  "num_classes": 1008
+  "num_classes": 1008,
+  "is_goodfire_retrained_checkpoint": false
 }

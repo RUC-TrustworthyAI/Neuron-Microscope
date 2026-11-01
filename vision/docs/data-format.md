@@ -1,42 +1,40 @@
-# Data format and provenance
+# 数据格式与可追溯性
 
-**English** · [简体中文](data-format_zh.md)
-
-## Independent optimization batches
+## 独立优化批次
 
 ```text
 run/
-  job.json           Fixed layer, channels, variant and configuration
-  metadata.json      Model identity, versions, branch mapping and objective
-  evaluation.json    Initial/checkpoint/final scores with the same definition
-  history.json       Optimization scores, losses, frequency band, blur and LR
-  complete.json      Completion, steps, elapsed time and allocator telemetry
-  resume.pt          Fourier, Adam and RNG state, retained in the source run
-  items/0/           First channel's initial/checkpoint/final PNGs
-  items/1/           Next channel, using the batch's seed configuration
+  job.json           不可变任务身份：layer/channels/slot/config
+  metadata.json      来源、权重摘要、版本、分支映射、目标定义、配置
+  evaluation.json    initial/checkpoint/final 同定义、无随机扰动的分数
+  history.json       优化期间的目标、损失、频段、模糊和学习率
+  complete.json      成功完成标记、步数、耗时、峰值分配与保留内存
+  resume.pt          FFT、Adam、随机状态；不发布到网页
+  items/0/           第一项 neuron 的 init/checkpoint/final PNG
+  items/1/           下一项 neuron，不是另一个 seed
 ```
 
-Each Diversity item contains four member images and a tiled preview. Evaluation score arrays correspond to those members. The viewer displays their mean and retains the full array in JSON.
+Diversity 的每个 item 包含 4 张图拼接的预览以及各成员图像；evaluation 的 score 数组逐成员对应。网页预览分数为成员分数均值，完整数组在 JSON 中保留。
 
-Campaign batches use the same layout under `batches/<job>/`. `queue.sqlite` records states such as `pending`, `running`, `done`, `unavailable`, `failed` and `split`. `protocol.json` records the configuration, source digests and batching policy. `progress.json` and `telemetry.jsonl` support monitoring.
+批量 campaign 在 `batches/<job>/` 下使用同一格式，`queue.sqlite` 保存 pending/running/done/unavailable/failed/split 等状态。`protocol.json` 保存默认配置、源码摘要与批次策略；`progress.json` 和 `telemetry.jsonl` 用于监测。
 
-## Natural examples
+## 自然样例
 
-A scan retains `inputs.npy`, layer scores and locations, `selected_images.jsonl`, and its protocol. Its `web/` directory contains:
+scan 目录保留 `inputs.npy`、每层 scores/locations、`selected_images.jsonl` 和协议。`web/` 包含：
 
-- `neurons/<layer>/<channel>.json`: sample IDs, classes, ranks, scores, atlas positions, heatmap offsets/shapes and peaks for Top 16 and Additional Examples.
-- `atlases/*.webp`: display atlases with eight images per row.
-- `heat/<layer>/<channel>.bin`: uint8 heatmaps indexed by the offsets in JSON.
-- `manifest.json`: relative asset paths and SHA-256 values.
-- `complete.json`: scan, channel and example counts, plus the digest of the exact manifest bytes.
+- `neurons/<layer>/<channel>.json`：Top 16 和 Additional Examples 的类别、真实样例标识、排名、分数、atlas 位置、热图 offset/shape/峰值。
+- `atlases/*.webp`：8 张图片横排的显示资产。
+- `heat/<layer>/<channel>.bin`：按 JSON offset 索引的 uint8 热图。
+- `manifest.json`：资产相对路径与 SHA-256。
+- `complete.json`：扫描数、neuron 数、样例数与 manifest 的精确字节摘要。
 
-Heatmap intensities are normalized per image. Negative heatmaps display `max(-pre,0)`. They represent layer activations.
+网页颜色深浅按每张图的响应范围归一化；负向显示 `max(-pre,0)`。不能把这些热图说成像素梯度归因。
 
-## Static export
+## 静态导出
 
-`data.json` provides the 5,804-channel catalog, result paths and example sources. `our-results.json` uses `layer:channel` keys. `ours[variant][step]` points to PNGs; `variantInfo` retains configuration, initial/final scores, seed and model provenance. The exporter imports completed batches and leaves missing targets without result records.
+`data.json` 提供完整 5,804-neuron 目录、结果路径和样例来源。`our-results.json` 以 `layer:channel` 为键，`ours[variant][step]` 指向 PNG，`variantInfo` 保留实际配置、初末分数、种子和模型来源。只导入完整 batch，没有结果的 neuron 不生成虚假记录。
 
-An optional `reference-catalog.json` has this form:
+可选 `reference-catalog.json`：
 
 ```json
 {
@@ -46,13 +44,13 @@ An optional `reference-catalog.json` has this form:
 }
 ```
 
-The five flags correspond to Positive, Path-guided +, Diversity, Negative and Path-guided −. `1` means verified available, `0` means unspecified, and `h` means confirmed unpublished on the reference site. Defaults are all `0`; mark availability only after verifying it. Reference URLs point to the official domain, and the exporter leaves those PNGs external.
+五个位置依次是 Positive、Path-guided +、Diversity、Negative、Path-guided −。`1` 表示已确认可用，`0` 表示未提供，`h` 表示已确认官网未公开。缺省所有标志为 `0`；不要将未经核验的可用性写为 `1`。参考图片 URL 指向官方域名，源码包和导出器均不自动复制图片。
 
-Each export writes a fresh directory and asset digests. Generated sites stay outside source control. `public_metadata` removes common absolute local paths; review custom records for sensitive content before publication.
+每次 export 生成新目录和资产摘要，保持旧导出可恢复。生成目录不纳入 Git；`public_metadata` 会清除常见机器绝对路径，但发布自定义运行记录前仍应检查敏感内容。
 
-## Receptive-field snapshots
+## 感受野快照
 
-`crop-examples` creates an independent snapshot:
+`crop-examples` 输出独立、不可变的快照：
 
 ```text
 rf_snapshot/
@@ -64,22 +62,10 @@ rf_snapshot/
   complete.json
 ```
 
-Each node records `cropPolicy`, the original `mapLocation`, `requestedRF`, actual `cropBounds`, and the `activationPosition` within the crop. `heatBase64` contains a 24 × 24 uint8 heatmap per example; `heatOffset` indexes its bytes. Negative heatmaps continue to use `max(-pre,0)`.
+节点保存 `cropPolicy`、原始 `mapLocation`、`requestedRF`、实际 `cropBounds`、裁剪坐标内的 `activationPosition`，以及 `heatBase64` 中每样例 24 × 24 的 uint8 热图。`heatOffset` 按字节索引。负向热图仍使用 `max(-pre,0)`。
 
-Shallow-layer crops use 8 × 6 atlases with 112 × 112 tiles. Deep full-image crops reuse 8 × 1 atlases. The viewer reads `atlasColumns` and `atlasRows` for placement. `atlasUrl` addresses an immutable image in cloud mode and becomes a relative local path in static exports.
+浅层裁剪图使用 8 × 6 atlas、每格 112 × 112；深层全图复用原有 8 × 1 atlas。前端读取 `atlasColumns`、`atlasRows`，而非假定只有一行。`atlasUrl` 在云端指向内容摘要，在静态导出时改写为本地相对路径。
 
-Compressed snapshots retain `encoding-audit.json`. WebP quality starts at 95, with whole-atlas PSNR of at least 36 dB and per-tile PSNR of at least 30 dB; lossless encoding is retained when these thresholds are missed. Scores, ranks, heatmaps and crop coordinates stay unchanged.
+压缩快照另外保留 `encoding-audit.json`：WebP quality 从 95 起，整张 atlas PSNR ≥36 dB、每格 ≥30 dB，否则保留无损图。压缩不会改变分数、排名、热图或裁剪坐标。
 
-`data.json.rfExamples` lists cropped nodes; other channels use the original scan assets. `publishedApi` defaults to false. When enabled, the viewer reads same-origin publication endpoints. Optimized images and natural examples use separate publication pointers.
-
-## Complete publication and seed-retry merges
-
-`prepare_completed_snapshot` combines the baseline campaign, an existing release and validated replacements in `accepted.json`. Each replacement keeps its own seed, configuration, source digests and initial/final scores. `--complete-neurons-only` updates neurons only when all five views are available.
-
-`--include-zero-activations` preserves original images with zero activation; `--include-zero-diversity` enables this for Diversity only. Non-finite scores, wrong-sign scores and incomplete images remain rejected. `qualityFlags` retains the original audit records.
-
-- `completeFiveModeNeurons`: neurons with all five views available for display.
-- `fullyValidFiveModeNeurons`: neurons whose five views meet the strict activation criteria.
-- `zeroActivationPolicy`: `reject`, `include_diversity` or `include_all`.
-
-The 2026-11-01 release displays all 5,804 neurons: 5,777 meet the strict activation criteria, and the other 27 retain their actual zero-activation images and scores. See the [publication record](hosting.md#current-published-gallery).
+静态导出的 `data.json.rfExamples` 记录已裁剪节点；其余节点继续使用原始扫描结果。`publishedApi` 默认为 false，开启后才读取同源云端发布 API。优化图与自然样例使用独立发布指针。
