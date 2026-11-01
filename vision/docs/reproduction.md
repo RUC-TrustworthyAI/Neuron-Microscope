@@ -57,7 +57,7 @@ vision-microscope campaign status --root vision-repro/outputs/all_neurons
 
 共 29,020 个 neuron-variant 请求，Diversity 每项含 4 张图。`--batch-images` 必须是正的 4 的倍数；Diversity 每批 neuron 数为它的四分之一。先以 1 个 worker 测量，再按实际剩余资源调高。独立 neuron 的损失求和，避免改变 batch 大小时缩放每个目标的梯度。
 
-监督进程记录 GPU 和系统内存、减少内存不足时的并发、只管理自己启动的子进程。资源估计是本项目经验值，不适用于承诺任意机器吞吐率。不要同时开启两个 supervisor；目录锁会拒绝第二个。不要在运行中修改被协议记录的代码文件。重启同一 campaign 可恢复未完成任务，缺少有效锚点的任务标为 unavailable。
+监督进程记录 GPU 和系统内存、减少内存不足时的并发、只管理自己启动的子进程。根据本机实测显存和吞吐量调整 worker 数量。不要同时开启两个 supervisor；目录锁会拒绝第二个。不要在运行中修改被协议记录的代码文件。重启同一 campaign 可恢复未完成任务，缺少有效锚点的任务标为 unavailable。
 
 ## 5. 感受野裁剪与网页导出
 

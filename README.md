@@ -35,9 +35,6 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 
 **Data:** The current 50 reports use **Reasoning Mix 100M**. The [data guide](language/docs/data.md) describes the corpus sources, saved activation format and readers. Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
-> [!IMPORTANT]
-> **This is an independent reproduction effort.** The LLM calls that propose, refine and evaluate explanations do not receive AlreadyClean's explanations. The reference report is added only when the final report is published for comparison.
-
 ## 📑 Contents <a id="contents"></a>
 
 - [💬 Language model neuron reports](#language-model-neuron-reports)
@@ -133,23 +130,21 @@ The model uses a pinned **Lucent Inception5h checkpoint**. The [method guide](vi
 
 ### 1. Native neurons often have recognizable semantics at strong activations
 
-We were encouraged to find clear concepts and patterns in many of the neurons we inspected, at large absolute activations on their positive and negative poles. Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars). Their legibility resembles what we look for in SAE latents. This has persuaded us to put more research effort back into native neurons themselves.
+We were encouraged to find clear concepts and patterns in many of the neurons we inspected, at large absolute activations on their positive and negative poles. Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars). Their legibility resembles what we look for in SAE latents. These findings encourage us to devote more research effort to native neurons.
 
 ### 2. We cannot yet claim to fully understand neurons
 
 [AlreadyClean](https://already-clean.goodfire.com/) estimates that roughly **90% of Qwen3-32B neuron poles have one main job**, with another approximately 7% having two related jobs. A footnote puts the share of non-arbitrary mixtures at about **97%** in some smaller, closely examined samples when judging strong activations. The essay also notes that these estimates depend on thresholds and on what counts as one job. Under our standard for explaining a neuron, this high estimate looks optimistic: **a good explanation should predict reasonably accurately where the neuron activates within a text.**
 
-The [Colorado report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars) illustrates the coverage gap. Strong positive responses often follow Colorado-related information, but high activation occurs at only some positions and is not confined to a small fixed set of tokens. We can often anticipate that a sentence will contain a strong response, while still struggling to predict exactly which token will carry it or why other positions remain quiet. Our current understanding is often useful at the coarse level of a whole text; predicting the neuron's response at individual positions remains substantially harder.
+The [Colorado report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars) illustrates the coverage gap. Strong positive responses often follow Colorado-related information, but high activation occurs at only some positions and is not confined to a small fixed set of tokens. We can often anticipate that a sentence will contain a strong response, while still struggling to predict exactly which token will carry it or why other positions remain quiet.
 
 ### 3. Superposition remains a plausible explanation
 
-Based on our observations so far, **superposition may still be present in native representations**. We cannot readily organize all the texts activating a given neuron under one broader semantic account. The strongest examples at either pole can have recognizable meaning while weaker responses occur in contexts whose connection to that meaning remains unclear.
+**[Superposition](https://transformer-circuits.pub/2022/toy_model/index.html) may still be present in native representations**. AlreadyClean's V-shaped-feature example links different images through a shared shape. For many of the neurons we inspected, we have not found a comparable semantic pattern linking strong and weak responses.
 
 For a concrete example, see [L55_N14892's Exemplars](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#exemplars): an Ada attribute description reaches **+57**, while OpenSSH documentation reaches **-72.5**. In the same report's [Activation spectrum](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#spectrum), a phosphatase glossary produces **+11.5625 on a space**, and a worked normal-distribution problem produces **+11 on `1`**. These weaker positives are about one fifth of the positive corpus maximum, yet their connection to the Ada/SQL-centered positive account remains unclear. In Spectrum, select **No visible cue** and the **8…16** activation bin to inspect these two examples.
 
-AlreadyClean's V-shaped-feature example shows how a shared pattern can unify apparently unrelated images. Across many of the neurons we inspected, however, we have not found an equally evident pattern connecting their strong and weak responses by visual inspection. A clear meaning at the extremes therefore leaves open what other information the same neuron carries.
-
-[Leo Gao's response](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean) also argues that activation magnitudes can carry important information and expresses the view that ablating small neuron activations can materially harm performance. This makes the weaker responses important to investigate alongside the strongest examples. Our interpretation remains a hypothesis based on these cases; testing whether [multiple features share representational dimensions](https://transformer-circuits.pub/2022/toy_model/index.html) will require feature decomposition and controlled interventions.
+[Leo Gao's response](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean) also argues that activation magnitudes can carry important information and expresses the view that ablating small neuron activations can materially harm performance. This makes the weaker responses important to investigate alongside the strongest examples. Testing this account requires feature decomposition and controlled interventions.
 
 ### 4. Neuron interpretations depend on the dataset
 
@@ -165,7 +160,7 @@ Separate scans of **L51_N20229**, each at approximately 100M tokens, also expose
   </a>
 </p>
 
-These observations make corpus coverage an important part of interpreting a neuron. Sampling, context handling and explanation methods also affect the result. With these factors still unresolved, and with our 50 neurons drawn from those with published reference reports, we cannot assign a precise interpretability rate to the model as a whole.
+These 50 neurons were selected from published reports, so this sample cannot establish the model-wide interpretability rate.
 
 ## 🧪 The LLM investigation pipeline <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a> <a id="workflow"></a> <a id="the-llm-investigation-pipeline"></a>
 
@@ -183,12 +178,12 @@ The walkthrough follows **L55_N11703 on Reasoning Mix 100M** from saved evidence
 
 ### Current runnable workflow
 
-The code in `language/` orchestrates direct LLM API calls and target-model measurements. The LLM returns explanations, predictions and experimental inputs in defined JSON formats; Python selects evidence, executes measurements and assembles HTML. The configuration generator supplies the settings below.
+The code in `language/` orchestrates direct LLM API calls and target-model measurements. The LLM returns explanations, predictions and experimental inputs in defined JSON formats; Python selects evidence, executes measurements and assembles HTML. The LLMs that propose, refine and evaluate explanations do not receive AlreadyClean's explanations. When supplied, reference reports are added at publication for comparison. The configuration generator supplies the settings below.
 
 1. **Sample evidence.** Allocate 500 positions equally across nonempty activation bins, selecting within each bin from the full saved corpus. Redistribute a bin's unused quota only when its corpus population is too small. The archive retains gate, up and product channels; the explanation model receives product values, contexts, extreme tokens and document exemplars, quantile cases, token selectivity, peak statistics and direct logit effects.
 2. **Explain, check and freeze.** Request at most five response rules per pole. The explanation and rule descriptions express the same account. A labeler predicts the sampled positions with their measurements hidden, in five concurrent batches of up to 100. Two revisions each read the preceding explanation, the 500 measured contexts and focused error feedback, followed by another blind labeling pass. Among the three versions, select the highest coverage with directional accuracy **>90%**; if none qualifies, select the highest accuracy. Freeze that explanation together with its own labels. An unsupported pole may remain unexplained.
 3. **Measure.** Run three feedback-guided Search rounds, requesting six regions with 16 texts each. Design four controlled tests with ten conditions each, measure them and improve the test design once. The head figure comes from these controlled tests. A separate Blind writer receives only the frozen explanation and rules, with six texts per supported pole. Search and Blind score full-input maxima or minima; controlled tests score a replacement span, a common suffix or a specified token. Batched GPU operations also compute attribution, measure responses of the target and attribution-linked neurons (Family), and perform interventions. With the shared worker enabled, one loaded model serves queued operations from multiple runs while their API calls overlap.
-4. **Analyze and publish.** The LLM analyzes support, counterexamples and unresolved patterns while preserving the frozen explanation and rules. An independent reader assesses the account. Fixed code renders the interactive report and, when a reference snapshot is supplied, adds the side-by-side comparison after research is complete.
+4. **Analyze and publish.** The LLM analyzes support, counterexamples and unresolved patterns while preserving the frozen explanation and rules. An independent reader assesses the account. Fixed code renders the interactive report.
 
 **Activation spectrum and Inside the neuron share one sample pool and the predictions from the refined, frozen explanation.** The labeler reads the full observed prefix and nearby continuation as linguistic context. It assigns No visible cue when the explanation does not clearly predict either direction. Because these samples inform refinement, their agreement scores provide development feedback. Independent written probes and controlled experiments supply further tests.
 

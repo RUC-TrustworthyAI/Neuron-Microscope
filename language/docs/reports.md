@@ -68,6 +68,6 @@ report/                             Final HTML and report data
 status.json                         Current phase and output path
 ```
 
-A report may have unavailable sections when the corresponding measurements have not been made or have failed; descriptive prose does not substitute for that evidence. Use the [run guide](running.md#records) to locate the records and the [method map](method.md) to trace their computation.
+If a section is unavailable, check its measurement records using the [run guide](running.md#records). The [method map](method.md) links each measurement to its implementation.
 
 Independent text predictions use `language/workflow/prompts.py`. Response rules come from the explanation refined before experiments. Both plots retain measured coordinates and those frozen predictions. Labeling uses five concurrent batches of at most 100. The supplied `llm.max_concurrent_requests: null` imposes no application-level API cap; a numeric limit is enforced through shared API slots on one host.

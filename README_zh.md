@@ -35,9 +35,6 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 **数据：** 当前 50 份报告均使用 **Reasoning Mix 100M**。[数据指南](language/docs/data.md)介绍了语料来源、激活格式和读取工具。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
-> [!IMPORTANT]
-> **本项目独立开展复现。** 负责提出、修订和评估解释的 LLM 不会收到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
-
 ## 📑 目录 <a id="contents"></a> <a id="目录"></a>
 
 - [💬 语言模型神经元报告](#language-model-neuron-reports)
@@ -133,23 +130,21 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 1. 原生神经元的强激活往往呈现清楚的语义
 
-我们欣喜地发现，在检查过的许多神经元中，正负两极的高绝对值激活呈现了清楚的概念或模式。例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，也在一定程度上说服了我们：值得重新把更多研究精力投入原生神经元本身。
+我们欣喜地发现，在检查过的许多神经元中，正负两极的高绝对值激活呈现了清楚的概念或模式。例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，鼓励我们把更多研究精力投入原生神经元。
 
 ### 2. 我们仍难以声称完全理解了神经元
 
 [AlreadyClean 原文](https://already-clean.goodfire.com/)估计，在 Qwen3-32B 神经元的正、负两极中，约 **90% 各有一个主要功能**，另有约 7% 具有两个相关功能；脚注还提到，在部分较小、检查较细的样本中，如果只考虑强激活，非任意混合的比例接近 **97%**。原文也说明，这些估计依赖激活阈值和对“一个功能”的定义。按我们对解释一个神经元的要求衡量，这一高比例仍显乐观：**一份好的解释，应当能够比较准确地预测神经元在文本的哪些具体位置激活。**
 
-[Colorado 报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)体现了这种覆盖度上的差距。强正激活的上文往往包含 Colorado 相关信息，但高激活只出现在其中一部分位置，响应也没有局限在几个固定 token 上。我们常能预判一句话可能包含强响应，却仍难以准确预测它出现在哪个 token，以及其他位置为什么没有激活。当前的理解往往能在整条文本的粗粒度上提供判断，精确到位置的响应预测仍困难得多。
+[Colorado 报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)体现了这种覆盖度上的差距。强正激活的上文往往包含 Colorado 相关信息，但高激活只出现在其中一部分位置，响应也没有局限在几个固定 token 上。我们常能预判一句话可能包含强响应，却仍难以准确预测它出现在哪个 token，以及其他位置为什么没有激活。
 
 ### 3. Superposition 可能仍然存在
 
-以我们目前的观察，**原生表示中可能仍然存在 superposition**。至少，我们无法轻易地将一个神经元激活的所有文本，都归入同一个更宽泛的语义解释。两极的强响应样例可以呈现清楚的含义，但较弱响应所处的文本，与这些含义之间的联系仍可能不明。
+**原生表示中可能仍然存在 [superposition](https://transformer-circuits.pub/2022/toy_model/index.html)**。原博客的 V-shaped feature 案例用共同形状解释了不同图像；在我们检查的许多神经元中，强弱响应之间的共同语义模式仍不清楚。
 
 一个具体例子是 [L55_N14892 的 Exemplars](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#exemplars)：Ada 属性说明达到 **+57**，OpenSSH 文档达到 **-72.5**，强响应的程序语境较清楚。但在同一报告的 [Activation spectrum](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#spectrum) 中，磷酸酶释义在空格处达到 **+11.5625**，正态分布解题在 `1` 处达到 **+11**。这两例约为正极语料最高值的五分之一，它们与当前以 Ada／SQL 为中心的正极解释有何联系，仍不清楚。在 Spectrum 中选择 **No visible cue** 与 **8…16** 激活区间，即可查看这两个样例。
 
-原博客的 V-shaped feature 案例说明，某种共同模式有时可以统一看起来互不相关的图像。然而，在我们检查的许多神经元中，尚难通过肉眼迅速找到同样清楚的模式，将强弱响应统一起来。即使两端的强激活具有清楚的语义，这个神经元在其他上下文中还承载了什么信息，仍是一个开放问题。
-
-[Leo Gao 的回应](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean)也指出，激活幅度可能承载重要信息，并认为消融较小的神经元激活可能明显损害模型表现。因此，弱响应也值得与强响应一起研究。我们目前的判断仍是基于案例的假设；要检验是否存在[多个特征共享表示维度](https://transformer-circuits.pub/2022/toy_model/index.html)的情况，还需要特征分解与受控干预。
+[Leo Gao 的回应](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean)也指出，激活幅度可能承载重要信息，并认为消融较小的神经元激活可能明显损害模型表现。因此，弱响应也值得与强响应一起研究。检验这一解释还需要特征分解与受控干预。
 
 ### 4. 神经元解释受数据集影响
 
@@ -165,7 +160,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
   </a>
 </p>
 
-这些观察说明，讨论神经元解释时，需要考虑语料覆盖。采样、上下文处理与解释方法也会影响结果。当前这些因素尚未分离，50 个神经元又均来自已有原报告的集合，因此我们还无法给出整个模型确切的可解释神经元比例。
+这 50 个神经元来自已有公开报告，尚不足以估计整个模型的可解释比例。
 
 ## 🧪 LLM 神经元研究流程 <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a><a id="workflow"></a> <a id="llm-神经元研究流程"></a>
 
@@ -183,12 +178,12 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 当前可运行流程
 
-`language/` 中的代码直接调用 LLM API，并组织目标模型测量。LLM 按约定的 JSON 格式返回解释、预测和实验输入；Python 负责选择证据、执行测量并生成 HTML。配置生成器提供下述设置。
+`language/` 中的代码直接调用 LLM API，并组织目标模型测量。LLM 按约定的 JSON 格式返回解释、预测和实验输入；Python 负责选择证据、执行测量并生成 HTML。提出、修订和评估解释的 LLM 不接收 AlreadyClean 的解释。提供原报告快照时，程序在发布阶段加入对比。配置生成器提供下述设置。
 
 1. **抽取证据。** 将 500 个位置均分到非空激活区间，并在各区间对应的完整语料中取样。只有某区间的全部位置仍不够配额时，才把余量分给其他区间。归档保留 gate、up 和 product 三个通道；解释模型只看 product 值，并结合上下文、极值 token、不同文档的代表样例、分位样本、token 选择性、峰值统计和直接 logit 效应。
 2. **解释、检验并冻结。** 正负极各最多提出五条规则，规则说明与正文共同表达同一份解释。盲标模型在隐藏实测值的情况下预测采样位置，每批最多 100 点，五路并行。模型修订两次，每次读取紧前一版解释、500 点实测上下文和重点错误反馈，再完成一轮盲标。三版中，优先从方向准确率 **>90%** 的版本里选择覆盖率最高的；均未达标时，选择准确率最高的。解释及其对应标签一起冻结。某一极证据不足时，可以保留为未解释。
 3. **执行测量。** Search 根据实测反馈进行三轮搜索，每轮请求六个区域，每区 16 条文本。模型设计四组受控测试，每组十个条件，测量后改进一次测试设计；头图来自这些受控测试。独立的 Blind 写作模型只看冻结解释与规则，为每个有解释支持的方向构造六条文本。Search 和 Blind 取全文最高或最低激活；受控测试测替换片段、共同后缀或指定 token。GPU 还批量计算归因，测量目标及相关神经元的响应（Family），并执行干预。启用共享 worker 后，同一份常驻模型按队列服务多个运行，期间各运行的 API 请求可以并行。
-4. **分析并发布。** LLM 在保留冻结解释与规则的前提下，分析支持证据、反例和尚未解释的现象，再由独立读者评估。固定代码生成交互式报告；提供参考快照时，在研究完成后加入双栏比较。
+4. **分析并发布。** LLM 在保留冻结解释与规则的前提下，分析支持证据、反例和尚未解释的现象，再由独立读者评估。固定代码生成交互式报告。
 
 **Activation spectrum 与 Inside the neuron 共用一组样本，以及修订后冻结解释所对应的预测。** 打标模型读取完整上文，并将紧邻后文作为语言背景；解释无法明确预测方向时，归入 No visible cue。由于这些样本参与解释修订，预测一致程度用于提供开发反馈。独立生成的盲测文本与受控实验提供进一步检验。
 
