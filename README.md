@@ -97,11 +97,13 @@ Each row links to a full interactive report with activation evidence, exemplars,
 
 The [vision module](vision/README.md) publishes all **12 layers and 5,804 InceptionV1 neurons** in five views: Positive, Path-guided +, Diversity, Negative and Path-guided − — **29,020 result groups and 46,432 optimized images**. Each neuron also has Top 16, Additional Examples and negative samples retrieved from 50,000 ImageNet training images, with receptive-field crops and activation heatmaps.
 
-[Open interactive viewer →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1) · [Five-view comparisons →](vision/README.md#reproduction-results) · [Install and run →](vision/README.md#quick-start)
+[Open interactive viewer →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1)
 
 <p align="center">
   <img src="vision/docs/assets/viewer-screenshot.png" alt="InceptionV1 Microscope: reference comparison, five visualization modes and top-activating images" width="92%">
 </p>
+
+[Five-view comparisons →](vision/README.md#reproduction-results)
 
 <table align="center">
   <tr><th>Positive</th><th>Path-guided +</th><th>Diversity</th><th>Negative</th><th>Path-guided −</th></tr>
@@ -116,7 +118,7 @@ The [vision module](vision/README.md) publishes all **12 layers and 5,804 Incept
 
 **mixed4c · 477**, configuration A, 224 × 224 inputs and 1,024 steps. Positive maximizes post-ReLU activation; Negative minimizes signed pre-ReLU activation. Diversity displays four images; here the lower-left member uses seed 1 and the other three use seed 0, with individual sources and scores recorded.
 
-The model uses a pinned **Lucent Inception5h checkpoint**. [Settings and measured scores](vision/docs/assets/provenance.json) and the [method guide](vision/docs/methodology.md) record the objectives, color priors and natural-example sampling.
+The model uses a pinned **Lucent Inception5h checkpoint**. [Settings and measured scores](vision/docs/assets/provenance.json) and the [method guide](vision/docs/methodology.md) record the objectives, color priors and natural-example sampling. [Install and run](vision/README.md#quick-start) the vision module to reproduce these results.
 
 ## Which AlreadyClean claims have we tested?
 

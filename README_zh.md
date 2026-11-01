@@ -97,11 +97,13 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 [Vision 模块](vision/README_zh.md)已发布 InceptionV1 全部 **12 层、5,804 个 neuron** 的五类可视化：Positive、Path-guided +、Diversity、Negative 和 Path-guided −，共 **29,020 组结果、46,432 张优化图**。每个 neuron 还提供从 50,000 张 ImageNet 训练图片中检索的 Top 16、Additional Examples 和负向样例，支持感受野裁剪与激活热图。
 
-[打开交互网页 →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1) · [五类结果对比 →](vision/README_zh.md#reproduction-results) · [安装与运行 →](vision/README_zh.md#quick-start)
+[打开交互网页 →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1)
 
 <p align="center">
   <img src="vision/docs/assets/viewer-screenshot.png" alt="InceptionV1 Microscope：原始结果对比、五类可视化与最高激活样例" width="92%">
 </p>
+
+[五类结果对比 →](vision/README_zh.md#reproduction-results)
 
 <table align="center">
   <tr><th>Positive</th><th>Path-guided +</th><th>Diversity</th><th>Negative</th><th>Path-guided −</th></tr>
@@ -116,7 +118,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 **mixed4c · 477**，A 配置，224 × 224 输入，1,024 步。Positive 最大化 post-ReLU 激活；Negative 最小化有符号 pre-ReLU 激活。Diversity 每组包含四张图片；此处左下图来自 seed 1，另外三张来自 seed 0，来源与激活分数均有记录。
 
-模型使用固定版本的 **Lucent Inception5h**。[参数与实测分数](vision/docs/assets/provenance.json)和[方法说明](vision/docs/methodology.md)记录了优化目标、颜色先验与自然样例的采样方式。
+模型使用固定版本的 **Lucent Inception5h**。[参数与实测分数](vision/docs/assets/provenance.json)和[方法说明](vision/docs/methodology.md)记录了优化目标、颜色先验与自然样例的采样方式。可按[安装与运行指南](vision/README_zh.md#quick-start)复现这些结果。
 
 ## 我们检验了哪些 AlreadyClean 主张 <a id="which-alreadyclean-claims-have-we-tested"></a>
 
