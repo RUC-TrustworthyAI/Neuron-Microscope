@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="README_zh.md">中文</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">Language model reports</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">Language model reports</a> ·
   <a href="vision/README.md">Vision model visualizations</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">Open the Colorado case</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=en">Watch the investigation</a> ·
@@ -35,7 +35,7 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 
 | Model | What you can inspect | Entry point |
 | --- | --- | --- |
-| **Qwen3-32B** | Activation evidence, explanations, controlled tests, interventions and unresolved cases. | [Interactive neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/) · [Investigation code](workflow/) |
+| **Qwen3-32B** | Activation evidence, explanations, controlled tests, interventions and unresolved cases. | [Interactive neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [Investigation code](workflow/) |
 | **InceptionV1 / Lucent Inception5h** | Five visualization objectives, natural-image examples, heatmaps and reference comparisons. | [Vision guide and examples](vision/README.md) · [Optimization code](vision/vision-repro/) |
 
 **Data:** [Sources, sampling procedures and readers for five LLM corpora](docs/data.md#corpora-used-in-the-comparisons) accompany the comparisons. LLM reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
@@ -81,10 +81,12 @@ In our SlimPajama 100M run, the template `Officials in {city} approved the annua
 
 ### Browse all current reports
 
-[Open the report directory →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)
+Explore **50 Qwen3-32B neurons on Reasoning Mix 100M**, with Head, Blind and Search scores alongside each report.
+
+[Open the report directory →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/)
 
 <p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">
     <img src="assets/report-directory.png" alt="Directory of Qwen3-32B neuron comparisons" width="92%">
   </a>
 </p>
@@ -138,7 +140,7 @@ The original essay contains claims at several levels. The table below tracks our
   </a>
 </p>
 
-Recorded on **29 October 2026**, the walkthrough follows a Colorado investigation using **Diverse 100M**, including revision of the interpretation after experiments. It preserves the prompts, measurements and intermediate reports from that run. The linked Qwen3 comparisons also document runs from 29 October, using SlimPajama 100M. The runnable workflow described below freezes the explanation before experiments and analyzes their results against that frozen explanation.
+Recorded on **29 October 2026**, the walkthrough follows a Colorado investigation using **Diverse 100M**, including revision of the interpretation after experiments. It preserves the prompts, measurements and intermediate reports from that run. The earlier SlimPajama 100M comparisons linked from the case studies document runs from 29 October. The runnable workflow described below freezes the explanation before experiments and analyzes their results against that frozen explanation.
 
 ### Current runnable workflow
 

@@ -14,7 +14,7 @@
 
 <p align="center">
   <a href="README.md">English</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">语言模型报告</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">语言模型报告</a> ·
   <a href="vision/README_zh.md">视觉模型可视化</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/L55_N11703/">查看 Colorado 案例</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/?lang=zh">跟随一次研究</a> ·
@@ -35,7 +35,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 | 模型 | 可以查看的内容 | 入口 |
 | --- | --- | --- |
-| **Qwen3-32B** | 激活证据、解释、受控测试、干预和尚未解决的案例。 | [交互式神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/) · [研究代码](workflow/) |
+| **Qwen3-32B** | 激活证据、解释、受控测试、干预和尚未解决的案例。 | [交互式神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [研究代码](workflow/) |
 | **InceptionV1／Lucent Inception5h** | 五种可视化目标、自然图像样例、热图和参考对比。 | [视觉模块指南与样例](vision/README_zh.md) · [优化代码](vision/vision-repro/) |
 
 **数据：** 对比案例附有[五套 LLM 语料的来源、采样流程和读取工具](docs/data.md#corpora-used-in-the-comparisons)。LLM 报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
@@ -81,10 +81,12 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 浏览当前全部报告
 
-[打开报告目录 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/)
+查看 **Reasoning Mix 100M 上的 50 个 Qwen3-32B 神经元报告**，导航页同时列出各报告的 Head、Blind 和 Search 分数。
+
+[打开报告目录 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/)
 
 <p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">
     <img src="assets/report-directory.png" alt="Qwen3-32B 神经元对比目录" width="92%">
   </a>
 </p>
@@ -138,7 +140,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
   </a>
 </p>
 
-这份记录来自 **2026 年 10 月 29 日**的 Colorado 研究，使用 **Diverse 100M**，包含实验后的解释修订。提示词、测量和中间报告保留了该次运行的内容。链接中的 Qwen3 对比报告同样记录了 10 月 29 日的运行，使用 SlimPajama 100M。下文介绍的可运行流程会在实验前冻结解释，再根据实验结果分析这份冻结解释。
+这份记录来自 **2026 年 10 月 29 日**的 Colorado 研究，使用 **Diverse 100M**，包含实验后的解释修订。提示词、测量和中间报告保留了该次运行的内容。案例链接中的早期 SlimPajama 100M 对比报告记录了 10 月 29 日的运行。下文介绍的可运行流程会在实验前冻结解释，再根据实验结果分析这份冻结解释。
 
 ### 当前可运行流程
 
