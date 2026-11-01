@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="README.md">English</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">语言模型分析</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">语言模型报告</a> ·
   <a href="vision/README_zh.md">视觉模型可视化</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">查看 Colorado 案例</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh">语言模型研究流程</a> ·
@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/"><img src="assets/badges/pipeline.svg" alt="语言侧：神经元分析"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/"><img src="assets/badges/pipeline.svg" alt="语言侧：神经元报告"></a>
   <a href="vision/README_zh.md"><img src="assets/badges/reports.svg" alt="视觉侧：神经元可视化"></a>
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh"><img src="assets/badges/live-demo.svg" alt="流程回放：语言侧"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="使用：安装与运行"></a>

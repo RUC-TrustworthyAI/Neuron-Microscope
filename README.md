@@ -10,7 +10,7 @@
 
 <p align="center">
   <a href="README_zh.md">中文</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">Language model analyses</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">Language model reports</a> ·
   <a href="vision/README.md">Vision model visualizations</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">Open the Colorado case</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en">Language walkthrough</a> ·
@@ -18,7 +18,7 @@
 </p>
 
 <p align="center">
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/"><img src="assets/badges/pipeline.svg" alt="Language: neuron analyses"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/"><img src="assets/badges/pipeline.svg" alt="Language: neuron reports"></a>
   <a href="vision/README.md"><img src="assets/badges/reports.svg" alt="Vision: neuron visualizations"></a>
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en"><img src="assets/badges/live-demo.svg" alt="Walkthrough: language"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="Usage: install and run"></a>
