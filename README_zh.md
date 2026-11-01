@@ -42,9 +42,9 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 - [💬 语言模型神经元报告](#language-model-neuron-reports)
 - [🖼️ 视觉模型神经元可视化](#vision-model-neuron-visualizations)
+- [💡 主要发现](#key-findings)
 - [🧪 LLM 神经元研究流程](#the-investigation-pipeline)
 - [🔬 视觉神经元研究流程](#the-vision-investigation-pipeline)
-- [💡 主要发现](#key-findings)
 - [⚖️ 如何评估报告中的证据](#evaluating-the-report-evidence)
 - [📦 安装与使用](#installation-and-usage)
 - [⏱️ 实测耗时与开销](#recorded-runtime-and-cost)
@@ -129,6 +129,42 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 模型使用固定版本的 **Lucent Inception5h**。[方法说明（英文）](vision/docs/methodology.md)介绍了优化目标、颜色先验与自然样例的采样方式。可按[安装与运行指南](vision/README_zh.md#quick-start)复现这些结果。
 
+## 💡 主要发现 <a id="key-findings"></a> <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="我们检验了哪些-alreadyclean-主张"></a> <a id="observations-from-the-current-comparisons"></a> <a id="what-we-have-found-so-far"></a> <a id="当前案例中的观察"></a>
+
+### 1. 原生神经元的强激活往往呈现清楚的语义
+
+我们欣喜地发现，在检查过的许多神经元中，正负两极的高绝对值激活呈现了清楚的概念或模式。例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=1)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=1)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，也在一定程度上说服了我们：值得重新把更多研究精力投入原生神经元本身。
+
+### 2. 如果要求预测具体激活位置，高可解释比例仍显乐观
+
+[AlreadyClean 原文](https://already-clean.goodfire.com/)估计，在 Qwen3-32B 神经元的正、负两极中，约 **90% 各有一个主要功能**，另有约 7% 具有两个相关功能；脚注还提到，在部分较小、检查较细的样本中，如果只考虑强激活，非任意混合的比例接近 **97%**。原文也说明，这些估计依赖激活阈值和对“一个功能”的定义。按我们对解释一个神经元的要求衡量，这一高比例仍显乐观：**一份好的解释，应当能够比较准确地预测神经元在文本的哪些具体位置激活。**
+
+[Colorado 报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)体现了这种覆盖度上的差距。强正激活的上文往往包含 Colorado 相关信息，但高激活只出现在其中一部分位置，响应也没有局限在几个固定 token 上。我们常能预判一句话可能包含强响应，却仍难以准确预测它出现在哪个 token，以及其他位置为什么没有激活。当前的理解往往能在整条文本的粗粒度上提供判断，精确到位置的响应预测仍困难得多。
+
+### 3. Superposition 可能仍然存在
+
+以我们目前的观察，**原生表示中可能仍然存在 superposition**。至少，我们无法轻易地将一个神经元激活的所有文本，都归入同一个更宽泛的语义解释。两极的强响应样例可以呈现清楚的含义，但较弱响应所处的文本，与这些含义之间的联系仍可能不明。
+
+原博客的 V-shaped feature 案例说明，某种共同模式有时可以统一看起来互不相关的图像。然而，在我们检查的许多神经元中，尚难通过肉眼迅速找到同样清楚的模式，将强弱响应统一起来。即使两端的强激活具有清楚的语义，这个神经元在其他上下文中还承载了什么信息，仍是一个开放问题。
+
+[Leo Gao 的回应](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean)也指出，激活幅度可能承载重要信息，并认为消融较小的神经元激活可能明显损害模型表现。因此，弱响应也值得与强响应一起研究。我们目前的判断仍是基于案例的假设；要检验是否存在[多个特征共享表示维度](https://transformer-circuits.pub/2022/toy_model/index.html)的情况，还需要特征分解与受控干预。
+
+### 4. 数据集会改变解释所依据的证据
+
+[L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=1)提供了一个直接的对照。在 Reasoning Mix 100M 中，书目条目在标题后的换行处反复出现强负响应，两篇样例分别达到 **-37 和 -36**；原报告的语料最低值为 **-11.8125**，其中最强负例主要呈现配置块和代码声明上下文。我们观察到的更强负极，让书目标题边界在解释中更加突出。
+
+相反的情况也会出现。[L26_N8504](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L26_N8504/?compare=1) 在我们的语料中范围为 **-4.15625 至 +11.8125**，原报告为 **-7.5 至 +21.25**，两端绝对值都只达到原报告的约 55%。我们的解释仍较零散，包括字母片段和空白；原报告则聚焦于具体的空白对齐模式。语料中的强响应样例不足，可能是这种差异的原因之一。
+
+对 **L51_N20229** 分别进行约 100M token 的扫描，也会观察到不同的激活范围：
+
+<p align="center">
+  <a href="assets/corpus-coverage.svg">
+    <img src="assets/corpus-coverage.svg" alt="四套约 100M token 语料中 L51_N20229 的负极最低值与正极最高值" width="90%">
+  </a>
+</p>
+
+这些观察说明，讨论神经元解释时，需要考虑语料覆盖。采样、上下文处理与解释方法也会影响结果。当前这些因素尚未分离，50 个神经元又均来自已有原报告的集合，因此我们还无法给出整个模型确切的可解释神经元比例。
+
 ## 🧪 LLM 神经元研究流程 <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a><a id="workflow"></a> <a id="llm-神经元研究流程"></a>
 
 ### 跟随一份完整研究记录
@@ -166,42 +202,6 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 4. **导出并比较。** 生成交互式 HTML，展示优化图像、优化过程中的检查点、自然样例、激活热图和 Nick / Goodfire 的参考结果。
 
 具体见[视觉研究流程](vision/README_zh.md#workflow)、[目标与测量细节](vision/docs/methodology.md)和[运行指南](vision/docs/reproduction.md)。
-
-## 💡 主要发现 <a id="key-findings"></a> <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="我们检验了哪些-alreadyclean-主张"></a> <a id="observations-from-the-current-comparisons"></a> <a id="what-we-have-found-so-far"></a> <a id="当前案例中的观察"></a>
-
-### 1. 原生神经元的强激活往往呈现清楚的语义
-
-我们欣喜地发现，在检查过的许多神经元中，正负两极的高绝对值激活呈现了清楚的概念或模式。例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=1)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=1)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，也在一定程度上说服了我们：值得重新把更多研究精力投入原生神经元本身。
-
-### 2. 如果要求预测具体激活位置，高可解释比例仍显乐观
-
-[AlreadyClean 原文](https://already-clean.goodfire.com/)估计，在 Qwen3-32B 神经元的正、负两极中，约 **90% 各有一个主要功能**，另有约 7% 具有两个相关功能；脚注还提到，在部分较小、检查较细的样本中，如果只考虑强激活，非任意混合的比例接近 **97%**。原文也说明，这些估计依赖激活阈值和对“一个功能”的定义。按我们对解释一个神经元的要求衡量，这一高比例仍显乐观：**一份好的解释，应当能够比较准确地预测神经元在文本的哪些具体位置激活。**
-
-[Colorado 报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)体现了这种覆盖度上的差距。强正激活的上文往往包含 Colorado 相关信息，但高激活只出现在其中一部分位置，响应也没有局限在几个固定 token 上。我们常能预判一句话可能包含强响应，却仍难以准确预测它出现在哪个 token，以及其他位置为什么没有激活。当前的理解往往能在整条文本的粗粒度上提供判断，精确到位置的响应预测仍困难得多。
-
-### 3. Superposition 可能仍然存在
-
-以我们目前的观察，**原生表示中可能仍然存在 superposition**。至少，我们无法轻易地将一个神经元激活的所有文本，都归入同一个更宽泛的语义解释。两极的强响应样例可以呈现清楚的含义，但较弱响应所处的文本，与这些含义之间的联系仍可能不明。
-
-原博客的 V-shaped feature 案例说明，某种共同模式有时可以统一看起来互不相关的图像。然而，在我们检查的许多神经元中，尚难通过肉眼迅速找到同样清楚的模式，将强弱响应统一起来。即使两端的强激活具有清楚的语义，这个神经元在其他上下文中还承载了什么信息，仍是一个开放问题。
-
-[Leo Gao 的回应](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean)也指出，激活幅度可能承载重要信息，并认为消融较小的神经元激活可能明显损害模型表现。因此，弱响应也值得与强响应一起研究。我们目前的判断仍是基于案例的假设；要检验是否存在[多个特征共享表示维度](https://transformer-circuits.pub/2022/toy_model/index.html)的情况，还需要特征分解与受控干预。
-
-### 4. 数据集会改变解释所依据的证据
-
-[L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=1)提供了一个直接的对照。在 Reasoning Mix 100M 中，书目条目在标题后的换行处反复出现强负响应，两篇样例分别达到 **-37 和 -36**；原报告的语料最低值为 **-11.8125**，其中最强负例主要呈现配置块和代码声明上下文。我们观察到的更强负极，让书目标题边界在解释中更加突出。
-
-相反的情况也会出现。[L26_N8504](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L26_N8504/?compare=1) 在我们的语料中范围为 **-4.15625 至 +11.8125**，原报告为 **-7.5 至 +21.25**，两端绝对值都只达到原报告的约 55%。我们的解释仍较零散，包括字母片段和空白；原报告则聚焦于具体的空白对齐模式。语料中的强响应样例不足，可能是这种差异的原因之一。
-
-对 **L51_N20229** 分别进行约 100M token 的扫描，也会观察到不同的激活范围：
-
-<p align="center">
-  <a href="assets/corpus-coverage.svg">
-    <img src="assets/corpus-coverage.svg" alt="四套约 100M token 语料中 L51_N20229 的负极最低值与正极最高值" width="90%">
-  </a>
-</p>
-
-这些观察说明，讨论神经元解释时，需要考虑语料覆盖。采样、上下文处理与解释方法也会影响结果。当前这些因素尚未分离，50 个神经元又均来自已有原报告的集合，因此我们还无法给出整个模型确切的可解释神经元比例。
 
 ## ⚖️ 如何评估报告中的证据 <a id="evaluating-the-report-evidence"></a> <a id="how-we-evaluate-an-explanation"></a> <a id="如何评估报告中的证据"></a>
 

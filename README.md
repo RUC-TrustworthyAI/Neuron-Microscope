@@ -42,9 +42,9 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 
 - [💬 Language model neuron reports](#language-model-neuron-reports)
 - [🖼️ Vision model neuron visualizations](#vision-model-neuron-visualizations)
+- [💡 Key findings](#key-findings)
 - [🧪 The LLM investigation pipeline](#the-investigation-pipeline)
 - [🔬 The vision investigation pipeline](#the-vision-investigation-pipeline)
-- [💡 Key findings](#key-findings)
 - [⚖️ Evaluating the report evidence](#evaluating-the-report-evidence)
 - [📦 Installation and usage](#installation-and-usage)
 - [⏱️ Recorded runtime and cost](#recorded-runtime-and-cost)
@@ -129,6 +129,42 @@ The [vision module](vision/README.md) publishes all **12 layers and 5,804 Incept
 
 The model uses a pinned **Lucent Inception5h checkpoint**. The [method guide](vision/docs/methodology.md) explains the objectives, color priors and natural-example sampling. [Install and run](vision/README.md#quick-start) the vision module to reproduce these results.
 
+## 💡 Key findings <a id="key-findings"></a> <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="what-we-have-found-so-far"></a> <a id="observations-from-the-current-comparisons"></a>
+
+### 1. Native neurons often have recognizable semantics at strong activations
+
+We were encouraged to find clear concepts and patterns in many of the neurons we inspected, at large absolute activations on their positive and negative poles. Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=1), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=1). Their legibility resembles what we look for in SAE latents. This has persuaded us to put more research effort back into native neurons themselves.
+
+### 2. The high interpretability estimate looks optimistic when token-level coverage is required
+
+[AlreadyClean](https://already-clean.goodfire.com/) estimates that roughly **90% of Qwen3-32B neuron poles have one main job**, with another approximately 7% having two related jobs. A footnote puts the share of non-arbitrary mixtures at about **97%** in some smaller, closely examined samples when judging strong activations. The essay also notes that these estimates depend on thresholds and on what counts as one job. Under our standard for explaining a neuron, this high estimate looks optimistic: **a good explanation should predict reasonably accurately where the neuron activates within a text.**
+
+The [Colorado report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1) illustrates the coverage gap. Strong positive responses often follow Colorado-related information, but high activation occurs at only some positions and is not confined to a small fixed set of tokens. We can often anticipate that a sentence will contain a strong response, while still struggling to predict exactly which token will carry it or why other positions remain quiet. Our current understanding is often useful at the coarse level of a whole text; predicting the neuron's response at individual positions remains substantially harder.
+
+### 3. Superposition remains a plausible explanation
+
+Based on our observations so far, **superposition may still be present in native representations**. We cannot readily organize all the texts activating a given neuron under one broader semantic account. The strongest examples at either pole can have recognizable meaning while weaker responses occur in contexts whose connection to that meaning remains unclear.
+
+AlreadyClean's V-shaped-feature example shows how a shared pattern can unify apparently unrelated images. Across many of the neurons we inspected, however, we have not found an equally evident pattern connecting their strong and weak responses by visual inspection. A clear meaning at the extremes therefore leaves open what other information the same neuron carries.
+
+[Leo Gao's response](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean) also argues that activation magnitudes can carry important information and expresses the view that ablating small neuron activations can materially harm performance. This makes the weaker responses important to investigate alongside the strongest examples. Our interpretation remains a hypothesis based on these cases; testing whether [multiple features share representational dimensions](https://transformer-circuits.pub/2022/toy_model/index.html) will require feature decomposition and controlled interventions.
+
+### 4. The corpus changes the evidence available for an explanation
+
+A useful contrast is [L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=1). In Reasoning Mix 100M, repeated book-catalog examples reach **-37 and -36** at newlines following their titles; the reference corpus minimum is **-11.8125**, with its strongest negative examples emphasizing configuration and code-declaration contexts. The larger negative tail brings catalog-title boundaries to the foreground of our account.
+
+The reverse also occurs. For [L26_N8504](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L26_N8504/?compare=1), our corpus spans **-4.15625 to +11.8125**, compared with **-7.5 to +21.25** in the reference. Both tails reach only about 55% of the reference magnitudes. Our account remains more fragmented, covering letter fragments and whitespace, while the reference centers on a specific alignment-whitespace pattern. Reduced exposure to strong examples may contribute to this difference.
+
+Separate scans of **L51_N20229**, each at approximately 100M tokens, also expose different activation ranges:
+
+<p align="center">
+  <a href="assets/corpus-coverage.svg">
+    <img src="assets/corpus-coverage.svg" alt="Observed negative and positive activation extrema for L51_N20229 across four approximately 100M-token corpora" width="90%">
+  </a>
+</p>
+
+These observations make corpus coverage an important part of interpreting a neuron. Sampling, context handling and explanation methods also affect the result. With these factors still unresolved, and with our 50 neurons drawn from those with published reference reports, we cannot assign a precise interpretability rate to the model as a whole.
+
 ## 🧪 The LLM investigation pipeline <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a> <a id="workflow"></a> <a id="the-llm-investigation-pipeline"></a>
 
 ### Follow a recorded investigation
@@ -166,42 +202,6 @@ The code in `vision/` combines natural-image retrieval and image optimization to
 4. **Export and compare.** Assemble an interactive HTML viewer with the optimized images, optimization checkpoints, natural examples, heatmaps and Nick / Goodfire references.
 
 See [the vision workflow](vision/README.md#workflow), [objectives and measurement details](vision/docs/methodology.md), and [the running guide](vision/docs/reproduction.md).
-
-## 💡 Key findings <a id="key-findings"></a> <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="what-we-have-found-so-far"></a> <a id="observations-from-the-current-comparisons"></a>
-
-### 1. Native neurons often have recognizable semantics at strong activations
-
-We were encouraged to find clear concepts and patterns in many of the neurons we inspected, at large absolute activations on their positive and negative poles. Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=1), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=1). Their legibility resembles what we look for in SAE latents. This has persuaded us to put more research effort back into native neurons themselves.
-
-### 2. The high interpretability estimate looks optimistic when token-level coverage is required
-
-[AlreadyClean](https://already-clean.goodfire.com/) estimates that roughly **90% of Qwen3-32B neuron poles have one main job**, with another approximately 7% having two related jobs. A footnote puts the share of non-arbitrary mixtures at about **97%** in some smaller, closely examined samples when judging strong activations. The essay also notes that these estimates depend on thresholds and on what counts as one job. Under our standard for explaining a neuron, this high estimate looks optimistic: **a good explanation should predict reasonably accurately where the neuron activates within a text.**
-
-The [Colorado report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1) illustrates the coverage gap. Strong positive responses often follow Colorado-related information, but high activation occurs at only some positions and is not confined to a small fixed set of tokens. We can often anticipate that a sentence will contain a strong response, while still struggling to predict exactly which token will carry it or why other positions remain quiet. Our current understanding is often useful at the coarse level of a whole text; predicting the neuron's response at individual positions remains substantially harder.
-
-### 3. Superposition remains a plausible explanation
-
-Based on our observations so far, **superposition may still be present in native representations**. We cannot readily organize all the texts activating a given neuron under one broader semantic account. The strongest examples at either pole can have recognizable meaning while weaker responses occur in contexts whose connection to that meaning remains unclear.
-
-AlreadyClean's V-shaped-feature example shows how a shared pattern can unify apparently unrelated images. Across many of the neurons we inspected, however, we have not found an equally evident pattern connecting their strong and weak responses by visual inspection. A clear meaning at the extremes therefore leaves open what other information the same neuron carries.
-
-[Leo Gao's response](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean) also argues that activation magnitudes can carry important information and expresses the view that ablating small neuron activations can materially harm performance. This makes the weaker responses important to investigate alongside the strongest examples. Our interpretation remains a hypothesis based on these cases; testing whether [multiple features share representational dimensions](https://transformer-circuits.pub/2022/toy_model/index.html) will require feature decomposition and controlled interventions.
-
-### 4. The corpus changes the evidence available for an explanation
-
-A useful contrast is [L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=1). In Reasoning Mix 100M, repeated book-catalog examples reach **-37 and -36** at newlines following their titles; the reference corpus minimum is **-11.8125**, with its strongest negative examples emphasizing configuration and code-declaration contexts. The larger negative tail brings catalog-title boundaries to the foreground of our account.
-
-The reverse also occurs. For [L26_N8504](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L26_N8504/?compare=1), our corpus spans **-4.15625 to +11.8125**, compared with **-7.5 to +21.25** in the reference. Both tails reach only about 55% of the reference magnitudes. Our account remains more fragmented, covering letter fragments and whitespace, while the reference centers on a specific alignment-whitespace pattern. Reduced exposure to strong examples may contribute to this difference.
-
-Separate scans of **L51_N20229**, each at approximately 100M tokens, also expose different activation ranges:
-
-<p align="center">
-  <a href="assets/corpus-coverage.svg">
-    <img src="assets/corpus-coverage.svg" alt="Observed negative and positive activation extrema for L51_N20229 across four approximately 100M-token corpora" width="90%">
-  </a>
-</p>
-
-These observations make corpus coverage an important part of interpreting a neuron. Sampling, context handling and explanation methods also affect the result. With these factors still unresolved, and with our 50 neurons drawn from those with published reference reports, we cannot assign a precise interpretability rate to the model as a whole.
 
 ## ⚖️ Evaluating the report evidence <a id="how-we-evaluate-an-explanation"></a> <a id="evaluating-the-report-evidence"></a>
 
