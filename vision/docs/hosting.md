@@ -35,6 +35,22 @@ The exporter checks recorded source hashes, completion markers, dimensions and a
 
 Use a unique output name containing letters, digits, `_` or `-`; it becomes the immutable release ID.
 
+To merge a continued campaign with the published snapshot and accepted seed retries:
+
+```bash
+python -m vision_repro.prepare_completed_snapshot \
+  vision-repro/outputs/continued_run vision-repro/outputs/latest_release \
+  --base-snapshot vision-repro/outputs/published_release \
+  --repair-root vision-repro/outputs/seed_retries \
+  --complete-neurons-only --threads 4
+```
+
+The exporter combines existing and newly generated modes, updates only complete five-mode neurons, and preserves other published nodes. Accepted repairs retain their actual seeds, scores and image hashes.
+
+Add `--include-zero-diversity` to display all four original Diversity images even when some members have zero activation. Successful repairs still take precedence. Scores and quality flags remain in the exported metadata. `completeFiveModeNeurons` counts display coverage; `fullyValidFiveModeNeurons` retains the stricter activation criterion. This option does not admit non-finite scores or change the Positive and Negative criteria.
+
+Use `--include-zero-activations` to retain zero-activation images in every mode for full display coverage. This changes publication eligibility only; optimization, original pixels, signed scores and experiment records are preserved. Non-finite scores, wrong-sign scores and incomplete files remain rejected.
+
 ## 3. Upload and activate
 
 Using the hosting provider's secret manager, configure a temporary random 64-character `IMPORT_TOKEN` and an ISO-8601 `IMPORT_EXPIRES_AT` timestamp. Deploy that environment, then run:
@@ -47,6 +63,8 @@ python -m vision_repro.publish_site_snapshot \
 The hidden prompt accepts a JSON object with `import` set to the temporary token. A deployment that requires a Sites service authorization header can also supply `service`. Credentials stay in process memory.
 
 Uploads are bounded, resumable and protected by an exclusive local lock. `upload-ack.jsonl` records verified object receipts for this origin. Every object is checked again before activating the release; the viewer changes only after the complete snapshot passes. `--available-only` can transfer a partial local copy without activating it.
+
+For incremental releases, add `--reuse-existing` to verify and skip identical cloud objects. Upload concurrency supports up to `--workers 32`; independent verification uses at most 16 workers.
 
 After publication, remove both import variables from the hosting environment and redeploy. Public reads continue to work. `publication.json` records the active release, verified counts and bytes.
 
@@ -64,3 +82,16 @@ After publication, remove both import variables from the hosting environment and
 Optimized images and natural examples use separate `active.json` and `examples-active.json` pointers. Publishing one leaves the other in place. The source repository contains implementation and demonstration figures; datasets and generated galleries live outside Git.
 
 Run API checks with `node hosting/test-media.mjs` and viewer checks with `node vision-repro/tests/test_viewer.mjs`.
+
+## Current published gallery
+
+[Open Vision Neuron Microscope](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1).
+
+Verified on 2026-11-01 against the public publication endpoints:
+
+| Content | Release | Coverage |
+| --- | --- | --- |
+| Optimized images | `site_all_results_20261101T0633` | 5,804 neurons, 29,020 channel–variant result groups, 46,432 images |
+| RF natural examples | `rf_examples_web_20261028T0932` | 5,804 neurons, 278,592 sample positions with heatmaps |
+
+The optimized release uses `include_all` for zero activations. Display coverage and strict activation validity are recorded separately in the [data format](data-format.md#complete-publication-and-seed-retry-merges). Full image collections remain in object storage; the repository contains code, configuration and selected gallery figures.

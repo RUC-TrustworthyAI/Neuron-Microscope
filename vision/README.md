@@ -7,6 +7,7 @@
 <p align="center">
   <a href="../README.md">Project home</a> ·
   <a href="README_zh.md">中文</a> ·
+  <a href="https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1">Interactive viewer</a> ·
   <a href="docs/gallery.md">Visual comparisons</a> ·
   <a href="#installation-and-usage">Install and run</a>
 </p>
@@ -15,7 +16,7 @@ This module implements feature visualization and natural-image retrieval for **I
 
 This module pins a Lucent Inception5h source revision and checkpoint digest. The [AlreadyClean reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights; exact weight identity has not been verified.
 
-The catalog covers **12 layers and 5,804 channels**. This is the target catalog; each exported viewer records which results are actually available. The [LLM investigation workflow](../docs/workflow.md) has a separate environment and entry point.
+The published viewer covers **12 layers and all 5,804 channels** in all five modes: **29,020 result groups and 46,432 images**, including four members per Diversity group. Each channel has 48 natural-example positions with receptive-field crops and heatmaps: **278,592 positions** in total. The [LLM investigation workflow](../docs/workflow.md) has a separate environment and entry point.
 
 ## Visual comparisons
 
@@ -24,22 +25,22 @@ The catalog covers **12 layers and 5,804 channels**. This is the target catalog;
 <table align="center">
   <tr><th>Positive</th><th>Diversity</th><th>Negative</th></tr>
   <tr>
-    <td><a href="docs/assets/mixed4c_260/positive.png"><img src="docs/assets/mixed4c_260/positive.png" width="220" alt="mixed4c:260 positive visualization"></a></td>
-    <td><a href="docs/assets/mixed4c_260/diversity.png"><img src="docs/assets/mixed4c_260/diversity.png" width="220" alt="mixed4c:260 four diversity members"></a></td>
-    <td><a href="docs/assets/mixed4c_260/negative.png"><img src="docs/assets/mixed4c_260/negative.png" width="220" alt="mixed4c:260 signed negative visualization"></a></td>
+    <td><a href="docs/assets/mixed4c_477/positive.png"><img src="docs/assets/mixed4c_477/positive.png" width="220" alt="mixed4c:477 positive visualization"></a></td>
+    <td><a href="docs/assets/mixed4c_477/diversity.png"><img src="docs/assets/mixed4c_477/diversity.png" width="220" alt="mixed4c:477 four diversity members"></a></td>
+    <td><a href="docs/assets/mixed4c_477/negative.png"><img src="docs/assets/mixed4c_477/negative.png" width="220" alt="mixed4c:477 signed negative visualization"></a></td>
   </tr>
 </table>
 
-**mixed4c:260 · configuration A · 224 × 224 · 1,024 steps · seed 0.** These are saved optimization outputs. The [gallery](docs/gallery.md) shows all five modes beside the reference images for four channels, with [settings and measured scores](docs/assets/provenance.json).
+**mixed4c:477 · configuration A · 224 × 224 · 1,024 steps · seed 0.** These are saved optimization outputs. The [gallery](docs/gallery.md) shows all five modes beside the reference images for four channels, with [settings and measured scores](docs/assets/provenance.json).
 
-The upstream project also links a [hosted interactive viewer](https://ziheng-inception-microscope-a.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=260&compare=1). The bundled comparisons above can be read directly in this repository.
+Open the [hosted interactive viewer](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1). The full gallery is stored online; selected comparisons and their scores are included in this repository.
 
 ## How the vision workflow works
 
 1. **Select the target.** Load the pinned Inception5h weights and choose a layer and channel. The target definition records its branch, spatial aggregation and pre/post-ReLU activation.
 2. **Retrieve natural examples.** Scan 50 images per ImageNet class, for 50,000 training images. Save response extrema, examples and activation heatmaps, then build anchors for the guided objectives.
 3. **Optimize images.** Optimize Fourier coefficients using the A configuration, fitted color statistics, frequency and blur schedules, and a Gaussian-weighted activation objective.
-4. **Inspect and export.** Export completed runs, optional natural examples, receptive-field crops and a verified reference catalog into an HTML viewer. Inspect configuration, scores and checkpoints alongside the images.
+4. **Inspect and export.** Export completed runs, optional natural examples, receptive-field crops and a verified reference catalog into an HTML viewer. Merge validated seed retries and previous releases, then inspect recorded scores and configuration alongside the images.
 
 | View | Activation objective | Additional constraint |
 | --- | --- | --- |
@@ -58,7 +59,7 @@ The path representation is a pooled activation-vector proxy. Its definition and 
 Use **Python 3.11+** and a separate environment. GPU runs and batch campaigns use Linux with a CUDA-compatible PyTorch and torchvision build. Install the package after those dependencies:
 
 ```bash
-git clone --branch hr-vision-integration https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone --branch ziheng-vision-merge https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope/vision
 python3 -m venv .venv
 source .venv/bin/activate
@@ -83,16 +84,16 @@ The manifest records the source revision, weight digest and `RGB * 255 - 117` pr
 From the `vision/` directory:
 
 ```bash
-vision-microscope optimize --layer mixed4c --neurons 260 \
+vision-microscope optimize --layer mixed4c --neurons 477 \
   --variant positive --steps 1024 \
-  --output vision-repro/outputs/mixed4c_260_positive
+  --output vision-repro/outputs/mixed4c_477_positive
 vision-microscope export \
-  --runs vision-repro/outputs/mixed4c_260_positive \
+  --runs vision-repro/outputs/mixed4c_477_positive \
   --output vision-repro/outputs/viewer
 python -m http.server 8766 --directory vision-repro/outputs/viewer
 ```
 
-Open <http://localhost:8766/?layer=mixed4c&neuron=260>. Use a fresh output directory for a changed configuration or viewer export. The [running guide](docs/reproduction.md) covers the ImageNet scan, anchors, all five modes, batch generation and resume.
+Open <http://localhost:8766/?layer=mixed4c&neuron=477>. Use a fresh output directory for a changed configuration or viewer export. The [running guide](docs/reproduction.md) covers the ImageNet scan, anchors, all five modes, batch generation and resume.
 
 To include verified reference images, pass `--reference-catalog` in the [documented format](docs/data-format.md#static-export). Natural samples use `--sample-run`; receptive-field crops additionally use `--rf-snapshot`. Export without these inputs contains the available optimization results and placeholders for missing material.
 

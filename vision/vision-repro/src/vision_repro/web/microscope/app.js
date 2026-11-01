@@ -21,7 +21,7 @@ async function unpack(response){
 async function json(path){const r=await fetch(path);if(!r.ok)throw Error(`${r.status} · ${path}`);return JSON.parse(new TextDecoder().decode(await unpack(r)));}
 function readURL(){
   const p=new URLSearchParams(location.search),l=data.layers.find(l=>l.name===p.get('layer'))||data.layers.find(l=>l.name==='mixed4c');
-  const raw=Number(p.get('neuron')??(l.name==='mixed4c'?447:0));
+  const raw=Number(p.get('neuron')??(l.name==='mixed4c'?477:0));
   state={layer:l.name,channel:Number.isInteger(raw)&&raw>=0&&raw<l.channels?raw:0,
     variant:variants.some(v=>v[0]===p.get('variant'))?p.get('variant'):'positive',
     compare:p.get('compare')!=='0',step:Number(p.get('step')||data.defaultSteps||1024)};

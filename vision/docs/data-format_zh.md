@@ -71,3 +71,15 @@ rf_snapshot/
 压缩快照另外保留 `encoding-audit.json`：WebP quality 从 95 起，整张 atlas PSNR ≥36 dB、每格 ≥30 dB，否则保留无损图。压缩不会改变分数、排名、热图或裁剪坐标。
 
 静态导出的 `data.json.rfExamples` 记录已裁剪节点；其余节点继续使用原始扫描结果。`publishedApi` 默认为 false，开启后才读取同源云端发布 API。优化图与自然样例使用独立发布指针。
+
+## 完整发布与补跑合并
+
+`prepare_completed_snapshot` 将原队列、已发布快照和 `accepted.json` 中的补跑结果合并。每个替代项保留自己的 seed、配置、源码摘要及初始／最终分数；`--complete-neurons-only` 仅更新五类结果齐全的 neuron。
+
+`--include-zero-activations` 保留激活为零的原始图片；`--include-zero-diversity` 仅对 Diversity 开启这一行为。非有限分数、错误符号或不完整图片仍会被拒绝。`qualityFlags` 保留原始审计记录。
+
+- `completeFiveModeNeurons`：五类图片均可显示的数量。
+- `fullyValidFiveModeNeurons`：五类结果均满足严格激活条件的数量。
+- `zeroActivationPolicy`：`reject`、`include_diversity` 或 `include_all`。
+
+2026-11-01 的全量发布覆盖 5,804 个 neuron，其中 5,777 个满足严格激活条件，另外 27 个保留实际零激活图片与分数。发布记录见[部署说明](hosting.md#current-published-gallery)。

@@ -7,6 +7,7 @@
 <p align="center">
   <a href="../README_zh.md">项目主页</a> ·
   <a href="README.md">English</a> ·
+  <a href="https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1">交互网页</a> ·
   <a href="docs/gallery.md">视觉对比</a> ·
   <a href="#installation-and-usage">安装与运行</a>
 </p>
@@ -15,7 +16,7 @@
 
 本模块固定了 Lucent Inception5h 的源码版本与权重摘要。[AlreadyClean 参考站元数据](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json)同样标注 Lucent 预训练权重；精确权重身份尚未核对。
 
-目录覆盖 **12 层、5,804 个通道**。这是可选目标的目录，每次网页导出会记录实际已有的结果。[LLM 研究流程](../docs/workflow.md)使用独立环境和入口。
+线上已覆盖 **12 层、全部 5,804 个通道**的五类结果，共 **29,020 组、46,432 张优化图**，其中 Diversity 每组四张。每个通道还包含 48 个带感受野裁剪和热图的自然样例位置，合计 **278,592 个**。[LLM 研究流程](../docs/workflow.md)使用独立环境和入口。
 
 ## 视觉对比 <a id="visual-comparisons"></a>
 
@@ -24,22 +25,22 @@
 <table align="center">
   <tr><th>正向优化</th><th>多样性优化</th><th>负向优化</th></tr>
   <tr>
-    <td><a href="docs/assets/mixed4c_260/positive.png"><img src="docs/assets/mixed4c_260/positive.png" width="220" alt="mixed4c:260 的正向优化结果"></a></td>
-    <td><a href="docs/assets/mixed4c_260/diversity.png"><img src="docs/assets/mixed4c_260/diversity.png" width="220" alt="mixed4c:260 的四个多样性成员"></a></td>
-    <td><a href="docs/assets/mixed4c_260/negative.png"><img src="docs/assets/mixed4c_260/negative.png" width="220" alt="mixed4c:260 的有符号负向优化结果"></a></td>
+    <td><a href="docs/assets/mixed4c_477/positive.png"><img src="docs/assets/mixed4c_477/positive.png" width="220" alt="mixed4c:477 的正向优化结果"></a></td>
+    <td><a href="docs/assets/mixed4c_477/diversity.png"><img src="docs/assets/mixed4c_477/diversity.png" width="220" alt="mixed4c:477 的四个多样性成员"></a></td>
+    <td><a href="docs/assets/mixed4c_477/negative.png"><img src="docs/assets/mixed4c_477/negative.png" width="220" alt="mixed4c:477 的有符号负向优化结果"></a></td>
   </tr>
 </table>
 
-**mixed4c:260 · A 配置 · 224 × 224 · 1,024 步 · seed 0。** 以上均为已保存的优化输出。[完整对比](docs/gallery.md)列出了四个通道的全部五种结果及原图，[参数和实测分数](docs/assets/provenance.json)可供核对。
+**mixed4c:477 · A 配置 · 224 × 224 · 1,024 步 · seed 0。** 以上均为已保存的优化输出。[完整对比](docs/gallery.md)列出了四个通道的全部五种结果及原图，[参数和实测分数](docs/assets/provenance.json)可供核对。
 
-上游还提供了[交互式展示站](https://ziheng-inception-microscope-a.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=260&compare=1)。上面的对比图片可以直接在仓库中查看。
+打开[交互式展示站](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1)浏览全部结果。仓库保留精选对比图片及对应分数。
 
 ## 视觉模块如何运行 <a id="how-the-vision-workflow-works"></a>
 
 1. **选择目标。** 加载固定版本的 Inception5h 权重，选定层和通道，记录其分支、空间聚合方式，以及 ReLU 前后的目标定义。
 2. **检索自然样例。** 从 ImageNet 每类扫描 50 张，共 50,000 张训练图像。保存激活极值、样例和热图，再为引导目标建立锚点。
 3. **优化图像。** 按 A 配置优化 Fourier 系数，使用拟合的颜色统计、频段与模糊调度，以及 Gaussian 加权的激活目标。
-4. **检查并导出。** 将已完成的优化结果、可选自然样例、感受野裁剪和已核验的参考索引导出为 HTML，结合图像检查配置、分数和中间检查点。
+4. **检查并导出。** 合并已验证的补跑结果与历史发布版本，将优化图、自然样例和感受野热图导出为 HTML，保留各自的真实 seed、分数与配置。
 
 | 视图 | 激活目标 | 附加约束 |
 | --- | --- | --- |
@@ -58,7 +59,7 @@
 使用 **Python 3.11+** 和独立环境。GPU 运行与批量生成使用 Linux，需要先安装与 CUDA 兼容的 PyTorch 和 torchvision，再安装本模块：
 
 ```bash
-git clone --branch hr-vision-integration https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
+git clone --branch ziheng-vision-merge https://github.com/RUC-TrustworthyAI/Neuron-Microscope.git
 cd Neuron-Microscope/vision
 python3 -m venv .venv
 source .venv/bin/activate
@@ -83,16 +84,16 @@ vision-microscope doctor
 以下命令从 `vision/` 目录执行：
 
 ```bash
-vision-microscope optimize --layer mixed4c --neurons 260 \
+vision-microscope optimize --layer mixed4c --neurons 477 \
   --variant positive --steps 1024 \
-  --output vision-repro/outputs/mixed4c_260_positive
+  --output vision-repro/outputs/mixed4c_477_positive
 vision-microscope export \
-  --runs vision-repro/outputs/mixed4c_260_positive \
+  --runs vision-repro/outputs/mixed4c_477_positive \
   --output vision-repro/outputs/viewer
 python -m http.server 8766 --directory vision-repro/outputs/viewer
 ```
 
-打开 <http://localhost:8766/?layer=mixed4c&neuron=260>。更改配置或重新导出网页时使用新目录。[运行指南](docs/reproduction_zh.md)还涵盖 ImageNet 扫描、锚点、五种目标、批量生成和续跑。
+打开 <http://localhost:8766/?layer=mixed4c&neuron=477>。更改配置或重新导出网页时使用新目录。[运行指南](docs/reproduction_zh.md)还涵盖 ImageNet 扫描、锚点、五种目标、批量生成和续跑。
 
 需要参考图时，按[数据格式](docs/data-format_zh.md#静态导出)提供 `--reference-catalog`。自然样例使用 `--sample-run`，感受野裁剪还需 `--rf-snapshot`。导出器仅显示已提供的结果，其余内容显示占位。
 

@@ -10,7 +10,7 @@ node hosting/test-media.mjs
 vision-microscope catalog
 ```
 
-The CPU suite covers signed targets, independent-channel batches, image parameterization, color statistics, queue coverage, resume, receptive-field geometry and static export. The Node checks cover the viewer and optional media API. Fixtures use synthetic data and do not need a model download, ImageNet archive, GPU or paid API.
+The CPU suite covers signed targets, independent-channel batches, image parameterization, color statistics, queue coverage, resume, receptive-field geometry, audited seed retries, complete-result merges and static export. Snapshot tests also cover zero-activation inclusion, original Diversity members, repair provenance and reuse of verified cloud objects. The Node checks cover the viewer and optional media API. Fixtures use synthetic data and do not need a model download, ImageNet archive, GPU or paid API.
 
 For numerical optimizer or model-loading changes, also run a short pretrained check on a designated CUDA host after provisioning the [model assets](../source/inceptionv1/README.md):
 

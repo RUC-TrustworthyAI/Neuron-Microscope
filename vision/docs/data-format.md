@@ -71,3 +71,15 @@ Shallow-layer crops use 8 × 6 atlases with 112 × 112 tiles. Deep full-image cr
 Compressed snapshots retain `encoding-audit.json`. WebP quality starts at 95, with whole-atlas PSNR of at least 36 dB and per-tile PSNR of at least 30 dB; lossless encoding is retained when these thresholds are missed. Scores, ranks, heatmaps and crop coordinates stay unchanged.
 
 `data.json.rfExamples` lists cropped nodes; other channels use the original scan assets. `publishedApi` defaults to false. When enabled, the viewer reads same-origin publication endpoints. Optimized images and natural examples use separate publication pointers.
+
+## Complete publication and seed-retry merges
+
+`prepare_completed_snapshot` combines the baseline campaign, an existing release and validated replacements in `accepted.json`. Each replacement keeps its own seed, configuration, source digests and initial/final scores. `--complete-neurons-only` updates neurons only when all five views are available.
+
+`--include-zero-activations` preserves original images with zero activation; `--include-zero-diversity` enables this for Diversity only. Non-finite scores, wrong-sign scores and incomplete images remain rejected. `qualityFlags` retains the original audit records.
+
+- `completeFiveModeNeurons`: neurons with all five views available for display.
+- `fullyValidFiveModeNeurons`: neurons whose five views meet the strict activation criteria.
+- `zeroActivationPolicy`: `reject`, `include_diversity` or `include_all`.
+
+The 2026-11-01 release displays all 5,804 neurons: 5,777 meet the strict activation criteria, and the other 27 retain their actual zero-activation images and scores. See the [publication record](hosting.md#current-published-gallery).

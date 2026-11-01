@@ -95,22 +95,24 @@ Each row links to a full interactive report with activation evidence, exemplars,
 
 ## Vision model neuron visualizations <a id="vision-neuron-visualizations"></a>
 
-The [vision module](vision/README.md) optimizes images for individual InceptionV1 channels and retrieves natural examples from an ImageNet scan. Its catalog contains **12 layers and 5,804 channels**. It implements Positive, Path-guided +, Diversity, Negative and Path-guided − views; the catalog size describes available targets, not the number of completed results.
+The [vision module](vision/README.md) publishes all **12 layers and 5,804 InceptionV1 neurons** in five views: Positive, Path-guided +, Diversity, Negative and Path-guided − — **29,020 result groups and 46,432 optimized images**. Each neuron also has Top 16, Additional Examples and negative samples retrieved from 50,000 ImageNet training images, with receptive-field crops and activation heatmaps.
 
-[Browse vision comparisons →](vision/docs/gallery.md) · [Install and run →](vision/README.md#installation-and-usage)
+[Open interactive viewer →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1) · [Five-view comparisons →](vision/docs/gallery.md) · [Install and run →](vision/README.md#installation-and-usage)
 
 <table align="center">
-  <tr><th>Positive</th><th>Diversity</th><th>Negative</th></tr>
+  <tr><th>Positive</th><th>Path-guided +</th><th>Diversity</th><th>Negative</th><th>Path-guided −</th></tr>
   <tr>
-    <td><a href="vision/docs/assets/mixed4c_260/positive.png"><img src="vision/docs/assets/mixed4c_260/positive.png" width="200" alt="InceptionV1 mixed4c:260, optimized positive response"></a></td>
-    <td><a href="vision/docs/assets/mixed4c_260/diversity.png"><img src="vision/docs/assets/mixed4c_260/diversity.png" width="200" alt="InceptionV1 mixed4c:260, four diversity members"></a></td>
-    <td><a href="vision/docs/assets/mixed4c_260/negative.png"><img src="vision/docs/assets/mixed4c_260/negative.png" width="200" alt="InceptionV1 mixed4c:260, optimized signed negative response"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/positive.png"><img src="vision/docs/assets/mixed4c_477/positive.png" width="150" alt="InceptionV1 mixed4c:477, Positive"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/path_positive.png"><img src="vision/docs/assets/mixed4c_477/path_positive.png" width="150" alt="InceptionV1 mixed4c:477, Path-guided +"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/diversity.png"><img src="vision/docs/assets/mixed4c_477/diversity.png" width="150" alt="InceptionV1 mixed4c:477, Diversity"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/negative.png"><img src="vision/docs/assets/mixed4c_477/negative.png" width="150" alt="InceptionV1 mixed4c:477, Negative"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/path_negative.png"><img src="vision/docs/assets/mixed4c_477/path_negative.png" width="150" alt="InceptionV1 mixed4c:477, Path-guided −"></a></td>
   </tr>
 </table>
 
-These are saved outputs for **mixed4c:260**, using configuration A, 224 × 224 inputs, 1,024 steps and seed 0. Positive maximizes post-ReLU activation; Negative minimizes signed pre-ReLU activation. [Recorded settings and scores](vision/docs/assets/provenance.json) accompany the images.
+**mixed4c · 477**, configuration A, 224 × 224 inputs and 1,024 steps. Positive maximizes post-ReLU activation; Negative minimizes signed pre-ReLU activation. Diversity contains four images per group.
 
-The implementation pins a **Lucent Inception5h checkpoint**. The [reference metadata](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json) also identifies Lucent pretrained weights; exact weight identity has not been verified. The [vision method guide](vision/docs/methodology.md) explains the objectives and sampling differences. The LLM workflow below applies to Qwen3.
+The model uses a pinned **Lucent Inception5h checkpoint**. [Settings and measured scores](vision/docs/assets/provenance.json) and the [method guide](vision/docs/methodology.md) record the objectives, color priors and natural-example sampling.
 
 ## Which AlreadyClean claims have we tested?
 

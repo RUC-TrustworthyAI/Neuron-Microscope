@@ -95,22 +95,24 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ## 视觉模型神经元可视化 <a id="vision-model-neuron-visualizations"></a> <a id="vision-neuron-visualizations"></a>
 
-[视觉模块](vision/README_zh.md)针对 InceptionV1 的单个通道优化图像，并从 ImageNet 扫描中检索自然样例。目录包含 **12 层、5,804 个通道**，实现了 Positive、Path-guided +、Diversity、Negative 和 Path-guided − 五种视图。目录规模表示可选目标数量，完成情况需查看具体结果。
+[Vision 模块](vision/README_zh.md)已发布 InceptionV1 全部 **12 层、5,804 个 neuron** 的五类可视化：Positive、Path-guided +、Diversity、Negative 和 Path-guided −，共 **29,020 组结果、46,432 张优化图**。每个 neuron 还提供从 50,000 张 ImageNet 训练图片中检索的 Top 16、Additional Examples 和负向样例，支持感受野裁剪与激活热图。
 
-[浏览视觉对比 →](vision/docs/gallery.md) · [安装与运行 →](vision/README_zh.md#installation-and-usage)
+[打开交互网页 →](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1) · [五类结果对比 →](vision/docs/gallery.md) · [安装与运行 →](vision/README_zh.md#installation-and-usage)
 
 <table align="center">
-  <tr><th>正向优化</th><th>多样性优化</th><th>负向优化</th></tr>
+  <tr><th>Positive</th><th>Path-guided +</th><th>Diversity</th><th>Negative</th><th>Path-guided −</th></tr>
   <tr>
-    <td><a href="vision/docs/assets/mixed4c_260/positive.png"><img src="vision/docs/assets/mixed4c_260/positive.png" width="200" alt="InceptionV1 mixed4c:260 的正向优化结果"></a></td>
-    <td><a href="vision/docs/assets/mixed4c_260/diversity.png"><img src="vision/docs/assets/mixed4c_260/diversity.png" width="200" alt="InceptionV1 mixed4c:260 的四个多样性成员"></a></td>
-    <td><a href="vision/docs/assets/mixed4c_260/negative.png"><img src="vision/docs/assets/mixed4c_260/negative.png" width="200" alt="InceptionV1 mixed4c:260 的有符号负向优化结果"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/positive.png"><img src="vision/docs/assets/mixed4c_477/positive.png" width="150" alt="InceptionV1 mixed4c:477, Positive"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/path_positive.png"><img src="vision/docs/assets/mixed4c_477/path_positive.png" width="150" alt="InceptionV1 mixed4c:477, Path-guided +"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/diversity.png"><img src="vision/docs/assets/mixed4c_477/diversity.png" width="150" alt="InceptionV1 mixed4c:477, Diversity"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/negative.png"><img src="vision/docs/assets/mixed4c_477/negative.png" width="150" alt="InceptionV1 mixed4c:477, Negative"></a></td>
+    <td><a href="vision/docs/assets/mixed4c_477/path_negative.png"><img src="vision/docs/assets/mixed4c_477/path_negative.png" width="150" alt="InceptionV1 mixed4c:477, Path-guided −"></a></td>
   </tr>
 </table>
 
-以上是 **mixed4c:260** 的已有输出，使用 A 配置、224 × 224 输入、1,024 步和 seed 0。Positive 最大化 ReLU 后的激活；Negative 最小化 ReLU 前的有符号激活。[参数与分数记录](vision/docs/assets/provenance.json)可用于核对这些图片。
+**mixed4c · 477**，A 配置，224 × 224 输入，1,024 步。Positive 最大化 post-ReLU 激活；Negative 最小化有符号 pre-ReLU 激活。Diversity 每组包含四张图片。
 
-实现使用固定版本的 **Lucent Inception5h 权重**。[参考站元数据](https://already-clean.goodfire.com/microscope/inceptionv1/meta.json)同样标注 Lucent 预训练权重；精确权重身份尚未核对。[视觉方法说明](vision/docs/methodology_zh.md)列出了目标定义与采样差异。下文的 LLM 研究流程适用于 Qwen3。
+模型使用固定版本的 **Lucent Inception5h**。[参数与实测分数](vision/docs/assets/provenance.json)和[方法说明](vision/docs/methodology_zh.md)记录了优化目标、颜色先验与自然样例的采样方式。
 
 ## 我们检验了哪些 AlreadyClean 主张 <a id="which-alreadyclean-claims-have-we-tested"></a>
 

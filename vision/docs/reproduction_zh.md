@@ -57,6 +57,20 @@ vision-microscope campaign status --root vision-repro/outputs/all_neurons
 
 监督进程记录 GPU 和系统内存、减少内存不足时的并发、只管理自己启动的子进程。资源估计是本项目经验值，不适用于承诺任意机器吞吐率。不要同时开启两个 supervisor；目录锁会拒绝第二个。不要在运行中修改被协议记录的代码文件。重启同一 campaign 可恢复未完成任务，缺少有效锚点的任务标为 unavailable。
 
+### 零激活结果补跑
+
+对审计名单中的 Positive 或 Diversity 更换 seed 补跑，保留 A 配置和 1,024 步；Diversity 按四张一组重做：
+
+```bash
+python -m vision_repro.repair_feature_campaign \
+  --base vision-repro/outputs/all_neurons \
+  --audit vision-repro/outputs/generation-audit.json \
+  --output vision-repro/outputs/quality_repair \
+  --workers 1 --batch-images 8 --seeds 1 2 3 4 5 6
+```
+
+审计 JSON 的 `flagged_variants` 列表包含 `layer`、`neuron`、`slot` 和 `scores`，分数须与原队列一致。每个 seed 使用可续跑队列；`accepted.json` 保存通过校验的替代结果及其真实 seed、分数和图片摘要，`repair_finished.json` 记录剩余项。原结果和所有尝试均保留。发布时使用 `prepare_completed_snapshot` 合并，见[部署说明](hosting.md)。
+
 ## 5. 感受野裁剪与网页导出
 
 使用已有扫描生成裁剪图和对齐热图；此步骤只使用 CPU：

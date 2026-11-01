@@ -57,6 +57,20 @@ The catalog requests 29,020 channel–variant pairs. Each Diversity pair produce
 
 A directory lock permits one supervisor per campaign. It records GPU and host-memory telemetry, reduces concurrency under memory pressure, and manages its own children. Keep protocol-tracked source files fixed during a campaign. Restart the same campaign to continue pending work. Targets without usable anchors are marked `unavailable`.
 
+### Retry zero-activation results
+
+Retry audited Positive or Diversity results with new seeds while retaining the A configuration and 1,024 steps. Diversity is rerun as a complete four-image group:
+
+```bash
+python -m vision_repro.repair_feature_campaign \
+  --base vision-repro/outputs/all_neurons \
+  --audit vision-repro/outputs/generation-audit.json \
+  --output vision-repro/outputs/quality_repair \
+  --workers 1 --batch-images 8 --seeds 1 2 3 4 5 6
+```
+
+The audit's `flagged_variants` list contains `layer`, `neuron`, `slot` and `scores`, matching the completed baseline. Each seed has a resumable queue. `accepted.json` records validated replacements and their real seeds, scores and image hashes; `repair_finished.json` records remaining targets. Original results and all attempts are retained. Merge these replacements using `prepare_completed_snapshot`, as shown in [Hosting](hosting.md).
+
 ## 5. Crop examples and export the viewer
 
 Receptive-field crops and aligned heatmaps are prepared on CPU from an existing scan:
