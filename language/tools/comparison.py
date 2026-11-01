@@ -29,10 +29,23 @@ def _replace_file(source, target):
 
 def blind_score(reproduced, reference):
     """Compare achieved blind-test extrema in two completed reports."""
+    def extrema(bundle):
+        tests = bundle.get('tests') or {}
+        return tuple((tests.get(field) or {}).get('achieved') for field in ('blind_max', 'blind_min'))
+    return _extrema_score(extrema(reproduced), extrema(reference))
+
+
+def search_score(reproduced, reference):
+    """Compare measured activation-search extrema in two completed reports."""
+    def extrema(bundle):
+        search = bundle.get('search') or {}
+        return search.get('best_positive'), search.get('best_negative')
+    return _extrema_score(extrema(reproduced), extrema(reference))
+
+
+def _extrema_score(reproduced, reference):
     values, ratios = {}, {}
-    for pole, field in [('positive', 'blind_max'), ('negative', 'blind_min')]:
-        ours = ((reproduced.get('tests') or {}).get(field) or {}).get('achieved')
-        theirs = ((reference.get('tests') or {}).get(field) or {}).get('achieved')
+    for pole, ours, theirs in zip(('positive', 'negative'), reproduced, reference):
         values[pole] = (ours, theirs)
         if ours is None or theirs is None:
             continue

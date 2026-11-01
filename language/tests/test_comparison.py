@@ -4,7 +4,8 @@ import json
 import re
 import tempfile
 import unittest
-from comparison import publish, blind_score
+from comparison import publish, blind_score, search_score
+from report_directory import comparison_rows, render
 
 
 def report_html(bundle):
@@ -67,9 +68,72 @@ class ComparisonTests(unittest.TestCase):
             (refs / 'L24_N17907.html').write_text(report_html(reference))
             publish(source, root / 'export', 'L24_N17907', refs)
             self.assertIn('data-blind-score-basis="positive"', (root / 'export/index.html').read_text())
-        from report_directory import render
         page = render([{'neuron': 'L24_N17907', 'blind_score': result}])
         self.assertIn('>0.991</span>', page)
+
+    def test_search_score_uses_search_extrema(self):
+        ours = {'search': {'best_positive': 30, 'best_negative': -20},
+                'tests': {'blind_max': {'achieved': 999}}}
+        reference = {'search': {'best_positive': 10, 'best_negative': -10}}
+        result = search_score(ours, reference)
+        self.assertEqual(result['score'], 2.5)
+        self.assertEqual(result['positive_ratio'], 3)
+        self.assertEqual(result['negative_ratio'], 2)
+        self.assertIsNone(search_score({}, reference))
+        ours['search']['best_positive'] = None
+        self.assertEqual(search_score(ours, reference)['score'], 2)
+        reference['search']['best_negative'] = 0
+        self.assertIsNone(search_score(ours, reference))
+
+    def test_directory_statistics_use_unrounded_available_scores(self):
+        rows = [{'neuron': f'L1_N{i}', 'model': 'Qwen3-32B',
+                 'blind_score': {'score': value}, 'search_score': {'score': search}}
+                for i, (value, search) in enumerate(zip([0.00049, 0.00049, 0.00149], [1, 3, 9]))]
+        rows.append({'neuron': 'L1_N3', 'ready': False})
+        page = render(rows, corpus='Reasoning Mix 100M')
+        headers = re.search(r'<thead>(.*?)</thead>', page, re.S)[1]
+        self.assertIn('Mean 0.001</span>', headers)
+        self.assertIn('Median 0.000</span>', headers)
+        self.assertIn('Mean 4.333</span>', headers)
+        self.assertIn('Median 3.000</span>', headers)
+        self.assertEqual(headers.count('of 3 available scores'), 4)
+        self.assertEqual(headers.count('<th>'), 5)
+        self.assertIn('4 interactive neuron reports · Qwen3-32B · Reasoning Mix 100M', page)
+        self.assertIn('L1_N0/?compare=1', page)
+        self.assertNotIn('href="L1_N3/', page)
+        self.assertNotIn('{{', page)
+        self.assertNotIn('Similarity', page)
+        self.assertNotIn('Head score', page)
+        empty = render([])
+        self.assertEqual(empty.count('Mean —</span>'), 2)
+        self.assertEqual(empty.count('Median —</span>'), 2)
+
+    def test_directory_reads_both_scores_from_completed_reports(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            folder = root / 'L1_N2'
+            (folder / 'comparison').mkdir(parents=True)
+            ours = {'claim': {'title': 'A <pattern>'}, 'neuron': {'model': 'Qwen3-32B'},
+                    'tests': {'blind_max': {'achieved': 20}, 'blind_min': {'achieved': -5}},
+                    'search': {'best_positive': 30, 'best_negative': -10}}
+            reference = {'claim': {'title': 'Reference & pattern'},
+                         'tests': {'blind_max': {'achieved': 10}, 'blind_min': {'achieved': -10}},
+                         'search': {'best_positive': 10, 'best_negative': -10}}
+            (folder / 'index.html').write_text(report_html(ours))
+            (folder / 'comparison/original.html').write_text(report_html(reference))
+            rows = comparison_rows(root, ['L1_N2', 'L1_N3'])
+            self.assertEqual(rows[0]['blind_score']['score'], 1.25)
+            self.assertEqual(rows[0]['search_score']['score'], 2)
+            self.assertIsNone(rows[1]['blind_score'])
+            self.assertIsNone(rows[1]['search_score'])
+            page = render(rows)
+            self.assertIn('A &lt;pattern&gt;', page)
+            self.assertIn('Reference &amp; pattern', page)
+            self.assertIn('Blind min: |-5 / -10|', page)
+            self.assertIn('Search max: 30 / 10', page)
+            from language.workflow.render import directory
+            directory(root, ['L1_N2', 'L1_N3'], None)
+            self.assertEqual((root / 'index.html').read_text(), page)
 
 
 if __name__=='__main__':unittest.main()
