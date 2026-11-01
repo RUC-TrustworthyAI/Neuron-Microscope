@@ -66,6 +66,12 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 [打开交互式对比 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)
 
+<p align="center">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">
+    <img src="assets/colorado-comparison.jpg" alt="Colorado 原报告与 Reasoning Mix 100M 复现报告的双栏截图" width="92%">
+  </a>
+</p>
+
 两份报告都发现了较强的 Colorado 正向响应，但对神经元具体计算什么提出了不同解释：
 
 - **原报告：** gate 会在即将填入地区相关信息的位置打开，up 投影承载带符号的地区身份。
@@ -127,6 +133,12 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 ### 跟随一份完整研究记录
 
 [打开语言模型研究过程记录 →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh)
+
+<p align="center">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh#loops">
+    <img src="assets/pipeline-walkthrough-zh.jpg" alt="语言模型 walkthrough 中三轮解释与盲标结果的截图" width="92%">
+  </a>
+</p>
 
 这份记录展示了 **Reasoning Mix 100M 上的 L55_N11703** 从已有证据到最终报告的过程，包括各步提示词、输入节选、结构化输出、三版解释与盲标结果、实测实验和开销。选中的解释在构造文本和 GPU 实验前冻结。
 

@@ -66,6 +66,12 @@ Each neuron link opens the original report on the left and our reproduction on t
 
 [Open the interactive comparison →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1)
 
+<p align="center">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">
+    <img src="assets/colorado-comparison.jpg" alt="Colorado reference and Reasoning Mix 100M reproduction shown side by side" width="92%">
+  </a>
+</p>
+
 Both reports identify a strong Colorado-related positive response, but they make different claims about what the neuron computes:
 
 - **Published report:** the gate opens before a place-specific fill-in value, while the up projection carries signed place identity.
@@ -127,6 +133,12 @@ The original essay contains claims at several levels. The table below tracks our
 ### Follow a recorded investigation
 
 [Open the recorded language model walkthrough →](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en)
+
+<p align="center">
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en#loops">
+    <img src="assets/pipeline-walkthrough-en.jpg" alt="Language model walkthrough showing three explanation and blind-labeling rounds" width="92%">
+  </a>
+</p>
 
 The walkthrough follows **L55_N11703 on Reasoning Mix 100M** from saved evidence to the final report. It presents the task prompts, excerpts of their inputs, structured responses, all three explanation-and-labeling versions, measured experiments and costs. The selected explanation is frozen before text construction and GPU experiments.
 
