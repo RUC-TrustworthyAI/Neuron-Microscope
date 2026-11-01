@@ -9,23 +9,18 @@
 </p>
 
 <p align="center">
-  An evidence-first framework for reproducing and stress-testing neuron explanations.
-</p>
-
-<p align="center">
   <a href="README_zh.md">中文</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">Language model reports</a> ·
   <a href="vision/README.md">Vision model visualizations</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">Open the Colorado case</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en">Watch the investigation</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en">Language walkthrough</a> ·
   <a href="#use-neuron-microscope">Run the project</a>
 </p>
 
 <p align="center">
-  <a href="docs/method.md"><img src="assets/badges/model.svg" alt="Model: dense Qwen3"></a>
-  <a href="docs/workflow.md"><img src="assets/badges/pipeline.svg" alt="Pipeline: structured"></a>
-  <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="Reports: interactive HTML"></a>
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en"><img src="assets/badges/live-demo.svg" alt="Showcase: online"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/"><img src="assets/badges/pipeline.svg" alt="Language: neuron reports"></a>
+  <a href="vision/README.md"><img src="assets/badges/reports.svg" alt="Vision: neuron visualizations"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=en"><img src="assets/badges/live-demo.svg" alt="Walkthrough: language"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="Usage: install and run"></a>
 </p>
 

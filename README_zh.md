@@ -9,23 +9,18 @@
 </p>
 
 <p align="center">
-  一个以证据为基础的框架，用于复现和检验神经元解释。
-</p>
-
-<p align="center">
   <a href="README.md">English</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/">语言模型报告</a> ·
   <a href="vision/README_zh.md">视觉模型可视化</a> ·
   <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=1">查看 Colorado 案例</a> ·
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh">跟随一次研究</a> ·
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh">语言模型研究流程</a> ·
   <a href="#use-neuron-microscope">运行项目</a>
 </p>
 
 <p align="center">
-  <a href="docs/method.md"><img src="assets/badges/model.svg" alt="模型：dense Qwen3"></a>
-  <a href="docs/workflow.md"><img src="assets/badges/pipeline.svg" alt="Pipeline：固定编排"></a>
-  <a href="docs/reports.md"><img src="assets/badges/reports.svg" alt="报告：交互式 HTML"></a>
-  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh"><img src="assets/badges/live-demo.svg" alt="展示：在线"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/"><img src="assets/badges/pipeline.svg" alt="语言侧：神经元报告"></a>
+  <a href="vision/README_zh.md"><img src="assets/badges/reports.svg" alt="视觉侧：神经元可视化"></a>
+  <a href="https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh"><img src="assets/badges/live-demo.svg" alt="流程回放：语言侧"></a>
   <a href="#use-neuron-microscope"><img src="assets/badges/quickstart.svg" alt="使用：安装与运行"></a>
 </p>
 

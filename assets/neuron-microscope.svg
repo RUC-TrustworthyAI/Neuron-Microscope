@@ -57,7 +57,7 @@
 
   <g font-family="Arial, Helvetica, sans-serif">
     <text x="526" y="246" font-size="82" font-weight="800" letter-spacing="-2.5" fill="#172844">Neuron Microscope</text>
-    <text x="530" y="303" font-size="29" fill="#6a7890">Reproducing AlreadyClean with agents.</text>
+    <text x="530" y="303" font-size="29" fill="#6a7890">Reproducing AlreadyClean across language and vision.</text>
     <path d="M532 342H582" stroke="#e66f3d" stroke-width="5" stroke-linecap="round"/>
     <path d="M594 342H644" stroke="#4b86d4" stroke-width="5" stroke-linecap="round"/>
   </g>
