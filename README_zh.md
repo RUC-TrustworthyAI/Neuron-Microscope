@@ -136,9 +136,21 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 2. 我们仍难以声称完全理解了神经元
 
-[AlreadyClean 原文](https://already-clean.goodfire.com/)估计，在 Qwen3-32B 神经元的正、负两极中，约 **90% 各有一个主要功能**，另有约 7% 具有两个相关功能；脚注还提到，在部分较小、检查较细的样本中，如果只考虑强激活，非任意混合的比例接近 **97%**。原文也说明，这些估计依赖激活阈值和对“一个功能”的定义。按我们对解释一个神经元的要求衡量，这一高比例仍显乐观：**一份好的解释，应当能够比较准确地预测神经元在文本的哪些具体位置激活。**
+找到神经元的主要语义规律，是理解它的起点。更完整的解释，还应说明它在什么条件下、哪些位置产生强响应，以及为什么其他位置没有同样的响应。
 
-[Colorado 报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)体现了这种覆盖度上的差距。强正激活的上文往往包含 Colorado 相关信息，但高激活只出现在其中一部分位置，响应也没有局限在几个固定 token 上。我们常能预判一句话可能包含强响应，却仍难以准确预测它出现在哪个 token，以及其他位置为什么没有激活。
+[Colorado 报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)提供了一个具体例子。强正激活的上文往往包含 Colorado 相关信息，但高激活只出现在其中一部分位置，响应也没有局限在几个固定 token 上。我们常能预判一句话可能包含强响应，却仍难以准确预测它出现在哪个 token，以及其他位置为什么响应很弱。
+
+[Cammarata](https://already-clean.goodfire.com/#:~:text=On%20Simulation%20Scores)指出，逐 token 模拟还需要理解 attention 如何把信息放到逗号等位置。这些细节未必是描述神经元主要语义功能所必需的。[Gao](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean)则建议，根据模拟误差对模型输出分布的影响来评价解释。这样可以容许不影响行为的位置差异，同时要求解释那些确实影响行为的差异。
+
+为了量化这一差距，我们冻结了 50 个 Qwen3-32B 神经元的解释及正负桶规则，在 1,000 段未向解释、修订模型展示的文本上进行测试。LLM 能看到完整前文、最多 128 个带编号的 token，以及紧邻其后的 10 个 token。它需要判断片段是否包含强响应，并为每个方向选出三个候选位置。随后，我们用保存的实测激活核对预测，全程不提供测量反馈。
+
+| 指标 | 结果 |
+|---|---:|
+| 强激活片段识别（平衡准确率） | **79.2%** |
+| 3 个候选位置的平均命中数 | **0.52 个** |
+| 平均命中数（允许 ±2 token 偏差） | **1.10 个** |
+
+结果表明，通过语义解释可以大致判断神经元会在什么样的上下文中激活，但仍难准确预测它具体在哪个 token 上激活。
 
 ### 3. Superposition 可能仍然存在
 

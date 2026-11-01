@@ -136,9 +136,21 @@ Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/
 
 ### 2. We cannot yet claim to fully understand neurons
 
-[AlreadyClean](https://already-clean.goodfire.com/) estimates that roughly **90% of Qwen3-32B neuron poles have one main job**, with another approximately 7% having two related jobs. A footnote puts the share of non-arbitrary mixtures at about **97%** in some smaller, closely examined samples when judging strong activations. The essay also notes that these estimates depend on thresholds and on what counts as one job. Under our standard for explaining a neuron, this high estimate looks optimistic: **a good explanation should predict reasonably accurately where the neuron activates within a text.**
+Identifying a neuron’s main semantic pattern is a starting point for understanding it. A fuller explanation should also account for when and where it responds strongly, and why other positions produce much weaker responses.
 
-The [Colorado report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars) illustrates the coverage gap. Strong positive responses often follow Colorado-related information, but high activation occurs at only some positions and is not confined to a small fixed set of tokens. We can often anticipate that a sentence will contain a strong response, while still struggling to predict exactly which token will carry it or why other positions remain quiet.
+The [Colorado report](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars) provides a concrete example. Strong positive responses often follow Colorado-related information, but high activation occurs at only some positions and is not confined to a small fixed set of tokens. We can often anticipate that a sentence will contain a strong response, while still struggling to predict exactly which token will carry it or why other positions remain quiet.
+
+[Cammarata](https://already-clean.goodfire.com/#:~:text=On%20Simulation%20Scores) notes that token-level simulation also requires understanding where attention places information, including on commas and other punctuation. These details may be unnecessary for describing a neuron’s main semantic function. [Gao](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean) proposes judging simulation errors by their effect on the model’s output distribution. This allows harmless differences in activation location while requiring explanations to account for differences that affect behavior.
+
+To quantify the gap, we froze the explanations and polarity rules for our 50 Qwen3-32B neurons and tested them on 1,000 passages not shown during explanation or revision. An LLM received the complete preceding context, up to 128 indexed tokens, and 10 following tokens. It predicted whether each passage contained a strong response and ranked three candidate positions for each polarity. We checked its predictions against saved activations, without providing measurement feedback.
+
+| Measure | Result |
+|---|---:|
+| Detecting passages with strong activations (balanced accuracy) | **79.2%** |
+| Average hits among three predicted positions | **0.52** |
+| Average hits with a tolerance of ±2 tokens | **1.10** |
+
+The results suggest that semantic explanations can tell us roughly what contexts activate a neuron, but predicting exactly which token it activates on remains difficult.
 
 ### 3. Superposition remains a plausible explanation
 
