@@ -1,0 +1,104 @@
+{
+  "seed": 42,
+  "torch_seed": 0,
+  "runtime": {
+    "dtype": "bfloat16",
+    "attention": "sdpa",
+    "threads": 8,
+    "bf16_reduced_precision_reduction": true,
+    "tf32": false,
+    "activation_offload": "cpu"
+  },
+  "gpu_groups": [
+    [
+      0,
+      1,
+      2,
+      3
+    ]
+  ],
+  "queue_seconds": 5400,
+  "experiment_seconds": 5400,
+  "inputs": {
+    "max_written_tokens": 4096,
+    "saved_prefix": "document_start_through_anchor"
+  },
+  "atlas": {
+    "documents": 12,
+    "extremes_per_pole": 4,
+    "reader_count": 30,
+    "top_units": 128,
+    "routes_per_pole": 3,
+    "holdout_fraction": 0.25,
+    "nmf_steps": 200
+  },
+  "family": {
+    "cases": 11,
+    "neighbours_per_side": 10
+  },
+  "graphs": {
+    "mlp_nodes": 64,
+    "embedding_nodes": 6,
+    "max_edges": 1200,
+    "steering_scale": 2
+  },
+  "followups": {
+    "random_controls": 3,
+    "semantic_cases_per_group": 2,
+    "natural_top": 20,
+    "natural_bottom": 10
+  },
+  "search": {
+    "rounds": 2
+  },
+  "blind": {
+    "candidates_per_pole": 6,
+    "max_written_tokens": 512
+  },
+  "route_prediction": false,
+  "paths": {
+    "reports": "data/reports",
+    "activations": "data/activations",
+    "model": "models/subject",
+    "state": ".local",
+    "references": "data/reference-pages"
+  },
+  "llm": {
+    "provider": "deepseek-official",
+    "model": "deepseek-flash",
+    "reasoning_effort": "high",
+    "max_concurrent_requests": null,
+    "max_output_tokens": 393216,
+    "chat_url": "https://api.deepseek.com/chat/completions",
+    "messages_url": "https://api.deepseek.com/anthropic/v1/messages"
+  },
+  "pricing": {
+    "cached_input_per_million": 0.003,
+    "input_per_million": 0.15,
+    "output_per_million": 0.6,
+    "peak_multiplier": 2,
+    "peak_utc_hours": [
+      [
+        1,
+        4
+      ],
+      [
+        6,
+        10
+      ]
+    ],
+    "peak_weekdays": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "source": "https://api-docs.deepseek.com/quick_start/pricing/",
+    "note": "Configure token prices for your API endpoint. Costs are estimates, not account invoices."
+  },
+  "spectrum_sampling": {
+    "label_batch_size": 100,
+    "total_points": 500
+  }
+}
