@@ -131,7 +131,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 **mixed4c · 477**。我们的结果使用 A 配置、224 × 224 输入和 1,024 步优化。Positive 最大化 post-ReLU 激活；Negative 最小化有符号 pre-ReLU 激活。Diversity 每组包含四张图片。
 
-模型使用固定版本的 **Lucent Inception5h**。[参数与实测分数](vision/docs/assets/provenance.json)和[方法说明](vision/docs/methodology.md)记录了优化目标、颜色先验与自然样例的采样方式。可按[安装与运行指南](vision/README_zh.md#quick-start)复现这些结果。
+模型使用固定版本的 **Lucent Inception5h**。[方法说明（英文）](vision/docs/methodology.md)介绍了优化目标、颜色先验与自然样例的采样方式。可按[安装与运行指南](vision/README_zh.md#quick-start)复现这些结果。
 
 ## 我们检验了哪些 AlreadyClean 主张 <a id="which-alreadyclean-claims-have-we-tested"></a>
 

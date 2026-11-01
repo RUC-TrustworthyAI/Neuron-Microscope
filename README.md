@@ -131,7 +131,7 @@ The [vision module](vision/README.md) publishes all **12 layers and 5,804 Incept
 
 **mixed4c · 477**. Our results use configuration A, 224 × 224 inputs and 1,024 steps. Positive maximizes post-ReLU activation; Negative minimizes signed pre-ReLU activation. Diversity contains four images.
 
-The model uses a pinned **Lucent Inception5h checkpoint**. [Settings and measured scores](vision/docs/assets/provenance.json) and the [method guide](vision/docs/methodology.md) record the objectives, color priors and natural-example sampling. [Install and run](vision/README.md#quick-start) the vision module to reproduce these results.
+The model uses a pinned **Lucent Inception5h checkpoint**. The [method guide](vision/docs/methodology.md) explains the objectives, color priors and natural-example sampling. [Install and run](vision/README.md#quick-start) the vision module to reproduce these results.
 
 ## Which AlreadyClean claims have we tested?
 
