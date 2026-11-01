@@ -35,6 +35,8 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 **数据：** 当前 50 份报告均使用 **Reasoning Mix 100M**。[数据指南](language/docs/data.md)介绍了语料来源、激活格式和读取工具。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
+**发现总结：** 在我们观察的 50 个 Qwen3-32B 神经元中，绝大多数的强激活文本都呈现出清楚的语义、语法或词形规律。但这些规律仍难解释弱激活，也难以准确预测一句话中强激活会落在哪个 token 上。
+
 ## 📑 目录 <a id="contents"></a> <a id="目录"></a>
 
 - [💬 语言模型神经元报告](#language-model-neuron-reports)
@@ -127,8 +129,6 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 模型使用固定版本的 **Lucent Inception5h**。[方法说明（英文）](vision/docs/methodology.md)介绍了优化目标、颜色先验与自然样例的采样方式。可按[安装与运行指南](vision/README_zh.md#quick-start)复现这些结果。
 
 ## 💡 主要发现 <a id="key-findings"></a> <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="我们检验了哪些-alreadyclean-主张"></a> <a id="observations-from-the-current-comparisons"></a> <a id="what-we-have-found-so-far"></a> <a id="当前案例中的观察"></a>
-
-在我们观察的 50 个 Qwen3-32B 神经元中，绝大多数的强激活文本都呈现出清楚的语义、语法或词形规律。但这些规律仍难解释弱激活，也难以准确预测一句话中强激活会落在哪个 token 上。
 
 ### 1. 原生神经元的强激活往往呈现清楚的语义
 

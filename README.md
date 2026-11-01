@@ -35,6 +35,8 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 
 **Data:** The current 50 reports use **Reasoning Mix 100M**. The [data guide](language/docs/data.md) describes the corpus sources, saved activation format and readers. Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
+**Key takeaways:** For most of the 50 Qwen3-32B neurons we examined, strongly activating texts showed clear semantic, syntactic, or word-form patterns. We still struggle to use these patterns to explain weak activations or predict exactly which token in a sentence will activate strongly.
+
 ## 📑 Contents <a id="contents"></a>
 
 - [💬 Language model neuron reports](#language-model-neuron-reports)
@@ -127,8 +129,6 @@ The [vision module](vision/README.md) publishes all **12 layers and 5,804 Incept
 The model uses a pinned **Lucent Inception5h checkpoint**. The [method guide](vision/docs/methodology.md) explains the objectives, color priors and natural-example sampling. [Install and run](vision/README.md#quick-start) the vision module to reproduce these results.
 
 ## 💡 Key findings <a id="key-findings"></a> <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="what-we-have-found-so-far"></a> <a id="observations-from-the-current-comparisons"></a>
-
-For most of the 50 Qwen3-32B neurons we examined, strongly activating texts showed clear semantic, syntactic, or word-form patterns. We still struggle to use these patterns to explain weak activations or predict exactly which token in a sentence will activate strongly.
 
 ### 1. Native neurons often have recognizable semantics at strong activations
 
