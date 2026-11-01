@@ -36,7 +36,7 @@ python3 language/examples/export_walkthrough.py --run runs/example --output runs
 python3 -m http.server 8000 --bind 127.0.0.1 --directory runs/walkthrough
 ```
 
-将 `runs/example` 换成已完成运行的目录，然后打开 <http://127.0.0.1:8000/?lang=zh>。导出程序根据保存的产物重新生成 `content/`、`reports/` 和 `screenshots/`，并保留复制的 HTML、JavaScript 和 CSS。导出的内容包括提示词与输入节选、结构化响应、各轮对比、测量和压缩报告。
+将 `runs/example` 换成已完成运行的目录，然后打开 <http://127.0.0.1:8000/?lang=zh>。导出程序根据保存的产物重新生成 `content/` 和 `reports/`，并清除复制的 `screenshots/` 目录。复制的 HTML、JavaScript 和 CSS 会保留。导出的内容包括提示词与输入节选、结构化响应、各轮对比、测量和压缩报告。所需截图请单独截取。
 
 ## 通过 GitHub Pages 发布
 

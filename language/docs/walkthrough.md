@@ -36,7 +36,7 @@ python3 language/examples/export_walkthrough.py --run runs/example --output runs
 python3 -m http.server 8000 --bind 127.0.0.1 --directory runs/walkthrough
 ```
 
-Replace `runs/example` with the completed run's directory, then open <http://127.0.0.1:8000/?lang=en>. The exporter rebuilds `content/`, `reports/` and `screenshots/` from saved artifacts while keeping the copied HTML, JavaScript and CSS. It exports prompt and input excerpts, structured responses, round comparisons, measurements and compressed reports.
+Replace `runs/example` with the completed run's directory, then open <http://127.0.0.1:8000/?lang=en>. The exporter rebuilds `content/` and `reports/` from saved artifacts and clears the copied `screenshots/` directory. The copied HTML, JavaScript and CSS remain in place. Exported content includes prompt and input excerpts, structured responses, round comparisons, measurements and compressed reports. Capture any screenshots separately.
 
 ## Publish with GitHub Pages
 
