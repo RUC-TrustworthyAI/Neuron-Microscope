@@ -38,22 +38,23 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 > [!IMPORTANT]
 > **本项目独立开展复现。** 在 LLM 研究中，研究模型不会看到 AlreadyClean 的解释。原报告仅在最终发布时加入，用于对比。
 
-## 目录
+## 📑 目录 <a id="contents"></a> <a id="目录"></a>
 
-- [语言模型神经元报告](#language-model-neuron-reports)
-- [视觉模型神经元可视化](#vision-model-neuron-visualizations)
-- [我们检验了哪些 AlreadyClean 主张](#which-alreadyclean-claims-have-we-tested)
-- [LLM 神经元研究流程](#the-investigation-pipeline)
-- [如何评估报告中的证据](#evaluating-the-report-evidence)
-- [当前案例中的观察](#observations-from-the-current-comparisons)
-- [安装与使用](#installation-and-usage)
-- [实测耗时与开销](#recorded-runtime-and-cost)
-- [局限与未来工作](#limitations-and-future-work)
-- [如何参与项目](#how-to-contribute)
-- [团队相关研究](#related-research-from-our-group)
-- [环境、数据与报告指南](#setup-data-and-report-guides)
+- [💬 语言模型神经元报告](#language-model-neuron-reports)
+- [🖼️ 视觉模型神经元可视化](#vision-model-neuron-visualizations)
+- [🧪 LLM 神经元研究流程](#the-investigation-pipeline)
+- [🔬 视觉神经元研究流程](#the-vision-investigation-pipeline)
+- [🧭 我们检验了哪些 AlreadyClean 主张](#which-alreadyclean-claims-have-we-tested)
+- [⚖️ 如何评估报告中的证据](#evaluating-the-report-evidence)
+- [💡 当前案例中的观察](#observations-from-the-current-comparisons)
+- [📦 安装与使用](#installation-and-usage)
+- [⏱️ 实测耗时与开销](#recorded-runtime-and-cost)
+- [🚧 局限与未来工作](#limitations-and-future-work)
+- [🤝 如何参与项目](#how-to-contribute)
+- [📚 团队相关研究](#related-research-from-our-group)
+- [📖 环境、数据与报告指南](#setup-data-and-report-guides)
 
-## 语言模型神经元报告 <a id="language-model-neuron-reports"></a> <a id="side-by-side-interactive-comparisons"></a> <a id="explore-the-evidence"></a><a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a>
+## 💬 语言模型神经元报告 <a id="language-model-neuron-reports"></a> <a id="side-by-side-interactive-comparisons"></a> <a id="explore-the-evidence"></a><a id="reports-and-walkthrough"></a><a id="live-demo"></a><a id="reproduction-results"></a> <a id="语言模型神经元报告"></a>
 
 ### 双栏案例：Colorado 神经元
 
@@ -88,7 +89,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 每一行都可进入完整交互式报告，查看激活证据、样例、搜索、聚类、效应、测试、批评、独立评阅和开销记录。两列各有 49 个有效分数：**Blind 均值为 0.864，中位数为 0.891；Search 均值为 0.782，中位数为 0.808**。导航页也在列标题中展示这些统计值。
 
-## 视觉模型神经元可视化 <a id="vision-model-neuron-visualizations"></a> <a id="vision-neuron-visualizations"></a>
+## 🖼️ 视觉模型神经元可视化 <a id="vision-model-neuron-visualizations"></a> <a id="vision-neuron-visualizations"></a> <a id="视觉模型神经元可视化"></a>
 
 [Vision 模块](vision/README_zh.md)已发布 InceptionV1 全部 **12 层、5,804 个 neuron** 的五类可视化：Positive、Path-guided +、Diversity、Negative 和 Path-guided −，共 **29,020 组结果、46,432 张优化图**。每个 neuron 还提供从 50,000 张 ImageNet 训练图片中检索的 Top 16、Additional Examples 和负向样例，支持感受野裁剪与激活热图。
 
@@ -128,23 +129,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 模型使用固定版本的 **Lucent Inception5h**。[方法说明（英文）](vision/docs/methodology.md)介绍了优化目标、颜色先验与自然样例的采样方式。可按[安装与运行指南](vision/README_zh.md#quick-start)复现这些结果。
 
-## 我们检验了哪些 AlreadyClean 主张 <a id="which-alreadyclean-claims-have-we-tested"></a>
-
-原文讨论了多个层次的主张。下表记录语言模型研究中已经检查的内容与尚待回答的问题。
-
-| 主张或问题 | 需要的实验证据 | 当前状态 |
-| --- | --- | --- |
-| 能否为 Qwen3 原生神经元给出连贯解释？ | 激活覆盖、独立构造的盲测文本、受控测试与干预。 | **初步证据：** Reasoning Mix 100M 的 50 份报告中，有些案例较清楚，有些部分一致，有些存在明显偏差。 |
-| 原报告的解释能否独立复现？ | 独立盲测后再进行双栏比较。 | **结果因案例而异。** 50 份报告的目录列出了双方解释，以及 Blind 和 Search 结果。 |
-| 语料选择是否改变可见行为？ | 在不同语料间匹配采样条件。 | 当前 50 份报告均使用 **Reasoning Mix 100M**，仅凭这组结果无法分离语料本身的影响。 |
-| 弱激活对全局行为是否不重要？ | 跨任务、跨层的全网络阈值消融。 | **计划中**，尚无明确结论。 |
-| 递归泛化能否解释看似混合的行为？ | 不同行为分支共享形成过程或因果机制的证据。 | **尚无结论。** 当前报告可以提供候选案例，尚未确立一般性结论。 |
-| 原生神经元是否比 SAE 特征更有用？ | 匹配神经元与特征、数据、测试、干预预算和评估标准。 | **计划中。** 尚无一般性比较结论。 |
-
-> [!IMPORTANT]
-> **这张表将随新证据更新。新增证据应对应具体报告、模型、语料、干预或反例。**
-
-## LLM 神经元研究流程 <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a><a id="workflow"></a>
+## 🧪 LLM 神经元研究流程 <a id="the-investigation-pipeline"></a> <a id="the-three-stage-investigation-pipeline"></a> <a id="how-an-investigation-works"></a><a id="workflow"></a> <a id="llm-神经元研究流程"></a>
 
 ### 跟随一份完整研究记录
 
@@ -171,7 +156,34 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 具体见[流程说明](docs/workflow.md)、[测量细节](docs/method.md)与[运行配置](docs/running.md)。
 
-## 如何评估报告中的证据 <a id="evaluating-the-report-evidence"></a> <a id="how-we-evaluate-an-explanation"></a>
+## 🔬 视觉神经元研究流程 <a id="the-vision-investigation-pipeline"></a> <a id="视觉神经元研究流程"></a>
+
+`vision/` 结合自然图像检索与图像优化，研究固定版本 Lucent Inception5h 中指定层和通道的响应。
+
+1. **选择神经元。** 加载固定检查点，指定要研究的层和通道。
+2. **准备自然样例。** 扫描 50,000 张 ImageNet 训练图片，检索较强的正负响应样例，计算激活热图和路径锚点，并按感受野裁剪激活极值附近的展示区域。
+3. **优化五种视图。** 在 Fourier 空间中优化图像，结合拟合的颜色基、逐步解锁频段、模糊退火和 Gaussian 加权激活目标。Positive 最大化 post-ReLU 激活；Negative 最小化有符号的 pre-ReLU 激活。Path-guided + 和 Path-guided − 在早期加入自然样例锚点引导。Diversity 为四张正向图像加入多样性目标。
+4. **导出并比较。** 生成交互式 HTML，展示优化图像、优化过程中的检查点、自然样例、激活热图和 Nick / Goodfire 的参考结果。
+
+具体见[视觉研究流程](vision/README_zh.md#workflow)、[目标与测量细节](vision/docs/methodology.md)和[运行指南](vision/docs/reproduction.md)。
+
+## 🧭 我们检验了哪些 AlreadyClean 主张 <a id="which-alreadyclean-claims-have-we-tested"></a> <a id="我们检验了哪些-alreadyclean-主张"></a>
+
+原文讨论了多个层次的主张。下表记录语言模型研究中已经检查的内容与尚待回答的问题。
+
+| 主张或问题 | 需要的实验证据 | 当前状态 |
+| --- | --- | --- |
+| 能否为 Qwen3 原生神经元给出连贯解释？ | 激活覆盖、独立构造的盲测文本、受控测试与干预。 | **初步证据：** Reasoning Mix 100M 的 50 份报告中，有些案例较清楚，有些部分一致，有些存在明显偏差。 |
+| 原报告的解释能否独立复现？ | 独立盲测后再进行双栏比较。 | **结果因案例而异。** 50 份报告的目录列出了双方解释，以及 Blind 和 Search 结果。 |
+| 语料选择是否改变可见行为？ | 在不同语料间匹配采样条件。 | 当前 50 份报告均使用 **Reasoning Mix 100M**，仅凭这组结果无法分离语料本身的影响。 |
+| 弱激活对全局行为是否不重要？ | 跨任务、跨层的全网络阈值消融。 | **计划中**，尚无明确结论。 |
+| 递归泛化能否解释看似混合的行为？ | 不同行为分支共享形成过程或因果机制的证据。 | **尚无结论。** 当前报告可以提供候选案例，尚未确立一般性结论。 |
+| 原生神经元是否比 SAE 特征更有用？ | 匹配神经元与特征、数据、测试、干预预算和评估标准。 | **计划中。** 尚无一般性比较结论。 |
+
+> [!IMPORTANT]
+> **这张表将随新证据更新。新增证据应对应具体报告、模型、语料、干预或反例。**
+
+## ⚖️ 如何评估报告中的证据 <a id="evaluating-the-report-evidence"></a> <a id="how-we-evaluate-an-explanation"></a> <a id="如何评估报告中的证据"></a>
 
 当前目录展示 **Blind score** 和 **Search score**。两者均计算复现最高值／原报告最高值，以及 |复现最低值／原报告最低值|，再对可用比值求平均。分数可以超过 1；汇总均值和中位数时排除缺失值。Blind 使用仅根据冻结解释编写的文本，Search 则使用实测反馈。这些极值用于衡量相对原报告的响应强度；因果判断仍需结合以下实验。
 
@@ -186,7 +198,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确立原生因果效应。具体见[测量范围](docs/method.md#relp-and-intervention-scope)。
 
-## 当前案例中的观察 <a id="observations-from-the-current-comparisons"></a> <a id="what-we-have-found-so-far"></a><a id="key-findings"></a>
+## 💡 当前案例中的观察 <a id="observations-from-the-current-comparisons"></a> <a id="what-we-have-found-so-far"></a><a id="key-findings"></a> <a id="当前案例中的观察"></a>
 
 ### 概念相近，响应条件仍可能不同
 
@@ -209,7 +221,7 @@ Colorado 在 Reasoning Mix 100M 中的语料范围为 **-44.5 至 +308**。Searc
 
 当前报告仍有三处不确定性：语料是否包含相关上下文，解释是否抓住了响应条件，以及写作模型能否依据解释构造强响应测试。需要匹配比较条件，才能区分这些影响。
 
-## 安装与使用 <a id="use-neuron-microscope"></a><a id="installation-and-usage"></a><a id="quick-start"></a>
+## 📦 安装与使用 <a id="use-neuron-microscope"></a><a id="installation-and-usage"></a><a id="quick-start"></a> <a id="安装与使用"></a>
 
 可以根据目标模型与证据选择入口。
 
@@ -270,7 +282,7 @@ python -m http.server 8000 --directory runs/example/report
 
 并行研究多个神经元时，为每个运行分别准备配置和输出目录；共用 GPU 组的运行应使用相同的 `gpu_lock`。`NEURON_MICROSCOPE_GPU_WORKER=1` 启用共享常驻模型。随附配置的 `llm.max_concurrent_requests: null` 不设置应用层 API 并发上限。继续执行、双栏导出和执行记录见[运行说明](docs/running.md)。
 
-## 实测耗时与开销 <a id="recorded-runtime-and-cost"></a> <a id="reproducibility-and-cost"></a>
+## ⏱️ 实测耗时与开销 <a id="recorded-runtime-and-cost"></a> <a id="reproducibility-and-cost"></a> <a id="实测耗时与开销"></a>
 
 每次 LLM 研究都会保留配置、API 请求与响应、token 费用估算、采样证据、解释与预测版本、测量和最终报告。新的解释仅根据目标激活证据形成，输入中不含旧解释或官方标签。
 
@@ -292,7 +304,7 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 
 以上来自单次实测。费用不含激活采集，并取决于所配置的模型端点和 token 单价。[已发布报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#interpretation-costs)与 [walkthrough](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/walkthrough/language/?lang=zh#report) 提供了具体记录。
 
-## 局限与未来工作 <a id="limitations-and-future-work"></a>
+## 🚧 局限与未来工作 <a id="limitations-and-future-work"></a> <a id="局限与未来工作"></a>
 
 ### 当前局限
 
@@ -314,7 +326,7 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 - [ ] 检验递归泛化等 AlreadyClean 主要主张。
 - [ ] 支持更多模型、层、语言和文体。
 
-## 如何参与项目 <a id="how-to-contribute"></a> <a id="contribute"></a>
+## 🤝 如何参与项目 <a id="how-to-contribute"></a> <a id="contribute"></a> <a id="如何参与项目"></a>
 
 欢迎提供支持、限定或反驳某项解释的证据。
 
@@ -329,7 +341,7 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 
 可以通过 [GitHub Issue](https://github.com/RUC-TrustworthyAI/Neuron-Microscope/issues) 提交具体的神经元 ID、上下文、实验、结果或建议。可复现的失败案例与分歧同样有价值。
 
-## 团队相关研究 <a id="related-research-from-our-group"></a> <a id="related-work-from-our-group"></a><a id="related-work"></a>
+## 📚 团队相关研究 <a id="related-research-from-our-group"></a> <a id="related-work-from-our-group"></a><a id="related-work"></a> <a id="团队相关研究"></a>
 
 团队相关工作涵盖特征学习、概念分析、解释评估和 LLM 安全。发表信息也可参阅[王希廷老师的学院主页](https://ai.ruc.edu.cn/szdw/zrjs/wxt/index.htm)。
 
@@ -340,7 +352,7 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 | **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li 等，EMNLP 2024 | 形式化概念解释，提出可读性和忠实度的度量方法。 | [论文](https://aclanthology.org/2024.emnlp-main.36/) · [代码](https://github.com/hr-jin/Concept-Explanation-Evaluation) |
 | **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng 等，arXiv 2026 | 利用 SAE 概念与因果归因，识别会削弱拒答的场景。 | [论文](https://arxiv.org/abs/2607.23496) |
 
-## 环境、数据与报告指南 <a id="setup-data-and-report-guides"></a> <a id="documentation"></a>
+## 📖 环境、数据与报告指南 <a id="setup-data-and-report-guides"></a> <a id="documentation"></a> <a id="环境数据与报告指南"></a>
 
 | 指南 | 用途 |
 | --- | --- |
@@ -352,7 +364,7 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 | [LLM 提示词与输出约定](language/workflow/) | 查看解释、打标、实验设计和报告分析的请求。 |
 | [视觉模块与样例](vision/README_zh.md) | 安装 InceptionV1 模块，查看可视化结果并导出网页。 |
 
-## 引用 <a id="citation"></a>
+## 📝 引用 <a id="citation"></a> <a id="引用"></a>
 
 如果在学术工作中使用 Neuron Microscope，请引用本仓库，并注明具体使用的版本或报告：
 
@@ -365,10 +377,10 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 }
 ```
 
-## 致谢 <a id="acknowledgements"></a>
+## 🙏 致谢 <a id="acknowledgements"></a> <a id="致谢"></a>
 
 报告结构参考 [Goodfire 的神经元报告](https://already-clean.goodfire.com/)。RelP 适配自 [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits)，来源版本记录在 [`language/tools/relp-source.json`](language/tools/relp-source.json)。
 
-## 许可 <a id="license"></a>
+## 📄 许可 <a id="license"></a> <a id="许可"></a>
 
 LLM 实现采用 [MIT License](LICENSE)。引入的视觉模块保留其[来源与许可说明](vision/THIRD_PARTY_NOTICES.md)，上游尚未为其原创代码声明许可证。第三方组件保留各自原有许可证。
