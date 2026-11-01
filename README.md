@@ -36,7 +36,7 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 **Data:** The current 50 reports use **Reasoning Mix 100M**. The [data guide](language/docs/data.md) describes the corpus sources, saved activation format and readers. Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
 > [!IMPORTANT]
-> **This is an independent reproduction effort.** In LLM investigations, the research models do not see AlreadyClean's explanations. The reference report is added only when the final report is published for comparison.
+> **This is an independent reproduction effort.** The LLM calls that propose, refine and evaluate explanations do not receive AlreadyClean's explanations. The reference report is added only when the final report is published for comparison.
 
 ## 📑 Contents <a id="contents"></a>
 
@@ -187,7 +187,7 @@ The code in `language/` orchestrates direct LLM API calls and target-model measu
 
 1. **Sample evidence.** Allocate 500 positions equally across nonempty activation bins, selecting within each bin from the full saved corpus. Redistribute a bin's unused quota only when its corpus population is too small. The archive retains gate, up and product channels; the explanation model receives product values, contexts, extreme tokens and document exemplars, quantile cases, token selectivity, peak statistics and direct logit effects.
 2. **Explain, check and freeze.** Request at most five response rules per pole. The explanation and rule descriptions express the same account. A labeler predicts the sampled positions with their measurements hidden, in five concurrent batches of up to 100. Two revisions each read the preceding explanation, the 500 measured contexts and focused error feedback, followed by another blind labeling pass. Among the three versions, select the highest coverage with directional accuracy **>90%**; if none qualifies, select the highest accuracy. Freeze that explanation together with its own labels. An unsupported pole may remain unexplained.
-3. **Measure.** Run three feedback-guided Search rounds, requesting six regions with 16 texts each. Design four controlled tests with ten conditions each, measure them and improve the test design once. The head figure comes from these controlled tests. A separate Blind writer receives only the frozen explanation and rules, with six texts per supported pole. Search and Blind score full-input maxima or minima; controlled tests score a replacement span, a common suffix or a specified token. Batched GPU operations also compute attribution, family responses and interventions. With the shared worker enabled, one loaded model serves queued operations from multiple runs while their API calls overlap.
+3. **Measure.** Run three feedback-guided Search rounds, requesting six regions with 16 texts each. Design four controlled tests with ten conditions each, measure them and improve the test design once. The head figure comes from these controlled tests. A separate Blind writer receives only the frozen explanation and rules, with six texts per supported pole. Search and Blind score full-input maxima or minima; controlled tests score a replacement span, a common suffix or a specified token. Batched GPU operations also compute attribution, measure responses of the target and attribution-linked neurons (Family), and perform interventions. With the shared worker enabled, one loaded model serves queued operations from multiple runs while their API calls overlap.
 4. **Analyze and publish.** The LLM analyzes support, counterexamples and unresolved patterns while preserving the frozen explanation and rules. An independent reader assesses the account. Fixed code renders the interactive report and, when a reference snapshot is supplied, adds the side-by-side comparison after research is complete.
 
 **Activation spectrum and Inside the neuron share one sample pool and the predictions from the refined, frozen explanation.** The labeler reads the full observed prefix and nearby continuation as linguistic context. It assigns No visible cue when the explanation does not clearly predict either direction. Because these samples inform refinement, their agreement scores provide development feedback. Independent written probes and controlled experiments supply further tests.
@@ -213,7 +213,7 @@ The current directory reports **Blind score** and **Search score**. For each, av
 | --- | --- | --- |
 | Coverage | Does the explanation account for both poles and the important residual cases? | Activation spectrum, exemplars, semantic clusters, prediction errors, and “No visible cue” cases. |
 | Specificity | Does it identify the trigger rather than merely the surrounding topic? | Controlled replacements, counterexamples, searches, and blind tests. |
-| Predictive value | Can the explanation anticipate responses on inputs not used to formulate it? | Independent explanation-only maximum/minimum tests, supported by controlled templates and family measurements. |
+| Predictive value | Can the explanation anticipate responses on inputs not used to formulate it? | Independent explanation-only maximum/minimum tests, supported by controlled templates and measurements of attribution-linked neurons. |
 | Causal relevance | Does changing the neuron or its inputs have the predicted effect? | Native interventions, ablations, controlled input changes, and output measurements. |
 | Stability | Does the interpretation persist across samples, prompts and independent runs? | Comparisons of explanations and measurements under matched conditions. |
 | Uncertainty | What remains unexplained or underdetermined? | Explicit criticism, alternative accounts, weak poles, and failed tests. |
@@ -227,7 +227,7 @@ Choose an entry point for the model and evidence you want to inspect.
 | Mode | What you can do | Requirements |
 | --- | --- | --- |
 | **Explore** | Inspect LLM reports, a recorded investigation and vision comparisons. | Browser only. |
-| **Try the renderer** | Generate and view a small synthetic report fixture. This tests the software and interface, not a scientific result. | Python; no API key, Docker, GPU, or model download. |
+| **Try the renderer** | Use synthetic data to check report generation and interaction. | Python; no API key, Docker, GPU, or model download. |
 | **Run an LLM investigation** | Analyze neurons from an existing activation archive and publish new reports. | Linux, Python 3.10+, CUDA host, model weights, activation data, and an LLM endpoint. |
 | **Visualize a vision neuron** | Optimize images and export an InceptionV1 viewer. | Python 3.11+, a separate environment, model assets and a CUDA host for optimization; see [vision setup](vision/README.md#quick-start). |
 
@@ -245,7 +245,7 @@ python language/examples/demo.py --output runs/demo
 python -m http.server 8000 --directory runs/demo
 ```
 
-Open <http://localhost:8000/>. The generated content is synthetic and should not be treated as experimental evidence.
+Open <http://localhost:8000/>.
 
 ### 2. Configure a full investigation
 
@@ -307,7 +307,6 @@ These values describe one measured case. Costs exclude activation collection and
 
 - The current set contains 50 neurons with reference reports, so its results cannot be generalized to all Qwen3-32B neurons.
 - Full activation archives do not yet have a public download; external users currently need to supply compatible input data.
-- The offline demo is synthetic and does not reproduce a published scientific result.
 - Corpus coverage, prompt choice, evidence presentation and LLM stochasticity can change an interpretation.
 - Blind and Search scores compare activation extrema. They do not establish mechanistic correctness, and a mean over available poles may summarize only one pole.
 - Negative poles and weak activations are often less clearly explained than strong positive responses.

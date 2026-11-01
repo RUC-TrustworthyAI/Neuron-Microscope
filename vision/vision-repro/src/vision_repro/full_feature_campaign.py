@@ -1,4 +1,4 @@
-"""Resumable queue for all 5,804 neurons × five explanation variants."""
+"""Resumable queue for all 5,804 neurons × five visualization modes."""
 import argparse
 from collections import Counter
 from datetime import datetime, timezone
@@ -55,7 +55,7 @@ def initialize(root, batch_images=32):
               'source_sha256':{name:sha256(Path(__file__).with_name(name)) for name in
                               ['full_feature_campaign.py','full_feature_viz.py','full_path_anchors.py']},
               'publish':{'policy':'Export only completed, validated batches. Uncomputed targets remain placeholders; no automatic hosting or upload.'},
-              'memory_policy':'No CUDA allocator fraction cap. Preserve host stability: leave 2 GiB MemAvailable headroom, reduce batch size when needed; never stop other users jobs.',
+              'memory_policy':'Leave 2 GiB MemAvailable headroom and reduce batch size under memory pressure.',
               'resume':'Per-batch Adam/FFT/RNG checkpoints at 256/512/768/1024; completed batches skipped',
               'web_delivery':'Use the static export command; large datasets and PNGs remain separate from Git source.'}
     write_json(root/'protocol.json',protocol)
@@ -141,7 +141,7 @@ def worker(root, max_jobs=None):
             con.execute("UPDATE jobs SET state='split',error=?,pid=NULL,updated=? WHERE id=?",(split_reason,time.time(),row['id']))
         con.commit();print(json.dumps(status(root)),flush=True)
         if con.execute("SELECT COUNT(*) FROM jobs WHERE state='failed'").fetchone()[0]>=3:
-            raise RuntimeError('Stopping our worker after three failed batches; inspect errors before resuming')
+            raise RuntimeError('Queue has at least three failed batches; inspect errors before resuming')
     result=status(root)
     if not result['batches'].get('pending') and not result['batches'].get('running'):
         write_json(root/'queue_finished.json',result)

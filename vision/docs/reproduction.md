@@ -1,6 +1,10 @@
 # 复现与批量生成
 
-所有命令从仓库根目录运行。使用 Python 3.11+ 和支持目标 GPU 的 PyTorch/CUDA；DGX Spark 需要兼容其架构的发行包，不能把通用 x86 wheel 当作安装方案。本仓库不会修改驱动或自动下载数据。先运行 `vision-microscope doctor`。
+以下命令在仓库的 `vision/` 目录运行。使用 Python 3.11+ 和支持目标 GPU 的 PyTorch/CUDA；DGX Spark 需要兼容其架构的发行包，不能把通用 x86 wheel 当作安装方案。本仓库不会修改驱动或自动下载数据。先运行 `vision-microscope doctor`。
+
+```bash
+cd vision
+```
 
 ## 1. 单 neuron 与 GPU 冒烟检查
 

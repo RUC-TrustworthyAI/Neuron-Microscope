@@ -150,4 +150,4 @@ docs/                 文档与示例图
 
 ## 🙏 致谢 <a id="acknowledgements"></a>
 
-本项目参考 [Nick / Goodfire 的 AlreadyClean](https://already-clean.goodfire.com/)、[Lucent](https://github.com/greentfrapp/lucent) 和 [Lucid](https://github.com/tensorflow/lucid)。README 结构参考 [Neuron-Microscope](https://github.com/RUC-TrustworthyAI/Neuron-Microscope)。相关来源与许可见[第三方说明](THIRD_PARTY_NOTICES.md)。
+本项目参考 [Nick / Goodfire 的 AlreadyClean](https://already-clean.goodfire.com/)、[Lucent](https://github.com/greentfrapp/lucent) 和 [Lucid](https://github.com/tensorflow/lucid)。相关来源与许可见[第三方说明](THIRD_PARTY_NOTICES.md)。

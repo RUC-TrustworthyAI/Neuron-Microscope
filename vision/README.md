@@ -150,4 +150,4 @@ Run `pytest vision-repro/tests`, `node vision-repro/tests/test_viewer.mjs`, and 
 
 ## 🙏 Acknowledgements <a id="acknowledgements"></a>
 
-This project builds on [Nick / Goodfire's AlreadyClean](https://already-clean.goodfire.com/), [Lucent](https://github.com/greentfrapp/lucent), and [Lucid](https://github.com/tensorflow/lucid). README structure follows [Neuron-Microscope](https://github.com/RUC-TrustworthyAI/Neuron-Microscope). See [sources and third-party terms](THIRD_PARTY_NOTICES.md).
+This project builds on [Nick / Goodfire's AlreadyClean](https://already-clean.goodfire.com/), [Lucent](https://github.com/greentfrapp/lucent), and [Lucid](https://github.com/tensorflow/lucid). See [sources and third-party terms](THIRD_PARTY_NOTICES.md).

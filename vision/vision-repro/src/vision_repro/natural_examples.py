@@ -1,4 +1,4 @@
-"""Our fixed ImageNet subset rankings and actual activation maps, not web samples."""
+"""Rank a fixed ImageNet subset and export activation maps."""
 import argparse
 from datetime import datetime, timezone
 import hashlib

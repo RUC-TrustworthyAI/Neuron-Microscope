@@ -1,8 +1,6 @@
-"""Public-description-inspired ordinary positive feature visualization.
+"""Optimize positive Inception5h feature visualizations.
 
-Numerical schedules are our choices, not recovered Goodfire hyperparameters.
-No path guidance or implicit initialization fallback is used. Optional explicit
-pre-ReLU warmup is separately recorded and is not a recovered author recipe.
+Configuration specifies numerical schedules and optional pre-ReLU warmup.
 """
 
 import argparse
@@ -312,7 +310,7 @@ def main():
             statistics_path = PROJECT_ROOT / statistics_path
         fitted_matrix, fitted_provenance = load_fitted_color(statistics_path)
     if args.device.startswith("cuda") and not torch.cuda.is_available():
-        raise RuntimeError("CUDA required; no silent CPU fallback")
+        raise RuntimeError("CUDA is required for the selected device but is unavailable")
     random.seed(config["seed"])
     np.random.seed(config["seed"])
     torch.manual_seed(config["seed"])
@@ -376,7 +374,7 @@ def main():
         "color_penalty_definitions": {
             "common_logit_l2": "mean over pixels and batch of square(mean RGB effective logits); no sum factor of 9",
             "luma_l2": "mean((encoded RGB luma-target)^2), actual blurred RGB before augmentation; weights .2126,.7152,.0722",
-            "note": "Luma target is our explicit image prior, not recovered author method",
+            "note": "Explicit luma image prior",
         },
         "logit_l2_definition": "mean(square(effective RGB logits after color map, active band mask, pixel gain and bias, before sigmoid/blur/affine)); no threshold",
         "color_mode": config["color_mode"],
@@ -396,7 +394,7 @@ def main():
             "replaced_modules": redirected_modules,
         },
         "pre_relu_fallback": False,
-        "hyperparameters": "our choices; not exact recovered author recipe",
+        "hyperparameters": "Implementation-specific hyperparameters",
         "preprocessing": "RGB [0,1] * 255 - 117",
         "target": {
             "layer": target.layer,
