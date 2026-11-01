@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="165" viewBox="0 0 900 165" role="img" aria-labelledby="title desc">
+<title id="title">发现总结</title>
+<desc id="desc">在我们观察的 50 个 Qwen3-32B 神经元中，绝大多数的强激活文本都呈现出清楚的语义、语法或词形规律。但这些规律仍难解释弱激活，也难以准确预测一句话中强激活会落在哪个 token 上。</desc>
+<rect x=".5" y=".5" width="899" height="164" rx="7" fill="#eff6ff" stroke="#d2e3f8"/>
+<path d="M4 7V158" stroke="#79a9e8" stroke-width="5"/>
+<g fill="#24292f" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif">
+<text x="24" y="39" font-size="20" font-weight="650">发现总结</text>
+<text font-size="18"><tspan x="24" y="81">在我们观察的 50 个 Qwen3-32B 神经元中，绝大多数的强激活文本都呈现出清楚的语义、</tspan>
+<tspan x="24" y="110">语法或词形规律。但这些规律仍难解释弱激活，也难以准确预测一句话中强激活会落在哪个 token </tspan>
+<tspan x="24" y="139">上。</tspan></text>
+</g></svg>

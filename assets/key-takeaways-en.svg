@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="165" viewBox="0 0 900 165" role="img" aria-labelledby="title desc">
+<title id="title">Key takeaways</title>
+<desc id="desc">For most of the 50 Qwen3-32B neurons we examined, strongly activating texts showed clear semantic, syntactic, or word-form patterns. We still struggle to use these patterns to explain weak activations or predict exactly which token in a sentence will activate strongly.</desc>
+<rect x=".5" y=".5" width="899" height="164" rx="7" fill="#eff6ff" stroke="#d2e3f8"/>
+<path d="M4 7V158" stroke="#79a9e8" stroke-width="5"/>
+<g fill="#24292f" font-family="-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',Arial,sans-serif">
+<text x="24" y="39" font-size="20" font-weight="650">Key takeaways</text>
+<text font-size="18"><tspan x="24" y="81">For most of the 50 Qwen3-32B neurons we examined, strongly activating texts showed clear semantic,</tspan>
+<tspan x="24" y="110">syntactic, or word-form patterns. We still struggle to use these patterns to explain weak</tspan>
+<tspan x="24" y="139">activations or predict exactly which token in a sentence will activate strongly.</tspan></text>
+</g></svg>
