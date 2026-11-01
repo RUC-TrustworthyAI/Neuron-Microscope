@@ -135,7 +135,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 我们欣喜地发现，在检查过的许多神经元中，正负两极的高绝对值激活呈现了清楚的概念或模式。例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，也在一定程度上说服了我们：值得重新把更多研究精力投入原生神经元本身。
 
-### 2. 如果要求预测具体激活位置，高可解释比例仍显乐观
+### 2. 我们仍难以声称完全理解了神经元
 
 [AlreadyClean 原文](https://already-clean.goodfire.com/)估计，在 Qwen3-32B 神经元的正、负两极中，约 **90% 各有一个主要功能**，另有约 7% 具有两个相关功能；脚注还提到，在部分较小、检查较细的样本中，如果只考虑强激活，非任意混合的比例接近 **97%**。原文也说明，这些估计依赖激活阈值和对“一个功能”的定义。按我们对解释一个神经元的要求衡量，这一高比例仍显乐观：**一份好的解释，应当能够比较准确地预测神经元在文本的哪些具体位置激活。**
 
@@ -151,7 +151,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 [Leo Gao 的回应](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean)也指出，激活幅度可能承载重要信息，并认为消融较小的神经元激活可能明显损害模型表现。因此，弱响应也值得与强响应一起研究。我们目前的判断仍是基于案例的假设；要检验是否存在[多个特征共享表示维度](https://transformer-circuits.pub/2022/toy_model/index.html)的情况，还需要特征分解与受控干预。
 
-### 4. 数据集会改变解释所依据的证据
+### 4. 神经元解释受数据集影响
 
 [L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=0#exemplars)提供了一个直接的对照。在 Reasoning Mix 100M 中，书目条目在标题后的换行处反复出现强负响应，两篇样例分别达到 **-37 和 -36**；原报告的语料最低值为 **-11.8125**，其中最强负例主要呈现配置块和代码声明上下文。我们观察到的更强负极，让书目标题边界在解释中更加突出。
 

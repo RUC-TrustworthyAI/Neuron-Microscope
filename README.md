@@ -135,7 +135,7 @@ The model uses a pinned **Lucent Inception5h checkpoint**. The [method guide](vi
 
 We were encouraged to find clear concepts and patterns in many of the neurons we inspected, at large absolute activations on their positive and negative poles. Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars). Their legibility resembles what we look for in SAE latents. This has persuaded us to put more research effort back into native neurons themselves.
 
-### 2. The high interpretability estimate looks optimistic when token-level coverage is required
+### 2. We cannot yet claim to fully understand neurons
 
 [AlreadyClean](https://already-clean.goodfire.com/) estimates that roughly **90% of Qwen3-32B neuron poles have one main job**, with another approximately 7% having two related jobs. A footnote puts the share of non-arbitrary mixtures at about **97%** in some smaller, closely examined samples when judging strong activations. The essay also notes that these estimates depend on thresholds and on what counts as one job. Under our standard for explaining a neuron, this high estimate looks optimistic: **a good explanation should predict reasonably accurately where the neuron activates within a text.**
 
@@ -151,7 +151,7 @@ AlreadyClean's V-shaped-feature example shows how a shared pattern can unify app
 
 [Leo Gao's response](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean) also argues that activation magnitudes can carry important information and expresses the view that ablating small neuron activations can materially harm performance. This makes the weaker responses important to investigate alongside the strongest examples. Our interpretation remains a hypothesis based on these cases; testing whether [multiple features share representational dimensions](https://transformer-circuits.pub/2022/toy_model/index.html) will require feature decomposition and controlled interventions.
 
-### 4. The corpus changes the evidence available for an explanation
+### 4. Neuron interpretations depend on the dataset
 
 A useful contrast is [L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=0#exemplars). In Reasoning Mix 100M, repeated book-catalog examples reach **-37 and -36** at newlines following their titles; the reference corpus minimum is **-11.8125**, with its strongest negative examples emphasizing configuration and code-declaration contexts. The larger negative tail brings catalog-title boundaries to the foreground of our account.
 
