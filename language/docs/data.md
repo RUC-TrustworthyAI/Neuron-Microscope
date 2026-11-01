@@ -21,7 +21,7 @@ The explanation model receives sampled contexts with measured product values, to
 
 ## Canonical activation archive
 
-The bundled adapter is `language/tools/dataset_reader.py`. A dataset-local `reader.py` can implement the same interface and is treated as trusted executable input.
+`language/tools/dataset_reader.py` reads the archive format below. The interpretation workflow's sampling step uses this built-in reader.
 
 ```text
 archive/
@@ -61,11 +61,13 @@ A manifest references paths instead of depending on those example names. Its fie
 - Histograms have shape `[part_neurons, 3, 65536]` and `uint64` counts, one bin for each BF16 bit pattern.
 - Documents must retain the same causal input prefix used during collection. Document boundaries must align with shards for this adapter.
 
-The scan uses `histogram`, `iter_neuron`, document rows and token IDs. The optional extremes/statistics methods use the additional index files. A custom adapter exposes `manifest`, `neurons`, `parts`, `locations`, `documents`, `starts`, `token_ids`, `document()`, `document_activations()`, `iter_neuron()`, `histogram()` and `close()`.
+The scan uses `histogram`, `iter_neuron`, document rows and token IDs. The optional extremes/statistics methods use the additional index files. A custom adapter for the report builder exposes `manifest`, `neurons`, `parts`, `locations`, `documents`, `starts`, `token_ids`, `document()`, `document_activations()`, `iter_neuron()`, `histogram()` and `close()`.
 
 ## Generate initial reports from an existing archive
 
 `language/analysis/build_dataset_reports.py` builds initial reports from saved activations. It expects the original token-input sidecars (`block-NNNNNN.ids.u32.npy`, `.offsets.u64.npy`, `.documents.json`) and capture metadata in the archive manifest: `model`, `model_snapshot`, `capture`, `selection`, `documents` and `neuron_count`.
+
+The report builder loads `Dataset` from a dataset-local `reader.py` when present. Both this builder and `language/analysis/add_token_tables.py` require `dataset.json` and the archive's verification record, `verification.json`, to contain `complete: true`.
 
 ```bash
 python language/analysis/build_dataset_reports.py \

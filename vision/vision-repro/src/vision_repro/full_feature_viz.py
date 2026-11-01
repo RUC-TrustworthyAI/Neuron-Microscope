@@ -331,7 +331,7 @@ class BatchRunner:
                         'diversity_definition': 'previous-layer Gaussian-weighted Gram cosine within each four-image group only',
                         'anchor_protocol_sha256': anchors.get('_protocol_sha256') if anchors else None,
                         'scope': 'A parameterization extended to other catalog layers and five variants; not recovered author hyperparameters',
-                        'batching': 'per-neuron independent Adam slices, seed0 augment streams, per-neuron ReLU release state; no cross-neuron diversity'}
+                        'batching': 'per-neuron independent Adam slices, augmentation streams initialized from the configured seed, per-neuron ReLU release state; no cross-neuron diversity'}
             write_json(output/'metadata.json', metadata)
             result = {'layer': layer, 'channels': channels, 'slot': slot, 'groups': groups, 'members': members,
                       'steps': config['steps'], 'executed_steps': config['steps']-start, 'elapsed_seconds': elapsed,

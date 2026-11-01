@@ -91,7 +91,7 @@ vision-microscope export --runs vision-repro/outputs/all_neurons \
 python -m http.server 8766 --directory vision-repro/outputs/site
 ```
 
-导出仅包含完成的批次及通过摘要验证的样例资产，不复制 checkpoint、原始 ImageNet 归档或服务器路径。未计算结果显示占位。导出目录必须是新的；传入多个 runs 时，同一 neuron/variant 重复会报错，请显式选择一组结果。
+导出仅包含完成的批次及通过摘要验证的样例资产，不复制 checkpoint、原始 ImageNet 归档。未计算结果显示占位。导出目录必须是新的；传入多个 runs 时，同一 neuron/variant 重复会报错，请显式选择一组结果。
 
 可选 `--reference-catalog /path/to/reference-catalog.json`：提供已验证的官方可用图片索引以开启参考对比；不下载或复制官方 PNG。无此索引时，参考图保留占位。格式见 [数据格式](data-format.md)。本地浏览器仍可通过链接访问官方 neuron 页面。
 

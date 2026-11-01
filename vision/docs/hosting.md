@@ -29,7 +29,7 @@ python -m vision_repro.prepare_site_snapshot \
   vision-repro/outputs/all_neurons vision-repro/outputs/optimized_release
 ```
 
-The exporter checks recorded source hashes, completion markers, dimensions and activation scores. A positive result must have positive activation; a negative result must have negative signed activation. All four Diversity members must pass. Failed checks appear as `quality_review`, not completed images. Original optimization artifacts stay in the campaign directory.
+The exporter checks recorded source hashes, completion markers, dimensions and activation scores. A positive result must have positive activation; a negative result must have negative signed activation. All four Diversity members must pass. Results that fail the activation-sign check are marked `quality_review`. Source hash or completion record mismatches, non-finite scores and incorrect image dimensions stop the export. Original optimization artifacts stay in the campaign directory.
 
 Use a unique output name containing letters, digits, `_` or `-`; it becomes the immutable release ID.
 
