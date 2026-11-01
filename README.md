@@ -370,7 +370,7 @@ If you use Neuron Microscope in academic work, please cite the repository and th
 
 ## 🙏 Acknowledgements <a id="acknowledgements"></a>
 
-The report structure follows [Goodfire's neuron reports](https://already-clean.goodfire.com/). RelP adapts [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits), with the source revision recorded in [`language/tools/relp-source.json`](language/tools/relp-source.json).
+The report structure follows [Goodfire's neuron reports](https://already-clean.goodfire.com/). Our RelP implementation is adapted from [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits).
 
 ## 📄 License <a id="license"></a>
 

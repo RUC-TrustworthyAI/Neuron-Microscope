@@ -370,7 +370,7 @@ GPU 时间包含记录到的模型加载和运算。API 流式时间对重叠区
 
 ## 🙏 致谢 <a id="acknowledgements"></a> <a id="致谢"></a>
 
-报告结构参考 [Goodfire 的神经元报告](https://already-clean.goodfire.com/)。RelP 适配自 [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits)，来源版本记录在 [`language/tools/relp-source.json`](language/tools/relp-source.json)。
+报告结构参考 [Goodfire 的神经元报告](https://already-clean.goodfire.com/)。RelP 实现基于 [`TransluceAI/circuits`](https://github.com/TransluceAI/circuits) 改编。
 
 ## 📄 许可 <a id="license"></a> <a id="许可"></a>
 
