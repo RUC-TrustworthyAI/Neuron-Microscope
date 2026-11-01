@@ -147,8 +147,8 @@ To quantify the gap, we froze the explanations and polarity rules for our 50 Qwe
 | Measure | Result |
 |---|---:|
 | Detecting passages with strong activations (balanced accuracy) | **79.2%** |
-| Average hits among three predicted positions | **0.52** |
-| Average hits with a tolerance of ±2 tokens | **1.10** |
+| Average hits among three predicted positions | **0.52 / 3 positions** |
+| Average hits with a tolerance of ±2 tokens | **1.10 / 3 positions** |
 
 The results suggest that semantic explanations can tell us roughly what contexts activate a neuron, but predicting exactly which token it activates on remains difficult.
 
