@@ -130,7 +130,7 @@ The model uses a pinned **Lucent Inception5h checkpoint**. The [method guide](vi
 
 ### 1. Native neurons often have recognizable semantics at strong activations
 
-Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars). Their legibility resembles what we look for in SAE latents. These findings encourage us to devote more research effort to native neurons.
+Examples include [Colorado-related context](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars), [firsthand experience expressed through “has to be seen / experienced”](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars), and [the roles of mathematical letters](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars). These patterns resemble the interpretable features found in SAE latents and encourage further study of native neurons.
 
 ### 2. We cannot yet claim to fully understand neurons
 
@@ -195,7 +195,7 @@ The code in `language/` uses direct LLM API calls to propose explanations and de
 1. **Sample evidence.** Sample contexts evenly across activation intervals and combine them with strong examples and corpus statistics.
 2. **Explain, check and freeze.** An LLM proposes an explanation. A blind labeler predicts the activation direction at each sampled position with measured values hidden. Use the prediction errors to guide two rounds of revision and blind labeling, then select and freeze a version based on blind-labeling performance.
 3. **Measure.** Search improves generated texts using observed examples and measured feedback; Blind writes new texts from the frozen explanation alone. Controlled tests vary one factor at a time and supply the report’s head figure. Attribution and interventions examine the neuron’s connections and effects on model outputs.
-4. **Analyze and publish.** The LLM analyzes experimental support, counterexamples and unresolved patterns against the frozen explanation. A separate LLM call reviews the explanation and evidence. Python generates the interactive report.
+4. **Analyze and generate the report.** The LLM analyzes experimental support, counterexamples and unresolved patterns against the frozen explanation. A separate LLM call reviews the explanation and evidence. Python generates the interactive report.
 
 See [the workflow](language/docs/workflow.md), [measurement details](language/docs/method.md), and [run configuration](language/docs/running.md).
 
@@ -233,8 +233,8 @@ Choose an entry point for the model and evidence you want to inspect.
 | Mode | What you can do | Requirements |
 | --- | --- | --- |
 | **Explore** | Inspect LLM reports, a recorded investigation and vision comparisons. | Browser only. |
-| **Try the renderer** | Use synthetic data to check report generation and interaction. | Python; no API key, Docker, GPU, or model download. |
-| **Run an LLM investigation** | Analyze neurons from an existing activation archive and publish new reports. | Linux, Python 3.10+, CUDA host, model weights, activation data, and an LLM endpoint. |
+| **Try the renderer** | Use synthetic data to check report generation and interaction. | Python on CPU. |
+| **Run an LLM investigation** | Analyze neurons from an existing activation archive and generate new reports. | Linux, Python 3.10+, CUDA host, model weights, activation data, and an LLM endpoint. |
 | **Visualize a vision neuron** | Optimize images and export an InceptionV1 viewer. | Python 3.11+, a separate environment, model assets and a CUDA host for optimization; see [vision setup](vision/README.md#quick-start). |
 
 ### 1. Try the offline renderer

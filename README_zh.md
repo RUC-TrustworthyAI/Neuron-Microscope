@@ -130,7 +130,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ### 1. 原生神经元的强激活往往呈现清楚的语义
 
-例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars)。这种可读性很像我们在 SAE latents 中寻找的可解释特性，鼓励我们把更多研究精力投入原生神经元。
+例如 [Colorado 相关上下文](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N11703/?compare=0#exemplars)、[“has to be seen / experienced”表达的亲身体验](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L24_N17907/?compare=0#exemplars)，以及[数学字母所扮演的角色](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L50_N3507/?compare=0#exemplars)。这些模式与 SAE latents 中的可解释特征相似，也让我们更有动力研究原生神经元。
 
 ### 2. 我们仍难以声称完全理解了神经元
 
@@ -195,7 +195,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 1. **抽取证据。** 从不同激活区间均衡抽取上下文，并结合强激活样例与语料统计。
 2. **解释、检验并冻结。** LLM 提出解释，盲标模型在看不到实测值的情况下，判断每个采样位置的激活方向。根据预测错误修订解释并重新盲标，完成两轮后，依据盲标表现选择并冻结最终解释。
 3. **执行测量。** Search 参考真实样例和测量反馈改进生成文本；Blind 只依据冻结解释编写新文本。受控测试每次改变一个因素，并用于生成报告头图。归因与干预实验进一步研究神经元之间的联系及其对模型输出的影响。
-4. **分析并发布。** LLM 对照冻结解释，分析实验中的支持证据、反例和尚未解释的现象，再通过一次单独的 LLM 调用评阅解释与证据。Python 生成交互式报告。
+4. **分析并生成报告。** LLM 对照冻结解释，分析实验中的支持证据、反例和尚未解释的现象，再通过一次单独的 LLM 调用评阅解释与证据。Python 生成交互式报告。
 
 具体见[流程说明](language/docs/workflow.md)、[测量细节](language/docs/method.md)与[运行配置](language/docs/running.md)。
 
@@ -220,7 +220,7 @@ Blind 只依据冻结解释编写新文本。Search 还会参考真实样例和�
 | --- | --- | --- |
 | 覆盖度 | 能否解释正负两极和重要的剩余案例？ | 激活谱、样例、语义聚类、预测错误与 No visible cue 案例。 |
 | 特异性 | 能否识别具体触发条件，并与周围主题区分？ | 受控替换、反例、搜索和盲测。 |
-| 预测能力 | 能否预测形成解释时未使用的输入？ | 独立的最大／最小响应盲测仅根据解释生成候选文本，受控模板与相关神经元的响应测量提供补充证据。 |
+| 预测能力 | 对于未参与解释的文本，能否预测神经元的响应？ | 独立的最大／最小响应盲测仅根据解释生成候选文本，受控模板与相关神经元的响应测量提供补充证据。 |
 | 因果相关性 | 改变神经元或输入，是否产生预期影响？ | 原生干预、消融、受控输入修改和输出测量。 |
 | 不确定性 | 哪些现象仍未解释，或证据不足以区分？ | 明确的批评、替代解释、弱响应极和失败测试。 |
 
@@ -233,8 +233,8 @@ RelP 使用修改后的导数提供辅助归因证据，仅凭归因图无法确
 | 方式 | 可以做什么 | 需要什么 |
 | --- | --- | --- |
 | **浏览结果** | 查看 LLM 报告、完整研究记录与视觉对比。 | 浏览器。 |
-| **体验渲染器** | 使用合成数据检查报告生成与交互功能。 | Python；无需 API 密钥、Docker、GPU 或模型下载。 |
-| **开展 LLM 研究** | 分析已有激活归档中的神经元，发布新报告。 | Linux、Python 3.10+、CUDA 主机、模型权重、激活数据和 LLM 端点。 |
+| **体验渲染器** | 使用合成数据检查报告生成与交互功能。 | Python，CPU 即可。 |
+| **开展 LLM 研究** | 分析已有激活归档中的神经元，生成新报告。 | Linux、Python 3.10+、CUDA 主机、模型权重、激活数据和 LLM 端点。 |
 | **可视化视觉神经元** | 优化图像并导出 InceptionV1 网页。 | Python 3.11+、独立环境、模型资产，以及用于优化的 CUDA 主机，见[视觉模块配置](vision/README_zh.md#quick-start)。 |
 
 ### 1. 体验离线渲染器
