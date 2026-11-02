@@ -328,7 +328,7 @@ python -m http.server 8000 --directory runs/example/report
 ## 🚀 未来工作 <a id="future-work"></a>
 
 1. **构造足够多样的神经元解释数据集。** 扩展语言、领域、文体与表达形式，尽量让每个被测神经元都遇到能在正负两极产生较强响应的输入，同时保留弱响应，支持跨激活范围检验解释。
-2. **改进神经元解释流程，提高可靠性。** 改进证据选择、解释修订与反例测试，让流程更可靠地预测激活方向、幅度和具体位置，并衡量独立运行之间的稳定性。
+2. **研究神经元的弱激活。** 探索弱激活承载的信息、它们与强响应的联系，以及对模型行为的影响。
 3. **引入更多被测模型，完善评测标准。** 扩展模型家族，从语义覆盖、token 级预测、弱激活、受控干预和下游行为影响等方面，更全面地评估神经元解释。
 
 ## 🤝 如何参与项目 <a id="how-to-contribute"></a> <a id="contribute"></a> <a id="如何参与项目"></a>
@@ -365,9 +365,9 @@ python -m http.server 8000 --directory runs/example/report
 | 工作 | 研究关联 | 链接 |
 | --- | --- | --- |
 | **C²R: Cross-sample Consistency Regularization Mitigates Feature Splitting and Absorption in Sparse Autoencoders** — Haoran Jin 等，ICML 2026 | 通过跨样本的一致性约束，缓解 SAE 中的特征分裂与吸收。 | [论文](https://arxiv.org/abs/2606.30609) · [代码](https://github.com/hr-jin/Cross-sample-Consistency-Regularization) |
+| **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng 等，arXiv 2026 | 利用 SAE 概念与因果归因，识别会削弱拒答的场景。 | [论文](https://arxiv.org/abs/2607.23496) |
 | **Uncovering Safety Risks of Large Language Models through Concept Activation Vector** — Zhihao Xu 等，NeurIPS 2024 | 利用安全概念激活向量，研究语言模型的安全机制及其脆弱性。 | [论文](https://arxiv.org/abs/2404.12038) · [代码](https://github.com/SproutNan/AI-Safety_SCAV) |
 | **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li 等，EMNLP 2024 | 形式化概念解释，提出可读性和忠实度的度量方法。 | [论文](https://aclanthology.org/2024.emnlp-main.36/) · [代码](https://github.com/hr-jin/Concept-Explanation-Evaluation) |
-| **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng 等，arXiv 2026 | 利用 SAE 概念与因果归因，识别会削弱拒答的场景。 | [论文](https://arxiv.org/abs/2607.23496) |
 
 ## 📝 引用 <a id="citation"></a> <a id="引用"></a>
 

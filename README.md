@@ -328,7 +328,7 @@ Execution time is the sum of API request time and GPU experiment time. GPU time 
 ## 🚀 Future work <a id="future-work"></a>
 
 1. **Build a more diverse dataset for neuron interpretation.** Broaden languages, domains, genres and constructions so that each tested neuron has a better chance of encountering inputs that elicit informative strong responses on both poles. Retain weaker responses as well, so explanations can be examined across the activation range.
-2. **Make the investigation pipeline more reliable.** Improve evidence selection, explanation refinement and counterexample testing. Aim for more dependable predictions of activation direction, magnitude and token position, and measure stability across independent runs.
+2. **Study weak neuron activations.** Investigate what they encode, how they relate to strong responses, and how they affect model behavior.
 3. **Expand the models and evaluation standards.** Study more model families and develop a fuller evaluation of neuron explanations, covering semantic scope, token-level prediction, weak activations, controlled interventions and effects on downstream behavior.
 
 ## 🤝 How to contribute <a id="contribute"></a> <a id="how-to-contribute"></a>
@@ -365,9 +365,9 @@ Our group's related work spans feature learning, concept-based analysis, explana
 | Work | Connection | Links |
 | --- | --- | --- |
 | **C²R: Cross-sample Consistency Regularization Mitigates Feature Splitting and Absorption in Sparse Autoencoders** — Haoran Jin et al., ICML 2026 | Encourages consistent latent assignments across samples to reduce feature splitting and absorption in SAEs. | [Paper](https://arxiv.org/abs/2606.30609) · [Code](https://github.com/hr-jin/Cross-sample-Consistency-Regularization) |
+| **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng et al., arXiv 2026 | Uses SAE concepts and causal attribution to identify scenarios that suppress refusal. | [Paper](https://arxiv.org/abs/2607.23496) |
 | **Uncovering Safety Risks of Large Language Models through Concept Activation Vector** — Zhihao Xu et al., NeurIPS 2024 | Uses safety concept activation vectors to investigate model safety mechanisms and vulnerabilities. | [Paper](https://arxiv.org/abs/2404.12038) · [Code](https://github.com/SproutNan/AI-Safety_SCAV) |
 | **Evaluating Readability and Faithfulness of Concept-based Explanations** — Meng Li et al., EMNLP 2024 | Formalizes concept-based explanations and develops measures of readability and faithfulness. | [Paper](https://aclanthology.org/2024.emnlp-main.36/) · [Code](https://github.com/hr-jin/Concept-Explanation-Evaluation) |
-| **Do LLMs Know Their Vulnerable Scenarios?** — Ziheng Peng et al., arXiv 2026 | Uses SAE concepts and causal attribution to identify scenarios that suppress refusal. | [Paper](https://arxiv.org/abs/2607.23496) |
 
 ## 📝 Citation <a id="citation"></a>
 
