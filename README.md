@@ -214,7 +214,7 @@ See [the vision workflow](vision/README.md#workflow), [objectives and measuremen
 
 We define **Blind score** and **Search score** to compare our neuron explanations with those in Nick Cammarata’s reports through the activation extremes reached by generated texts. For each test, we average the available ratios of our maximum / reference maximum and |our minimum / reference minimum|. Higher scores mean our texts reach stronger activation extremes relative to the corresponding reference test; scores can exceed 1.
 
-- **Blind score:** Measures how strongly new texts activate the neuron when written from the final explanation alone.
+- **Blind score:** Measures activation strength of texts generated from the explanation alone.
 - **Search score:** Measures how strongly texts activate the neuron after refinement using observed examples and measured feedback.
 
 | Dimension | Question | Evidence in the reports |
