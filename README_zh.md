@@ -26,7 +26,7 @@
 
 <a id="overview"></a>
 
-神经网络中的神经元会随输入产生不同的数值响应，我们把这种响应称为**激活**。有些神经元对特定的概念、语法、形状或纹理表现出明显偏好。研究这些响应，有助于我们理解模型如何处理信息。
+大模型在训练时，并没有被要求让每个神经元对应一个人类能理解的概念。Goodfire 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 提出，模型内部可能已经存在大量清晰、可理解的结构，让我们重新关注：神经元本身究竟有多可解释？强激活中呈现的规律，能否解释弱激活，并预测具体的激活位置？
 
 **Neuron Microscope 是研究这些神经元的开源工具：** 查看激活样例、提出解释，并通过实验检验这些解释。项目从复现 Nick Cammarata 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 中的神经元分析出发。
 

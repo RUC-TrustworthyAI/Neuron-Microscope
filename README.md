@@ -26,7 +26,7 @@
 
 <a id="overview"></a>
 
-Neurons in a neural network produce numerical responses, called **activations**, that change with the input. Some respond strongly to particular concepts, grammatical patterns, shapes or textures. Studying these responses can help us understand how a model processes information.
+Training a large language model does not require each neuron to represent a concept humans can understand. Goodfire's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) suggests that models may already contain many clear, interpretable structures, prompting us to revisit a central question: how interpretable are neurons themselves? Can patterns seen in strong activations explain weak activations and predict precisely where a neuron will activate?
 
 **Neuron Microscope is an open-source toolkit for studying these neurons:** inspect activating inputs, propose explanations and test them through experiments. The project began with a reproduction of the neuron analyses in Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/).
 
