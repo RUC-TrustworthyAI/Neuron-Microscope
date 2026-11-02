@@ -26,12 +26,19 @@
 
 <a id="overview"></a>
 
-Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/). The project includes **Qwen3-32B language-model investigations** and **InceptionV1 feature visualization**.
+Neurons in a neural network produce numerical responses, called **activations**, that change with the input. Some respond strongly to particular concepts, grammatical patterns, shapes or textures. Studying these responses can help us understand how a model processes information.
 
-| Model | What you can inspect | Entry point |
-| --- | --- | --- |
-| **Qwen3-32B** | Activation evidence, explanations, controlled tests, interventions and unresolved cases. | [Interactive neuron reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [Investigation code](language/) |
-| **InceptionV1 / Lucent Inception5h** | Five visualization objectives, natural-image examples, heatmaps and reference comparisons. | [Vision guide and examples](vision/README.md) · [Optimization code](vision/vision-repro/) |
+**Neuron Microscope is an open-source toolkit for studying these neurons:** inspect activating inputs, propose explanations and test them through experiments. The project began with a reproduction of the neuron analyses in Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/).
+
+## 🛠️ What you can do <a id="what-you-can-do"></a>
+
+- **Investigate language-model neurons (dense Qwen3).** Choose neurons and a text corpus, collect activations, generate and refine explanations, run text tests, attribution and interventions, and export interactive reports. Change the corpus or prompts to compare explanations and measured responses.
+
+  [Browse examples](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [Run it yourself](#installation-and-usage)
+
+- **Explore vision-model neurons (InceptionV1 / Lucent Inception5h).** Choose a layer and channel, retrieve strongly activating natural images, and optimize images to reveal the neuron's preferences. Export an interactive viewer to inspect five visualization modes, activation heatmaps and optimization progress.
+
+  [Browse examples](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1) · [Run it yourself](vision/README.md#quick-start)
 
 **Data:** The current 50 reports use **Reasoning Mix 100M**. The [data guide](language/docs/data.md) describes the corpus sources, saved activation format and readers. Reports include selected contexts and measurements; full sampled texts and activation archives do not yet have a public download.
 
@@ -39,6 +46,7 @@ Neuron Microscope reproduces and tests the neuron analyses behind Nick Cammarata
 
 ## 📑 Contents <a id="contents"></a>
 
+- [🛠️ What you can do](#what-you-can-do)
 - [💬 Language model neuron reports](#language-model-neuron-reports)
 - [🖼️ Vision model neuron visualizations](#vision-model-neuron-visualizations)
 - [💡 Key findings](#key-findings)

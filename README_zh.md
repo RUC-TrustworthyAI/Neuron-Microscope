@@ -26,12 +26,19 @@
 
 <a id="overview"></a>
 
-Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 中的神经元分析。项目包含 **Qwen3-32B 语言模型研究**与 **InceptionV1 特征可视化**。
+神经网络中的神经元会随输入产生不同的数值响应，我们把这种响应称为**激活**。有些神经元对特定的概念、语法、形状或纹理表现出明显偏好。研究这些响应，有助于我们理解模型如何处理信息。
 
-| 模型 | 可以查看的内容 | 入口 |
-| --- | --- | --- |
-| **Qwen3-32B** | 激活证据、解释、受控测试、干预和尚未解决的案例。 | [交互式神经元报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [研究代码](language/) |
-| **InceptionV1／Lucent Inception5h** | 五种可视化目标、自然图像样例、热图和参考对比。 | [视觉模块指南与样例](vision/README_zh.md) · [优化代码](vision/vision-repro/) |
+**Neuron Microscope 是研究这些神经元的开源工具：** 查看激活样例、提出解释，并通过实验检验这些解释。项目从复现 Nick Cammarata 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 中的神经元分析出发。
+
+## 🛠️ 你可以做什么 <a id="what-you-can-do"></a>
+
+- **研究语言模型中的神经元（dense Qwen3）。** 指定神经元和文本语料，采集激活、生成并修订解释、运行文本测试、归因与干预实验，最后导出交互式报告。可以更换语料或提示词，比较得到的解释与实测响应。
+
+  [浏览已有样例](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/) · [自己运行](#installation-and-usage)
+
+- **探索视觉模型中的神经元（InceptionV1／Lucent Inception5h）。** 指定层和通道，检索真实图像中的强响应样例，并通过优化图像探索神经元偏好的特征。导出交互页面，查看五种可视化结果、激活热图和优化过程。
+
+  [浏览已有样例](https://vision-neuron-microscope.tart-olm-9383.chatgpt.site/?layer=mixed4c&neuron=477&compare=1) · [自己运行](vision/README_zh.md#quick-start)
 
 **数据：** 当前 50 份报告均使用 **Reasoning Mix 100M**。[数据指南](language/docs/data.md)介绍了语料来源、激活格式和读取工具。报告包含选定的上下文和测量结果；完整采样文本与激活归档尚无公开下载入口。
 
@@ -39,6 +46,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 ## 📑 目录 <a id="contents"></a> <a id="目录"></a>
 
+- [🛠️ 你可以做什么](#what-you-can-do)
 - [💬 语言模型神经元报告](#language-model-neuron-reports)
 - [🖼️ 视觉模型神经元可视化](#vision-model-neuron-visualizations)
 - [💡 主要发现](#key-findings)
