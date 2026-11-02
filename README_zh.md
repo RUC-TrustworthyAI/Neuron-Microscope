@@ -309,14 +309,14 @@ python -m http.server 8000 --directory runs/example/report
 
 | 项目 | 每个神经元平均值 |
 | --- | --- |
-| 执行耗时 | 1 小时 13 分 45 秒 |
+| 执行耗时（API + GPU） | 29 分 59 秒 |
 | GPU 实验时间 | 5 分 9 秒 |
 | GPU 使用量 | 0.343 GPU 卡时 |
-| API 流式响应时间 | 23 分 52 秒 |
+| API 请求时间 | 24 分 50 秒 |
 | API 请求数 | 27.46 次 |
 | API 费用估算 | $0.7821 |
 
-执行耗时包含 GPU 排队等待，GPU 时间包含模型加载和测量。API 并发响应时，重叠时间只计一次。GPU 与 API 任务可以重叠，激活采集开销另计。各项明细见 [50 份报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/)。
+执行耗时按 API 请求时间与 GPU 实验时间之和计算。GPU 时间包含模型加载和测量，激活采集开销另计。各项明细见 [50 份报告](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/)。
 
 ## 🚧 当前局限 <a id="limitations-and-future-work"></a> <a id="局限与未来工作"></a> <a id="当前局限"></a>
 

@@ -309,14 +309,14 @@ The table shows **per-neuron arithmetic means across all 50 published Qwen3-32B 
 
 | Metric | Mean per neuron |
 | --- | --- |
-| Execution time | 1 h 13 min 45 s |
+| Execution time (API + GPU) | 29 min 59 s |
 | GPU experiment time | 5 min 9 s |
 | GPU usage | 0.343 GPU card-hours |
-| API streaming time | 23 min 52 s |
+| API request time | 24 min 50 s |
 | API requests | 27.46 |
 | Estimated API cost | $0.7821 |
 
-Execution time includes GPU queueing; GPU time includes model loading and measurements. API streaming time counts overlapping responses once. GPU work and API streams can overlap. These figures exclude activation collection. Individual breakdowns are available in the [50 reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/).
+Execution time is the sum of API request time and GPU experiment time. GPU time includes model loading and measurements; activation collection is excluded. Individual breakdowns are available in the [50 reports](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/).
 
 ## 🚧 Limitations <a id="limitations-and-future-work"></a> <a id="limitations"></a>
 
