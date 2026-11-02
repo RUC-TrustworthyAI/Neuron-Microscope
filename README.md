@@ -84,7 +84,7 @@ Explore **50 Qwen3-32B neurons on Reasoning Mix 100M**, with Blind and Search sc
   </a>
 </p>
 
-Each row links to a full interactive report with activation evidence, exemplars, searches, clusters, effects, tests, criticism, an LLM review and cost records. Across the 49 available scores in each column, **Blind has mean 0.864 and median 0.891; Search has mean 0.782 and median 0.808**. The directory shows these summaries in the column headings.
+Each entry opens the full report alongside the original. Across the 49 available scores in each column, **Blind has mean 0.864 and median 0.891; Search has mean 0.782 and median 0.808**.
 
 ## 🖼️ Vision model neuron visualizations <a id="vision-neuron-visualizations"></a> <a id="vision-model-neuron-visualizations"></a>
 
@@ -154,13 +154,13 @@ The results suggest that semantic explanations can tell us roughly what contexts
 
 **[Superposition](https://transformer-circuits.pub/2022/toy_model/index.html) may still be present in native representations**. AlreadyClean's V-shaped-feature example links different images through a shared shape. For many of the neurons we inspected, we have not found a comparable semantic pattern linking strong and weak responses.
 
-For a concrete example, see [L55_N14892's Exemplars](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#exemplars): an Ada attribute description reaches **+57**, while OpenSSH documentation reaches **-72.5**. In the same report's [Activation spectrum](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#spectrum), a phosphatase glossary produces **+11.5625 on a space**, and a worked normal-distribution problem produces **+11 on `1`**. These weaker positives are about one fifth of the positive corpus maximum, yet their connection to the Ada/SQL-centered positive account remains unclear. In Spectrum, select **No visible cue** and the **8…16** activation bin to inspect these two examples.
+For a concrete example, see [L55_N14892's Exemplars](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#exemplars): an Ada attribute description reaches **+57**, while OpenSSH documentation reaches **-72.5**. In the same report's [Activation spectrum](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#spectrum), a phosphatase glossary produces **+11.5625 on a space**, and a worked normal-distribution problem produces **+11 on `1`**. These weaker positives are about one fifth of the positive corpus maximum, yet their connection to the strong positive responses to programming text remains unclear. In Spectrum, select **No visible cue** and the **8…16** activation bin to inspect these two examples.
 
 [Leo Gao's response](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean) also argues that activation magnitudes can carry important information and expresses the view that ablating small neuron activations can materially harm performance. This makes the weaker responses important to investigate alongside the strongest examples. Testing this account requires feature decomposition and controlled interventions.
 
 ### 4. Neuron interpretations depend on the dataset
 
-A useful contrast is [L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=0#exemplars). In Reasoning Mix 100M, repeated book-catalog examples reach **-37 and -36** at newlines following their titles; the reference corpus minimum is **-11.8125**, with its strongest negative examples emphasizing configuration and code-declaration contexts. The larger negative tail brings catalog-title boundaries to the foreground of our account.
+A useful contrast is [L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=0#exemplars). In Reasoning Mix 100M, repeated book-catalog examples reach **-37 and -36** at newlines following their titles; the reference corpus minimum is **-11.8125**, with its strongest negative examples emphasizing configuration and code-declaration contexts. These examples led us to include boundaries after book titles in our interpretation.
 
 The reverse also occurs. For [L26_N8504](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L26_N8504/?compare=0#distribution), our corpus spans **-4.15625 to +11.8125**, compared with **-7.5 to +21.25** in the reference. Both tails reach only about 55% of the reference magnitudes. Our account remains more fragmented, covering letter fragments and whitespace, while the reference centers on a specific alignment-whitespace pattern. Reduced exposure to strong examples may contribute to this difference.
 
@@ -186,7 +186,7 @@ These 50 neurons were selected from published reports, so this sample cannot est
   </a>
 </p>
 
-The walkthrough follows **L55_N11703 on Reasoning Mix 100M** from saved evidence to the final report. It presents the task prompts, excerpts of their inputs, structured responses, all three explanation-and-labeling versions, measured experiments and costs. The selected explanation is frozen before text construction and GPU experiments.
+Follow **L55_N11703 on Reasoning Mix 100M** from the initial evidence and explanation revisions through experiments to the final report.
 
 ### Current runnable workflow
 
@@ -274,7 +274,7 @@ python -m language.collection \
   --output data/reasoning-mix-100m
 ```
 
-The command shuffles documents with seed 42, takes up to 4,096 tokens from each document's beginning and trims the final prefix to reach the token budget. It saves native gate, up and product activations, aligned token IDs and document positions, histograms and indices. It then builds initial reports with token tables and static logit effects in `data/reasoning-mix-100m/reports/<neuron-id>/`. BF16 activations take approximately 600 MB per neuron at 100M tokens, plus input data and reports. Repeating the same command resumes completed input preparation, activation shards and reports. See the [data guide](language/docs/data.md#collect-activations-from-local-text) for the output layout and batch settings.
+The command saves an activation archive in `data/reasoning-mix-100m/` and initial reports in `data/reasoning-mix-100m/reports/<neuron-id>/`, ready for the next step. At 100M tokens, BF16 activations require approximately 600 MB per neuron, plus input data and reports. Repeating the same command resumes the collection. See the [data guide](language/docs/data.md#collect-activations-from-local-text) for sampling and output details.
 
 ### 3. Configure an LLM investigation
 
@@ -298,9 +298,9 @@ NEURON_MICROSCOPE_GPU_WORKER=1 python -m language \
 python -m http.server 8000 --directory runs/example/report
 ```
 
-Append `--stop-after interpretation` to inspect the refined explanation and both labeled plots using saved activations before loading the target model. Repeating the command with the same configuration reuses completed API responses and saved sampling and measurement records. Use a new output directory when changing scientific inputs.
+Append `--stop-after interpretation` to inspect the refined explanation and both labeled plots using saved activations before loading the target model. Repeating the command with the same configuration reuses completed API responses and saved sampling and measurement records. Use a new output directory when changing the neuron, dataset, model or prompts.
 
-For concurrent neurons, use separate configurations and output directories, with the same `gpu_lock` for runs sharing a GPU group. `NEURON_MICROSCOPE_GPU_WORKER=1` enables the shared resident model. The supplied `llm.max_concurrent_requests: null` places no application-level API concurrency cap. The [run guide](language/docs/running.md) covers continuation, comparison export and execution records.
+For concurrent neurons, use separate configurations and output directories, with the same `gpu_lock` for runs sharing a GPU group. `NEURON_MICROSCOPE_GPU_WORKER=1` enables the shared resident model. The [run guide](language/docs/running.md) covers continuation, comparison export and execution records.
 
 ## ⏱️ Recorded runtime and cost <a id="reproducibility-and-cost"></a> <a id="recorded-runtime-and-cost"></a>
 
@@ -319,8 +319,6 @@ Execution time includes GPU queueing; GPU time includes model loading and measur
 
 ## 🚧 Limitations <a id="limitations-and-future-work"></a> <a id="limitations"></a>
 
-- The current set contains 50 neurons with reference reports, so its results cannot be generalized to all Qwen3-32B neurons.
-- Full activation archives do not yet have a public download; external users currently need to supply compatible input data.
 - Corpus coverage, prompt choice, evidence presentation and LLM stochasticity can change an interpretation.
 - Blind and Search scores compare activation extrema. They do not establish mechanistic correctness, and a mean over available poles may summarize only one pole.
 - Negative poles and weak activations are often less clearly explained than strong positive responses.

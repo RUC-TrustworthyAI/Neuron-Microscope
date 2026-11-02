@@ -84,7 +84,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
   </a>
 </p>
 
-每一行都可进入完整交互式报告，查看激活证据、样例、搜索、聚类、效应、测试、批评、LLM 评阅和开销记录。两列各有 49 个有效分数：**Blind 均值为 0.864，中位数为 0.891；Search 均值为 0.782，中位数为 0.808**。导航页也在列标题中展示这些统计值。
+每个条目都可打开完整报告，与原报告对照阅读。两列各有 49 个有效分数：**Blind 均值为 0.864，中位数为 0.891；Search 均值为 0.782，中位数为 0.808**。
 
 ## 🖼️ 视觉模型神经元可视化 <a id="vision-model-neuron-visualizations"></a> <a id="vision-neuron-visualizations"></a> <a id="视觉模型神经元可视化"></a>
 
@@ -154,13 +154,13 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
 
 **原生表示中可能仍然存在 [superposition](https://transformer-circuits.pub/2022/toy_model/index.html)**。原博客的 V-shaped feature 案例用共同形状解释了不同图像；在我们检查的许多神经元中，强弱响应之间的共同语义模式仍不清楚。
 
-一个具体例子是 [L55_N14892 的 Exemplars](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#exemplars)：Ada 属性说明达到 **+57**，OpenSSH 文档达到 **-72.5**，强响应的程序语境较清楚。但在同一报告的 [Activation spectrum](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#spectrum) 中，磷酸酶释义在空格处达到 **+11.5625**，正态分布解题在 `1` 处达到 **+11**。这两例约为正极语料最高值的五分之一，它们与当前以 Ada／SQL 为中心的正极解释有何联系，仍不清楚。在 Spectrum 中选择 **No visible cue** 与 **8…16** 激活区间，即可查看这两个样例。
+一个具体例子是 [L55_N14892 的 Exemplars](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#exemplars)：Ada 属性说明达到 **+57**，OpenSSH 文档达到 **-72.5**，强响应的程序语境较清楚。但在同一报告的 [Activation spectrum](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L55_N14892/?compare=0#spectrum) 中，磷酸酶释义在空格处达到 **+11.5625**，正态分布解题在 `1` 处达到 **+11**。这两例约为正极语料最高值的五分之一，它们与程序文本中的强正响应有何联系，仍不清楚。在 Spectrum 中选择 **No visible cue** 与 **8…16** 激活区间，即可查看这两个样例。
 
 [Leo Gao 的回应](https://www.lesswrong.com/posts/Dkh7pXKjoNWkkxQDz/neural-networks-are-not-already-clean)也指出，激活幅度可能承载重要信息，并认为消融较小的神经元激活可能明显损害模型表现。因此，弱响应也值得与强响应一起研究。检验这一解释还需要特征分解与受控干预。
 
 ### 4. 神经元解释受数据集影响
 
-[L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=0#exemplars)提供了一个直接的对照。在 Reasoning Mix 100M 中，书目条目在标题后的换行处反复出现强负响应，两篇样例分别达到 **-37 和 -36**；原报告的语料最低值为 **-11.8125**，其中最强负例主要呈现配置块和代码声明上下文。我们观察到的更强负极，让书目标题边界在解释中更加突出。
+[L49_N11562](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L49_N11562/?compare=0#exemplars)提供了一个直接的对照。在 Reasoning Mix 100M 中，书目条目在标题后的换行处反复出现强负响应，两篇样例分别达到 **-37 和 -36**；原报告的语料最低值为 **-11.8125**，其中最强负例主要呈现配置块和代码声明上下文。据此，我们在解释中加入了书目标题后的边界。
 
 相反的情况也会出现。[L26_N8504](https://ruc-trustworthyai.github.io/Neuron-Microscope-Pages/reasoning-mix-100m-50/L26_N8504/?compare=0#distribution) 在我们的语料中范围为 **-4.15625 至 +11.8125**，原报告为 **-7.5 至 +21.25**，两端绝对值都只达到原报告的约 55%。我们的解释仍较零散，包括字母片段和空白；原报告则聚焦于具体的空白对齐模式。语料中的强响应样例不足，可能是这种差异的原因之一。
 
@@ -186,7 +186,7 @@ Neuron Microscope 独立复现并研究 Nick Cammarata 的 [*Neural Networks Are
   </a>
 </p>
 
-这份记录展示了 **Reasoning Mix 100M 上的 L55_N11703** 从已有证据到最终报告的过程，包括各步提示词、输入节选、结构化输出、三版解释与盲标结果、实测实验和开销。选中的解释在构造文本和 GPU 实验前冻结。
+跟随 **Reasoning Mix 100M 上的 L55_N11703**，查看从初始证据、解释修订到实验和最终报告的完整过程。
 
 ### 当前可运行流程
 
@@ -274,7 +274,7 @@ python -m language.collection \
   --output data/reasoning-mix-100m
 ```
 
-命令用种子 42 打乱文档顺序，每篇取开头最多 4,096 个 token，并裁剪最后一篇的前缀以达到预算。程序保存原生 gate、up、product 激活、对应的 token ID、文档位置、直方图和索引，然后在 `data/reasoning-mix-100m/reports/<neuron-id>/` 生成带有 token 统计表和静态 logit 效应的初始报告。100M tokens 的三个 BF16 通道每个神经元约占 600 MB，此外还需保存输入数据和报告。相同命令再次运行时，会复用已完成的输入准备、激活分片和报告。输出目录和批次设置见[数据指南](language/docs/data.md#collect-activations-from-local-text)。
+命令将激活归档保存到 `data/reasoning-mix-100m/`，并在 `data/reasoning-mix-100m/reports/<neuron-id>/` 生成初始报告，可直接用于下一步。100M tokens 的 BF16 激活每个神经元约占 600 MB，此外还需保存输入数据和报告。再次执行相同命令可继续采集。采样与输出格式见[数据指南](language/docs/data.md#collect-activations-from-local-text)。
 
 ### 3. 配置 LLM 研究
 
@@ -298,9 +298,9 @@ NEURON_MICROSCOPE_GPU_WORKER=1 python -m language \
 python -m http.server 8000 --directory runs/example/report
 ```
 
-添加 `--stop-after interpretation`，即可利用已有激活查看修订后的解释和两张标注图，此时尚未加载目标模型。使用相同配置再次运行时，会复用已完成的 API 响应，以及已保存的采样和测量记录。更改科学输入时，应使用新的输出目录。
+添加 `--stop-after interpretation`，即可利用已有激活查看修订后的解释和两张标注图，此时尚未加载目标模型。使用相同配置再次运行时，会复用已完成的 API 响应，以及已保存的采样和测量记录。更换神经元、数据集、模型或提示词时，使用新的输出目录。
 
-并行研究多个神经元时，为每个运行分别准备配置和输出目录；共用 GPU 组的运行应使用相同的 `gpu_lock`。`NEURON_MICROSCOPE_GPU_WORKER=1` 启用共享常驻模型。随附配置的 `llm.max_concurrent_requests: null` 不设置应用层 API 并发上限。继续执行、双栏导出和执行记录见[运行说明](language/docs/running.md)。
+并行研究多个神经元时，为每个运行分别准备配置和输出目录；共用 GPU 组的运行应使用相同的 `gpu_lock`。`NEURON_MICROSCOPE_GPU_WORKER=1` 启用共享常驻模型。继续执行、双栏导出和执行记录见[运行说明](language/docs/running.md)。
 
 ## ⏱️ 实测耗时与开销 <a id="recorded-runtime-and-cost"></a> <a id="reproducibility-and-cost"></a> <a id="实测耗时与开销"></a>
 
@@ -319,8 +319,6 @@ python -m http.server 8000 --directory runs/example/report
 
 ## 🚧 当前局限 <a id="limitations-and-future-work"></a> <a id="局限与未来工作"></a> <a id="当前局限"></a>
 
-- 当前集合包含 50 个已有原报告的神经元，结果尚无法推广到 Qwen3-32B 的全部神经元。
-- 完整激活归档尚无公开下载入口，外部用户目前需要提供兼容的输入数据。
 - 语料覆盖、提示词选择、证据展示与 LLM 随机性都可能改变解释。
 - Blind 和 Search 分数比较激活极值，无法证明机制解释正确；对可用方向求平均时，也可能只包含单极。
 - 负极和弱激活的解释往往不如强正向响应清楚。
