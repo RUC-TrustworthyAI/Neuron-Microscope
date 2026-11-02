@@ -328,8 +328,9 @@ Execution time is the sum of API request time and GPU experiment time. GPU time 
 ## 🚀 Future work <a id="future-work"></a>
 
 1. **Build a more diverse dataset for neuron interpretation.** Broaden languages, domains, genres and constructions so that each tested neuron has a better chance of encountering inputs that elicit informative strong responses on both poles. Retain weaker responses as well, so explanations can be examined across the activation range.
-2. **Study weak neuron activations.** Investigate what they encode, how they relate to strong responses, and how they affect model behavior.
-3. **Expand the models and evaluation standards.** Study more model families and develop a fuller evaluation of neuron explanations, covering semantic scope, token-level prediction, weak activations, controlled interventions and effects on downstream behavior.
+2. **Explore superposition and weak activations.** Investigate whether neurons encode multiple features, how weak and strong responses relate, and how weak activations affect model behavior.
+3. **Make the investigation pipeline more reliable.** Improve evidence selection, explanation refinement and counterexample testing. Aim for more dependable predictions of activation direction, magnitude and token position, and measure stability across independent runs.
+4. **Expand the models and evaluation standards.** Study more model families and develop a fuller evaluation of neuron explanations, covering semantic scope, token-level prediction, weak activations, controlled interventions and effects on downstream behavior.
 
 ## 🤝 How to contribute <a id="contribute"></a> <a id="how-to-contribute"></a>
 
