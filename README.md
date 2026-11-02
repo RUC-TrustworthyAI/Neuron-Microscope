@@ -72,8 +72,6 @@ Both reports identify a strong Colorado-related positive response, but they make
 - **Published report:** the gate opens before a place-specific fill-in value, while the up projection carries signed place identity.
 - **Our reproduction:** positive responses follow Colorado place and institution names across local-government, education, health, contact and news contexts. The negative account is limited to certain non-Colorado administrative contact and citation blocks.
 
-In the Reasoning Mix 100M investigation, contact variants in `Contact block: {slot} End of contact.` reach **+188 to +352** for six Colorado institutions. Each value is the signed largest absolute response within the replacement span; all six peak on a space. Three out-of-state variants range from **-26.5 to +42.75**, while a generic clinic with a Colorado `720` number still reaches **+165**. These results support a Colorado-related response and leave the contributions of institution names, area codes and formatting to be separated. The report includes the full texts, attribution results, interventions and counterexamples.
-
 ### Browse all current reports
 
 Explore **50 Qwen3-32B neurons on Reasoning Mix 100M**, with Blind and Search scores alongside each report.
