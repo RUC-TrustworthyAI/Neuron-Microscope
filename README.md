@@ -26,9 +26,9 @@
 
 <a id="overview"></a>
 
-Training a large language model does not require each neuron to represent a concept humans can understand. Goodfire's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) suggests that models may already contain many clear, interpretable structures, prompting us to revisit two questions: how interpretable are neurons themselves? Can patterns seen in strong activations explain weak activations and predict precisely where a neuron will activate?
+Goodfire's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) has attracted widespread attention in interpretability research. It argues that neural networks may already contain many clear, interpretable structures, with many neurons serving recognizable functions. This challenges the view that individual neurons often mix unrelated concepts and are difficult to understand directly. The article has renewed our interest in two questions: how interpretable are neurons themselves? Can patterns seen in strong activations explain weak activations and predict precisely where a neuron will activate?
 
-**Neuron Microscope is an open-source toolkit for studying these neurons:** inspect activating inputs, propose explanations and test them through experiments. The project began with a reproduction of the neuron analyses in Nick Cammarata's [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/).
+We developed and open-sourced **Neuron Microscope** to investigate these questions, building on our reproduction of Nick Cammarata's neuron analyses. The toolkit helps researchers inspect activation examples, propose explanations and test them through experiments.
 
 ## 🛠️ What you can do <a id="what-you-can-do"></a>
 

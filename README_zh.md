@@ -26,9 +26,9 @@
 
 <a id="overview"></a>
 
-大模型在训练时，并没有被要求让每个神经元对应一个人类能理解的概念。Goodfire 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 提出，模型内部可能已经存在大量清晰、可理解的结构，让我们重新关注：神经元本身究竟有多可解释？强激活中呈现的规律，能否解释弱激活，并预测具体的激活位置？
+Goodfire 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 在可解释性领域引发了广泛关注。文章提出，神经网络内部可能已经存在大量清晰、可理解的结构，许多神经元本身就具有可辨认的功能。这一观点挑战了单个神经元往往混合多种无关概念、难以直接理解的看法。这让我们重新关注：神经元本身究竟有多可解释？强激活中呈现的规律，能否解释弱激活，并预测具体的激活位置？
 
-**Neuron Microscope 是研究这些神经元的开源工具：** 查看激活样例、提出解释，并通过实验检验这些解释。项目从复现 Nick Cammarata 的 [*Neural Networks Are Already Clean*](https://already-clean.goodfire.com/) 中的神经元分析出发。
+为研究这些问题，我们从复现 Nick Cammarata 的神经元分析出发，开发并开源了 **Neuron Microscope**。这套工具箱帮助研究者查看激活样例、提出解释，并通过实验检验这些解释。
 
 ## 🛠️ 你可以做什么 <a id="what-you-can-do"></a>
 
