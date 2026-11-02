@@ -84,7 +84,7 @@ Explore **50 Qwen3-32B neurons on Reasoning Mix 100M**, with Blind and Search sc
   </a>
 </p>
 
-Each row links to a full interactive report with activation evidence, exemplars, searches, clusters, effects, tests, criticism, an independent review and cost records. Across the 49 available scores in each column, **Blind has mean 0.864 and median 0.891; Search has mean 0.782 and median 0.808**. The directory shows these summaries in the column headings.
+Each row links to a full interactive report with activation evidence, exemplars, searches, clusters, effects, tests, criticism, an LLM review and cost records. Across the 49 available scores in each column, **Blind has mean 0.864 and median 0.891; Search has mean 0.782 and median 0.808**. The directory shows these summaries in the column headings.
 
 ## 🖼️ Vision model neuron visualizations <a id="vision-neuron-visualizations"></a> <a id="vision-model-neuron-visualizations"></a>
 
@@ -190,14 +190,12 @@ The walkthrough follows **L55_N11703 on Reasoning Mix 100M** from saved evidence
 
 ### Current runnable workflow
 
-The code in `language/` orchestrates direct LLM API calls and target-model measurements. The LLM returns explanations, predictions and experimental inputs in defined JSON formats; Python selects evidence, executes measurements and assembles HTML. The LLMs that propose, refine and evaluate explanations do not receive AlreadyClean's explanations. When supplied, reference reports are added at publication for comparison. The configuration generator supplies the settings below.
+The code in `language/` uses direct LLM API calls to propose explanations and design tests. Python selects evidence, runs measurements and builds the report. Reference reports are added after the investigation for side-by-side comparison.
 
-1. **Sample evidence.** Allocate 500 positions equally across nonempty activation bins, selecting within each bin from the full saved corpus. Redistribute a bin's unused quota only when its corpus population is too small. The archive retains gate, up and product channels; the explanation model receives product values, contexts, extreme tokens and document exemplars, quantile cases, token selectivity, peak statistics and direct logit effects.
-2. **Explain, check and freeze.** Request at most five response rules per pole. The explanation and rule descriptions express the same account. A labeler predicts the sampled positions with their measurements hidden, in five concurrent batches of up to 100. Two revisions each read the preceding explanation, the 500 measured contexts and focused error feedback, followed by another blind labeling pass. Among the three versions, select the highest coverage with directional accuracy **>90%**; if none qualifies, select the highest accuracy. Freeze that explanation together with its own labels. An unsupported pole may remain unexplained.
-3. **Measure.** Run three feedback-guided Search rounds, requesting six regions with 16 texts each. Design four controlled tests with ten conditions each, measure them and improve the test design once. The head figure comes from these controlled tests. A separate Blind writer receives only the frozen explanation and rules, with six texts per supported pole. Search and Blind score full-input maxima or minima; controlled tests score a replacement span, a common suffix or a specified token. Batched GPU operations also compute attribution, measure responses of the target and attribution-linked neurons (Family), and perform interventions. With the shared worker enabled, one loaded model serves queued operations from multiple runs while their API calls overlap.
-4. **Analyze and publish.** The LLM analyzes support, counterexamples and unresolved patterns while preserving the frozen explanation and rules. An independent reader assesses the account. Fixed code renders the interactive report.
-
-**Activation spectrum and Inside the neuron share one sample pool and the predictions from the refined, frozen explanation.** The labeler reads the full observed prefix and nearby continuation as linguistic context. It assigns No visible cue when the explanation does not clearly predict either direction. Because these samples inform refinement, their agreement scores provide development feedback. Independent written probes and controlled experiments supply further tests.
+1. **Sample evidence.** Sample contexts evenly across activation intervals and combine them with strong examples and corpus statistics.
+2. **Explain, check and freeze.** An LLM proposes an explanation. A blind labeler predicts the activation direction at each sampled position with measured values hidden. Use the prediction errors to guide two rounds of revision and blind labeling, then select and freeze a version based on blind-labeling performance.
+3. **Measure.** Search improves generated texts using observed examples and measured feedback; Blind writes new texts from the frozen explanation alone. Controlled tests vary one factor at a time and supply the report’s head figure. Attribution and interventions examine the neuron’s connections and effects on model outputs.
+4. **Analyze and publish.** The LLM analyzes experimental support, counterexamples and unresolved patterns against the frozen explanation. A separate LLM call reviews the explanation and evidence. Python generates the interactive report.
 
 See [the workflow](language/docs/workflow.md), [measurement details](language/docs/method.md), and [run configuration](language/docs/running.md).
 
@@ -214,7 +212,9 @@ See [the vision workflow](vision/README.md#workflow), [objectives and measuremen
 
 ## ⚖️ Evaluating the report evidence <a id="how-we-evaluate-an-explanation"></a> <a id="evaluating-the-report-evidence"></a>
 
-The current directory reports **Blind score** and **Search score**. For each, average the available ratios of reproduced maximum / reference maximum and |reproduced minimum / reference minimum|. A score can exceed 1; missing measurements are excluded from its summary statistics. Blind tests use texts written from the frozen explanation alone, while Search uses measured feedback. These extrema measure response strength relative to the reference; causal claims require the experiments below.
+We define **Blind score** and **Search score** to compare our neuron explanations with those in Nick Cammarata’s reports through the activation extremes reached by generated texts. For each test, we average the available ratios of our maximum / reference maximum and |our minimum / reference minimum|. Higher scores mean our texts reach stronger activation extremes relative to the corresponding reference test; scores can exceed 1.
+
+Blind texts are written from the frozen explanation alone. Search also uses observed examples and measured feedback to improve the texts.
 
 | Dimension | Question | Evidence in the reports |
 | --- | --- | --- |
@@ -222,7 +222,6 @@ The current directory reports **Blind score** and **Search score**. For each, av
 | Specificity | Does it identify the trigger rather than merely the surrounding topic? | Controlled replacements, counterexamples, searches, and blind tests. |
 | Predictive value | Can the explanation anticipate responses on inputs not used to formulate it? | Independent explanation-only maximum/minimum tests, supported by controlled templates and measurements of attribution-linked neurons. |
 | Causal relevance | Does changing the neuron or its inputs have the predicted effect? | Native interventions, ablations, controlled input changes, and output measurements. |
-| Stability | Does the interpretation persist across samples, prompts and independent runs? | Comparisons of explanations and measurements under matched conditions. |
 | Uncertainty | What remains unexplained or underdetermined? | Explicit criticism, alternative accounts, weak poles, and failed tests. |
 
 RelP provides supporting attribution evidence using modified derivatives; its graphs alone do not establish a native causal effect. See [the measurement scope](language/docs/method.md#relp-and-intervention-scope).
