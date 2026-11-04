@@ -384,7 +384,7 @@ If you use Neuron Microscope in academic work, please cite the repository and th
 
 ```bibtex
 @software{ruc_trustworthyai_neuron_microscope_2026,
-  author = {Haoran Jin and Ziheng Peng and Xiting Wang},
+  author = {Haoran Jin and Ziheng Peng and Xiting Wang* and Defu Lian and Hong Xie},
   title = {Neuron Microscope: Investigating native neurons in language and vision models.},
   year = {2026},
   url = {https://github.com/RUC-TrustworthyAI/Neuron-Microscope}
