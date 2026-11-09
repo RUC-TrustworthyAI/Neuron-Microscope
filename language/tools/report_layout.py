@@ -325,39 +325,17 @@ def graph_display(source):
     return source[:start]+part+source[stop:]
 
 
-VERDICT_CODE = r"""const verdictOf = value => {
-    const text=String(value || '').trim().toLowerCase();
-    if (['survived','narrowed','rejected'].includes(text)) return text;
-    // Older free-text decisions keep their complete wording in the expanded body.
-    if (/\b(narrow\w*|qualif\w*|partial\w*|directionally|broaden\w*|revis\w*)\b/.test(text)) return 'narrowed';
-    if (/^(rejected|not supported|unsupported|refuted|falsified)\b/.test(text)) return 'rejected';
-    if (/^(survived|supported)\b/.test(text)) return 'survived';
-    return '';
-  };"""
-
-CRITICISM = r"""// 8. Criticism.
+CRITICISM = r"""// 8. Criticism: compact table, each row expands to the result and evidence.
 (() => { const K = B.criticism; if (!has(K)) return;
-  __VERDICT_CODE__
   const s = Math.max(...K.flatMap(k => (k.evidence || []).map(e => Math.abs(e.activation || 0))), 1e-9);
-  const rows = K.map(k => {
-    const verdict=verdictOf(k.verdict), original=String(k.verdict || '').trim();
-    return $('details', {class:'crow'},
-      $('summary', null, $('span', {class:'n'}, k.round),
-        $('span', null, $('span', {class:'pill '+verdict}, verdict || '—')),
-        $('span', {class:'att',title:k.attack || ''}, k.attack || '')),
-      $('div', {class:'bodyc'},
-        k.prediction ? P($('b',null,'Prediction. '),k.prediction) : null,
-        k.result ? P($('b',null,'Result. '),k.result) : null,
-        original && original.toLowerCase()!==verdict ? P($('b',null,'Verdict. '),original) : null,
-        has(k.evidence) ? $('div',{class:'ev'},k.evidence.map(e=>$('div',null,
-          tile(e.activation,{signed:true,scale:s}),$('span',null,e.text)))) : null));
-  });
-  sec('criticism','Criticism',
-    [P('Each round, a critic tries to break the claim. The verdict records whether the claim survived as written, was narrowed, or was rejected. Open a row for the result and evidence.')],
-    $('div',null,rows));
-})();
+  const rows = K.map(k => $('details', { class: 'crow' }, $('summary', null, $('span', { class: 'n' }, k.round), $('span', null, $('span', { class: 'pill ' + (k.verdict || '') }, k.verdict || '')), $('span', { class: 'att', title: k.attack || '' }, k.attack || '')),
+    $('div', { class: 'bodyc' }, k.prediction ? P($('b', null, 'Prediction. '), k.prediction) : null, k.result ? P($('b', null, 'Result. '), k.result) : null, has(k.evidence) ? $('div', { class: 'ev' }, k.evidence.map(e => $('div', null, tile(e.activation, { signed: true, scale: s }), $('span', null, e.text)))) : null)));
+  const intro = B.followup_status?.showing_baseline
+    ? P('Initial Criticism. Open a row for the result and evidence.')
+    : P('Each round, a critic tries to break the claim. The verdict records whether the claim survived as written, was narrowed, or was rejected. Open a row for the result and evidence.');
+  sec('criticism', 'Criticism', [intro], $('div', null, rows)); })();
 
-""".replace('__VERDICT_CODE__',VERDICT_CODE)
+"""
 
 
 def render(source):

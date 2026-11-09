@@ -36,6 +36,8 @@ def preview(value, limit=3):
 def export(run, output):
     config = read(run / 'config.json')
     initial_report = Path(config['report'])
+    report_data = read(initial_report / 'report.json')
+    source_identity = report_data.get('identity', {})
     artifacts = read(run / 'artifacts.json')
     history = read(run / 'interpretation-history.json')
     sample = read(run / 'sample/sections.json')['spectrum']
@@ -100,7 +102,9 @@ def export(run, output):
     costs_path = run / 'report/interpretation-costs.json'
     costs = read(costs_path) if costs_path.exists() else bundle.get('interpretation_costs')
     episode = {
-        'unit': config['neuron'], 'subject_model': 'Qwen3-32B', 'dataset': 'Reasoning Mix 100M',
+        'unit': config['neuron'], 'subject_model': source_identity.get('model') or config['model'],
+        'dataset': 'Saved native activation corpus',
+        'source_identity': source_identity,
         'n_tokens': sampling['tokens_scanned'], 'corpus': artifacts['corpus'],
         'preparation': {key: sampling[key] for key in ('sampled_points', 'population_bin_counts', 'sample_bin_counts',
                        'scan_seconds', 'wall_seconds', 'new_model_forwards', 'gpu_seconds', 'llm_requests')},
@@ -117,8 +121,11 @@ def export(run, output):
         'atlas': [{key: row[key] for key in ('id', 'text', 'selected', 'upstream', 'downstream') if key in row} for row in artifacts['atlas']],
         'graphs': [{'id': row['id'], 'text': row['graph']['text'], 'position': row['graph']['position']} for row in artifacts['graphs']],
         'review': artifacts['review'], 'analysis': artifacts['revision'], 'costs': costs,
+        'followups': artifacts.get('followups', {'status': 'disabled', 'rounds': []}),
+        'followup_file': 'content/followups.json',
         'report': 'reports/final.html', 'initial_report': 'reports/evidence.html',
     }
+    write(content / 'followups.json', episode['followups'])
     write(content / 'episode.json', episode)
     reports = output / 'reports'
     reports.mkdir(exist_ok=True)

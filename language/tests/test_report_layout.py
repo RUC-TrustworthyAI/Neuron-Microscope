@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from report_layout import headline,render,CIRCUIT,COLOURS,VERDICT_CODE,GRAPH_HELPERS
+from report_layout import headline,render,CIRCUIT,COLOURS,GRAPH_HELPERS
 
 class LayoutTests(unittest.TestCase):
     def test_merge_relocates_bootstrap_after_earlier_layout_text_changes(self):
@@ -56,20 +56,6 @@ class LayoutTests(unittest.TestCase):
         code+="\nconst e={peak_index:350,token_activations:Array.from({length:500},(_,i)=>({token:String(i),activation:i===350?90:0}))};const p=exemplarPreview(e);console.log(JSON.stringify([p.token_activations.length,p.peak_index,p.token_activations[0].token,p.token_activations[p.peak_index].activation,e.token_activations.length]));"
         result=subprocess.run(['node','-e',code],capture_output=True,text=True,check=True)
         self.assertEqual(json.loads(result.stdout),[33,32,'318',90,500])
-
-    def test_criticism_uses_short_badges_and_preserves_legacy_decisions(self):
-        import subprocess
-        values=['survived','narrowed','rejected','Survived with a narrower mechanism: measured qualification.',
-                'Partially supported and broadened: a qualified account.',
-                'Directionally supported but not sufficient to reproduce the extremes.',
-                'Partial support for output engagement.', 'Unknown decision']
-        code=VERDICT_CODE+'\nconsole.log(JSON.stringify('+json.dumps(values)+'.map(verdictOf)));'
-        result=subprocess.run(['node','-e',code],capture_output=True,text=True,check=True)
-        self.assertEqual(json.loads(result.stdout),['survived','narrowed','rejected','narrowed','narrowed','narrowed','narrowed',''])
-        html='// 8. Criticism: compact table, each row expands to the result and evidence.\nold();\n// 9. Appendix.\n'
-        rendered=render(html)
-        self.assertIn("P($('b',null,'Verdict. '),original)",rendered)
-        self.assertEqual(render(rendered),rendered)
 
     def test_circuit_uses_two_independent_slots(self):
         self.assertIn("table(G.upstream,",CIRCUIT)

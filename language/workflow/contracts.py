@@ -1,5 +1,10 @@
 """The model supplies text and references; measured values stay in Python."""
 
+import math
+
+
+FOLLOWUP_SCHEMA_VERSION = 11
+
 
 def obj(**fields):
     return {'type': 'object', 'properties': fields, 'required': list(fields), 'additionalProperties': False}
@@ -68,8 +73,17 @@ REVIEW = obj(group=string('one_idea', 'branching', 'unplaced', 'two_related', 'm
 
 def validate(value, schema, path='$'):
     kind = schema['type']
+    if isinstance(kind, list):
+        for alternative in kind:
+            try:
+                validate(value, {**schema, 'type': alternative}, path)
+            except ValueError:
+                continue
+            return
+        raise ValueError(f'{path}: expected one of {kind!r}')
     valid = {'object': isinstance(value, dict), 'array': isinstance(value, list),
-             'string': isinstance(value, str), 'integer': type(value) is int}[kind]
+             'string': isinstance(value, str), 'integer': type(value) is int,
+             'number': type(value) in (int, float), 'null': value is None}[kind]
     if not valid:
         raise ValueError(f'{path}: expected {kind}')
     if 'enum' in schema and value not in schema['enum']:
@@ -91,6 +105,11 @@ def validate(value, schema, path='$'):
         if not schema.get('minLength', 0) <= len(value) <= schema.get('maxLength', float('inf')):
             raise ValueError(f'{path}: unexpected text length')
     elif kind == 'integer':
+        if not schema.get('minimum', value) <= value <= schema.get('maximum', value):
+            raise ValueError(f'{path}: value out of range')
+    elif kind == 'number':
+        if not -math.inf < value < math.inf:
+            raise ValueError(f'{path}: expected finite number')
         if not schema.get('minimum', value) <= value <= schema.get('maximum', value):
             raise ValueError(f'{path}: value out of range')
 

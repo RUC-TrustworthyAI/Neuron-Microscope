@@ -26,6 +26,8 @@ def configuration(neuron, model, report, activations, gpus):
         'atlas_written': 20,
         'batch_size': 16,
         'batch_tokens': 8192,
+        'followups': {'max_rounds': 2, 'max_experiments': 6, 'max_conditions': 36,
+                      'max_input_tokens': 1024},
     }
 
 

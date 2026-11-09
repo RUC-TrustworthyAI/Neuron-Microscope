@@ -14,8 +14,9 @@ from .state import read, write, lock, Timeline, now
 from .evidence import initial_packet, spectrum_packet, natural_cases, prediction_feedback, evidence_catalog
 from .interpretation import explain
 from .measure import Measurements, summarized, search_regions, batch_comparison
-from .revision import finalize
+from .revision import analyze, review_report
 from .controls import run as run_controls
+from .followups import check_run_directory, run as run_followups, settings as followup_settings
 
 
 def validate_candidates(output):
@@ -28,10 +29,26 @@ def validate_candidates(output):
                 raise ValueError('Candidate labels must be one word or a phrase of at most four words and 48 characters')
 
 
+def investigate_criticism(client, measure, initial, predictions, baseline_rows, packet, evidence,
+                         root, timeline, options, identity, corpus, *, archive=None):
+    # Use the unchanged upstream analysis as the source of experiment questions.
+    revision = analyze(client, initial, predictions, packet, evidence, timeline)
+    if archive is not None:
+        from .criticism_archive import add_revision_cohorts
+        add_revision_cohorts(archive, revision)
+        write(Path(root) / 'followups/archive.json', archive)
+    followups, rows = run_followups(client, measure, initial, predictions, baseline_rows,
+        root, timeline, options, identity, corpus, criticism=revision['criticism'], evidence=evidence, archive=archive)
+    return revision, followups, rows
+
+
 def run(config, root, stop_after=None):
     from .render import assemble, assemble_interpretation, costs
+    followup_options = followup_settings(config.get('followups', {'max_rounds': 0}))
     root, report = Path(root), Path(config['report'])
     root.mkdir(parents=True, exist_ok=True)
+    if followup_options['max_rounds']:
+        check_run_directory(root)
     timeline = Timeline(root)
     client = Client(config['llm'], root / 'api', config['api_slots'])
     data = read(report / 'report.json')
@@ -41,8 +58,14 @@ def run(config, root, stop_after=None):
     if old_config.exists() and read(old_config) != config:
         raise ValueError('Configuration changed; use a separate run directory')
     write(old_config, config)
-    if (root / 'status.json').exists() and read(root / 'status.json')['phase'] in (
-            ('complete', 'interpretation_complete') if stop_after == 'interpretation' else ('complete',)):
+    saved_phase = read(root / 'status.json')['phase'] if (root / 'status.json').exists() else None
+    if saved_phase in (('complete', 'interpretation_complete') if stop_after == 'interpretation' else ('complete',)):
+        if saved_phase == 'complete' and followup_options['max_rounds'] and config.get('followup_archive'):
+            from .criticism_archive import check_archive_source
+            saved_archive = root / 'followups/archive.json'
+            if not saved_archive.is_file():
+                raise ValueError('Saved followup_archive metadata is missing; choose a new run directory')
+            check_archive_source(config['followup_archive'], request_base, read(saved_archive))
         return root / 'report'
     with lock(root / 'execution.lock', blocking=False), timeline.span('workflow', 'execution', 0):
         timeline.status('prepare')
@@ -72,7 +95,7 @@ def run(config, root, stop_after=None):
         timeline.status('interpretation_complete', html=str(output / 'index.html'))
         return output
     from common import Runtime
-    from paper_sections import prepare as prepare_sections, run as run_sections
+    from paper_sections import exemplar, prepare as prepare_sections, run as run_sections
     from model_tools import attribute
     from .interventions import matched_ablation
     with lock(root / 'execution.lock', blocking=False), timeline.span('workflow-experiments', 'execution', 0):
@@ -152,7 +175,6 @@ def run(config, root, stop_after=None):
                     if not candidates:
                         continue
                     winner = max(candidates, key=lambda r: sign * r['selected']['product'])
-                    from paper_sections import exemplar
                     tests[field] = {'target': data['statistics']['product']['max' if sign == 1 else 'min'],
                                     'achieved': winner['selected']['product'], **exemplar(winner)}
                 tests['explanation_version'] = predictions['version']
@@ -215,27 +237,43 @@ def run(config, root, stop_after=None):
                         matched_ablation(runtime, graph_results, root / 'graphs', config['settings']))
                 for result, row in zip(graph_results, graph_sources):
                     result['steering']['activation_context'] = exemplar(row)
+                baseline_rows = search_rows + control_rows + blind_rows
+                evidence = evidence_catalog(baseline_rows, atlas, graph_results, sample_data, packet)
+                revision_packet = {'initial': initial, 'natural_evidence': packet,
+                    'search_progress': round_summaries,
+                    'search': [summarized(r) for r in search_rows],
+                    'controls': [summarized(r) for r in control_rows],
+                    'blind_tests': [summarized(r) for r in blind_rows],
+                    'prediction_feedback': prediction_feedback(predictions),
+                    'atlas': [{'id': r['id'], 'text': r['text'], 'selected': r['selected'],
+                               'upstream': r['upstream'][:8], 'downstream': r['downstream'][:8]} for r in atlas],
+                    'circuit': atlas_sections['circuit'],
+                    'graphs': [{'id': g['id'], 'text': g['graph']['text'], 'meta': g['graph']['meta']}
+                               for g in graph_rows],
+                    'interventions': [{k: r.get(k) for k in ('ablation', 'steering')} for r in graph_results],
+                    'matched_ablations': ablation_section}
+                archive = None
+                if followup_options['max_rounds']:
+                    from .criticism_archive import build_archive
+                    archive = build_archive(baseline_rows + atlas, sample_data, contexts, predictions,
+                        graph_rows, activations=config['activations'], neuron_id=config['neuron'],
+                        tokenizer=measure.runtime.tokenizer)
+                    if config.get('followup_archive'):
+                        from .criticism_archive import load_archive
+                        archive = load_archive(config['followup_archive'], request_base, archive)
+                revision, followups, followup_rows = investigate_criticism(client, measure, initial,
+                    predictions, baseline_rows + atlas, revision_packet, evidence, root, timeline,
+                    followup_options, request_base, data['statistics']['product'], archive=archive)
                 measure.runtime = None
                 if remote is None:
                     torch = runtime.torch
                     del runtime
                     gc.collect()
                     torch.cuda.empty_cache()
-        timeline.status('revision')
-        all_measured = search_rows + control_rows + blind_rows
-        evidence = evidence_catalog(all_measured, atlas, graph_results, sample_data, packet)
-        revision_packet = {'initial': initial, 'natural_evidence': packet,
-            'search_progress': round_summaries,
-            'search': [summarized(r) for r in search_rows], 'controls': [summarized(r) for r in control_rows],
-            'blind_tests': [summarized(r) for r in blind_rows], 'prediction_feedback': prediction_feedback(predictions),
-            'atlas': [{'id': r['id'], 'text': r['text'], 'selected': r['selected'],
-                       'upstream': r['upstream'][:8], 'downstream': r['downstream'][:8]} for r in atlas],
-            'circuit': atlas_sections['circuit'],
-            'graphs': [{'id': g['id'], 'text': g['graph']['text'], 'meta': g['graph']['meta']} for g in graph_rows],
-            'interventions': [{k: r.get(k) for k in ('ablation', 'steering')} for r in graph_results],
-            'matched_ablations': ablation_section}
-        revision, predictions, review = finalize(client, initial, predictions, revision_packet,
-            evidence, sample_data, contexts, root, timeline)
+        all_measured = baseline_rows + followup_rows
+        if followup_rows:
+            evidence.update({row['id']: exemplar(row) for row in followup_rows})
+        review = review_report(client, revision, predictions, revision_packet, timeline, followups)
         for result in graph_results:
             tests.setdefault('steering', []).append(result['steering'])
             ablation = result.get('ablation') or {}
@@ -247,7 +285,7 @@ def run(config, root, stop_after=None):
             'sample': sample_data, 'predictions': predictions, 'figures': figures, 'tests': tests,
             'search_regions': list(region_records.values()), 'atlas': atlas, 'atlas_sections': atlas_sections,
             'graphs': graph_rows, 'all_measured': all_measured, 'logit_effect': packet['logit_effect'],
-            'evidence': evidence,
+            'evidence': evidence, 'followups': followups,
             'ablation': ablation_section,
             'corpus': {key: data['statistics']['product'][key] for key in ('max', 'min')}}
         write(root / 'artifacts.json', artifacts)
