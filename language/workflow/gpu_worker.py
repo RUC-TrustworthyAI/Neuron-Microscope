@@ -113,7 +113,10 @@ class RuntimePool:
         from settings import request_settings
         request = job['request']
         cfg = request_settings(request)
-        signature = (request['model'], json.dumps(cfg['runtime'], sort_keys=True),
+        runtime_settings = {**cfg['runtime'], **request.get('runtime', {})}
+        # Offload is a forward policy, so jobs with different modes can share the weights.
+        activation_offload = runtime_settings.pop('activation_offload', None)
+        signature = (request['model'], json.dumps(runtime_settings, sort_keys=True),
                      tuple(cfg['gpu_groups'][0]), request.get('torch_seed', cfg['torch_seed']))
         loaded = None
         if self.base is None:
@@ -135,6 +138,10 @@ class RuntimePool:
         runtime, rng = self.contexts[key]
         if runtime.neuron != request['neuron']:
             raise ValueError('Neuron changed within a GPU session')
+        if activation_offload is None:
+            runtime.settings.pop('activation_offload', None)
+        else:
+            runtime.settings['activation_offload'] = activation_offload
         self.restore(rng)
         return runtime, loaded
 

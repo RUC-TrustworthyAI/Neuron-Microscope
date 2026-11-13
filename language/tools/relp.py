@@ -5,8 +5,10 @@ Native HF forward values and SDPA kernels are retained; only backward is changed
 """
 import contextlib
 import types
+from contextvars import ContextVar
 from pathlib import Path
 import torch
+from torch.utils.checkpoint import checkpoint
 from common import write
 from settings import load
 
@@ -39,13 +41,31 @@ class HalfProduct(torch.autograd.Function):
 
 
 @contextlib.contextmanager
-def rules(model, local=False):
+def rules(model, local=False, checkpoint_blocks=False):
     """Keep the native forward; local leaves remove indirect MLP-to-MLP paths."""
     state = {'products': {}, 'sources': {}, 'calls': {}, 'embedding': None}
     originals, hooks = [], []
+    recomputing = ContextVar('relp_recomputing', default=False)
+
+    class RecomputeContext:
+        def __enter__(self):
+            self.token = recomputing.set(True)
+
+        def __exit__(self, *_):
+            recomputing.reset(self.token)
+
+    def checkpoint_contexts():
+        return contextlib.nullcontext(), RecomputeContext()
+
     def replace(module, function):
         originals.append((module, module.forward))
         module.forward = types.MethodType(function, module)
+
+    def checkpoint_forward(original):
+        def forward(self, *args, **kwargs):
+            return checkpoint(original, *args, use_reentrant=False, context_fn=checkpoint_contexts, **kwargs)
+        return forward
+
     def norm_forward(original, module):
         def forward(self, x):
             value = original(x)
@@ -65,6 +85,9 @@ def rules(model, local=False):
         return self.down_proj(HalfProduct.apply(gate, self.up_proj(x)))
     def capture(layer):
         def hook(module, args):
+            if recomputing.get():
+                # The existing graph differentiates with respect to the original detached leaf.
+                return (state['sources'][layer],) + args[1:] if local else None
             value = args[0]
             state['products'][layer] = value
             state['calls'][layer] = state['calls'].get(layer, 0) + 1
@@ -82,6 +105,8 @@ def rules(model, local=False):
             if module.__class__.__name__ == 'Qwen3RMSNorm':
                 replace(module, norm_forward(module.forward, module))
         for layer, block in enumerate(model.model.layers):
+            if checkpoint_blocks:
+                replace(block, checkpoint_forward(block.forward))
             replace(block.mlp.act_fn, silu_forward(block.mlp.act_fn.forward))
             replace(block.mlp, mlp_forward)
             # Detaching Q/K preserves the original SDPA forward and its OV derivative.
@@ -102,7 +127,8 @@ def selected_nodes(runtime, ids, pos, layer, unit, token_id=None, budget=None, e
     cfg=load()['graphs']
     budget=cfg['mlp_nodes'] if budget is None else budget
     embeddings=cfg['embedding_nodes'] if embeddings is None else embeddings
-    with rules(runtime.model) as s, torch.enable_grad():
+    checkpoint_blocks = runtime.settings.get('activation_offload') == 'checkpoint'
+    with rules(runtime.model, checkpoint_blocks=checkpoint_blocks) as s, torch.enable_grad():
         logits = runtime.forward(ids, pos)
         root = s['products'][layer][0, pos, unit] if token_id is None else logits[token_id]
         last = layer if token_id is None else len(runtime.model.model.layers) - 1
@@ -157,53 +183,75 @@ def selected_nodes(runtime, ids, pos, layer, unit, token_id=None, budget=None, e
         return nodes, logit, float(root.detach()), logits.detach().cpu(), coverage
 
 
+@contextlib.contextmanager
+def local_queries(runtime, ids, pos=None):
+    checkpoint_blocks = runtime.settings.get('activation_offload') == 'checkpoint'
+
+    @contextlib.contextmanager
+    def forward():
+        with rules(runtime.model, local=True, checkpoint_blocks=checkpoint_blocks) as state, torch.enable_grad():
+            yield state, runtime.forward(ids, pos)
+
+    if checkpoint_blocks:
+        # A partial VJP may leave some recomputed tensors in a retained graph.
+        # Drop the graph after each query so those tensors cannot accumulate.
+        def query(function, *args):
+            with forward() as (state, logits):
+                return function(state, logits, False, *args)
+        yield query
+    else:
+        with forward() as (state, logits):
+            yield lambda function, *args: function(state, logits, True, *args)
+
+
 def local_edges(runtime, ids, pos, nodes, logit=None, max_edges=None):
     max_edges=load()['graphs']['max_edges'] if max_edges is None else max_edges
     links = []
     mlp_nodes = [n for n in nodes if isinstance(n['layer'], int)]
-    with rules(runtime.model, local=True) as s, torch.enable_grad():
-        logits = runtime.forward(ids, pos)
-        receivers = mlp_nodes + ([logit] if logit else [])
-        for target in receivers:
+
+    def add_links(s, logits, retain_graph, target, candidates):
+        layer = target['layer']
+        source_layers = sorted({n['layer'] for n in candidates if isinstance(n['layer'], int)})
+        sources = [s['sources'][l] for l in source_layers]
+        if any(n['layer'] == 'embedding' for n in candidates):
+            sources.append(s['embedding'])
+        root = logits[target['feature']] if layer == 'logit' else s['products'][layer][0,target['ctx_idx'],target['feature']]
+        receiver_value = float(root.detach())
+        # Same adaptive epsilon convention as Transluce's relative-attribution edges.
+        reference = logits if layer == 'logit' else s['products'][layer]
+        epsilon = float(reference.detach().float().abs().mean()) * 1e-6
+        denominator = receiver_value + epsilon
+        if denominator == 0:
+            return
+        gradients = torch.autograd.grad(root, sources, retain_graph=retain_graph, allow_unused=True)
+        gs = dict(zip(source_layers, gradients[:len(source_layers)]))
+        for source in candidates:
+            p, n, l = source['ctx_idx'], source['feature'], source['layer']
+            if l == 'embedding':
+                g = gradients[-1]
+                if g is None:
+                    continue
+                contribution = float((s['embedding'][0,p].detach().float()*g[0,p].float()).sum())
+            else:
+                g = gs.get(l)
+                if g is None:
+                    continue
+                contribution = float((s['sources'][l][0,p,n].detach().float()*g[0,p,n].float()))
+            relative = contribution / denominator
+            flow = relative * target['influence']
+            if flow:
+                links.append({'source':source['node_id'], 'target':target['node_id'],
+                    'weight':flow, 'final_attribution':flow,
+                    'relative_weight':relative, 'local_contribution':contribution})
+
+    with local_queries(runtime, ids, pos) as query:
+        for target in mlp_nodes + ([logit] if logit else []):
             layer = target['layer']
             last = len(runtime.model.model.layers) if layer == 'logit' else layer
             candidates = [n for n in nodes if n['layer'] == 'embedding' or
                           (isinstance(n['layer'], int) and n['layer'] < last and n['ctx_idx'] <= target['ctx_idx'])]
-            if not candidates:
-                continue
-            source_layers = sorted({n['layer'] for n in candidates if isinstance(n['layer'], int)})
-            sources = [s['sources'][l] for l in source_layers]
-            with_embedding = any(n['layer'] == 'embedding' for n in candidates)
-            if with_embedding:
-                sources.append(s['embedding'])
-            root = logits[target['feature']] if layer == 'logit' else s['products'][layer][0,target['ctx_idx'],target['feature']]
-            gradients = torch.autograd.grad(root, sources, retain_graph=True, allow_unused=True)
-            gs = dict(zip(source_layers, gradients[:len(source_layers)]))
-            receiver_value = float(root.detach())
-            # Same adaptive epsilon convention as Transluce's relative-attribution edges.
-            reference = logits if layer == 'logit' else s['products'][layer]
-            epsilon = float(reference.detach().float().abs().mean()) * 1e-6
-            denominator = receiver_value + epsilon
-            if denominator == 0:
-                continue
-            for source in candidates:
-                p, n, l = source['ctx_idx'], source['feature'], source['layer']
-                if l == 'embedding':
-                    g = gradients[-1]
-                    if g is None:
-                        continue
-                    contribution = float((s['embedding'][0,p].detach().float()*g[0,p].float()).sum())
-                else:
-                    g = gs.get(l)
-                    if g is None:
-                        continue
-                    contribution = float((s['sources'][l][0,p,n].detach().float()*g[0,p,n].float()))
-                relative = contribution / denominator
-                flow = relative * target['influence']
-                if flow:
-                    links.append({'source':source['node_id'], 'target':target['node_id'],
-                        'weight':flow, 'final_attribution':flow,
-                        'relative_weight':relative, 'local_contribution':contribution})
+            if candidates:
+                query(add_links, target, candidates)
     return sorted(links, key=lambda e:-abs(e['weight']))[:max_edges]
 
 
@@ -227,30 +275,35 @@ def graph(runtime, ids, pos, layer, unit, token_id=None, budget=None, embeddings
 def direct(runtime, ids, pos, layer, unit, reader_units=(), top_units=None):
     """Signed local RelP contributions for explicitly selected full-prefix inputs."""
     top_units=load()["atlas"]["top_units"] if top_units is None else top_units
-    with rules(runtime.model, local=True) as s, torch.enable_grad():
-        runtime.forward(ids)
+
+    def upstream_contributions(s, _, retain_graph):
         root = s['products'][layer][0,pos,unit]
         upstream = []
-        if layer:
-            gradients = torch.autograd.grad(root, [s['sources'][l] for l in range(layer)],
-                                            retain_graph=True, allow_unused=True)
-            for l, gradient in enumerate(gradients):
-                if gradient is None:
-                    continue
-                scores = (gradient[0,:pos+1].float()*s['sources'][l][0,:pos+1].detach().float()).sum(0)
-                ix = scores.abs().topk(min(top_units, scores.numel())).indices.tolist()
-                vals = scores[ix].detach().cpu().tolist()
-                upstream.extend({'layer':l,'neuron':n,'weight':v} for n,v in zip(ix,vals) if v)
-        upstream = sorted(upstream, key=lambda x:-abs(x['weight']))[:top_units]
+        gradients = torch.autograd.grad(root, [s['sources'][l] for l in range(layer)],
+                                        retain_graph=retain_graph, allow_unused=True)
+        for l, gradient in enumerate(gradients):
+            if gradient is None:
+                continue
+            scores = (gradient[0,:pos+1].float()*s['sources'][l][0,:pos+1].detach().float()).sum(0)
+            ix = scores.abs().topk(min(top_units, scores.numel())).indices.tolist()
+            vals = scores[ix].detach().cpu().tolist()
+            upstream.extend({'layer':l,'neuron':n,'weight':v} for n,v in zip(ix,vals) if v)
+        return sorted(upstream, key=lambda x:-abs(x['weight']))[:top_units]
+
+    def downstream_contribution(s, _, retain_graph, rl, rn):
+        # Same-position nominated readers; this bounded coverage is kept in the record.
+        target = s['products'][rl][0,pos,rn]
+        gradient = torch.autograd.grad(target, s['sources'][layer],
+                                       retain_graph=retain_graph, allow_unused=True)[0]
+        value = float(gradient[0,pos,unit].float()*s['sources'][layer][0,pos,unit].detach().float()) if gradient is not None else 0.
+        return {'layer':rl, 'neuron':rn, 'weight':value,
+                'activation':float(target.detach()), 'position':pos}
+
+    with local_queries(runtime, ids) as query:
+        upstream = query(upstream_contributions) if layer else []
         downstream = []
         for reader in reader_units:
             rl, rn = int(reader['layer']), int(reader.get('neuron',reader.get('index')))
-            if rl <= layer:
-                continue
-            # Same-position nominated readers; this bounded coverage is kept in the record.
-            target = s['products'][rl][0,pos,rn]
-            gradient = torch.autograd.grad(target, s['sources'][layer], retain_graph=True, allow_unused=True)[0]
-            value = float(gradient[0,pos,unit].float()*s['sources'][layer][0,pos,unit].detach().float()) if gradient is not None else 0.
-            downstream.append({'layer':rl, 'neuron':rn, 'weight':value,
-                'activation':float(target.detach()), 'position':pos})
+            if rl > layer:
+                downstream.append(query(downstream_contribution, rl, rn))
         return upstream, downstream

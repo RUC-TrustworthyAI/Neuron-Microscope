@@ -40,10 +40,11 @@ class GPUWorkerTests(unittest.TestCase):
                 result = cls(object(), object(), {}, request['neuron'])
                 result.identity, result.versions = {}, {}
                 return result
-        cfg = {'runtime': {}, 'gpu_groups': [[0, 1, 2, 3]], 'torch_seed': 0}
+        cfg = {'runtime': {'activation_offload': 'cpu'}, 'gpu_groups': [[0, 1, 2, 3]], 'torch_seed': 0}
         a = {'session': 'a', 'request': {'model': '/model', 'neuron': {'layer': 2, 'index': 3}}}
         b = copy.deepcopy(a)
         b['session'], b['request']['neuron']['index'] = 'b', 4
+        b['request']['runtime'] = {'activation_offload': 'checkpoint'}
         with patch('common.Runtime', Runtime), patch('settings.request_settings', return_value=cfg):
             pool = RuntimePool()
             ra, _ = pool.context(a)
@@ -53,6 +54,8 @@ class GPUWorkerTests(unittest.TestCase):
             rb, loaded = pool.context(b)
             self.assertIs(ra.model, rb.model)
             self.assertNotEqual(ra.neuron, rb.neuron)
+            self.assertEqual(ra.settings['activation_offload'], 'cpu')
+            self.assertEqual(rb.settings['activation_offload'], 'checkpoint')
             self.assertFalse(hasattr(rb, 'cache'))
             self.assertEqual(Torch.value, 123)
             self.assertIsNone(loaded)
@@ -60,6 +63,12 @@ class GPUWorkerTests(unittest.TestCase):
             self.assertIs(again, ra)
             self.assertEqual(Torch.value, 456)
             self.assertEqual(Runtime.loads, 1)
+            a['request']['runtime'] = {'activation_offload': 'checkpoint'}
+            self.assertIs(pool.context(a)[0], ra)
+            self.assertEqual(ra.settings['activation_offload'], 'checkpoint')
+            a['request']['runtime']['dtype'] = 'float32'
+            with self.assertRaisesRegex(ValueError, 'incompatible model or numerical settings'):
+                pool.context(a)
 
     def test_queue_preserves_request_and_excludes_waiting_from_gpu_time(self):
         with tempfile.TemporaryDirectory() as folder:

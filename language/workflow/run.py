@@ -42,7 +42,7 @@ def investigate_criticism(client, measure, initial, predictions, baseline_rows, 
     return revision, followups, rows
 
 
-def run(config, root, stop_after=None):
+def run(config, root, stop_after=None, *, checkpoint_attribution=False):
     from .render import assemble, assemble_interpretation, costs
     followup_options = followup_settings(config.get('followups', {'max_rounds': 0}))
     root, report = Path(root), Path(config['report'])
@@ -54,6 +54,8 @@ def run(config, root, stop_after=None):
     data = read(report / 'report.json')
     neuron = {'layer': data['identity']['layer'], 'index': data['identity']['neuron']}
     request_base = {'model': config['model'], 'neuron': neuron, 'settings': config['settings']}
+    runtime_request = ({**request_base, 'runtime': {'activation_offload': 'checkpoint'}}
+                       if checkpoint_attribution else request_base)
     old_config = root / 'config.json'
     if old_config.exists() and read(old_config) != config:
         raise ValueError('Configuration changed; use a separate run directory')
@@ -113,7 +115,7 @@ def run(config, root, stop_after=None):
             timeline.status('gpu-queue')
             queued = time.time()
             from .gpu_worker import GPUClient
-            remote = GPUClient(config, root, timeline, request_base) if os.environ.get('NEURON_MICROSCOPE_GPU_WORKER') == '1' else None
+            remote = GPUClient(config, root, timeline, runtime_request) if os.environ.get('NEURON_MICROSCOPE_GPU_WORKER') == '1' else None
             with remote if remote is not None else lock(config['gpu_lock']):
                 if remote is not None:
                     runtime = remote
@@ -121,7 +123,7 @@ def run(config, root, stop_after=None):
                     write(root / 'gpu-queue.json', {'seconds': time.time() - queued, 'devices': config['gpus']})
                     timeline.status('loading-model')
                     with timeline.span('model-load', 'gpu', 3):
-                        runtime = Runtime.load(request_base)
+                        runtime = Runtime.load(runtime_request)
                 gpu_span = remote.span if remote is not None else lambda name: timeline.span(name, 'gpu', 3)
                 measure = Measurements(runtime, root / 'measurements', timeline,
                                        config['batch_size'], config['batch_tokens'])
@@ -316,7 +318,11 @@ def main():
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--backend-tools', type=Path, default=Path(__file__).resolve().parents[1] / 'tools')
     parser.add_argument('--stop-after', choices=['interpretation'])
+    parser.add_argument('--checkpoint-attribution', action='store_true',
+                        help='recompute decoder activations during RelP backward to reduce activation storage')
     args = parser.parse_args()
+    if args.checkpoint_attribution and (args.config is None or args.stop_after):
+        parser.error('--checkpoint-attribution requires a full --config investigation')
     sys.path.insert(0, str(args.backend_tools.resolve()))
     if args.anatomy_from is not None:
         if args.stop_after:
@@ -335,7 +341,8 @@ def main():
     os.environ['NEURON_MICROSCOPE_SETTINGS'] = str(args.output / 'backend-settings.json')
     write(Path(os.environ['NEURON_MICROSCOPE_SETTINGS']), config['settings'])
     try:
-        output = run(config, args.output, stop_after=args.stop_after)
+        output = run(config, args.output, stop_after=args.stop_after,
+                     checkpoint_attribution=args.checkpoint_attribution)
         if config.get('publish'):
             from comparison import publish
             destination = Path(config['publish']) / config['neuron']
