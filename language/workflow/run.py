@@ -311,11 +311,19 @@ def main():
     mode.add_argument('--config', type=Path)
     mode.add_argument('--ablate-from', type=Path, metavar='INVESTIGATION',
                       help='measure and render expanded ablations from a completed investigation')
+    mode.add_argument('--anatomy-from', type=Path, metavar='INVESTIGATION',
+                      help='render paired Anatomy traces from a completed investigation')
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--backend-tools', type=Path, default=Path(__file__).resolve().parents[1] / 'tools')
     parser.add_argument('--stop-after', choices=['interpretation'])
     args = parser.parse_args()
     sys.path.insert(0, str(args.backend_tools.resolve()))
+    if args.anatomy_from is not None:
+        if args.stop_after:
+            parser.error('--stop-after requires --config')
+        from .anatomy_replay import replay
+        print(replay(args.anatomy_from, args.output) / 'index.html')
+        return
     if args.ablate_from is not None:
         if args.stop_after:
             parser.error('--stop-after requires --config')

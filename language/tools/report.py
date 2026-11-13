@@ -7,6 +7,8 @@ from pathlib import Path
 
 BUNDLE = re.compile(r'(<script\b(?=[^>]*\bid=["\x27]bundle["\x27])[^>]*>)(.*?)(</script>)', re.S)
 EFFECT = re.compile(r'// 5b\. What it does:.*?(?=// 5c\. Where it sits:)', re.S)
+ANATOMY_PAIR = re.compile(r'// Task 3 paired Anatomy renderer\..*?// End paired Anatomy renderer\.', re.S)
+ANATOMY_INTRO = re.compile(r"(sec\(\{ id: 'anatomy', wide: true \}, 'Inside the neuron', \[P\(')([^']+)(')")
 
 
 def refresh_effect(source):
@@ -20,6 +22,36 @@ def refresh_effect(source):
 def encode_bundle(bundle):
     return json.dumps(bundle, ensure_ascii=False, allow_nan=False, separators=(',', ':')).replace(
         '<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+
+
+def refresh_anatomy_pair(source):
+    """Insert the pair renderer without replacing saved Anatomy plots or layout adapters."""
+    template = Path(__file__).resolve().parents[1] / 'analysis/report.html'
+    canonical = template.read_text(encoding='utf-8')
+    block = ANATOMY_PAIR.search(canonical)
+    intro = ANATOMY_INTRO.search(canonical)
+    if block is None or intro is None:
+        raise ValueError('Missing paired Anatomy renderer in report template')
+    source = ANATOMY_INTRO.sub(lambda match: match[1] + intro[2] + match[3], source, count=1)
+    source = source.replace('have the gate open;', 'have positive raw gate;').replace(
+        'Points in the shaded left band are off whatever up says.',
+        'The shaded left band marks negative raw gate values.')
+    source = source.replace("@media (max-width:1000px){.topnav a[href='#anatomy'],",
+                            '@media (max-width:1000px){')
+    if ANATOMY_PAIR.search(source):
+        return ANATOMY_PAIR.sub(lambda _: block[0], source, count=1)
+    legacy = '  if (has(A.headline)) figs.push('
+    if source.count(legacy) != 1:
+        raise ValueError('Expected one legacy Anatomy headline renderer')
+    return source.replace(legacy, '  ' + block[0] + '\n'
+                          '  if (!hasAnatomyPair && has(A.headline)) figs.push(', 1)
+
+
+def replace_anatomy_pair(source, pair):
+    bundle, _ = source_bundle(source)
+    bundle['anatomy'] = {**(bundle.get('anatomy') or {}), 'pair': pair}
+    source = BUNDLE.sub(lambda match: match[1] + encode_bundle(bundle) + match[3], source, count=1)
+    return refresh_anatomy_pair(source), bundle
 
 
 def show_criticism_nav(source):
@@ -233,4 +265,7 @@ def merge(source, patches):
     source=re.sub(r'<!-- paper-review:start -->.*?<!-- paper-review:end -->','',source,flags=re.S)
     from report_layout import render as align_layout
     from exemplar_display import render as render_exemplars
-    return readable_data_scripts(strip_capture_table(presentation(render_exemplars(align_layout(source))))), bundle
+    source = presentation(render_exemplars(align_layout(source)))
+    if (patches.get('anatomy') or {}).get('pair') is not None:
+        source = refresh_anatomy_pair(source)
+    return readable_data_scripts(strip_capture_table(source)), bundle

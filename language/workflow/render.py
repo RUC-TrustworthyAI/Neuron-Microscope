@@ -120,6 +120,7 @@ def assemble(root, initial_report, neuron, artifacts, cards):
     from paper_sections import exemplar, search_patch, labelled
     from report_layout import headline
     from saved_display import peak_fields, default_anatomy
+    from .anatomy_pairs import select_anatomy_pair
     source = (initial_report / 'index.html').read_text()
     bundle, _ = source_bundle(source)
     initial, revised, review = artifacts['initial'], artifacts['revision'], artifacts['review']
@@ -161,7 +162,11 @@ def assemble(root, initial_report, neuron, artifacts, cards):
         write(folder / 'conditions.json', [{**r, 'condition': i} for i, r in enumerate(rows)])
         write(folder / 'tool-request.json', {'id': figure['id'], 'template': figure['template']})
         sweeps.append(str(folder))
-    patch['display_selection'] = {'headline_figure_id': headline_figure(artifacts['figures'], artifacts['corpus'], initial)}
+    preferred = headline_figure(artifacts['figures'], artifacts['corpus'], initial)
+    patch['display_selection'] = {'headline_figure_id': preferred}
+    pair = select_anatomy_pair(artifacts['figures'], artifacts['all_measured'], preferred_figure_id=preferred)
+    if pair is not None:
+        patch['anatomy']['pair'] = pair
     patch['headline'] = headline({**bundle, **patch}, initial_report, sweeps)
     patch['interpretation_costs'] = costs(root, neuron, cards)
     page, bundle = merge(source, patch)
