@@ -166,9 +166,9 @@ def dispatch(runtime, job):
     if operation == 'attribute':
         from model_tools import attribute
         return attribute(payload['request'], Path(payload['folder']), runtime)
-    if operation == 'matched-ablation':
-        from .interventions import matched_ablation
-        return matched_ablation(runtime, payload['results'], Path(payload['folder']), payload['settings'])
+    if operation == 'measure-ablations':
+        from .ablation_run import measure
+        return measure(runtime, payload['plan'], Path(payload['folder']))
     raise ValueError('Unknown GPU operation: ' + operation)
 
 

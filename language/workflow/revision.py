@@ -1,6 +1,38 @@
 """Analyze experiments while preserving the frozen explanation and predictions."""
+import hashlib
+import json
+
 from . import contracts, prompts
 from .evidence import prediction_feedback
+from .state import read
+
+
+def ablation_analysis_packet(section, evidence):
+    rows = sorted(section['rows'], key=lambda row: -row['kl'])[:5]
+    fields = ('kind', 'text', 'peak_token', 'live_product', 'kl', 'kl_controls', 'gains', 'losses')
+    examples = [{**{field: row[field] for field in fields},
+                 'evidence_id': row['source_id'] if row['source_id'] in evidence else None}
+                for row in rows]
+    return {'summary': section['summary'], 'examples': examples}
+
+
+def resume_graph_ablation_packet(root, packet):
+    """Honor a completed analysis request from before Effect was expanded."""
+    folder = root / 'api/report-analysis'
+    result = folder / 'result.json'
+    if not result.is_file():
+        return False
+    fingerprint = read(result)['input_id']
+    for path in sorted(folder.glob('attempt-*/request.json')):
+        messages = read(path)['messages'][:2]
+        if hashlib.sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest() != fingerprint:
+            continue
+        prior = json.loads(messages[1]['content']).get('matched_ablations', {})
+        if 'replaces_case_ids' in prior:
+            packet['matched_ablations'] = prior
+            return True
+        break
+    return False
 
 
 def analyze(client, initial, predictions, packet, evidence, timeline):

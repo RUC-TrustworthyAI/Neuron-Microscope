@@ -14,7 +14,7 @@ from .state import read, write, lock, Timeline, now
 from .evidence import initial_packet, spectrum_packet, natural_cases, prediction_feedback, evidence_catalog
 from .interpretation import explain
 from .measure import Measurements, summarized, search_regions, batch_comparison
-from .revision import analyze, review_report
+from .revision import ablation_analysis_packet, analyze, resume_graph_ablation_packet, review_report
 from .controls import run as run_controls
 from .followups import check_run_directory, run as run_followups, settings as followup_settings
 
@@ -97,7 +97,7 @@ def run(config, root, stop_after=None):
     from common import Runtime
     from paper_sections import exemplar, prepare as prepare_sections, run as run_sections
     from model_tools import attribute
-    from .interventions import matched_ablation
+    from .ablation_run import prepare as prepare_ablation, measure as measure_ablation
     with lock(root / 'execution.lock', blocking=False), timeline.span('workflow-experiments', 'execution', 0):
         packet = initial_packet(report)
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
@@ -231,10 +231,14 @@ def run(config, root, stop_after=None):
                                       if remote is not None else attribute(graph_request, folder, runtime))
                     graph_rows.append(read(folder / 'graph.json'))
                     graph_results.append(result)
-                with gpu_span('matched-ablations'):
-                    ablation_section = (remote.call('matched-ablation', results=graph_results,
-                        folder=str(root / 'graphs'), settings=config['settings']) if remote is not None else
-                        matched_ablation(runtime, graph_results, root / 'graphs', config['settings']))
+                timeline.status('point-ablations')
+                ablation_folder = root / 'ablation'
+                ablation_plan = prepare_ablation(config, request_base, sample_data, contexts, control_rows,
+                    figures, data, predictions, initial, ablation_folder)
+                with gpu_span('point-ablations'):
+                    ablation_section = (remote.call('measure-ablations', plan=ablation_plan,
+                        folder=str(ablation_folder.resolve())) if remote is not None else
+                        measure_ablation(runtime, ablation_plan, ablation_folder))
                 for result, row in zip(graph_results, graph_sources):
                     result['steering']['activation_context'] = exemplar(row)
                 baseline_rows = search_rows + control_rows + blind_rows
@@ -251,7 +255,8 @@ def run(config, root, stop_after=None):
                     'graphs': [{'id': g['id'], 'text': g['graph']['text'], 'meta': g['graph']['meta']}
                                for g in graph_rows],
                     'interventions': [{k: r.get(k) for k in ('ablation', 'steering')} for r in graph_results],
-                    'matched_ablations': ablation_section}
+                    'matched_ablations': ablation_analysis_packet(ablation_section, evidence)}
+                legacy_analysis = resume_graph_ablation_packet(root, revision_packet)
                 archive = None
                 if followup_options['max_rounds']:
                     from .criticism_archive import build_archive
@@ -274,6 +279,8 @@ def run(config, root, stop_after=None):
         if followup_rows:
             evidence.update({row['id']: exemplar(row) for row in followup_rows})
         review = review_report(client, revision, predictions, revision_packet, timeline, followups)
+        if legacy_analysis:
+            revision['section_prose'].pop('ablation', None)
         for result in graph_results:
             tests.setdefault('steering', []).append(result['steering'])
             ablation = result.get('ablation') or {}
@@ -300,12 +307,21 @@ def run(config, root, stop_after=None):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', required=True, type=Path)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument('--config', type=Path)
+    mode.add_argument('--ablate-from', type=Path, metavar='INVESTIGATION',
+                      help='measure and render expanded ablations from a completed investigation')
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--backend-tools', type=Path, default=Path(__file__).resolve().parents[1] / 'tools')
     parser.add_argument('--stop-after', choices=['interpretation'])
     args = parser.parse_args()
     sys.path.insert(0, str(args.backend_tools.resolve()))
+    if args.ablate_from is not None:
+        if args.stop_after:
+            parser.error('--stop-after requires --config')
+        from .ablation_run import replay
+        replay(args.ablate_from, args.output)
+        return
     config = read(args.config)
     os.environ['CUDA_VISIBLE_DEVICES'] = '' if args.stop_after == 'interpretation' else ','.join(map(str, config['gpus']))
     os.environ['NEURON_MICROSCOPE_SETTINGS'] = str(args.output / 'backend-settings.json')

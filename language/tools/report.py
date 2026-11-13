@@ -6,6 +6,34 @@ import re
 from pathlib import Path
 
 BUNDLE = re.compile(r'(<script\b(?=[^>]*\bid=["\x27]bundle["\x27])[^>]*>)(.*?)(</script>)', re.S)
+EFFECT = re.compile(r'// 5b\. What it does:.*?(?=// 5c\. Where it sits:)', re.S)
+
+
+def refresh_effect(source):
+    template = Path(__file__).resolve().parents[1] / 'analysis/report.html'
+    effect = EFFECT.search(template.read_text(encoding='utf-8'))
+    if effect is None or EFFECT.search(source) is None:
+        raise ValueError('Expected an Effect renderer in both the saved report and template')
+    return EFFECT.sub(lambda _: effect[0], source, count=1)
+
+
+def encode_bundle(bundle):
+    return json.dumps(bundle, ensure_ascii=False, allow_nan=False, separators=(',', ':')).replace(
+        '<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+
+
+def show_criticism_nav(source):
+    """Keep the Criticism link visible in older reports at narrow widths."""
+    return source.replace(",.topnav a[href='#criticism']{display:none}", "{display:none}")
+
+
+def replace_ablation(source, section):
+    bundle, _ = source_bundle(source)
+    bundle['ablation'] = section
+    # The original analysis predates the new measurements.
+    (bundle.get('section_prose') or {}).pop('ablation', None)
+    source = BUNDLE.sub(lambda match: match[1] + encode_bundle(bundle) + match[3], source, count=1)
+    return show_criticism_nav(refresh_effect(source)), bundle
 
 def source_bundle(source):
     match = BUNDLE.search(source)
@@ -47,7 +75,7 @@ def strip_capture_table(source):
 
 def presentation(source):
     """Shared report layout; short verdict badges, readable challenges and blank Appendix."""
-    source = source.replace("['Neuron paper',", "['Neuron report',")
+    source = show_criticism_nav(source).replace("['Neuron paper',", "['Neuron report',")
     style = """<style id="neuron-paper-layout">
 #criticism .crow > summary .pill{max-width:100%;white-space:nowrap}
 @media(max-width:600px){
@@ -81,6 +109,8 @@ def merge_test_fields(previous,current):
 def merge(source, patches):
     bundle, (start,stop) = source_bundle(source)
     bundle.update(patches)
+    if patches.get('ablation') is not None:
+        source = refresh_effect(source)
     exemplars = bundle.get('exemplars') or {}
     if exemplars.get('bands'):
         bundle['exemplars'] = {**exemplars, 'bands': {
@@ -134,7 +164,7 @@ def merge(source, patches):
     stop = source.find('const POS =',start)
     source = source[:start]+"const B = JSON.parse(document.getElementById('bundle').textContent);\n\n"+source[stop:]
     match = BUNDLE.search(source)
-    encoded = json.dumps(bundle,ensure_ascii=False,allow_nan=False,separators=(',',':')).replace('<','\\u003c').replace('\u2028','\\u2028').replace('\u2029','\\u2029')
+    encoded = encode_bundle(bundle)
     source = source[:match.start(2)]+encoded+source[match.end(2):]
     if 'claim' in patches:
         source = re.sub(r'<title>.*?</title>','<title>'+html.escape(patches['claim']['title'])+'</title>',source,count=1,flags=re.S)

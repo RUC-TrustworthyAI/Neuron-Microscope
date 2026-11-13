@@ -156,7 +156,7 @@ svg text{font-family:var(--sans)}
 .stk .tk{font-size:13.5px;line-height:1.5;padding:1px 3px;white-space:pre;border-radius:3px}.stk .tk.peak{outline:1.5px solid var(--pos);outline-offset:1px}.stk .tk.peak.n{outline-color:var(--neg)}
 @media (max-width:820px){.headline,.card,.route,.cols2,.neigh,.census,.gwrap{grid-template-columns:1fr}.headline .panel+.panel{margin-top:28px}.crow .bodyc{padding-left:0}}
 @media (max-width:1280px){.topnav{gap:16px}.topnav a[href='#custom'],.topnav a[href='#graphs'],.topnav a[href='#circuit'],.topnav a[href='#appendix']{display:none}}
-@media (max-width:1000px){.topnav a[href='#anatomy'],.topnav a[href='#family'],.topnav a[href='#criticism']{display:none}}
+@media (max-width:1000px){.topnav a[href='#anatomy'],.topnav a[href='#family']{display:none}}
 @media print{.topnav{display:none}.wrap{padding:0}.sec{break-inside:avoid-page}details{display:block}details>*{display:block}.bands{display:none}.pane{display:block!important;margin:0 0 18px}.more{display:none}}
 </style></head>
 <body>
@@ -573,18 +573,116 @@ let SPEC_COLOUR = {};
   if (has(LE) && (has(LE.promote) || has(LE.suppress))) { const s = Math.max(...[...(LE.promote || []), ...(LE.suppress || [])].map(u => Math.abs(u.weight || 0)), 1e-9);
     const col = (items, title) => has(items) ? $('div', null, $('div', { class: 'sub' }, title), $('table', null, items.slice(0, 12).map(u => $('tr', null, $('td', null, tk(u.token)), $('td', { class: 'num' }, tile(u.weight, { signed: true, scale: s, d: 2 })))))) : null;
     figs.push(fig($('div', { class: 'cols' }, col(LE.promote, 'Promotes'), col(LE.suppress, 'Suppresses')), `Direct effect of the unit's output vector on the logits${LE.norm != null ? `; vector norm ${fmt(LE.norm)}` : ''}.`)); }
-  if (has(AB) && has(AB.rows)) { const rows = [...AB.rows].sort((a, b) => (b.kl || 0) - (a.kl || 0)); const kmax = Math.max(...rows.flatMap(r => [r.kl || 0, ...(r.kl_controls || [])]), 1e-9); const sm = AB.summary || {};
-    const tiles = $('div', { class: 'tiles', style: 'margin:0 0 16px' }); if (sm.median_kl != null) tiles.append(kTile('median KL', sm.median_kl)); if (sm.median_kl_controls != null) tiles.append(kTile('median control KL', sm.median_kl_controls)); if (sm.n != null) tiles.append(kTile('texts', sm.n));
-    const tbl = $('table', null, $('tr', null, $('th', null, 'Text'), $('th', { style: 'text-align:right' }, 'KL'), $('th', { style: 'text-align:right' }, 'Max control'), $('th', null, 'Next token, before → after'), $('th', null, 'Top losses')));
-    const row = r => { const ctl = has(r.kl_controls) ? Math.max(...r.kl_controls) : null; const pb = r.next_logprob_base != null ? Math.exp(r.next_logprob_base) : null, pa = r.next_logprob_ablated != null ? Math.exp(r.next_logprob_ablated) : null; const txt = r.text || '';
-      return $('tr', null, $('td', null, r.kind ? [$('span', { class: 'pill' }, r.kind), ' '] : null, $('span', { class: 'tail' }, (txt.length > 120 ? '…' : '') + txt.slice(-120)), r.peak_token != null ? [' ', tk(r.peak_token)] : null),
-        $('td', { class: 'num' }, tile(r.kl, { signed: true, scale: kmax, d: 2 })), $('td', { class: 'num' }, ctl != null ? tile(ctl, { d: 2 }) : '–'),
-        $('td', { style: 'white-space:nowrap' }, r.next_token != null ? [tk(r.next_token), ' ', pb != null ? `${pct(pb)} → ${pct(pa)}` : ''] : ''),
-        $('td', null, (r.losses || []).slice(0, 3).map(l => $('span', { class: 'tokchip loss' }, JSON.stringify(l.token), ' ', fmt(l.dp))))); };
-    rows.slice(0, 12).forEach(r => tbl.append(row(r))); let btn = null; if (rows.length > 12) { btn = $('button', { class: 'more' }, `Show ${rows.length - 12} more`); btn.onclick = () => { rows.slice(12).forEach(r => tbl.append(row(r))); btn.remove(); }; }
-    figs.push(fig($('div', null, tiles, $('div', { class: 'sub' }, 'Ablation at the peak token'), tbl, btn), 'Zeroing the unit at the peak token. KL is between the base and ablated next-token distributions; controls zero three random other neurons of the same layer instead. Losses are the tokens whose probability fell most.')); }
+  const sm = AB?.summary || {};
+  const coverage = sm.coverage || {};
+  const hasCoverage = has(coverage);
+  if (has(AB?.rows) || hasCoverage) {
+    const rows = [...(AB.rows || [])].sort((a, b) => (b.kl ?? 0) - (a.kl ?? 0));
+    const scale = Math.max(...rows.map(r => Math.max(r.kl ?? 0, ...(r.kl_controls || []))), 1e-9);
+    const n = sm.n ?? rows.length;
+    const count = value => value == null ? '–' : value.toLocaleString();
+    const tiles = $('div', { class: 'tiles', style: 'margin:0 0 16px' },
+      sm.median_kl != null ? kTile('median KL', sm.median_kl) : null,
+      sm.median_kl_controls != null ? kTile('median control KL', sm.median_kl_controls) : null,
+      kTile('texts', null, { text: n < sm.expected ? `${count(n)} / ${count(sm.expected)}` : count(n) }));
+    const cohortNames = {
+      'strong-positive': 'Positive tail', 'strong-negative': 'Negative tail',
+      medium: 'Moderate', weak: 'Weak', controlled: 'Controlled', graph: 'Graph examples',
+    };
+    const cohortName = kind => Object.hasOwn(cohortNames, kind) ? cohortNames[kind] : kind;
+    const headers = (labels, rightAligned) => $('thead', null, $('tr', null,
+      labels.map((label, i) => $('th', { scope: 'col', style: rightAligned(i) ? 'text-align:right' : null }, label))));
+    const scroll = child => $('div', { style: 'overflow-x:auto' }, child);
+    const numeric = value => $('td', { class: 'num' }, value);
+    let coverageFigure = null;
+    if (hasCoverage) {
+      const bands = Object.entries(coverage);
+      const hasSelected = bands.some(([, cohort]) => cohort.selected != null);
+      const headings = ['Cohort', 'Requested', ...(hasSelected ? ['Selected'] : []),
+        'Measured', 'Median KL', 'Median control KL'];
+      const coverageRows = bands.map(([kind, cohort]) => $('tr', null,
+        $('th', { scope: 'row' }, cohortName(kind)), numeric(count(cohort.requested)),
+        hasSelected ? numeric(count(cohort.selected)) : null,
+        numeric(count(cohort.completed)), numeric(fmt(cohort.median_kl)), numeric(fmt(cohort.median_kl_controls))));
+      const coverageTable = $('table', { 'aria-label': 'Coverage by cohort' }, headers(headings, i => i > 0),
+        $('tbody', null, coverageRows));
+      coverageFigure = $('div', { style: 'margin:0 0 16px' },
+        $('div', { class: 'sub' }, 'Coverage by cohort'), scroll(coverageTable));
+    }
+    const probability = new Intl.NumberFormat(undefined, { style: 'percent', maximumSignificantDigits: 3 });
+    const tinyProbability = new Intl.NumberFormat(undefined,
+      { style: 'percent', notation: 'scientific', maximumSignificantDigits: 3 });
+    const showProbability = p => p == null ? '–' : (p > 0 && p < 1e-5 ? tinyProbability : probability).format(p);
+    const fromLog = logprob => logprob == null ? null : Math.exp(logprob);
+    const transition = r => {
+      if (r.next_token != null) {
+        const label = r.kind === 'controlled' ? 'Controlled next token' : 'Observed next token';
+        return [r.next_token, fromLog(r.next_logprob_base), fromLog(r.next_logprob_ablated), label];
+      }
+      const top = r.top_base?.[0];
+      if (!top) return null;
+      const match = (r.top_ablated || []).find(item => top.token_id != null && item.token_id != null
+        ? item.token_id === top.token_id : item.token === top.token);
+      return [top.token, top.p, fromLog(r.baseline_top_logprob_ablated) ?? match?.p, 'Baseline top prediction'];
+    };
+    const changes = (items, loss = false) => (items || []).map(item =>
+      $('span', { class: 'tokchip' + (loss ? ' loss' : '') }, JSON.stringify(item.token), ' ', fmt(item.dp)));
+    const predictions = items => (items || []).map(item => [tk(item.token), ' ', showProbability(item.p), ' ']);
+    const detailField = (label, data) => has(data) ? $('div', { style: 'margin:5px 0' }, $('b', null, label), ' ', data) : null;
+    const details = (r, label, controls) => {
+      const ids = r.control_neurons || (sm.controls?.length === controls.length ? sm.controls : []);
+      const layer = B.neuron?.layer;
+      const controlResults = controls.map((kl, i) => {
+        const id = ids[i] == null ? `#${i + 1}` : `${layer != null ? `L${layer}/` : ''}N${ids[i]}`;
+        return $('span', { class: 'tokchip' }, `${id} · ${fmt(kl)}`);
+      });
+      return $('details', { style: 'padding:0;border:0' }, label,
+        $('div', { style: 'margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere' }, r.text),
+        detailField('Case ID', r.case_id),
+        r.peak_index != null ? detailField('Scored position', r.peak_index) : null,
+        r.saved_product != null ? detailField('Saved activation (product)', fmt(r.saved_product)) : null,
+        r.live_product != null ? detailField('Measured activation (product)', fmt(r.live_product)) : null,
+        r.relative_product_magnitude != null ? detailField('Saved magnitude relative to same-sign extreme',
+          showProbability(r.relative_product_magnitude)) : null,
+        detailField('Group', r.semantic_group ?? r.group),
+        detailField('Condition', r.condition_label),
+        detailField('Top predictions before ablation', predictions(r.top_base)),
+        detailField('Top predictions after ablation', predictions(r.top_ablated)),
+        detailField('Probability gains', changes(r.gains)),
+        detailField('Probability losses', changes(r.losses, true)),
+        detailField('Same-layer control KL', controlResults));
+    };
+    const row = r => {
+      const controls = r.kl_controls || [];
+      const comparison = transition(r);
+      const txt = r.text || '';
+      const label = $('summary', { style: 'letter-spacing:normal' },
+        r.kind ? [$('span', { class: 'pill' }, cohortName(r.kind)), ' '] : null,
+        $('span', { class: 'tail' }, (txt.length > 120 ? '…' : '') + txt.slice(-120)),
+        r.peak_token != null ? [' ', tk(r.peak_token)] : null);
+      return $('tr', null, $('td', null, details(r, label, controls)),
+        numeric(tile(r.kl, { signed: true, scale })),
+        numeric(controls.length ? tile(Math.max(...controls)) : '–'),
+        $('td', null, comparison ? [tk(comparison[0]), ' ',
+          $('span', { style: 'white-space:nowrap' }, `${showProbability(comparison[1])} → ${showProbability(comparison[2])}`),
+          $('div', { class: 'cap', style: 'margin:0' }, comparison[3])] : '–'),
+        $('td', null, changes((r.losses || []).slice(0, 3), true)));
+    };
+    const body = $('tbody', null, rows.slice(0, 12).map(row));
+    const table = $('table', { 'aria-label': 'Per-example ablations' },
+      headers(['Text', 'KL', 'Max control', 'Next token, before → after', 'Top losses'], i => i === 1 || i === 2), body);
+    let more = null;
+    if (rows.length > 12) {
+      more = $('button', { class: 'more', type: 'button' }, `Show ${count(rows.length - 12)} more`);
+      more.onclick = () => { rows.slice(12).forEach(r => body.append(row(r))); more.remove(); };
+    }
+    const location = hasCoverage ? 'scored token' : 'peak token';
+    figs.push(fig($('div', null, tiles, coverageFigure, $('div', { class: 'sub' }, `Ablation at the ${location}`),
+      rows.length ? scroll(table) : P('No ablations completed.'), more),
+      `The target neuron is zeroed at the ${location}. KL compares the base and ablated next-token distributions. Each control zeros one random neuron from the same layer at the same position. Open an example to inspect the full context and measured changes.`));
+  }
   if (!figs.length) return;
-  sec({ id: 'ablation', wide: true }, 'What it does', [P('Two readings of the unit’s effect on the output. The direct logit effect is what its output vector alone adds to each token. Ablation removes the unit at the peak token and measures how much the next-token distribution moves, against controls that zero random other neurons of the same layer.')], figs); })();
+  sec({ id: 'ablation', wide: true }, 'What it does', [P('The direct logit effect measures what the unit’s output vector adds to each token. Ablation measures how the next-token distribution changes when the unit is zeroed at a single position.')], figs); })();
 
 // 5c. Where it sits: family heatmap over one sentence and the upstream/downstream neighbourhood.
 (() => { const F = B.family; if (!has(F)) return; const figs = []; const fam = [...(F.family || [])].sort((a, b) => (a.layer - b.layer) || (a.neuron - b.neuron)); const isSelf = u => u.layer === N.layer && u.neuron === N.neuron; const Ms = F.measurements || [];

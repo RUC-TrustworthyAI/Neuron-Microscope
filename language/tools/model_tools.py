@@ -63,16 +63,21 @@ def sweep(request, output, runtime=None):
         write(output/'figure.json', fig)
     return result
 
+def point_logits(runtime, ids, position, neuron_index=None, *, zero=False):
+    """Capture the native trace and next-token logits with an optional point edit."""
+    with runtime.torch.no_grad(), runtime.capture(
+            zero_position=position if zero else None, neuron_index=neuron_index) as trace:
+        logits = runtime.forward(ids, position).detach().cpu()
+    return logits, trace
+
+
 def native_ablation(runtime, ids, pos, target_id, gradient_logits, output=None):
     torch = runtime.torch
-    with torch.no_grad(), runtime.capture() as baseline:
-        a = runtime.forward(ids, pos).detach().cpu()
-    with torch.no_grad(), runtime.capture() as repeat:
-        repeated_logits=runtime.forward(ids,pos).detach().cpu()
+    a, baseline = point_logits(runtime, ids, pos)
+    repeated_logits, repeat = point_logits(runtime, ids, pos)
     repeated=torch.equal(a,repeated_logits) and all(torch.equal(baseline[c],repeat[c]) for c in ['gate','value','product'])
     grad_difference=float((a-gradient_logits.detach().cpu()).abs().max())
-    with torch.no_grad(), runtime.capture(zero_position=pos) as edited:
-        b = runtime.forward(ids, pos).detach().cpu()
+    b, edited = point_logits(runtime, ids, pos, zero=True)
     unchanged_upstream = all(torch.equal(baseline[c], edited[c]) for c in ['gate','value','product'])
     if not torch.isfinite(a).all() or not torch.isfinite(b).all():
         raise ValueError('Nonfinite ablation logits')
