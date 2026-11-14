@@ -275,20 +275,41 @@ def graph(runtime, ids, pos, layer, unit, token_id=None, budget=None, embeddings
 def direct(runtime, ids, pos, layer, unit, reader_units=(), top_units=None):
     """Signed local RelP contributions for explicitly selected full-prefix inputs."""
     top_units=load()["atlas"]["top_units"] if top_units is None else top_units
+    checkpoint_blocks = runtime.settings.get('activation_offload') == 'checkpoint'
 
-    def upstream_contributions(s, _, retain_graph):
-        root = s['products'][layer][0,pos,unit]
-        upstream = []
-        gradients = torch.autograd.grad(root, [s['sources'][l] for l in range(layer)],
-                                        retain_graph=retain_graph, allow_unused=True)
-        for l, gradient in enumerate(gradients):
-            if gradient is None:
-                continue
-            scores = (gradient[0,:pos+1].float()*s['sources'][l][0,:pos+1].detach().float()).sum(0)
-            ix = scores.abs().topk(min(top_units, scores.numel())).indices.tolist()
-            vals = scores[ix].detach().cpu().tolist()
-            upstream.extend({'layer':l,'neuron':n,'weight':v} for n,v in zip(ix,vals) if v)
-        return sorted(upstream, key=lambda x:-abs(x['weight']))[:top_units]
+    def reduce_upstream(source_layer, source, gradient):
+        scores = (gradient[0, :pos+1].float() * source[0, :pos+1].detach().float()).sum(0)
+        indices = scores.abs().topk(min(top_units, scores.numel())).indices.tolist()
+        values = scores[indices].detach().cpu().tolist()
+        return [{'layer': source_layer, 'neuron': index, 'weight': value}
+                for index, value in zip(indices, values) if value]
+
+    def upstream_contributions(state, _, retain_graph):
+        root = state['products'][layer][0, pos, unit]
+        sources = [state['sources'][i] for i in range(layer)]
+        if checkpoint_blocks:
+            # Local sources are detached leaves. Consume their complete gradients
+            # as autograd produces them so a VJP cannot return every layer at once.
+            by_layer = {}
+
+            def consume(source_layer, source):
+                gradient = source.grad
+                source.grad = None
+                by_layer[source_layer] = reduce_upstream(source_layer, source, gradient)
+
+            with contextlib.ExitStack() as hooks:
+                for source_layer, source in enumerate(sources):
+                    handle = source.register_post_accumulate_grad_hook(
+                        lambda leaf, source_layer=source_layer: consume(source_layer, leaf))
+                    hooks.callback(handle.remove)
+                torch.autograd.backward(root, inputs=sources)
+            # Preserve ascending layer order for tied influence magnitudes.
+            upstream = [row for i in range(layer) for row in by_layer.get(i, [])]
+        else:
+            gradients = torch.autograd.grad(root, sources, retain_graph=retain_graph, allow_unused=True)
+            upstream = [row for i, (source, gradient) in enumerate(zip(sources, gradients))
+                        if gradient is not None for row in reduce_upstream(i, source, gradient)]
+        return sorted(upstream, key=lambda row: -abs(row['weight']))[:top_units]
 
     def downstream_contribution(s, _, retain_graph, rl, rn):
         # Same-position nominated readers; this bounded coverage is kept in the record.

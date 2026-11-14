@@ -92,12 +92,29 @@ class RelPTest(unittest.TestCase):
         runtime.settings['activation_offload'] = 'checkpoint'
         blocks = list(runtime.model.model.layers)
         original_forwards = [block.forward for block in blocks]
-        with patch('torch.autograd.grad', side_effect=RuntimeError('failed VJP')):
+        with patch('torch.autograd.backward', side_effect=RuntimeError('failed VJP')):
             with self.assertRaisesRegex(RuntimeError, 'failed VJP'):
                 direct(runtime, [1, 2], 1, 2, 3)
         self.assertEqual([block.forward for block in blocks], original_forwards)
         self.assertFalse(runtime.model.model.embed_tokens._forward_hooks)
         self.assertTrue(all(not block.mlp.down_proj._forward_pre_hooks for block in blocks))
+
+    def test_checkpoint_releases_upstream_leaf_gradients(self):
+        runtime = self.bf16_runtime()
+        ids, pos, layer, neuron = [1, 2, 3, 4, 5, 6], 5, 3, 3
+        expected = direct(runtime, ids, pos, layer, neuron, top_units=24)
+        self.assertTrue(expected[0])
+        runtime.settings['activation_offload'] = 'checkpoint'
+
+        with patch('torch.autograd.backward', wraps=torch.autograd.backward) as backward, \
+             patch('torch.autograd.grad', side_effect=AssertionError('upstream gradients were returned together')):
+            self.assertEqual(direct(runtime, ids, pos, layer, neuron, top_units=24), expected)
+
+        backward.assert_called_once()
+        leaves = backward.call_args.kwargs['inputs']
+        self.assertEqual(len(leaves), layer)
+        self.assertTrue(all(leaf.is_leaf and leaf.grad is None for leaf in leaves))
+        self.assertTrue(all(not leaf._post_accumulate_grad_hooks for leaf in leaves))
 
     def test_checkpoint_local_edges_skip_missing_sources_and_zero_denominator(self):
         runtime = self.bf16_runtime()
