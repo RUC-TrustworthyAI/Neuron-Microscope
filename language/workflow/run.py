@@ -281,9 +281,13 @@ def main():
     parser.add_argument('--stop-after', choices=['interpretation'])
     parser.add_argument('--checkpoint-attribution', action='store_true',
                         help='recompute decoder activations during RelP backward to reduce activation storage')
+    parser.add_argument('--followup', action='store_true',
+                        help='continue with up to two follow-up rounds in a sibling <output>-followup directory')
     args = parser.parse_args()
     if args.checkpoint_attribution and (args.config is None or args.stop_after):
         parser.error('--checkpoint-attribution requires a full --config investigation')
+    if args.followup and (args.config is None or args.stop_after):
+        parser.error('--followup requires a full --config investigation')
     sys.path.insert(0, str(args.backend_tools.resolve()))
     if args.anatomy_from is not None:
         if args.stop_after:
@@ -298,26 +302,41 @@ def main():
         replay(args.ablate_from, args.output)
         return
     config = read(args.config)
+    if args.followup:
+        source = args.output.resolve()
+        followup_root = source.with_name(source.name + '-followup')
+        if config.get('publish'):
+            destination = (Path(config['publish']) / config['neuron']).resolve()
+            if any(destination == root or destination in root.parents or root in destination.parents
+                   for root in (source, followup_root)):
+                parser.error('--followup publication must be separate from both investigation directories')
     os.environ['CUDA_VISIBLE_DEVICES'] = '' if args.stop_after == 'interpretation' else ','.join(map(str, config['gpus']))
     os.environ['NEURON_MICROSCOPE_SETTINGS'] = str(args.output / 'backend-settings.json')
     write(Path(os.environ['NEURON_MICROSCOPE_SETTINGS']), config['settings'])
     try:
         output = run(config, args.output, stop_after=args.stop_after,
                      checkpoint_attribution=args.checkpoint_attribution)
-        if config.get('publish'):
-            from comparison import publish
-            destination = Path(config['publish']) / config['neuron']
-            if not destination.exists():
-                publish(output, destination, config['neuron'], config['references'])
-            from .render import directory
-            with lock(Path(config['publish']) / '.directory.lock'):
-                directory(config['publish'], config.get('publish_neurons', [config['neuron']]), config['references'])
     except Exception as error:
         import traceback
         write(args.output / 'failure.json', {'at': now(), 'error': str(error), 'traceback': traceback.format_exc()})
         Timeline(args.output).status('failed', error=str(error))
         raise
+    if args.followup:
+        from .followups import run as run_followups
+        output = run_followups(source, followup_root)
+        print(output / 'index.html')
+        if read(followup_root / 'status.json')['phase'] != 'complete':
+            return 1
+    if config.get('publish'):
+        from comparison import publish
+        destination = Path(config['publish']) / config['neuron']
+        from .render import directory
+        with lock(Path(config['publish']) / '.directory.lock'):
+            if args.followup or not destination.exists():
+                publish(output, destination, config['neuron'], config['references'], replace=args.followup)
+            directory(config['publish'], config.get('publish_neurons', [config['neuron']]), config['references'])
+    return 0
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

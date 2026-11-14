@@ -31,13 +31,22 @@ Use `--ablate-from <complete-investigation> --output <new-dir>` to measure expan
 
 Use `--anatomy-from <complete-investigation> --output <new-dir>` to add a [paired Anatomy view](anatomy.md) from completed controlled measurements.
 
-Use the [follow-up entry point](followups.md) to investigate the original Criticism in at most two rounds of five questions. It writes a separate report and leaves this foundation workflow unchanged.
+Append `--followup` to continue automatically into [Criticism-driven follow-up investigation](followups.md) after the foundation completes:
+
+```bash
+python -u -m language --config workflow.local.json --output runs/example --followup
+python -m http.server 8000 --directory runs/example-followup/report
+```
+
+The foundation stays in `runs/example`; follow-up records and the final report are written to the sibling directory `runs/example-followup`. Follow-ups use at most two rounds of five questions, seed 42, a 1,024-token input limit and up to 12 natural examples per query group. Repeating the same command reuses completed foundation and follow-up checkpoints. Follow-up failures return a nonzero exit code without changing the foundation's completed status.
+
+`--followup` requires a full `--config` investigation: it cannot be combined with `--stop-after interpretation`, `--ablate-from` or `--anatomy-from`. It can be combined with `--checkpoint-attribution`. The [standalone entry point](followups.md#run-when-authorized) remains available for custom follow-up paths and sampling limits.
 
 `max_rules_per_pole` sets the per-pole rule limit. The generator sets it to 5 and `max_refinements` to 2, producing an initial explanation, two revisions and three labeling passes. A hand-written configuration that omits the rule limit uses 3. `No visible cue` is supplied separately; a pole without supported rules may remain unexplained.
 
 `batch_tokens` limits padded tokens per measurement batch. Set `NEURON_MICROSCOPE_GPU_WORKER=1` to share one resident model per GPU group across queued operations from different runs; API requests can continue while other runs use the GPU. Runs sharing a physical GPU group must use the same `gpu_lock`. Without the worker, the lock covers a run’s complete measurement stage. Separate groups can measure concurrently. `llm.max_concurrent_requests: null` imposes no application-level API cap; a numeric limit uses the shared `api_slots` directory.
 
-Optional `publish`, `references` and `publish_neurons` fields export reports and a comparison directory. `references` contains snapshots named `Lx_Ny.html`; they are read only after research is complete. Each investigation writes to a new directory. Repeating the command with the same configuration reuses completed API responses, sampling and measurement files. Change the output directory when changing scientific inputs.
+Optional `publish`, `references` and `publish_neurons` fields export reports and a comparison directory. With `--followup`, export occurs after successful follow-up completion and updates an existing export with the final report, preserving the original research files. `references` contains snapshots named `Lx_Ny.html`; they are read only after research is complete. Each investigation writes to a new directory. Repeating the command with the same configuration reuses completed API responses, sampling and measurement files. Change the output directory when changing scientific inputs.
 
 ## Measurements and interpretation
 

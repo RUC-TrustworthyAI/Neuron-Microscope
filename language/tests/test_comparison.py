@@ -46,6 +46,27 @@ class ComparisonTests(unittest.TestCase):
             self.assertNotIn('data-reference=', (output/'index.html').read_text())
             self.assertFalse((output/'comparison/original.html').exists())
 
+    def test_followup_replaces_export_without_writing_through_foundation_links(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            foundation, followup, output = (root / name for name in ('foundation', 'followup', 'export'))
+            foundation.mkdir()
+            followup.mkdir()
+            for folder, title in ((foundation, 'Foundation'), (followup, 'With follow-up')):
+                (folder / 'index.html').write_text(report_html({'claim': {'title': title}}))
+                (folder / 'paper-data.json').write_text(json.dumps({'title': title}))
+            original = {path.name: path.read_bytes() for path in foundation.iterdir()}
+            publish(foundation, output, 'L1_N2', root / 'absent')
+            publish(followup, output, 'L1_N2', root / 'absent', replace=True)
+            self.assertEqual({path.name: path.read_bytes() for path in foundation.iterdir()}, original)
+            self.assertEqual((output / 'paper-data.json').read_bytes(), (followup / 'paper-data.json').read_bytes())
+            self.assertIn('With follow-up', (output / 'index.html').read_text())
+            self.assertEqual((output / 'index.html').read_text().count('neuron-comparison:start'), 1)
+            self.assertNotIn('neuron-comparison:start', (followup / 'index.html').read_text())
+            for destination in (followup, followup / 'nested', root):
+                with self.subTest(destination=destination), self.assertRaises(ValueError):
+                    publish(followup, destination, 'L1_N2', replace=True)
+
     def test_blind_score_uses_achieved_values_and_retains_large_ratios(self):
         ours={'tests': {'blind_max': {'achieved': 30, 'target': 999}, 'blind_min': {'achieved': -20}}}
         reference={'tests': {'blind_max': {'achieved': 10, 'target': 999}, 'blind_min': {'achieved': -10}}}

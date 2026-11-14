@@ -22,6 +22,7 @@ def _copy(source, target):
 
 
 def _replace_file(source, target):
+    target = Path(target)
     temporary = target.with_name(target.name + '.comparison.tmp')
     shutil.copy2(source, temporary)
     temporary.replace(target)
@@ -105,10 +106,15 @@ def install(report, neuron, references=None, directory='../'):
     return available
 
 
-def publish(source, destination, neuron, references=None, directory='../'):
+def publish(source, destination, neuron, references=None, directory='../', *, replace=False):
     """Create an exported report with comparison controls."""
     source, destination = Path(source), Path(destination)
-    shutil.copytree(source, destination, copy_function=_copy)
+    if replace and (source.resolve() == destination.resolve() or
+                    source.resolve() in destination.resolve().parents or
+                    destination.resolve() in source.resolve().parents):
+        raise ValueError('Updated publication must be separate from its source report')
+    shutil.copytree(source, destination, copy_function=_replace_file if replace else _copy,
+                    dirs_exist_ok=replace)
     from exemplar_display import render as render_exemplars
     page = destination / 'index.html'
     source_html = page.read_text()

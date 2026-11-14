@@ -18,7 +18,17 @@ Assessments record result, verdict, suggested revision and evidence IDs. Revisio
 
 ## Run when authorized
 
-Use the existing Linux environment and credentials supplied through `NEURON_PAPER_API_KEY_FILE` (outside the repository) or `DEEPSEEK_API_KEY`:
+Use the existing Linux environment and credentials supplied through `NEURON_PAPER_API_KEY_FILE` (outside the repository) or `DEEPSEEK_API_KEY`. To run the foundation and follow-ups with one command:
+
+```bash
+python -u -m language --config workflow.local.json --output runs/example --followup
+```
+
+The command completes or resumes the foundation in `runs/example`, then starts follow-ups in the sibling directory `runs/example-followup`. The final report is `runs/example-followup/report/index.html`. Defaults are seed 42, 1,024 tokens per contrast input and up to 12 natural examples per query group. The foundation's explanation, predictions, report and completed status remain intact if a follow-up fails.
+
+`--followup` requires a full `--config` investigation. It cannot be combined with `--stop-after interpretation`, `--ablate-from` or `--anatomy-from`; `--checkpoint-attribution` can be used alongside it. When `publish` is configured, successful follow-ups export the final report and update any existing export without changing the research files.
+
+The standalone entry point remains available to select a different output directory or override the seed and limits:
 
 ```bash
 python -m language.workflow.followups \
@@ -31,7 +41,7 @@ The source and output must be separate, non-nested directories. Text measurement
 
 No human inspection or adjustment is part of execution. A failed item is archived and does not discard successful items; all failures are visible to round two. If any item fails, final status is `complete_with_failures` and the CLI exits nonzero. A planner or infrastructure failure sets `failed`. Invalid outputs are never converted into successful scientific results. There are no transport retry loops or automatic changes to scientific parameters.
 
-Repeat the identical command after interruption to reuse completed API and measurement checkpoints. Failed item records remain terminal; change the output directory for a new attempt. The manifest pins source files, configuration, options, implementation, model metadata and archive metadata. Large weight and activation arrays use size and modification time rather than full-file hashes. Changing these inputs rejects reuse.
+Repeat the identical command after interruption to reuse completed API and measurement checkpoints. With `--followup`, a completed foundation is reused before resuming the follow-up stage. Both entry points return a nonzero exit code when a follow-up fails. Failed item records remain terminal; use the standalone entry point with a new follow-up output directory for a new attempt. The manifest pins source files, configuration, options, implementation, model metadata and archive metadata. Large weight and activation arrays use size and modification time rather than full-file hashes. Changing these inputs rejects reuse.
 
 ## Artifacts and software checks
 
