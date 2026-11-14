@@ -1,109 +1,44 @@
-# Followup experiments from Criticism
+# Criticism-driven follow-up investigations
 
-Followups reproduce the public investigation flow and compact report format of
-the [Colorado case](https://already-clean.goodfire.com/neuron-scientist/L55_N11703/).
-Its internal prompts and scheduler were not published, so internal equivalence cannot be verified.
-The explanation, blind labels and original Criticism stay frozen; followups investigate their counterexamples and doubts.
+Follow-up investigation starts from a **completed** foundation investigation. It preserves the original explanation, predictions and Criticism, then investigates at most five questions in each of two rounds. It stops when the planner has no new distinguishable question, when all proposed questions repeat earlier ones, or when an entire round fails. It never pads a round to five.
 
-## Run and budget
+## Protocol
 
-Configurations from `language/examples/configure.py` enable:
+Each question registers its original Criticism IDs, working hypothesis, rival, competing predictions and distinguishing observation before accessing new measurements. The planner can choose:
 
-```json
-"followups": {
-  "max_rounds": 2,
-  "max_experiments": 6,
-  "max_conditions": 36,
-  "max_input_tokens": 1024
-}
+- **Review:** read identified examples, graphs or the baseline ablation summary, including full contexts from the preceding round. No new model forward is required.
+- **Contrast:** specify literal prefixes, suffixes and replacement fragments. Python constructs every condition and scoring span; it never extracts replacements from model-written full sentences. One to three frames share two to six conditions. Every declared condition is retained, with the first as reference. Signed product and differences from that reference are measured without selecting a winning frame.
+- **Corpus:** scan the complete saved activation archive on CPU. Two to four literal-query groups sample up to twelve matching documents each by seeded reservoir sampling, excluding documents shown during initial interpretation. Document selection never uses activation strength. The first literal match is scored with signed absolute maximum. Exact saved tokens, all three native channels, the match span and the causal prefix through the selected token are retained. Groups can overlap; empty groups and exclusions are recorded. These lexical samples do not establish semantic coverage or population prevalence.
+
+The generation prompt includes the JSON schema before every call. The shared client uses JSON mode and at most one automatic contract correction; this is not provider-enforced strict JSON Schema. Semantic fields are structured before generation. Token limits and valid scoring positions are checked before GPU execution, without silent truncation or changing an experiment to make it fit.
+
+Round two receives the **entire original Criticism**, frozen explanation, **every round-one question, specification, case outcome, assessment and failure**, and the accumulated proposed revisions. Each case retains its selected response, scored-region summary, scoring positions (lossless ranges), and a labeled input excerpt. Complete token traces and inputs remain in the archive and are available through review by case ID. Baseline graphs are referenced rather than repeatedly embedded in the history. The immediate assessment sees complete case text. No case outcome is replaced by just a final verdict or a shortlist of unresolved items.
+
+Assessments record result, verdict, suggested revision and evidence IDs. Revisions remain a working ledger; they never overwrite the initial explanation or its blind labels. These adaptive investigations are development evidence, not held-out validation. The two reserved neurons remain separate and are not discovered or run by this command.
+
+## Run when authorized
+
+Use the existing Linux environment and credentials supplied through `NEURON_PAPER_API_KEY_FILE` (outside the repository) or `DEEPSEEK_API_KEY`:
+
+```bash
+python -m language.workflow.followups \
+  --source runs/foundation/interpretations/L22_N6010 \
+  --output runs/followups-L22_N6010 \
+  --seed 42 --max-tokens 1024 --natural-per-group 12
 ```
-Run with `python -m language --config ... --output ...`. Omitting `followups` or setting
-`max_rounds: 0` retains the baseline workflow. `--stop-after interpretation` stops before model experiments.
 
-This implementation uses the Colorado case's observed counts as ceilings: at most six investigations
-in round one and five in round two, also respecting a smaller `max_experiments`.
-Use fewer or stop early when no useful question remains. `max_conditions` limits
-distinct new inputs per investigation; several readouts share one native trace.
-Saved graph groups are independent of this limit. Inputs exceeding the token
-budget are unavailable rather than truncated; valid sibling investigations run.
+The source and output must be separate, non-nested directories. Text measurements use one local model and batch size one; the default per-input budget is 1,024 tokens. Natural queries reuse saved activations and require no GPU. No reference blog explanations are supplied to the model.
 
-## Investigation cycle
+No human inspection or adjustment is part of execution. A failed item is archived and does not discard successful items; all failures are visible to round two. If any item fails, final status is `complete_with_failures` and the CLI exits nonzero. A planner or infrastructure failure sets `failed`. Invalid outputs are never converted into successful scientific results. There are no transport retry loops or automatic changes to scientific parameters.
 
-1. Start from upstream Criticism; optionally inspect saved evidence before design.
-2. Register one falsifiable question, changed and fixed conditions, scored tokens
-   and a textual prediction explaining which outcomes distinguish the competing
-   explanations. Keep matched probes or a sweep in one investigation.
-3. Execute the registered operations and retain actual measurements.
-4. The result API receives complete condition text and measured readouts. It gives
-   the decisive contrast, exceptions and tested scope. The verdict judges the
-   tested working claim: `survived`, `narrowed`, `rejected` or `inconclusive`.
-5. A short `suggested_revision` can change the affected local rule. The next round
-   can test that revision or an unexpected observation using compact prior results.
+Repeat the identical command after interruption to reuse completed API and measurement checkpoints. Failed item records remain terminal; change the output directory for a new attempt. The manifest pins source files, configuration, options, implementation, model metadata and archive metadata. Large weight and activation arrays use size and modification time rather than full-file hashes. Changing these inputs rejects reuse.
 
-Investigations cite source Criticism, prior investigations or measured evidence. Working claims
-retain their parent and producing investigation. Missing evidence can be deferred with a reason.
-Change matched prefixes and score at or after the change; suffix changes test earlier-token invariance.
+## Artifacts and software checks
 
-## Evidence operations
+`frozen.json` preserves the baseline; `r*-i*/preregistered.json`, `evidence.json` and `record.json` retain specifications, raw measurements and decisions. `round-*.json` and `investigation.json` retain the full outcome ledger. `api/` contains the shared client's requests, responses and usage; credentials are not recorded. `status.json` reports completion or failure. The separate `report/` appends compact Criticism rows, preserving every other baseline report field, including Task2 and Task3.
 
-Leave unused operation arrays empty. Saved inspection schedules no new forwards.
-
-- `probes`: score exact new text or a saved `case_id`, with named readouts.
-  Locations are the complete `input`, a literal `marker` with zero-based
-  `occurrence` and optional `token_offset`, `token_position` (`start` only), or
-  half-open `token_range` (`start`, `end`). Reductions are signed `max`, `min`,
-  `absmax` or `single`; metrics are `product` and `peak_position`. Saved full-input
-  and marker reads require a complete trace; partial traces support saved positions.
-- `graph_queries`: select explicit `case_ids` or a `cohort_id` per group and a
-  layer/neuron. Return presence, available rank/influence/activation statistics
-  and scope. Optional `view: "census"` surveys observed units; `census_limit`
-  limits the returned list to 1–128 (default 32), not the counted graph population.
-  These are attribution observations; omitted nodes do not become zero activations.
-- `resamples`: draw without replacement from sorted eligible saved cases using
-  `sample_size` and `seed`, optionally filtering `group` and `activation_band`.
-  Pair each isolated replay with its original product; retain pairs, `tolerance`,
-  reproduced fraction and scoped `quantile` statistics. Isolation ends at the
-  original anchor and uses its decoded visible token span. Unavailable spans
-  cannot be replayed. Fresh no-cue probes can accompany the replay.
-- `quantiles`: read a registered `quantile` from an existing weighted distribution,
-  preserving its population scope. A development sample cannot stand for the corpus.
-
-The archive comes from project measurements: native traces, saved spectrum contexts and
-frozen groups, actual RelP graphs and available distributions.
-Whole-corpus quantiles require the native BF16 histogram. Missing cohorts or
-histograms stay unavailable; the Colorado reference is never measurement input.
-New forwards retain token IDs, offsets and native `gate`, `up` (stored as `value`) and `product`, including the scoring token.
-
-## Import saved evidence
-
-Optional `followup_archive` is an absolute JSON path with this envelope:
-
-```json
-{"schema_version": 1, "identity": {"model": "...", "neuron": {}, "settings": {}}, "archive": {}}
+```bash
+PYTHONPATH=language/tools python -m unittest language.tests.test_followups -v
 ```
-Copy `model`, numeric layer/index `neuron` and the complete `settings` from the
-configuration; identity must match. Include at least one evidence domain:
 
-| Domain | Contents |
-| --- | --- |
-| `traces` | Case-ID map: `text`, ordered native `trace`, matching `selected`; retain token IDs, offsets and `isolation_text` when available. |
-| `graphs` | Case-ID map: `nodes` with numeric `layer`/`neuron`; saved `rank`, `influence` and `activation` may be absent. |
-| `cohorts` | Cohort-ID map of existing IDs, containing only traces or only graphs. |
-| `cohort_descriptions` | Nonblank membership description for every imported cohort. |
-| `distributions` | Distribution-ID map: finite `values`, positive integer `counts`, nonblank population `scope`. |
-
-Imports retain source provenance, accept exact duplicates and reject conflicting IDs. Missing node statistics stay missing.
-The importer reads only the explicit project-owned JSON path and does not discover reference reports.
-
-## Report and resume
-
-The unchanged Colorado UI shows round, verdict and challenge; expanding shows Prediction, Result and evidence. Its fields are
-`round`, `attack`, `prediction`, `result`, `verdict`, `evidence` and
-`suggested_revision`. Conditions and conclusions belong in the concise prose;
-local revision state adds no second explanation panel or round-zero table.
-
-`followups/context.json` retains the frozen sources and archive fingerprint.
-Each round saves registration before execution, then measurements, API results
-and claim versions; `summary.json` joins the rounds. API records are under
-`api/followups/`. Full sweeps, traces, graph statistics and replay pairs stay on disk. Resume reuses completed work
-with the same schema, configuration, source evidence and request inputs. Changed inputs or prompts require a new directory.
+The tests use synthetic archives and fake API/model objects. They verify software behavior and are not scientific experiments or evidence of improved interpretation quality.

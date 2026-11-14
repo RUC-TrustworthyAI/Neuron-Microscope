@@ -35,7 +35,7 @@ def resume_graph_ablation_packet(root, packet):
     return False
 
 
-def analyze(client, initial, predictions, packet, evidence, timeline):
+def finalize(client, initial, predictions, packet, evidence, sample, contexts, root, timeline):
     valid_atlas = {row['id'] for row in packet['atlas']}
 
     def check_revision(output):
@@ -58,16 +58,12 @@ def analyze(client, initial, predictions, packet, evidence, timeline):
     analysis = client.request('report-analysis', prompts.REVISE,
         {**packet, 'current_explanation': initial, 'prediction_feedback': prediction_feedback(predictions)},
         contracts.REPORT_ANALYSIS, 4, check_revision)
-    return {**analysis, **{key: initial[key] for key in ('claim', 'response_rules')}}
+    revision = {**analysis, **{key: initial[key] for key in ('claim', 'response_rules')}}
 
-def review_report(client, revision, predictions, packet, timeline, followups=None):
     timeline.status('independent-review')
-    review_packet = {'claim': revision['claim'], 'response_rules': revision['response_rules'],
+    review = client.request('final-review', prompts.REVIEW,
+        {'claim': revision['claim'], 'response_rules': revision['response_rules'],
          'criticism': revision['criticism'], 'clusters': revision['clusters'],
          'search_progress': packet['search_progress'], 'controls': packet['controls'],
-         'blind_tests': packet['blind_tests'], 'prediction_feedback': prediction_feedback(predictions)}
-    if followups and followups['status'] != 'disabled':
-        from .criticism_report import history_for_planning
-        review_packet['followups'] = {'status': followups['status'],
-            'stop_reason': followups['stop_reason'], 'rounds': history_for_planning(followups['rounds'])}
-    return client.request('final-review', prompts.REVIEW, review_packet, contracts.REVIEW, 4)
+         'blind_tests': packet['blind_tests'], 'prediction_feedback': prediction_feedback(predictions)}, contracts.REVIEW, 4)
+    return revision, predictions, review

@@ -121,11 +121,8 @@ def export(run, output):
         'atlas': [{key: row[key] for key in ('id', 'text', 'selected', 'upstream', 'downstream') if key in row} for row in artifacts['atlas']],
         'graphs': [{'id': row['id'], 'text': row['graph']['text'], 'position': row['graph']['position']} for row in artifacts['graphs']],
         'review': artifacts['review'], 'analysis': artifacts['revision'], 'costs': costs,
-        'followups': artifacts.get('followups', {'status': 'disabled', 'rounds': []}),
-        'followup_file': 'content/followups.json',
         'report': 'reports/final.html', 'initial_report': 'reports/evidence.html',
     }
-    write(content / 'followups.json', episode['followups'])
     write(content / 'episode.json', episode)
     reports = output / 'reports'
     reports.mkdir(exist_ok=True)

@@ -518,7 +518,7 @@ class WorkflowTests(unittest.TestCase):
 
 
     def test_report_analysis_cannot_replace_frozen_rules(self):
-        from language.workflow.revision import analyze, review_report
+        from language.workflow.revision import finalize
         from language.workflow.state import Timeline
         class FakeClient:
             calls = []
@@ -536,11 +536,11 @@ class WorkflowTests(unittest.TestCase):
         client = FakeClient()
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
-            packet = dict(atlas=[], search_progress=[], controls=[], blind_tests=[])
-            revised = analyze(client, frozen, predictions, packet, {}, Timeline(root))
-            review_report(client, revised, predictions, packet, Timeline(root))
+            revised, labels, review = finalize(client, frozen, predictions,
+                dict(atlas=[], search_progress=[], controls=[], blind_tests=[]), {}, {}, {}, root, Timeline(root))
         self.assertEqual(revised['claim'], frozen['claim'])
         self.assertEqual(revised['response_rules'], frozen['response_rules'])
+        self.assertIs(labels, predictions)
         self.assertEqual(client.calls, ['report-analysis', 'final-review'])
 
     def test_price_accounts_for_cached_tokens(self):

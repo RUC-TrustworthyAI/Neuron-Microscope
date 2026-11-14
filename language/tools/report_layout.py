@@ -325,17 +325,61 @@ def graph_display(source):
     return source[:start]+part+source[stop:]
 
 
-CRITICISM = r"""// 8. Criticism: compact table, each row expands to the result and evidence.
-(() => { const K = B.criticism; if (!has(K)) return;
-  const s = Math.max(...K.flatMap(k => (k.evidence || []).map(e => Math.abs(e.activation || 0))), 1e-9);
-  const rows = K.map(k => $('details', { class: 'crow' }, $('summary', null, $('span', { class: 'n' }, k.round), $('span', null, $('span', { class: 'pill ' + (k.verdict || '') }, k.verdict || '')), $('span', { class: 'att', title: k.attack || '' }, k.attack || '')),
-    $('div', { class: 'bodyc' }, k.prediction ? P($('b', null, 'Prediction. '), k.prediction) : null, k.result ? P($('b', null, 'Result. '), k.result) : null, has(k.evidence) ? $('div', { class: 'ev' }, k.evidence.map(e => $('div', null, tile(e.activation, { signed: true, scale: s }), $('span', null, e.text)))) : null)));
-  const intro = B.followup_status?.showing_baseline
-    ? P('Initial Criticism. Open a row for the result and evidence.')
-    : P('Each round, a critic tries to break the claim. The verdict records whether the claim survived as written, was narrowed, or was rejected. Open a row for the result and evidence.');
-  sec('criticism', 'Criticism', [intro], $('div', null, rows)); })();
+VERDICT_CODE = r"""const verdictOf = value => {
+    const text=String(value || '').trim().toLowerCase();
+    if (['survived','narrowed','rejected','inconclusive'].includes(text)) return text;
+    // Older free-text decisions keep their complete wording in the expanded body.
+    if (/\b(narrow\w*|qualif\w*|partial\w*|directionally|broaden\w*|revis\w*)\b/.test(text)) return 'narrowed';
+    if (/^(rejected|not supported|unsupported|refuted|falsified)\b/.test(text)) return 'rejected';
+    if (/^(survived|supported)\b/.test(text)) return 'survived';
+    return '';
+  };"""
 
-"""
+CRITICISM = r"""// 8. Criticism.
+(() => { const K = B.criticism; if (!has(K)) return;
+  __VERDICT_CODE__
+  const s = Math.max(...K.flatMap(k => (k.evidence || []).map(e => Math.abs(e.activation || 0))), 1e-9);
+  const grouped = new Map();
+  K.forEach(k => {
+    const round = k.investigation_id ? Number(k.round) : 0;
+    if (!grouped.has(round)) grouped.set(round, []);
+    grouped.get(round).push(k);
+  });
+  const row = (k, number) => {
+    const verdict=verdictOf(k.verdict), original=String(k.verdict || '').trim();
+    const attack = k.investigation_id ? (k.attack || '').replace(/^Follow-up round \d+:\s*/, '') : (k.attack || '');
+    return $('details', {class:'crow'},
+      $('summary', null, $('span', {class:'n',style:'white-space:nowrap'}, number),
+        $('span', null, $('span', {class:'pill '+verdict}, verdict || '—')),
+        $('span', {class:'att',title:attack}, attack)),
+      $('div', {class:'bodyc'},
+        k.prediction ? P($('b',null,'Prediction. '),k.prediction) : null,
+        k.result ? P($('b',null,'Result. '),k.result) : null,
+        original && original.toLowerCase()!==verdict ? P($('b',null,'Verdict. '),original) : null,
+        has(k.evidence) ? $('div',{class:'ev'},k.evidence.map(e=>$('div',null,
+          tile(e.activation,{signed:true,scale:s}),$('span',null,e.text)))) : null));
+  };
+  const groups = [...grouped].sort(([a], [b]) => a - b).map(([round, entries]) => {
+    const title = round ? `Follow-up Round ${round}` : 'Original Criticism';
+    return $('div', {class:'criticism-group','data-round':round,style:'margin:26px 0 0'},
+      $('h3', {style:'display:flex;align-items:baseline;gap:12px;margin:0 0 12px;font-size:17px'},
+        title, $('span', {class:'quiet',style:'font-size:13px;font-weight:400'}, `${entries.length} ${entries.length === 1 ? 'item' : 'items'}`)),
+      $('div', null, entries.map((k, i) => row(k, round ? `${round}.${i + 1}` : `C${i + 1}`))));
+  });
+  sec('criticism','Criticism',
+    [P('Grouped by original criticism and follow-up round. Counts refer to items. Open an item to view its predictions, results, and evidence.')],
+    $('div',null,groups));
+})();
+
+""".replace('__VERDICT_CODE__',VERDICT_CODE)
+
+
+def refresh_criticism(source):
+    """Refresh only Criticism presentation; leave embedded results and other sections intact."""
+    source = re.sub(r'// 8\. Criticism[^\n]*\n.*?(?=// 9\. Appendix\.)', lambda _: CRITICISM,
+                    source, count=1, flags=re.S)
+    return re.sub(r"^[ \t]*foldExtra\(\[\.\.\.document\.querySelectorAll\('#criticism \.crow'\)\], 8, 'Additional criticism rounds'\);\r?\n?",
+                  '', source, flags=re.M)
 
 
 def render(source):
@@ -381,8 +425,7 @@ def render(source):
     source = source.replace("), tiles, big); })();", "), tiles); })();", 1)
     source = re.sub(r'// 6\. Circuit tables:.*?(?=// 7\. Tests\.)',lambda m:CIRCUIT,
                     source,count=1,flags=re.S)
-    source = re.sub(r'// 8\. Criticism[^\n]*\n.*?(?=// 9\. Appendix\.)',lambda m:CRITICISM,
-                    source,count=1,flags=re.S)
+    source = refresh_criticism(source)
     source = source.replace("has(K) ? 'Clusters' : 'Routes'", "'Clusters'")
     source = re.sub(r'  if \(has\(T\.steering\)\) \{.*?(?=  if \(has\(T\.ablation\)\))',
                     lambda m:STEERING,source,count=1,flags=re.S)

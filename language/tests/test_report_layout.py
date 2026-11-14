@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from pathlib import Path
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from report_layout import headline,render,CIRCUIT,COLOURS,GRAPH_HELPERS
+from report_layout import headline,render,CIRCUIT,COLOURS,VERDICT_CODE,GRAPH_HELPERS,CRITICISM,refresh_criticism
 
 class LayoutTests(unittest.TestCase):
     def test_merge_relocates_bootstrap_after_earlier_layout_text_changes(self):
@@ -56,6 +56,59 @@ class LayoutTests(unittest.TestCase):
         code+="\nconst e={peak_index:350,token_activations:Array.from({length:500},(_,i)=>({token:String(i),activation:i===350?90:0}))};const p=exemplarPreview(e);console.log(JSON.stringify([p.token_activations.length,p.peak_index,p.token_activations[0].token,p.token_activations[p.peak_index].activation,e.token_activations.length]));"
         result=subprocess.run(['node','-e',code],capture_output=True,text=True,check=True)
         self.assertEqual(json.loads(result.stdout),[33,32,'318',90,500])
+
+    def test_criticism_uses_short_badges_and_preserves_legacy_decisions(self):
+        import subprocess
+        values=['survived','narrowed','rejected','inconclusive','Survived with a narrower mechanism: measured qualification.',
+                'Partially supported and broadened: a qualified account.',
+                'Directionally supported but not sufficient to reproduce the extremes.',
+                'Partial support for output engagement.', 'Unknown decision']
+        code=VERDICT_CODE+'\nconsole.log(JSON.stringify('+json.dumps(values)+'.map(verdictOf)));'
+        result=subprocess.run(['node','-e',code],capture_output=True,text=True,check=True)
+        self.assertEqual(json.loads(result.stdout),['survived','narrowed','rejected','inconclusive','narrowed','narrowed','narrowed','narrowed',''])
+        html='// 8. Criticism: compact table, each row expands to the result and evidence.\nold();\n// 9. Appendix.\n'
+        rendered=render(html)
+        self.assertIn("P($('b',null,'Verdict. '),original)",rendered)
+        self.assertEqual(render(rendered),rendered)
+
+    def test_criticism_groups_and_numbers_preserve_every_result(self):
+        import subprocess
+        rows = [{'round': i, 'attack': f'Original {i}', 'verdict': 'narrowed',
+                 'prediction': 'Saved prediction', 'result': f'Saved result {i}', 'evidence': []}
+                for i in range(1, 6)]
+        rows += [{'round': r, 'investigation_id': f'r{r}-i{i}',
+                  'attack': f'Follow-up round {r}: Question {i}', 'verdict': 'survived',
+                  'prediction': 'Saved prediction', 'result': f'Saved result {r}.{i}', 'evidence': []}
+                 for r in (1, 2) for i in range(1, 6)]
+        code = 'const B={criticism:' + json.dumps(rows) + '};\n' + r"""
+const before=JSON.stringify(B), has=x=>!!x?.length;
+const $=(tag,attrs,...children)=>({tag,attrs:attrs||{},children:children.flat().filter(x=>x!=null)});
+const P=(...children)=>$('p',null,...children), tile=value=>$('span',null,value);
+let output; const sec=(id,title,intro,body)=>{output=body;};
+""" + CRITICISM + r"""
+const walk=node=>typeof node==='object'?[node,...node.children.flatMap(walk)]:[];
+const text=node=>typeof node==='object'?node.children.map(text).join(''):String(node);
+const groups=walk(output).filter(node=>node.attrs.class==='criticism-group');
+console.log(JSON.stringify({unchanged:before===JSON.stringify(B),groups:groups.map(group=>({
+  heading:text(group.children[0]),numbers:walk(group).filter(n=>n.attrs.class==='n').map(text),
+  questions:walk(group).filter(n=>n.attrs.class==='att').map(text),
+  results:walk(group).filter(n=>n.attrs.class==='bodyc').map(text)}))}));
+"""
+        value=json.loads(subprocess.run(['node','-e',code],capture_output=True,text=True,check=True).stdout)
+        self.assertTrue(value['unchanged'])
+        self.assertEqual([group['heading'] for group in value['groups']],
+                         ['Original Criticism5 items','Follow-up Round 15 items','Follow-up Round 25 items'])
+        self.assertEqual([group['numbers'] for group in value['groups']],
+                         [[f'C{i}' for i in range(1,6)], [f'1.{i}' for i in range(1,6)], [f'2.{i}' for i in range(1,6)]])
+        self.assertEqual(value['groups'][1]['questions'], [f'Question {i}' for i in range(1,6)])
+        for original, displayed in zip(rows, [text for group in value['groups'] for text in group['results']]):
+            self.assertIn(original['result'], displayed)
+        head='<script id="bundle">'+json.dumps({'criticism':rows})+'</script>\n'
+        tail='// 9. Appendix.\nkeep_appendix();\nkeep_other_sections();\n'
+        folding="  foldExtra([...document.querySelectorAll('#criticism .crow')], 8, 'Additional criticism rounds');\n"
+        refreshed=refresh_criticism(head+'// 8. Criticism.\nold();\n'+tail+folding)
+        self.assertEqual(refreshed, head+CRITICISM+tail)
+        self.assertEqual(refresh_criticism(refreshed), refreshed)
 
     def test_circuit_uses_two_independent_slots(self):
         self.assertIn("table(G.upstream,",CIRCUIT)

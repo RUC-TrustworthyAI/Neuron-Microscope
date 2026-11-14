@@ -2,7 +2,6 @@
 import collections
 import copy
 from pathlib import Path
-from .criticism_report import criticism_patch
 from .state import read, write, union_seconds
 from .labels import plot_fields
 
@@ -93,7 +92,7 @@ def assemble_interpretation(root, initial_report, interpretation, sample, predic
     patch = {'claim': interpretation['claim'], 'agent_read': None, 'agent_read_full': None,
              'section_prose': {}, 'headline': None, 'search': None, 'clusters': [],
              'routes': [], 'custom': None, 'graphs_curated': None, 'family': None,
-             'circuit': None, 'tests': None, 'criticism': [], 'followup_status': None, 'interpretation_costs': None}
+             'circuit': None, 'tests': None, 'criticism': [], 'interpretation_costs': None}
     patch.update(plot_fields(sample, predictions, None))
     page, bundle = merge(source, patch)
     scope = '''<script id="interpretation-view">
@@ -146,7 +145,10 @@ def assemble(root, initial_report, neuron, artifacts, cards):
                                         for g in artifacts['graphs']]}
     measured = {row['id']: row for row in artifacts['all_measured']}
     evidence = artifacts.get('evidence') or {identity: exemplar(row) for identity, row in measured.items()}
-    patch.update(criticism_patch(revised['criticism'], artifacts.get('followups'), evidence))
+    patch['criticism'] = []
+    for i, criticism in enumerate(revised['criticism']):
+        patch['criticism'].append({**{k: v for k, v in criticism.items() if k != 'evidence_ids'}, 'round': i + 1,
+            'evidence': [evidence[identity] for identity in criticism['evidence_ids']]})
     patch['tests'] = artifacts['tests']
     patch['ablation'] = artifacts.get('ablation')
     # Restore measured token-level output effects independently of narrative choices.
