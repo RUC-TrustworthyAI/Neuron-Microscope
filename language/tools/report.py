@@ -2,6 +2,7 @@
 import copy
 import html
 import json
+import math
 import re
 from pathlib import Path
 
@@ -10,6 +11,11 @@ EFFECT = re.compile(r'// 5b\. What it does:.*?(?=// 5c\. Where it sits:)', re.S)
 TESTS = re.compile(r'// 7\. Tests\..*?(?=// 8\. Criticism[.:])', re.S)
 ANATOMY_PAIR = re.compile(r'// Task 3 paired Anatomy renderer\..*?// End paired Anatomy renderer\.', re.S)
 ANATOMY_INTRO = re.compile(r"(sec\(\{ id: 'anatomy', wide: true \}, 'Inside the neuron', \[P\(')([^']+)(')")
+NEURON_LABEL_SCRIPTS = re.compile(
+    r'<script id="neuron-labels" type="application/json">(?P<data>.*?)</script>'
+    r'<style id="neuron-label-style">.*?</style>'
+    r'<script id="neuron-label-render">.*?</script>', re.S)
+NEURON_LABEL_HOOK = re.compile(r'/\* neuron-labels:start \*/.*?/\* neuron-labels:end \*/', re.S)
 
 
 def refresh_effect(source):
@@ -32,6 +38,73 @@ def refresh_tests(source):
 def encode_bundle(bundle):
     return json.dumps(bundle, ensure_ascii=False, allow_nan=False, separators=(',', ':')).replace(
         '<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+
+
+def neuron_labels_overlay(result, evidence):
+    """Resolve qualitative labels to their cited discovery measurements."""
+    labels, citations = {}, {}
+    samples = evidence.get('samples') or {}
+    for unit, label in (result.get('labels') or {}).items():
+        by_id = {
+            sample['id']: sample for sample in samples.get(unit, [])
+            if sample.get('id') and sample.get('neuron_id') == unit
+            and sample.get('split') == 'discovery'
+            and type(sample.get('activation')) in (int, float)
+            and math.isfinite(sample['activation'])
+        }
+        cited_ids = [key for key in dict.fromkeys(label.get('evidence_ids') or []) if key in by_id]
+        labels[unit] = {field: label.get(field, '')
+                        for field in ('label', 'description', 'status', 'positive', 'negative')}
+        labels[unit]['evidence_ids'] = cited_ids
+        citations.update({key: copy.deepcopy(by_id[key]) for key in cited_ids})
+    return {'labels': labels, 'evidence': citations, 'scope': copy.deepcopy(evidence.get('scope') or {})}
+
+
+def strip_neuron_labels(source):
+    """Recover the exact HTML used as input to the label overlay."""
+    scripts = NEURON_LABEL_SCRIPTS.search(source)
+    if scripts is None:
+        return source
+    renderer, end_tag, tail = source[scripts.end():].partition('</script>')
+    return source[:scripts.start()] + NEURON_LABEL_HOOK.sub('', renderer) + end_tag + tail
+
+
+def update_neuron_labels(source, result, evidence):
+    """Render functional labels as a reversible overlay on a saved report."""
+    from report_layout import render_neuron_labels
+
+    source = strip_neuron_labels(source)
+    bundle, _ = source_bundle(source)
+    overlay = neuron_labels_overlay(result, evidence)
+    bundle['neuron_labels'] = overlay
+    insertion = BUNDLE.search(source).end()
+    renderer, end_tag, tail = source[insertion:].partition('</script>')
+    scripts = (f'<script id="neuron-labels" type="application/json">{encode_bundle(overlay)}</script>'
+               f'<style id="neuron-label-style">{NEURON_LABEL_STYLE}</style>'
+               '<script id="neuron-label-render">'
+               + Path(__file__).with_name('neuron_label_display.js').read_text(encoding='utf-8')
+               + '</script>')
+    page = source[:insertion] + scripts + render_neuron_labels(renderer) + end_tag + tail
+    return page, bundle
+
+
+NEURON_LABEL_STYLE = """
+.neuron-label-control{cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+button.neuron-label-control{border:0;padding:0;color:inherit;background:none;font:inherit;text-align:left}
+.chip.neuron-label-control{text-decoration:none}
+.chip.neuron-label-control .lbl{text-decoration:underline;text-underline-offset:3px}
+#neuron-label-evidence{box-sizing:border-box;width:min(680px,calc(100% - 32px));max-height:calc(100% - 48px);border:1px solid var(--rule);border-radius:9px;padding:20px;color:var(--ink);background:#fff}
+#neuron-label-evidence::backdrop{background:#1d1d1f66}
+#neuron-label-evidence h2{margin:8px 0;font-size:22px;line-height:1.2}
+#neuron-label-evidence p{margin:8px 0}
+#neuron-label-evidence .neuron-label-meta{font-size:12px;color:var(--ink3);overflow-wrap:anywhere}
+#neuron-label-evidence .neuron-label-close{float:right}
+#neuron-label-evidence li{margin-bottom:12px}
+#neuron-label-evidence .neuron-label-context{white-space:pre-wrap;overflow-wrap:anywhere;font:13px/1.55 var(--mono);padding:8px 10px;background:#f6f6f7}
+#neuron-label-evidence mark{background:#ffe4bd;color:inherit;border-radius:2px;box-shadow:0 1px #a95020}
+svg .neuron-label-control{cursor:pointer}
+svg .neuron-label-control:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+"""
 
 
 def refresh_anatomy_pair(source):
@@ -57,11 +130,19 @@ def refresh_anatomy_pair(source):
                           '  if (!hasAnatomyPair && has(A.headline)) figs.push(', 1)
 
 
+def _replay_data(source, bundle):
+    """Include the independent label overlay in the replay's JSON export."""
+    labels = NEURON_LABEL_SCRIPTS.search(source)
+    if labels is None:
+        return bundle
+    return {**bundle, 'neuron_labels': json.loads(labels['data'])}
+
+
 def replace_anatomy_pair(source, pair):
     bundle, _ = source_bundle(source)
     bundle['anatomy'] = {**(bundle.get('anatomy') or {}), 'pair': pair}
     source = BUNDLE.sub(lambda match: match[1] + encode_bundle(bundle) + match[3], source, count=1)
-    return refresh_anatomy_pair(source), bundle
+    return refresh_anatomy_pair(source), _replay_data(source, bundle)
 
 
 def show_criticism_nav(source):
@@ -75,7 +156,7 @@ def replace_ablation(source, section):
     # The original analysis predates the new measurements.
     (bundle.get('section_prose') or {}).pop('ablation', None)
     source = BUNDLE.sub(lambda match: match[1] + encode_bundle(bundle) + match[3], source, count=1)
-    return show_criticism_nav(refresh_effect(source)), bundle
+    return show_criticism_nav(refresh_effect(source)), _replay_data(source, bundle)
 
 
 def apply_route_descriptions(bundle, result):

@@ -176,6 +176,9 @@ def dispatch(runtime, job):
     if operation == 'measure-ablations':
         from .ablation_run import measure
         return measure(runtime, payload['plan'], Path(payload['folder']))
+    if operation == 'neuron-label-evidence':
+        from .neuron_label_evidence import collect
+        return collect(payload['config'], payload['candidates'], runtime, token_budget=payload['token_budget'])
     raise ValueError('Unknown GPU operation: ' + operation)
 
 

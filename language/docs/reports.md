@@ -48,6 +48,8 @@ The head figure comes from the controlled test with the highest positive respons
 
 The Family heatmap displays the selected measured sentence, with rows for the target and attribution-linked upstream and downstream neurons. Steering inputs reuse native traces from completed graph measurements and show an expandable activation context. Attribution-axis labels prioritize positions carrying measured graph nodes; complete observed inputs and node/edge values remain in the saved measurements.
 
+Related neurons use the same short name in Family, Circuit and the attribution graph inspector. Select a name to see the description and the measured examples it cites. The evidence panel shows the measured token ID, position and signed native product. When the tokenizer splits a Unicode character across tokens, the highlight includes the complete character. Units with no supported description are marked as having insufficient evidence.
+
 Tests shows route-prediction accuracy, the training-majority baseline and the number of scored cases. The matrix uses actual routes as rows and predicted routes as columns; route names are shared with the per-example results. Expand a prediction to read its observed prefix and target token. The largest test-class fraction is a reference, not the fitted baseline; unassigned cases are reported separately. These predictions use the existing atlas split and saved attributions.
 
 ## Inspect an underlying result
@@ -66,6 +68,7 @@ predictions.json                    Selected version’s predictions shared by b
 api/                                Requests, responses, usage, cost and timing
 measurements/                       Search, controls and blind-test measurements
 atlas/, graphs/                     Attribution, family and intervention data
+neuron-labels/                      Measured discovery and holdout samples, label records
 artifacts.json                      Structured data passed to the renderer
 report/                             Final HTML and report data
 status.json                         Current phase and output path

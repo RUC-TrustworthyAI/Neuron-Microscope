@@ -16,6 +16,7 @@ from .controls import run as run_controls
 from .search import run as run_search, validate_candidates
 from .attribution import run as run_attribution
 from .route_prediction import run as predict_routes
+from . import neuron_labels
 
 
 def run(config, root, stop_after=None, *, checkpoint_attribution=False):
@@ -34,15 +35,16 @@ def run(config, root, stop_after=None, *, checkpoint_attribution=False):
         raise ValueError('Configuration changed; use a separate run directory')
     write(old_config, config)
     if stop_after is None and (root / 'artifacts.json').exists():
-        # Completed measurements are enough to resume this API-only stage, even
-        # after an interrupted prediction. Preserve frozen follow-up sources.
+        # Resume report additions without repeating the completed investigation.
         with lock(root / 'execution.lock', blocking=False):
-            with timeline.span('route-prediction', 'execution', 0):
+            artifacts = read(root / 'artifacts.json')
+            with timeline.span('resume-report', 'execution', 0):
                 html = root / 'report/index.html'
                 if not html.exists() or '<script id="interpretation-view">' in html.read_text(encoding='utf-8'):
                     with timeline.span('render', 'cpu', 5):
-                        assemble(root, report, config['neuron'], read(root / 'artifacts.json'), len(config['gpus']))
+                        assemble(root, report, config['neuron'], artifacts, len(config['gpus']))
                 result = predict_routes(client, root, timeline)
+                neuron_labels.complete(config, root, artifacts.get('atlas_sections', {}), client, timeline)
             output = update_routes(root, result, config)
             timeline.status('complete', html=str(output / 'index.html'))
         return output
@@ -135,6 +137,8 @@ def run(config, root, stop_after=None, *, checkpoint_attribution=False):
                     ablation_section = (remote.call('measure-ablations', plan=ablation_plan,
                         folder=str(ablation_folder.resolve())) if remote is not None else
                         measure_ablation(runtime, ablation_plan, ablation_folder))
+                label_evidence = neuron_labels.prepare(config, root, atlas_sections, timeline, runtime,
+                                                       gpu_span=gpu_span)
                 measure.runtime = None
                 if remote is None:
                     torch = runtime.torch
@@ -181,7 +185,7 @@ def run(config, root, stop_after=None, *, checkpoint_attribution=False):
             assemble(root, report, config['neuron'], artifacts, len(config['gpus']))
         tests['route_prediction'] = predict_routes(client, root, timeline)
         write(root / 'artifacts.json', artifacts)
-    # Final costs include the completed execution interval and render operation.
+        neuron_labels.complete(config, root, atlas_sections, client, timeline, label_evidence)
     output = update_routes(root, tests['route_prediction'], config)
     timeline.status('complete', html=str(output / 'index.html'))
     return output

@@ -115,7 +115,7 @@ def assemble_interpretation(root, initial_report, interpretation, sample, predic
 
 def assemble(root, initial_report, neuron, artifacts, cards):
     from report import merge, source_bundle
-    from paper_sections import exemplar, search_patch, labelled
+    from paper_sections import exemplar, search_patch
     from report_layout import headline
     from saved_display import peak_fields, default_anatomy
     from .anatomy_pairs import select_anatomy_pair
@@ -138,7 +138,6 @@ def assemble(root, initial_report, neuron, artifacts, cards):
     if anatomy is not None:
         patch['anatomy'] = anatomy
     patch['clusters'] = clusters(artifacts['atlas'], revised['clusters'], patch.get('routes', []))
-    patch = labelled(patch, {'units': {u['id']: u['label'] for u in revised['units']}})
     graph_captions = {g['id']: g for g in revised['graph_captions']}
     patch['graphs_curated'] = {'picks': [dict(g, **{k: v for k, v in graph_captions.get(g['id'], {}).items() if k != 'id'})
                                         for g in artifacts['graphs']]}
@@ -182,10 +181,12 @@ def assemble(root, initial_report, neuron, artifacts, cards):
 def update_routes(root, result, config):
     """Add saved path predictions without rebuilding an investigated report."""
     from report import update_route_prediction
+    from .neuron_labels import report_overlay
 
     output = root / 'report'
     page, bundle = update_route_prediction((output / 'index.html').read_text(encoding='utf-8'), result,
         interpretation_costs=costs(root, config['neuron'], len(config['gpus'])))
+    page, bundle = report_overlay(page, root)
     write(output / 'paper-data.json', {'bundle': bundle})
     write(output / 'interpretation-costs.json', bundle['interpretation_costs'])
     temporary = output / 'index.html.tmp'

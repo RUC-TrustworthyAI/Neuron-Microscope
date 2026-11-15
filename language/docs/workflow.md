@@ -1,6 +1,6 @@
 # Structured workflow
 
-This entry point investigates a neuron through direct, schema-constrained LLM calls. Python selects saved evidence, executes measurements, joins labels to observations and renders the existing interactive report. Prompts and output contracts are in `language/workflow/prompts.py` and `language/workflow/contracts.py`.
+This entry point investigates a neuron through direct JSON-mode LLM calls, validated locally against explicit schemas. JSON mode guarantees JSON syntax; Python checks allowed references and other contract constraints, selects saved evidence, executes measurements, joins labels to observations and renders the existing interactive report. Prompts and output contracts are in `language/workflow/prompts.py` and `language/workflow/contracts.py`.
 
 ## Run
 
@@ -52,6 +52,7 @@ Optional `publish`, `references` and `publish_neurons` fields export reports and
 3. Run three Search rounds with measured feedback, requesting six regions and 16 texts per region. Design four controlled tests with ten conditions each, then improve the test design once using measurements and retain the stronger version of each test. Conditions use a replacement span or common suffix, scoring the signed largest absolute response or a specified single token. The head figure selects the test with the highest positive response when positive rules exist, otherwise the strongest negative response. Its labels remain separate from the complete inputs. The independent Blind writer sees only the frozen claim and rules and writes six texts per supported pole; Search and Blind score full-input maxima or minima. Measure 20 natural and 20 written attribution cases, family responses and three graphs. The [ablation stage](ablation.md) measures the target and same-layer random controls across ranked corpus cases, moderate and weak activations, and a controlled sweep.
 4. Analyze the measured experiments against the frozen explanation. Keep contrary results in Criticism and section prose. An independent reader assesses the account, its supported branches and unresolved patterns. The two plots retain the frozen rules and final blind predictions. These samples provide development feedback and are not a held-out evaluation.
 5. Assemble the HTML from the structured outputs and measured values. [Anatomy](anatomy.md) compares the three native signals across two measured conditions from one sweep. Static Promotes/Suppresses values come from the report's measured logit effects. Semantic clusters retain the measured atlas cases, including unresolved cases.
+6. Name the related neurons using their own measured corpus activations, following the [basic label approach](https://www.goodfire.com/research/neurons-as-an-interpretable-basis#finding-neuron-subcircuits). The stage selects Family members and the displayed upstream and downstream neighbors. It samples up to 32,768 tokens from saved document prefixes, reuses archived native products and replays the same prefixes once for missing coordinates. Naming uses positive and negative peaks and near-zero examples from the discovery documents. The holdout documents stay out of naming requests. Full runs and completed runs resumed with the same command both add labels automatically. Reports retain the scan scope and cited cases in `neuron-labels/`.
 
 ## Records
 
@@ -59,7 +60,9 @@ Optional `publish`, `references` and `publish_neurons` fields export reports and
 
 API calls connect directly, ignoring system proxy settings. HTTP errors,
 connection failures and interrupted streams propagate to the caller without
-automatic transport retries. Existing JSON-format correction, context-capacity
-adjustment and completed-result checkpoints are retained.
+automatic transport retries. A single JSON-contract correction reports all invalid
+enum references together, including when resuming old failed responses. References
+must match the supplied IDs exactly; invalid corrections remain rejected and logged.
+Context-capacity adjustment and completed-result checkpoints are retained.
 
 GPU time counts recorded model operations and loading. API streaming time counts overlapping streams once. Execution time includes CPU work, API latency and GPU-lock waits within the running process, excluding gaps between resumed processes. These intervals can overlap, so GPU and API times do not sum to execution time. Activation collection is outside the report run. Prices are configured estimates; usage records are retained for comparison with the provider invoice.

@@ -325,6 +325,50 @@ def graph_display(source):
     return source[:start]+part+source[stop:]
 
 
+def _label_hook(code):
+    return f'/* neuron-labels:start */{code}/* neuron-labels:end */'
+
+
+def _wrap_label_hook(source, expression, before, after):
+    return re.sub(expression, lambda match: (
+        _label_hook(before) + match[0] + _label_hook(after)), source, count=1)
+
+
+def render_neuron_labels(source):
+    """Attach reversible hooks to the saved Family, Circuit and graph renderers."""
+    def family(part):
+        part = _wrap_label_hook(part, r'\bchip\(u,\s*wmax\)', 'neuronLabelDisplay.chip(u, ', ')')
+        part = part.replace('holder.append(svg);', _label_hook(
+            'neuronLabelDisplay.heatmap(svg, fam); ') + 'holder.append(svg);', 1)
+        return _wrap_label_hook(part, r'\b300(?=,\s*cw\s*=)',
+                                'neuronLabelDisplay.heatmapWidth(fam, ', ')')
+
+    def circuit(part):
+        return _wrap_label_hook(part, r"\$\('td',\s*null,\s*u\.label\s*\|\|\s*''\)",
+                                'neuronLabelDisplay.cell(u, ', ')')
+
+    def graphs(part):
+        part = _wrap_label_hook(part, r"n\.label\s*\|\|\s*n\.clerp\s*\|\|\s*''(?=;)",
+                                'neuronLabelDisplay.name(neuronLabelDisplay.graphUnit(n), ', ')')
+        part = _wrap_label_hook(part, r"(?<=' · ' \+ )labelOf\(n\)(?= : '')",
+                                'neuronLabelDisplay.tooltip(', ')')
+        part = _wrap_label_hook(part,
+                                r"labelOf\(n\) && layerKey\(n\) !== 'logit' \? "
+                                r"\$\('div', \{ class: 'dim' \}, labelOf\(n\)\) : null",
+                                'neuronLabelDisplay.graphControl(n) || (', ')')
+        return part.replace('nL.append(c);', _label_hook(
+            'neuronLabelDisplay.graphNode(c, n, panel); ') + 'nL.append(c);', 1)
+
+    sections = (
+        (r'// 5c\. Where it sits:.*?(?=// 6\. Circuit)', family),
+        (r'// 6\. Circuit tables:.*?(?=// 7\. Tests)', circuit),
+        (r'// 0c\. Three graphs:.*?(?=// 1\. Distribution)', graphs),
+    )
+    for pattern, renderer in sections:
+        source = re.sub(pattern, lambda match: renderer(match[0]), source, count=1, flags=re.S)
+    return source
+
+
 VERDICT_CODE = r"""const verdictOf = value => {
     const text=String(value || '').trim().toLowerCase();
     if (['survived','narrowed','rejected','inconclusive'].includes(text)) return text;

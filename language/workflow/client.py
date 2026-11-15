@@ -33,6 +33,29 @@ def parse_output(answer, schema):
     return output
 
 
+def validation_feedback(output, schema, error):
+    """Report all invalid enum values so one correction can repair the whole response."""
+    invalid = []
+
+    def visit(value, rule, path):
+        if 'enum' in rule and value not in rule['enum']:
+            invalid.append(f'{path}: unexpected value {value!r}')
+        if isinstance(value, dict):
+            for key, child in rule.get('properties', {}).items():
+                if key in value:
+                    visit(value[key], child, path + '.' + key)
+        elif isinstance(value, list) and 'items' in rule:
+            for index, item in enumerate(value):
+                visit(item, rule['items'], f'{path}[{index}]')
+
+    visit(output, schema, '$')
+    if not invalid:
+        return str(error)
+    if str(error) not in invalid:
+        invalid.insert(0, str(error))
+    return '; '.join(invalid) + '. Use exact enum values from the schema; do not abbreviate or invent IDs.'
+
+
 class Client:
     def __init__(self, config, root, slots):
         self.config, self.root, self.slots = config, Path(root), Path(slots)
@@ -93,7 +116,11 @@ class Client:
                     check(output)
             except (ValueError, KeyError, TypeError) as error:
                 if last_invalid is None:
-                    last_invalid = (answer, str(error))
+                    try:
+                        feedback = validation_feedback(parse_output(answer, schema), schema, error)
+                    except (ValueError, KeyError, TypeError):
+                        feedback = str(error)
+                    last_invalid = (answer, feedback)
                 continue
             write(folder / 'result.json', {'input_id': fingerprint, 'output': output})
             return output
@@ -126,11 +153,15 @@ class Client:
                 write(folder / 'result.json', {'input_id': fingerprint, 'output': output})
                 return output
             except (ValueError, KeyError, TypeError) as error:
-                write(destination / 'format-error.json', {'error': str(error)})
+                try:
+                    feedback = validation_feedback(parse_output(answer, schema), schema, error)
+                except (ValueError, KeyError, TypeError):
+                    feedback = str(error)
+                write(destination / 'format-error.json', {'error': feedback})
                 if correction == attempts - 1:
                     raise
                 messages += [{'role': 'assistant', 'content': answer},
-                             {'role': 'user', 'content': 'Correct the JSON contract error while preserving the scientific content: ' + str(error)}]
+                             {'role': 'user', 'content': 'Correct the JSON contract error while preserving the scientific content: ' + feedback}]
 
     def _stream(self, messages, folder, stage, max_tokens=None):
         folder.mkdir(parents=True)

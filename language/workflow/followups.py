@@ -45,7 +45,9 @@ def load_source(source, report_snapshot=None):
     if artifacts['initial'] != initial or artifacts['predictions'] != predictions:
         raise ValueError('Foundation artifacts do not match the frozen explanation and predictions')
     from .followup_report import BUNDLE
-    html = files['report/index.html'].decode('utf-8')
+    from report import strip_neuron_labels
+    html = strip_neuron_labels(files['report/index.html'].decode('utf-8'))
+    files['report/index.html'] = html.encode('utf-8')
     bundles = list(BUNDLE.finditer(html))
     if len(bundles) != 1:
         raise ValueError('Expected exactly one foundation report bundle')
@@ -84,12 +86,17 @@ def route_overlay(html, source):
     return page
 
 
-def integrate_report(report, source):
+def integrate_report(report, source, *, in_place=True):
     """Replace report files atomically, without writing through publication hardlinks."""
-    destination = source / 'report'
-    html = route_overlay((report / 'index.html').read_text(encoding='utf-8'), source)
-    from .followup_report import BUNDLE
-    contents = {'paper-data.json': (json.dumps({'bundle': json.loads(BUNDLE.search(html)[2])},
+    if not in_place and not (source / 'neuron-labels/result.json').is_file():
+        return report
+    destination = source / 'report' if in_place else report
+    html = (report / 'index.html').read_text(encoding='utf-8')
+    if in_place:
+        html = route_overlay(html, source)
+    from .neuron_labels import report_overlay
+    html, bundle = report_overlay(html, source)
+    contents = {'paper-data.json': (json.dumps({'bundle': bundle},
                                                ensure_ascii=False, indent=2) + '\n').encode('utf-8'),
                 'index.html': html.encode('utf-8')}
     for name, content in contents.items():
@@ -126,7 +133,8 @@ def run(source, root, options=None, *, in_place=False, client_factory=Client, ex
         else:
             write(marker, manifest)
         if in_place:
-            current = (source / 'report/index.html').read_bytes()
+            from report import strip_neuron_labels
+            current = strip_neuron_labels((source / 'report/index.html').read_bytes().decode('utf-8')).encode('utf-8')
             rendered = root / 'report/index.html'
             if (fingerprint(current) != base['files']['report/index.html'] and
                     current != route_overlay(base['html'], source).encode('utf-8')) and (
@@ -145,7 +153,7 @@ def run(source, root, options=None, *, in_place=False, client_factory=Client, ex
         write(root / 'backend-settings.json', config['settings'])
         try:
             if (root / 'status.json').exists() and read(root / 'status.json')['phase'] in ('complete', 'complete_with_failures'):
-                return integrate_report(root / 'report', source) if in_place else root / 'report'
+                return integrate_report(root / 'report', source, in_place=in_place)
             client = client_factory(config['llm'], root / 'api', config['api_slots'])
             with executor_factory(config, root / 'measurements', timeline, options,
                                   base['excluded_documents']) as executor:
@@ -159,8 +167,7 @@ def run(source, root, options=None, *, in_place=False, client_factory=Client, ex
                     if path.exists():
                         record['evidence'] = read(path)
             output = render(base['html'], display_rounds, root)
-            if in_place:
-                output = integrate_report(output, source)
+            output = integrate_report(output, source, in_place=in_place)
             failures = sum(record['status'] == 'failed' for current in result['rounds']
                            for record in current['investigations'])
             timeline.status('complete_with_failures' if failures else 'complete',
