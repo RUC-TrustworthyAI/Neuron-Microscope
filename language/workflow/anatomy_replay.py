@@ -1,9 +1,6 @@
 """Render a same-template Anatomy comparison from saved native traces."""
-import hashlib
-import json
-
 from .anatomy_pairs import select_anatomy_pair
-from .state import lock, write
+from .state import lock, read, write
 
 
 def replay(source, root):
@@ -12,14 +9,12 @@ def replay(source, root):
     source, root = source.resolve(), root.resolve()
     if root == source or source in root.parents or root in source.parents:
         raise ValueError('Anatomy replay requires a separate output directory')
-    if json.loads((source / 'status.json').read_bytes())['phase'] != 'complete':
+    if read(source / 'status.json')['phase'] != 'complete':
         raise ValueError('Anatomy replay requires a completed source investigation')
 
-    files = {name: (source / name).read_bytes()
-             for name in ('config.json', 'artifacts.json', 'report/index.html')}
-    config = json.loads(files['config.json'])
-    artifacts = json.loads(files['artifacts.json'])
-    source_html = files['report/index.html'].decode('utf-8')
+    config = read(source / 'config.json')
+    artifacts = read(source / 'artifacts.json')
+    source_html = (source / 'report/index.html').read_text(encoding='utf-8')
     source_data, _ = source_bundle(source_html)
     if source_data['neuron']['id'] != config['neuron']:
         raise ValueError('Source report and investigation identify different neurons')
@@ -29,19 +24,16 @@ def replay(source, root):
         raise ValueError('Source investigation has no eligible measured Anatomy pair')
     page, bundle = replace_anatomy_pair(source_html, pair)
 
-    receipt = {'source_investigation': str(source), 'neuron': config['neuron'],
-               'files': {name: hashlib.sha256(blob).hexdigest() for name, blob in files.items()}}
+    receipt = {'source_investigation': str(source), 'neuron': config['neuron']}
     marker = root / 'anatomy-source.json'
-    if root.is_dir() and not marker.exists() and any(path.name != 'execution.lock' for path in root.iterdir()):
-        raise ValueError('Anatomy replay requires an empty or matching output directory')
     with lock(root / 'execution.lock', blocking=False):
         if marker.exists():
-            if json.loads(marker.read_bytes()) != receipt:
-                raise ValueError('Source investigation changed; choose a separate output directory')
+            previous = read(marker)
+            if any(previous.get(key) != value for key, value in receipt.items()):
+                raise ValueError('Output belongs to another investigation; choose a separate output directory')
         elif any(path.name != 'execution.lock' for path in root.iterdir()):
             raise ValueError('Anatomy replay requires an empty or matching output directory')
-        else:
-            write(marker, receipt)
+        write(marker, receipt)
         output = root / 'report'
         write(root / 'status.json', {'phase': 'rendering'})
         write(root / 'anatomy-pair.json', pair)

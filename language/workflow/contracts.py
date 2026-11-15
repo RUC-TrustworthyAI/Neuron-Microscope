@@ -49,6 +49,8 @@ CONTROL = obj(id=S, title=S, rationale=S, template=S,
 PLAN = obj(controls=arr(CONTROL, 4, 4), family_sentences=arr(S, 3, 5))
 PREDICTIONS = obj(predictions=arr(obj(id=S, group=S, predicted_pole=string('positive', 'negative', 'uncertain'), reason=S)))
 BLIND = obj(positive=arr(CANDIDATE, 0, 6), negative=arr(CANDIDATE, 0, 6))
+ROUTE_DESCRIPTIONS = obj(routes=arr(obj(id=S, name=S, description=S), 1))
+ROUTE_PREDICTIONS = obj(predictions=arr(obj(id=S, predicted_route=S), 1))
 REVISION = obj(claim=CLAIM, response_rules=arr(RULE, 2, 6),
     criticism=arr(obj(attack=S, prediction=S, result=S,
                      verdict=string('survived', 'narrowed', 'rejected', 'inconclusive'), evidence_ids=arr(S)), 3, 5),

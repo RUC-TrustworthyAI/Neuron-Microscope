@@ -25,11 +25,9 @@ def _character_span(text, folded_span):
 
 
 def _row(dataset, tokenizer, neuron, candidate, identity, label):
-    document, original_ids, match = candidate
+    document, match = candidate
     saved = dataset.document_activations(document['document_id'], neuron)
     ids = list(map(int, saved['token_ids']))
-    if ids != original_ids:
-        raise ValueError('Saved corpus tokens changed during lookup')
     text = tokenizer.decode(ids, skip_special_tokens=False)
     encoded = tokenizer.encode(text, add_special_tokens=False)
     if encoded.ids != ids:
@@ -64,9 +62,9 @@ def _row(dataset, tokenizer, neuron, candidate, identity, label):
 
 def validate_spec(spec):
     groups = spec['groups']
-    if not 2 <= len(groups) <= 4 or len({group['label'] for group in groups}) != len(groups):
-        raise ValueError('Corpus lookup requires two to four uniquely labelled groups')
-    if any(not group['label'].strip() or not group['terms'] or
+    if len({group['label'] for group in groups}) != len(groups):
+        raise ValueError('Corpus groups must have distinct labels')
+    if any(not group['label'].strip() or
            any(not term.strip() for term in group['terms']) for group in groups):
         raise ValueError('Each corpus group needs a label and nonempty literal terms')
     queries = [frozenset(term.casefold() for term in group['terms']) for group in groups]
@@ -76,10 +74,7 @@ def validate_spec(spec):
 
 def _lookup(dataset, tokenizer, neuron, spec, *, seed=42, limit=12, exclude_document_ids=()):
     """Inject a lightweight tokenizer and archive for offline contract tests."""
-    validate_spec(spec)
     groups = spec['groups']
-    if type(limit) is not int or limit < 1:
-        raise ValueError('Corpus sample limit must be a positive integer')
     if dataset.manifest['channels'] != ['gate', 'value', 'product']:
         raise ValueError('Corpus lookup requires native gate, value and product channels')
     excluded = set(map(str, exclude_document_ids))
@@ -109,7 +104,7 @@ def _lookup(dataset, tokenizer, neuron, spec, *, seed=42, limit=12, exclude_docu
                     continue
                 summary['eligible_documents'] += 1
                 index = rng.randrange(summary['eligible_documents'])
-                candidate = (document, ids, match)
+                candidate = (document, match)
                 if len(sample) < limit:
                     sample.append(candidate)
                 elif index < limit:

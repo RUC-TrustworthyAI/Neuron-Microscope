@@ -10,8 +10,10 @@ from language.workflow.state import write
 class WalkthroughExportTest(unittest.TestCase):
     def test_export_uses_recorded_identity(self):
         import contextlib
+        import gzip
         import io
         from language.examples.export_walkthrough import export
+        from language.tools.report import BUNDLE, encode_bundle
         from language.workflow.state import read
         with tempfile.TemporaryDirectory() as folder:
             base = Path(folder)
@@ -22,8 +24,18 @@ class WalkthroughExportTest(unittest.TestCase):
             write(report / 'report.json', {'identity': identity})
             html = '<html><script id="bundle">{"display_selection":{"headline_figure_id":"control"}}</script></html>'
             (report / 'index.html').write_text(html)
-            write(run / 'report/paper-data.json', {})
-            (run / 'report/index.html').write_text(html)
+            bundle = {'display_selection': {'headline_figure_id': 'control'},
+                      'criticism': [{'attack': 'Original criticism', 'verdict': 'narrowed'},
+                                    {'round': 1, 'investigation_id': 'R1_Q1', 'criticism_ids': ['C1'],
+                                     'attack': 'Follow-up round 1: Does context distinguish the explanations?',
+                                     'result': 'Only the contextual condition activated.', 'verdict': 'survived'}],
+                      'ablation': {'rows': [{'kl': .016, 'kl_controls': [.001, .002, .003]}],
+                                   'summary': {'n': 1, 'controls': [9, 4, 8]}},
+                      'anatomy': {'pair': {'figure_id': 'control', 'rows': [
+                          {'case_id': 'control:0', 'gate': [1.], 'up': [2.], 'act': [1.462]},
+                          {'case_id': 'control:1', 'gate': [-1.], 'up': [2.], 'act': [-.538]}]}}}
+            write(run / 'report/paper-data.json', {'bundle': bundle})
+            (run / 'report/index.html').write_text(f'<html><script id="bundle">{encode_bundle(bundle)}</script></html>')
             write(run / 'artifacts.json', {'all_measured': [], 'figures': [{'id': 'control', 'results': []}],
                 'corpus': {'min': -1., 'max': 1.}, 'tests': {}, 'atlas': [], 'graphs': [],
                 'review': {}, 'revision': {'criticism': []}})
@@ -45,6 +57,10 @@ class WalkthroughExportTest(unittest.TestCase):
             self.assertEqual(episode['subject_model'], identity['model'])
             self.assertEqual(episode['source_identity'], identity)
             self.assertEqual(episode['dataset'], 'Saved native activation corpus')
+            exported_html = gzip.decompress((output / 'reports/final.html.gz').read_bytes()).decode()
+            exported_bundle = json.loads(BUNDLE.search(exported_html)[2])
+            for field in ('criticism', 'ablation', 'anatomy'):
+                self.assertEqual(exported_bundle[field], bundle[field])
 
 
 @unittest.skipUnless(os.environ.get('WORKFLOW_TEST_REPORT'), 'Set an activation-only report fixture')

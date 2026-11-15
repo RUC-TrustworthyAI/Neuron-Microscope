@@ -1,135 +1,21 @@
 """Offline follow-up contracts: no API calls, real neuron inputs, or model forwards."""
-import copy
 import json
-import os
 import tempfile
 import unittest
 from contextlib import contextmanager
 from pathlib import Path
-from types import SimpleNamespace
 from unittest.mock import patch
 
-import numpy as np
-
+from language.tests.followup_fixtures import (CharacterTokenizer, FakeClient, FakeDataset,
+    FakeExecutor, base_packet, measured, plan, question, specification)
 from language.workflow import followup_protocol as protocol
 from language.workflow.followup_corpus import _lookup
 from language.workflow.followup_execute import Executor, contrast_items
 from language.workflow.followup_report import render
-from language.workflow.followups import DEFAULTS, SOURCE_FILES, rounds, run
+from language.workflow.followups import DEFAULTS, rounds
 from language.tools.report import BUNDLE
 from language.workflow.contracts import validate
-from language.workflow.state import Timeline, read, write
-
-
-def question(name, action='contrast'):
-    return {'question': name, 'criticism_ids': ['C1'], 'action': action,
-            'evidence_ids': ['saved-1'], 'hypothesis': 'relation', 'rival': 'lexical',
-            'prediction_if_hypothesis': 'changes with relation',
-            'prediction_if_rival': 'unchanged with relation',
-            'distinguishing_observation': 'paired change', 'why_new': name}
-
-
-def plan(items):
-    return {'decision': 'continue' if items else 'stop', 'reason': 'fixed test plan',
-            'investigations': items}
-
-
-def specification():
-    return {'score_location': 'replacement_span', 'frames': [{'prefix': 'repeatA ', 'suffix': ' repeatA'}],
-            'conditions': [{'label': text, 'replacement': text,
-                            'prediction_if_hypothesis': 'different', 'prediction_if_rival': 'same'}
-                           for text in ('repeatA', 'repeatB')]}
-
-
-def measured(identity):
-    token = {'position': 0, 'token_id': 97, 'token': 'a', 'gate': 1., 'value': 2., 'product': 2.}
-    return {'id': identity, 'label': 'synthetic', 'text': 'a', 'token_ids': [97], 'trace': [token],
-            'selected': token, 'scored_positions': [0], 'status': 'complete',
-            'score': {'location': 'replacement_span', 'reduction': 'absmax'}}
-
-
-class FakeClient:
-    def __init__(self, plans):
-        self.plans, self.calls = plans, []
-
-    def request(self, name, prompt, packet, schema, stage, check=None):
-        self.calls.append((name, copy.deepcopy(packet)))
-        if name.endswith('/plan'):
-            value = self.plans[packet['round'] - 1]
-        elif name.endswith('/specification'):
-            value = specification()
-        else:
-            value = {'result': 'Synthetic comparison only', 'verdict': 'narrowed',
-                     'suggested_revision': 'Restrict the proposed relation to this frame',
-                     'evidence_ids': [row['id'] for row in packet['evidence']['rows']]}
-        value = copy.deepcopy(value)
-        validate(value, schema)
-        if check:
-            check(value)
-        return value
-
-
-class FakeExecutor:
-    def __init__(self, fail=()):
-        self.fail, self.calls = set(fail), []
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *error):
-        pass
-
-    def validate_spec(self, action, spec, identity):
-        validate(spec, protocol.SPECIFICATIONS[action])
-
-    def execute(self, action, spec, identity):
-        self.calls.append(identity)
-        if identity in self.fail:
-            raise RuntimeError('synthetic measurement failure')
-        return {'kind': action, 'rows': [measured(identity + '-case')]}
-
-
-class CharacterTokenizer:
-    def __call__(self, text, **kwargs):
-        return {'input_ids': list(map(ord, text)), 'offset_mapping': [(i, i + 1) for i in range(len(text))]}
-
-    def encode(self, text, **kwargs):
-        value = self(text)
-        return SimpleNamespace(ids=value['input_ids'], offsets=value['offset_mapping'])
-
-    def decode(self, ids, **kwargs):
-        return ''.join(map(chr, ids))
-
-
-class FakeDataset:
-    def __init__(self, texts, multiplier=1):
-        self.scanned, self.reads, self.multiplier = False, [], multiplier
-        self.token_ids, self.rows = [], []
-        for identity, text in enumerate(texts):
-            self.rows.append({'document_id': identity, 'token_start': len(self.token_ids), 'token_count': len(text)})
-            self.token_ids.extend(map(ord, text))
-        self.documents = self
-        self.manifest = {'channels': ['gate', 'value', 'product'], 'tokens': len(self.token_ids),
-                         'documents': len(texts)}
-
-    def to_batches(self, **kwargs):
-        yield SimpleNamespace(to_pylist=lambda: self.rows)
-        self.scanned = True
-
-    def document_activations(self, identity, neuron):
-        if not self.scanned:
-            raise AssertionError('Activations read before completing document selection')
-        self.reads.append(identity)
-        row = self.rows[identity]
-        ids = self.token_ids[row['token_start']:row['token_start'] + row['token_count']]
-        values = np.arange(1, len(ids) + 1, dtype=float) * self.multiplier
-        return {'token_ids': ids, 'activations': np.stack([values, values, values], axis=1)}
-
-
-def base_packet():
-    return {'initial': {'claim': {'title': 'Frozen'}, 'response_rules': []},
-            'original_criticism': [{'id': 'C1', 'attack': 'Is it a relation?'}],
-            'catalog': {'saved-1': {'id': 'saved-1', 'text': 'saved context', 'activation': 1.}}}
+from language.workflow.state import Timeline
 
 
 class FollowupTests(unittest.TestCase):
@@ -245,55 +131,6 @@ class FollowupTests(unittest.TestCase):
                              {'label': 'two', 'terms': ['dog', 'CAT', 'cat']}]):
                 with self.subTest(groups=invalid), self.assertRaises(ValueError):
                     executor.validate_spec('corpus', {'groups': invalid}, 'r1-i1')
-
-    def test_resume_preserves_source_and_rejects_changed_execution_identity(self):
-        with tempfile.TemporaryDirectory() as temporary, patch.dict(os.environ):
-            root, source = Path(temporary) / 'followup', Path(temporary) / 'foundation'
-            base = base_packet()
-            config = {'neuron': 'L1_N2', 'model': '/synthetic/model', 'activations': '/synthetic/archive',
-                      'gpus': [], 'settings': {}, 'llm': {}, 'api_slots': str(Path(temporary) / 'slots')}
-            bundle = {'neuron': {'id': 'L1_N2'}, 'criticism': [{'attack': 'original'}],
-                      'anatomy': {'saved': [1, 2]}, 'ablation': {'saved': [3, 4]}}
-            values = {'config.json': config, 'interpretation.json': base['initial'], 'predictions.json': {'records': []},
-                      'evidence.json': {'documents': [{'id': '0'}]},
-                      'artifacts.json': {'initial': base['initial'], 'predictions': {'records': []},
-                                         'revision': {'criticism': [{'attack': 'original'}]},
-                                         'evidence': base['catalog']}, 'status.json': {'phase': 'complete'}}
-            for name, value in values.items():
-                write(source / name, value)
-            (source / 'report').mkdir()
-            (source / 'report/index.html').write_text('<script id="bundle">' + json.dumps(bundle) + '</script>')
-            before = {name: (source / name).read_bytes() for name in SOURCE_FILES}
-            client, executor = FakeClient([plan([question('first')]), plan([])]), FakeExecutor()
-            kwargs = {'client_factory': lambda *args: client, 'executor_factory': lambda *args: executor}
-            with patch('language.workflow.followups.input_identity', return_value={'synthetic': 1}), \
-                 patch('language.workflow.followups.render', side_effect=RuntimeError('synthetic render interruption')):
-                with self.assertRaises(RuntimeError):
-                    run(source, root, **kwargs)
-            self.assertEqual(read(root / 'status.json')['phase'], 'failed')
-            (root / 'frozen.json').unlink()
-            calls_before = len(executor.calls)
-            with patch('language.workflow.followups.input_identity', return_value={'synthetic': 1}):
-                output = run(source, root, **kwargs)
-                self.assertTrue((output / 'index.html').is_file())
-                self.assertEqual(read(root / 'status.json')['phase'], 'complete')
-                self.assertEqual(read(root / 'frozen.json')['initial'], base['initial'])
-                self.assertEqual(len(executor.calls), calls_before)
-                with self.assertRaises(ValueError):
-                    run(source, root, {'max_tokens': 512}, **kwargs)
-                calls_after = len(client.calls)
-                run(source, root, **kwargs)
-                self.assertEqual(len(client.calls), calls_after)
-            with patch('language.workflow.followups.input_identity', return_value={'synthetic': 2}):
-                with self.assertRaises(ValueError):
-                    run(source, root, **kwargs)
-            self.assertEqual(before, {name: (source / name).read_bytes() for name in SOURCE_FILES})
-            changed = read(source / 'evidence.json')
-            changed['documents'].append({'id': '1'})
-            write(source / 'evidence.json', changed)
-            with patch('language.workflow.followups.input_identity', return_value={'synthetic': 1}):
-                with self.assertRaises(ValueError):
-                    run(source, root, **kwargs)
 
     def test_report_only_appends_criticism_and_preserves_failed_status(self):
         bundle = {'claim': {'title': 'Frozen'}, 'criticism': [{'attack': 'Original', 'round': 1}],

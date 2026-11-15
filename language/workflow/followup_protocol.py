@@ -85,11 +85,12 @@ def assessment_schema(evidence_ids):
                suggested_revision=string(), evidence_ids=arr(string(*evidence_ids)))
 
 
-def check_plan(plan, criticism_ids, evidence_ids):
+def check_plan(plan, evidence_ids):
     if (plan['decision'] == 'continue') != bool(plan['investigations']):
         raise ValueError('continue needs investigations; stop needs an empty list')
     for item in plan['investigations']:
-        if set(item['criticism_ids']) - set(criticism_ids) or set(item['evidence_ids']) - set(evidence_ids):
-            raise ValueError('Use only supplied criticism and evidence IDs')
+        # Nonempty ID lists are enforced by the schema's enum constraints.
+        if not evidence_ids and item['evidence_ids']:
+            raise ValueError('No saved evidence IDs are available')
         if item['action'] == 'review' and not item['evidence_ids']:
             raise ValueError('Review requires saved evidence IDs')

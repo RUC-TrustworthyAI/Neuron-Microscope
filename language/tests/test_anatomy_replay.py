@@ -47,5 +47,16 @@ class AnatomyReplayTests(unittest.TestCase):
             self.assertNotIn('Old intro', rendered)
             self.assertNotIn(".topnav a[href='#anatomy']", rendered)
             self.assertEqual(json.loads((output / 'status.json').read_bytes())['phase'], 'complete')
+            marker = output / 'anatomy-source.json'
+            receipt = json.loads(marker.read_bytes())
+            marker.write_text(json.dumps({**receipt, 'files': {'report/index.html': 'legacy digest'}}))
+            page.write_bytes(before + b'\n<!-- updated source report -->')
+            with patch('language.workflow.anatomy_replay.select_anatomy_pair', return_value=pair):
+                replay(source, output)
+                self.assertIn('updated source report', (report / 'index.html').read_text())
+                self.assertEqual(json.loads(marker.read_bytes()), receipt)
+                marker.write_text(json.dumps({**receipt, 'neuron': 'L2_N3'}))
+                with self.assertRaisesRegex(ValueError, 'another investigation'):
+                    replay(source, output)
             with self.assertRaisesRegex(ValueError, 'separate output directory'):
                 replay(source, source / 'nested')

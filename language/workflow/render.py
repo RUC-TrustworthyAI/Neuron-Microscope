@@ -86,9 +86,8 @@ def headline_figure(figures, corpus, explanation=None):
 
 def assemble_interpretation(root, initial_report, interpretation, sample, predictions):
     """Render the explanation and its two shared-label plots."""
-    from report import merge, source_bundle
+    from report import merge
     source = (initial_report / 'index.html').read_text()
-    bundle, _ = source_bundle(source)
     patch = {'claim': interpretation['claim'], 'agent_read': None, 'agent_read_full': None,
              'section_prose': {}, 'headline': None, 'search': None, 'clusters': [],
              'routes': [], 'custom': None, 'graphs_curated': None, 'family': None,
@@ -177,6 +176,21 @@ def assemble(root, initial_report, neuron, artifacts, cards):
     (output / 'index.html').write_text(page)
     write(output / 'paper-data.json', {'bundle': bundle})
     write(output / 'interpretation-costs.json', patch['interpretation_costs'])
+    return output
+
+
+def update_routes(root, result, config):
+    """Add saved path predictions without rebuilding an investigated report."""
+    from report import update_route_prediction
+
+    output = root / 'report'
+    page, bundle = update_route_prediction((output / 'index.html').read_text(encoding='utf-8'), result,
+        interpretation_costs=costs(root, config['neuron'], len(config['gpus'])))
+    write(output / 'paper-data.json', {'bundle': bundle})
+    write(output / 'interpretation-costs.json', bundle['interpretation_costs'])
+    temporary = output / 'index.html.tmp'
+    temporary.write_text(page, encoding='utf-8')
+    temporary.replace(output / 'index.html')
     return output
 
 

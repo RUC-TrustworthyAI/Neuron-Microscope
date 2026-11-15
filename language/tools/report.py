@@ -7,6 +7,7 @@ from pathlib import Path
 
 BUNDLE = re.compile(r'(<script\b(?=[^>]*\bid=["\x27]bundle["\x27])[^>]*>)(.*?)(</script>)', re.S)
 EFFECT = re.compile(r'// 5b\. What it does:.*?(?=// 5c\. Where it sits:)', re.S)
+TESTS = re.compile(r'// 7\. Tests\..*?(?=// 8\. Criticism[.:])', re.S)
 ANATOMY_PAIR = re.compile(r'// Task 3 paired Anatomy renderer\..*?// End paired Anatomy renderer\.', re.S)
 ANATOMY_INTRO = re.compile(r"(sec\(\{ id: 'anatomy', wide: true \}, 'Inside the neuron', \[P\(')([^']+)(')")
 
@@ -17,6 +18,15 @@ def refresh_effect(source):
     if effect is None or EFFECT.search(source) is None:
         raise ValueError('Expected an Effect renderer in both the saved report and template')
     return EFFECT.sub(lambda _: effect[0], source, count=1)
+
+
+def refresh_tests(source):
+    """Refresh only the Tests renderer in a saved report."""
+    template = Path(__file__).resolve().parents[1] / 'analysis/report.html'
+    tests = TESTS.search(template.read_text(encoding='utf-8'))
+    if tests is None or TESTS.search(source) is None:
+        raise ValueError('Expected a Tests renderer in both the saved report and template')
+    return TESTS.sub(lambda _: tests[0], source, count=1)
 
 
 def encode_bundle(bundle):
@@ -67,11 +77,55 @@ def replace_ablation(source, section):
     source = BUNDLE.sub(lambda match: match[1] + encode_bundle(bundle) + match[3], source, count=1)
     return show_criticism_nav(refresh_effect(source)), bundle
 
-def source_bundle(source):
-    match = BUNDLE.search(source)
-    if match is None or len(list(BUNDLE.finditer(source))) != 1:
+
+def apply_route_descriptions(bundle, result):
+    """Use the prediction stage's names without changing semantic clusters."""
+    names = result.get('route_names') or {}
+    if isinstance(names, list):
+        names = dict(zip(result.get('route_ids') or [], names))
+    descriptions = {item['id']: item for item in result.get('descriptions') or []}
+    for route in bundle.get('routes') or []:
+        identifier = route.get('id')
+        description = descriptions.get(identifier, {})
+        name = description.get('name') or names.get(identifier)
+        if name:
+            route['name'] = name
+        if 'description' in description:
+            route['description'] = description['description']
+
+
+def route_prediction_execution(result):
+    execution = {'status': result.get('status', 'complete')}
+    if 'reason' in result:
+        execution['reason'] = result['reason']
+    return execution
+
+
+def update_route_prediction(source_html, result, *, interpretation_costs=None):
+    """Add saved-attribution predictions while preserving the rest of the report."""
+    matches = list(BUNDLE.finditer(source_html))
+    if len(matches) != 1:
         raise ValueError('Expected exactly one report bundle')
-    bundle = json.loads(match[2])
+    bundle = json.loads(matches[0][2])
+    tests = copy.deepcopy(bundle.get('tests') or {})
+    tests['route_prediction'] = copy.deepcopy(result)
+    execution = dict(tests.get('execution') or {})
+    execution['route_prediction'] = route_prediction_execution(result)
+    tests['execution'] = execution
+    bundle['tests'] = tests
+    apply_route_descriptions(bundle, result)
+    if interpretation_costs is not None:
+        bundle['interpretation_costs'] = copy.deepcopy(interpretation_costs)
+    source_html = BUNDLE.sub(
+        lambda match: match[1] + encode_bundle(bundle) + match[3], source_html, count=1)
+    return refresh_tests(source_html), bundle
+
+
+def source_bundle(source):
+    matches = list(BUNDLE.finditer(source))
+    if len(matches) != 1:
+        raise ValueError('Expected exactly one report bundle')
+    bundle = json.loads(matches[0][2])
     start = source.find('const B =')
     stop = source.find('const POS =',start)
     if start < 0 or stop < 0:
@@ -139,7 +193,7 @@ def merge_test_fields(previous,current):
     return merged
 
 def merge(source, patches):
-    bundle, (start,stop) = source_bundle(source)
+    bundle, _ = source_bundle(source)
     bundle.update(patches)
     if patches.get('ablation') is not None:
         source = refresh_effect(source)
@@ -165,17 +219,14 @@ def merge(source, patches):
             values.extend(example.get('activation') for example in cluster['examples'])
             return max(abs(value or 0) for value in values)
         bundle['clusters'] = sorted(clusters, key=cluster_strength, reverse=True)
-    # Route prediction is disabled; retain raw artifacts and leave the report slot empty.
-    tests=copy.deepcopy(bundle.get('tests') or {})
-    had_route_score=tests.get('route_prediction') is not None
-    tests['route_prediction']=None
-    tests.setdefault('execution',{})['route_prediction']={'status':'not_run','reason':'Route prediction is disabled in this pipeline.'}
-    bundle['tests']=tests
-    if had_route_score:
-        # The earlier combined summary includes the now-hidden route score.
-        prose=copy.deepcopy(bundle.get('section_prose') or {})
-        prose.pop('tests',None)
-        bundle['section_prose']=prose
+    if (bundle.get('tests') or {}).get('route_prediction') is not None:
+        tests = copy.deepcopy(bundle['tests'])
+        result = tests['route_prediction']
+        tests['execution'] = {**(tests.get('execution') or {}),
+                              'route_prediction': route_prediction_execution(result)}
+        bundle['tests'] = tests
+        apply_route_descriptions(bundle, result)
+        source = refresh_tests(source)
     bundle['neuron']={k:v for k,v in bundle.get('neuron',{}).items()
                       if k not in ['autointerp_label','autointerp_description']}
     source=source.replace("if (N.autointerp_label) meta.append($('span', null, 'Original autointerp label: ', $('b', null, N.autointerp_label))); ", '')

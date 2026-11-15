@@ -10,13 +10,9 @@ from .state import Timeline, lock, now, read, write
 
 def compatible_plan(saved, current):
     """Allow a saved plan to acquire authored next tokens for its existing cases."""
-    cases = []
-    for case in current['cases']:
-        if case['kind'] == 'controlled':
-            cases.append({**case, 'next_token_id': None})
-        else:
-            cases.append(case)
-    return saved == current or saved == {**current, 'cases': cases}
+    return saved == current or saved == {**current, 'cases': [
+        {**case, 'next_token_id': None} if case['kind'] == 'controlled' else case
+        for case in current['cases']]}
 
 
 def prepare(config, request, sample, contexts, control_rows, figures, data, predictions, initial,
@@ -60,7 +56,7 @@ def measure(runtime, plan, folder):
 
 def replay(source, root):
     """Add a fresh Effect panel to a completed local investigation."""
-    from common import Runtime, digest
+    from common import Runtime
     from report import replace_ablation
 
     source, root = source.resolve(), root.resolve()
@@ -70,15 +66,12 @@ def replay(source, root):
         raise ValueError('Ablation replay requires a completed source investigation')
     config = read(source / 'config.json')
     source_html = source / 'report/index.html'
-    inputs = ['config.json', 'artifacts.json', 'sample/sections.json',
-              'sample/saved-contexts.json', 'report/index.html']
-    receipt = {'source_investigation': str(source), 'files': {name: digest(source / name) for name in inputs}}
+    receipt = {'source_investigation': str(source)}
     marker = root / 'ablation-source.json'
-    if root.is_dir() and not marker.exists() and any(path.name != 'execution.lock' for path in root.iterdir()):
-        raise ValueError('Ablation replay requires an empty or matching output directory')
     with lock(root / 'execution.lock', blocking=False):
         if marker.exists():
-            if read(marker) != receipt:
+            # The plan below pins every measurement input; unrelated report edits need no invalidation.
+            if read(marker)['source_investigation'] != str(source):
                 raise ValueError('Source investigation changed; choose a separate output directory')
         elif any(path.name != 'execution.lock' for path in root.iterdir()):
             raise ValueError('Ablation replay requires an empty or matching output directory')

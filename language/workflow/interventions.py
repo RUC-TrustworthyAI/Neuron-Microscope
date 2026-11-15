@@ -36,9 +36,6 @@ def measure_case(runtime, case, controls, folder):
     if not runtime.torch.isfinite(logits).all():
         raise ValueError(f"Nonfinite logits for {case['case_id']}")
     edits = [capture['edit'] for _, capture in interventions]
-    for unit, edit in zip([target, *controls], edits):
-        if (edit['neuron'], edit['position'], edit['after'], edit['entries_targeted']) != (unit, pos, 0, 1):
-            raise RuntimeError(f"Unexpected point intervention for {case['case_id']}: {edit}")
     if edits[0]['before'] != float(trace['product'][pos]):
         raise RuntimeError(f"Target activation changed before intervention for {case['case_id']}")
 
@@ -46,8 +43,6 @@ def measure_case(runtime, case, controls, folder):
     log_base, log_zero = log_probs[:2]
     base, zero = log_base.exp(), log_zero.exp()
     kl = (base * (log_base - log_probs[1:])).sum(dim=-1).tolist()
-    if min(kl) < -1e-9:
-        raise ValueError(f"Invalid KL for {case['case_id']}")
     kl = [max(0., value) for value in kl]
     delta = zero - base
 

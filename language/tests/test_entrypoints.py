@@ -42,35 +42,42 @@ class EntrypointTests(unittest.TestCase):
         self.assertEqual(config['settings']['runtime']['dtype'], 'bfloat16')
         self.assertEqual(config['settings']['runtime']['attention'], 'sdpa')
 
-    def test_followup_is_opt_in_and_publishes_the_final_report(self):
-        for enabled in (False, True):
-            with self.subTest(followup=enabled), tempfile.TemporaryDirectory() as folder:
+    def test_followup_defaults_on_with_opt_out_and_publishes_the_final_report(self):
+        cases = ((None, True, False, False), ('--followup', True, True, False),
+                 ('--no-followup', False, True, False), (None, False, True, True))
+        for flag, enabled, exported, partial in cases:
+            with self.subTest(flag=flag, exported=exported, partial=partial), tempfile.TemporaryDirectory() as folder:
                 root = Path(folder)
-                foundation, followup = root / 'example', root / 'example-followup'
+                foundation = root / 'example'
+                followup = foundation / 'followup'
                 destination = root / 'published' / 'L1_N2'
                 config = {'gpus': [0], 'settings': {}, 'neuron': 'L1_N2',
                           'publish': str(destination.parent), 'references': str(root / 'references')}
                 config_path = root / 'config.json'
                 write(config_path, config)
-                if enabled:
+                if exported:
                     destination.mkdir(parents=True)
                     (destination / 'index.html').write_text('Previously exported foundation report')
                 events = []
 
                 def complete_foundation(*args, **kwargs):
                     events.append('foundation')
-                    write(foundation / 'status.json', {'phase': 'complete'})
+                    write(foundation / 'status.json', {'phase': 'interpretation_complete' if partial else 'complete'})
                     return foundation / 'report'
 
-                def complete_followup(source, output):
+                def complete_followup(source, output, *, in_place):
                     self.assertEqual(read(source / 'status.json')['phase'], 'complete')
                     events.append('followup')
                     write(output / 'status.json', {'phase': 'complete'})
-                    return output / 'report'
+                    return source / 'report'
 
                 argv = ['language', '--config', str(config_path), '--output', str(foundation)]
-                if enabled:
-                    argv += ['--followup', '--checkpoint-attribution']
+                if flag:
+                    argv.append(flag)
+                if flag == '--followup':
+                    argv.append('--checkpoint-attribution')
+                if partial:
+                    argv += ['--stop-after', 'interpretation']
                 with patch.object(sys, 'argv', argv), patch.object(sys, 'path', sys.path.copy()), \
                      patch.dict(os.environ), redirect_stdout(io.StringIO()), \
                      patch('language.workflow.run.run', side_effect=complete_foundation) as base_run, \
@@ -78,24 +85,29 @@ class EntrypointTests(unittest.TestCase):
                      patch('comparison.publish', side_effect=lambda *a, **kw: events.append('publish')) as publish, \
                      patch('language.workflow.render.directory') as directory:
                     self.assertEqual(main(), 0)
-                base_run.assert_called_once_with(config, foundation, stop_after=None,
-                                                 checkpoint_attribution=enabled)
+                base_run.assert_called_once_with(config, foundation, stop_after='interpretation' if partial else None,
+                                                 checkpoint_attribution=flag == '--followup')
                 if enabled:
-                    followup_run.assert_called_once_with(foundation.resolve(), followup.resolve())
+                    followup_run.assert_called_once_with(foundation.resolve(), followup.resolve(), in_place=True)
                 else:
                     followup_run.assert_not_called()
-                report = (followup if enabled else foundation) / 'report'
-                publish.assert_called_once_with(report, destination, 'L1_N2', config['references'], replace=enabled)
+                report = foundation / 'report'
+                if partial and exported:
+                    publish.assert_not_called()
+                else:
+                    publish.assert_called_once_with(report, destination, 'L1_N2', config['references'], replace=exported)
                 directory.assert_called_once()
-                self.assertEqual(events, ['foundation', 'followup', 'publish'] if enabled else ['foundation', 'publish'])
+                expected = ['foundation'] + (['followup'] if enabled else []) + ([] if partial and exported else ['publish'])
+                self.assertEqual(events, expected)
                 self.assertEqual(read(config_path), config)
-                self.assertEqual(read(foundation / 'status.json')['phase'], 'complete')
+                self.assertEqual(read(foundation / 'status.json')['phase'], 'interpretation_complete' if partial else 'complete')
 
     def test_followup_failure_preserves_foundation_and_exits_unsuccessfully(self):
         for fatal in (False, True):
             with self.subTest(fatal=fatal), tempfile.TemporaryDirectory() as folder:
                 root = Path(folder)
-                foundation, followup = root / 'example', root / 'example-followup'
+                foundation = root / 'example'
+                followup = foundation / 'followup'
                 config_path = root / 'config.json'
                 write(config_path, {'gpus': [0], 'settings': {}, 'neuron': 'L1_N2',
                                     'publish': str(root / 'published'), 'references': str(root / 'references')})
@@ -104,13 +116,13 @@ class EntrypointTests(unittest.TestCase):
                     write(foundation / 'status.json', {'phase': 'complete'})
                     return foundation / 'report'
 
-                def fail_followup(source, output):
+                def fail_followup(source, output, *, in_place):
                     write(output / 'status.json', {'phase': 'failed' if fatal else 'complete_with_failures'})
                     if fatal:
                         raise RuntimeError('synthetic follow-up failure')
-                    return output / 'report'
+                    return source / 'report'
 
-                argv = ['language', '--config', str(config_path), '--output', str(foundation), '--followup']
+                argv = ['language', '--config', str(config_path), '--output', str(foundation)]
                 with patch.object(sys, 'argv', argv), patch.object(sys, 'path', sys.path.copy()), \
                      patch.dict(os.environ), redirect_stdout(io.StringIO()), \
                      patch('language.workflow.run.run', side_effect=complete_foundation), \
@@ -146,11 +158,13 @@ class EntrypointTests(unittest.TestCase):
                 followup_run.assert_not_called()
                 self.assertFalse(output.exists())
 
-    def test_followup_publication_cannot_overlap_research_directories(self):
-        for location in ('foundation', 'followup', 'ancestor'):
-            with self.subTest(location=location), tempfile.TemporaryDirectory() as folder:
+    def test_publication_cannot_overlap_research_directories(self):
+        for location, enabled in ((location, enabled) for location in ('foundation', 'followup', 'ancestor')
+                                  for enabled in (False, True)):
+            with self.subTest(location=location, followup=enabled), tempfile.TemporaryDirectory() as folder:
                 root = Path(folder)
-                foundation, followup = root / 'L1_N2' / 'example', root / 'L1_N2' / 'example-followup'
+                foundation = root / 'L1_N2' / 'example'
+                followup = foundation / 'followup'
                 for research in (foundation, followup):
                     write(research / 'status.json', {'phase': 'complete'})
                     write(research / 'backend-settings.json', {'preserve': str(research)})
@@ -160,7 +174,9 @@ class EntrypointTests(unittest.TestCase):
                 write(config_path, {'gpus': [0], 'settings': {}, 'neuron': 'L1_N2',
                                     'publish': str(publications[location]), 'references': str(root / 'references')})
                 before = {path.relative_to(root): path.read_bytes() for path in root.rglob('*') if path.is_file()}
-                argv = ['language', '--config', str(config_path), '--output', str(foundation), '--followup']
+                argv = ['language', '--config', str(config_path), '--output', str(foundation)]
+                if not enabled:
+                    argv.append('--no-followup')
                 with patch.object(sys, 'argv', argv), patch.object(sys, 'path', sys.path.copy()), \
                      patch.dict(os.environ), redirect_stderr(io.StringIO()), \
                      patch('language.workflow.run.run') as base_run, \

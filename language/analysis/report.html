@@ -795,17 +795,54 @@ let SPEC_COLOUR = {};
     return $('div', { class: 'pair' }, $('div', { class: 'tiles' }, kTile('target', b.target, { signed: true, scale: s }), kTile('achieved', b.achieved, { signed: true, scale: s, big: true })), $('div', null, $('div', { class: 'sub' }, name), has(b.token_activations) ? toks(b.token_activations, b.peak_index, null, neg, { left: b.cut_left, right: b.cut_right }) : $('span', { class: 'toks' }, b.text || ''))); };
   const bm = blind(T.blind_max, 'Blind max: write a text that reaches the corpus peak'), bn = blind(T.blind_min, 'Blind min: write a text that reaches the corpus trough', true);
   if (bm || bn) figs.push(fig($('div', null, bm, bn), 'The explanation is used to write text without looking at the corpus. Achieved is the model’s measured activation on that text.'));
-  const rp = T.route_prediction; if (has(rp)) { const box = $('div', { class: 'pair' }, $('div', { class: 'tiles' }, kTile('accuracy', null, { text: pct(rp.accuracy), big: true }), rp.baseline != null ? kTile('baseline', null, { text: pct(rp.baseline) }) : null, rp.n != null ? kTile('n', rp.n) : null), $('div', null, $('div', { class: 'sub' }, 'Route prediction'), $('p', { style: 'font-size:15px;color:var(--ink2);margin:0' }, 'Given only the text, predict which route the graph will use, then run the graph and check.')));
-    if (has(rp.confusion)) { const R = B.routes || [], k = rp.confusion.length, cs = 26, L = 210, mx = Math.max(...rp.confusion.flat(), 1), W = Math.max(L + cs * k + 8, L + 300); const svg = svgEl('svg', { viewBox: `0 0 ${W} ${cs * k + 40}`, width: W, style: 'display:block;margin-top:10px;max-width:100%' });
-      rp.confusion.forEach((row, i) => { svg.append(svgEl('text', { x: L - 8, y: 30 + i * cs + cs / 2 + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#1d1d1f' }, (rp.route_names && rp.route_names[i]) || (R[i] || {}).name || `route ${i + 1}`)); row.forEach((v, j) => { svg.append(svgEl('rect', { x: L + j * cs, y: 30 + i * cs, width: cs - 1.5, height: cs - 1.5, rx: 2, fill: hexA('#1d1d1f', 0.04 + 0.7 * v / mx) })); svg.append(svgEl('text', { x: L + j * cs + cs / 2 - 0.75, y: 30 + i * cs + cs / 2 + 4, 'text-anchor': 'middle', 'font-size': 11, fill: v / mx > 0.5 ? '#fff' : '#1d1d1f' }, v)); }); });
-      svg.append(svgEl('text', { x: L, y: 18, 'font-size': 11, fill: '#8a8a90' }, 'columns: predicted route · rows: actual route')); box.lastChild.append(svg); }
-    figs.push(fig(box)); }
+  const rp = T.route_prediction; if (has(rp)) {
+    const routes = B.routes || [], ids = rp.route_ids || routes.map(r => r.id);
+    const names = Object.fromEntries(routes.map(r => [r.id, r.name || r.id]));
+    if (Array.isArray(rp.route_names)) rp.route_names.forEach((name, i) => { names[ids[i]] = name; });
+    else Object.assign(names, rp.route_names || {});
+    (rp.descriptions || []).forEach(r => { if (r.name) names[r.id] = r.name; });
+    const routeLabel = id => id == null ? 'Unassigned' : names[id] && names[id] !== id ? `${id} · ${names[id]}` : String(id);
+    const detail = $('div', null, $('div', { class: 'sub' }, 'Route prediction'), $('p', { style: 'font-size:15px;color:var(--ink2);margin:0' }, 'Given only the observed text through the target token, predict its route and compare it with the saved attribution.'));
+    if (rp.n === 0 && rp.reason) detail.append(P(rp.reason));
+    const accuracy = rp.n > 0 && Array.isArray(rp.rows) ? `${pct(rp.accuracy)} (${rp.rows.filter(row => row.correct === true).length}/${rp.n})` : pct(rp.accuracy);
+    const box = $('div', { class: 'pair' }, $('div', { class: 'tiles' }, kTile('accuracy', null, { text: accuracy, big: true }), rp.baseline != null ? kTile('baseline', null, { text: pct(rp.baseline) }) : null, rp.n != null ? kTile('n', rp.n) : null), detail);
+    if (has(rp.confusion)) {
+      const matrixIds = rp.confusion.map((_, i) => ids[i] || `route ${i + 1}`), k = matrixIds.length, cs = 26, L = 270, top = 44;
+      const mx = Math.max(...rp.confusion.flat(), 1), W = Math.max(L + cs * k + 8, L + 300);
+      const svg = svgEl('svg', { viewBox: `0 0 ${W} ${top + cs * k + 8}`, width: W, role: 'img', 'aria-label': 'Route prediction confusion matrix', style: 'display:block;margin-top:10px;max-width:100%' });
+      svg.append(svgEl('text', { x: L, y: 12, 'font-size': 11, fill: '#8a8a90' }, 'columns: predicted route · rows: actual route'));
+      matrixIds.forEach((id, j) => svg.append(svgEl('text', { x: L + j * cs + cs / 2, y: 32, 'text-anchor': 'middle', 'font-size': 11, fill: '#8a8a90' }, id)));
+      rp.confusion.forEach((row, i) => {
+        const label = routeLabel(matrixIds[i]);
+        const name = svgEl('text', { x: L - 8, y: top + i * cs + cs / 2 + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#1d1d1f' }, label.length > 43 ? label.slice(0, 40) + '…' : label);
+        name.append(svgEl('title', {}, label)); svg.append(name);
+        row.forEach((v, j) => {
+          const cell = svgEl('rect', { x: L + j * cs, y: top + i * cs, width: cs - 1.5, height: cs - 1.5, rx: 2, 'data-actual': matrixIds[i], 'data-predicted': matrixIds[j], fill: hexA('#1d1d1f', 0.04 + 0.7 * v / mx) });
+          cell.append(svgEl('title', {}, `${routeLabel(matrixIds[i])} → ${routeLabel(matrixIds[j])}: ${v}`)); svg.append(cell);
+          svg.append(svgEl('text', { x: L + j * cs + cs / 2 - 0.75, y: top + i * cs + cs / 2 + 4, 'text-anchor': 'middle', 'font-size': 11, 'pointer-events': 'none', fill: v / mx > 0.5 ? '#fff' : '#1d1d1f' }, v));
+        });
+      });
+      detail.append(svg);
+    }
+    const notes = [];
+    if (rp.baseline != null) notes.push(`Baseline always predicts ${routeLabel(rp.baseline_route_id)}, the most frequent training route.`);
+    if (rp.test_majority_fraction != null) notes.push(`Largest test class: ${pct(rp.test_majority_fraction)} (reference only).`);
+    if (rp.unassigned_n != null) notes.push(`Unassigned test cases: ${rp.unassigned_n}.`);
+    const samples = has(rp.rows) ? $('details', { style: 'margin-top:16px' }, $('summary', null, `Inspect ${rp.rows.length} predictions`),
+      $('div', { style: 'overflow-x:auto' }, $('table', { 'aria-label': 'Individual route predictions', style: 'font-size:13px' },
+        $('thead', null, $('tr', null, ['Example / observed text', 'Target token', 'Predicted', 'Actual', 'Result'].map(label => $('th', { scope: 'col' }, label)))),
+        $('tbody', null, rp.rows.map(row => $('tr', null,
+          $('td', null, $('details', null, $('summary', null, row.id), $('div', { class: 'toks', style: 'display:block;max-width:38em;max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:8px' }, row.text || ''))),
+          $('td', null, $('code', null, JSON.stringify(row.token ?? '')), $('div', { class: 'dim' }, row.position == null ? '' : `position ${row.position} (0-based)`)),
+          $('td', null, row.predicted_route == null ? 'Not predicted' : routeLabel(row.predicted_route)), $('td', null, routeLabel(row.actual_route)),
+          $('td', null, row.correct === true ? 'Correct' : row.correct === false ? 'Incorrect' : 'Unscored'))))))) : null;
+    figs.push(fig($('div', null, box, samples), notes.join(' '))); }
   if (has(T.steering)) { const s = Math.max(...T.steering.flatMap(x => [Math.abs(x.baseline || 0), Math.abs(x.steered || 0)]), 1e-9);
     figs.push(fig($('div', null, $('div', { class: 'sub' }, 'Steering'), $('table', null, $('tr', null, $('th', null, 'Prompt'), $('th', { style: 'text-align:right' }, 'Strength'), $('th', { style: 'text-align:right' }, 'Baseline'), $('th', { style: 'text-align:right' }, 'Steered'), $('th', null, 'Note')),
       T.steering.map(x => $('tr', null, $('td', null, $('span', { class: 'toks' }, x.prompt)), $('td', { class: 'num' }, fmt(x.strength)), $('td', { class: 'num' }, tile(x.baseline, { signed: true, scale: s })), $('td', { class: 'num' }, tile(x.steered, { signed: true, scale: s })), $('td', { style: 'color:var(--ink2);font-size:13.5px' }, x.note || ''))))), 'Baseline and steered values are the measured quantity named in each note.')); }
   if (has(T.ablation)) { const s = Math.max(...T.ablation.map(x => Math.abs(x.effect || 0)), 1e-9);
     figs.push(fig($('div', null, $('div', { class: 'sub' }, 'Ablation'), $('table', null, $('tr', null, $('th', null, 'Graph'), $('th', { style: 'text-align:right' }, 'Effect'), $('th', null, 'Note')), T.ablation.map(x => $('tr', null, $('td', { class: 'id' }, x.graph_id), $('td', { class: 'num' }, tile(x.effect, { signed: true, scale: s, d: 2 })), $('td', { style: 'color:var(--ink2);font-size:13.5px' }, x.note || ''))))), 'Effect of zeroing the unit on each graph’s target, as measured.')); }
-  if (!figs.length) return; sec({ id: 'tests', wide: true }, 'Tests', [P('Predictions made from the explanation and then checked against the model. Blind max and min are the sharpest: if the explanation is right, a text written from it alone should reach the corpus extremes.')], figs); })();
+  if (!figs.length) return; sec({ id: 'tests', wide: true }, 'Tests', [P('Predictions checked against measured responses and saved attributions. Blind max and min ask whether text written from the explanation alone can reach the corpus extremes.')], figs); })();
 
 // 8. Criticism: compact table, each row expands to the result and evidence.
 (() => { const K = B.criticism; if (!has(K)) return;

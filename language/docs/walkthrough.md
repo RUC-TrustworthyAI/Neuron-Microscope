@@ -38,6 +38,16 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory runs/walkthrough
 
 Replace `runs/example` with the completed run's directory, then open <http://127.0.0.1:8000/?lang=en>. The exporter rebuilds `content/` and `reports/` from saved artifacts and clears the copied `screenshots/` directory. The copied HTML, JavaScript and CSS remain in place. Exported content includes prompt and input excerpts, structured responses, round comparisons, measurements and compressed reports. Capture any screenshots separately.
 
+After the default follow-up stage completes, the same export command includes the appended Criticism in the final report because it reads `runs/example/report/index.html`. The step-by-step walkthrough still covers the foundation investigation; follow-up questions and outcomes are available in that final report, not as additional walkthrough steps.
+
+To refresh the repository's existing website directly, use:
+
+```bash
+python3 language/examples/export_walkthrough.py --run runs/example --output website/walkthrough/language
+```
+
+This rebuilds the same generated subdirectories without rerunning experiments. Deploy the updated website separately.
+
 ## Publish with GitHub Pages
 
 For a repository with GitHub Pages available:

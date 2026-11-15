@@ -21,12 +21,12 @@ Assessments record result, verdict, suggested revision and evidence IDs. Revisio
 Use the existing Linux environment and credentials supplied through `NEURON_PAPER_API_KEY_FILE` (outside the repository) or `DEEPSEEK_API_KEY`. To run the foundation and follow-ups with one command:
 
 ```bash
-python -u -m language --config workflow.local.json --output runs/example --followup
+python -u -m language --config workflow.local.json --output runs/example
 ```
 
-The command completes or resumes the foundation in `runs/example`, then starts follow-ups in the sibling directory `runs/example-followup`. The final report is `runs/example-followup/report/index.html`. Defaults are seed 42, 1,024 tokens per contrast input and up to 12 natural examples per query group. The foundation's explanation, predictions, report and completed status remain intact if a follow-up fails.
+The command completes or resumes the foundation in `runs/example`, then saves follow-up records and status in `runs/example/followup/`. It retains a snapshot of the original report and updates `runs/example/report/index.html` and `paper-data.json` with the appended Criticism. Defaults are seed 42, 1,024 tokens per contrast input and up to 12 natural examples per query group. The frozen explanation, predictions, original Criticism and foundation completion status remain unchanged. The main report is updated only after the follow-up report has been rendered; a completed investigation with failed items includes those failures in the report and exits nonzero.
 
-`--followup` requires a full `--config` investigation. It cannot be combined with `--stop-after interpretation`, `--ablate-from` or `--anatomy-from`; `--checkpoint-attribution` can be used alongside it. When `publish` is configured, successful follow-ups export the final report and update any existing export without changing the research files.
+Follow-ups are enabled by default for full `--config` investigations; append `--no-followup` to disable them. Interpretation-only and replay modes skip them automatically. Explicit `--followup` cannot be combined with `--stop-after interpretation`, `--ablate-from` or `--anatomy-from`; `--checkpoint-attribution` can be used alongside it. When `publish` is configured, successful follow-ups export the updated report and replace any existing export. Failed follow-ups are not published.
 
 The standalone entry point remains available to select a different output directory or override the seed and limits:
 
@@ -37,18 +37,20 @@ python -m language.workflow.followups \
   --seed 42 --max-tokens 1024 --natural-per-group 12
 ```
 
-The source and output must be separate, non-nested directories. Text measurements use one local model and batch size one; the default per-input budget is 1,024 tokens. Natural queries reuse saved activations and require no GPU. No reference blog explanations are supplied to the model.
+For the standalone entry point, source and output must be separate, non-nested directories; its report is written under the specified output and does not update the source report. Text measurements use one local model and batch size one; the default per-input budget is 1,024 tokens. Natural queries reuse saved activations and require no GPU. No reference blog explanations are supplied to the model.
 
 No human inspection or adjustment is part of execution. A failed item is archived and does not discard successful items; all failures are visible to round two. If any item fails, final status is `complete_with_failures` and the CLI exits nonzero. A planner or infrastructure failure sets `failed`. Invalid outputs are never converted into successful scientific results. There are no transport retry loops or automatic changes to scientific parameters.
 
-Repeat the identical command after interruption to reuse completed API and measurement checkpoints. With `--followup`, a completed foundation is reused before resuming the follow-up stage. Both entry points return a nonzero exit code when a follow-up fails. Failed item records remain terminal; use the standalone entry point with a new follow-up output directory for a new attempt. The manifest pins source files, configuration, options, implementation, model metadata and archive metadata. Large weight and activation arrays use size and modification time rather than full-file hashes. Changing these inputs rejects reuse.
+Repeat the identical command after interruption to reuse completed API and measurement checkpoints. When follow-ups are enabled, a completed foundation is reused before resuming the follow-up stage. Both entry points return a nonzero exit code when a follow-up fails. Failed item records remain terminal. A new attempt through the standalone entry point requires an unaugmented foundation report and a new follow-up output directory; an already augmented source report is rejected to prevent duplicate additions. Resume checks compare source-content digests, options, model metadata and archive metadata. Large weight and activation arrays use size and modification time rather than full-file hashes. Source-code hashes and obsolete manifest fields are ignored, so code refactoring alone does not invalidate completed checkpoints; changed scientific inputs still reject reuse.
+
+Existing sibling directories such as `runs/example-followup` are not migrated automatically. The default layout keeps all new records inside `runs/example`. The [walkthrough exporter](walkthrough.md#export-another-completed-run) reads its updated report directly, so no separate report replacement is needed.
 
 ## Artifacts and software checks
 
-`frozen.json` preserves the baseline; `r*-i*/preregistered.json`, `evidence.json` and `record.json` retain specifications, raw measurements and decisions. `round-*.json` and `investigation.json` retain the full outcome ledger. `api/` contains the shared client's requests, responses and usage; credentials are not recorded. `status.json` reports completion or failure. The separate `report/` appends compact Criticism rows, preserving every other baseline report field, including Task2 and Task3.
+Under `runs/example/followup/` (or the standalone output), `frozen.json` preserves the baseline; `r*-i*/preregistered.json`, `evidence.json` and `record.json` retain specifications, raw measurements and decisions. `round-*.json` and `investigation.json` retain the full outcome ledger. `api/` contains the shared client's requests, responses and usage; credentials are not recorded. `status.json` reports follow-up completion or failure. The final report appends compact Criticism rows, preserving every other baseline report field, including Task2 and Task3.
 
 ```bash
-PYTHONPATH=language/tools python -m unittest language.tests.test_followups -v
+PYTHONPATH=language/tools python -m unittest language.tests.test_followups language.tests.test_followup_resume -v
 ```
 
 The tests use synthetic archives and fake API/model objects. They verify software behavior and are not scientific experiments or evidence of improved interpretation quality.

@@ -22,16 +22,9 @@ def _condition(result, measured, prefix, suffix):
             or text != result.get('text') or text != prefix + replacement + suffix):
         return None
     trace, ids = row['trace'], row['token_ids']
-    if not ids or len(trace) != len(ids):
+    offsets = [token.get('offset') for token in trace]
+    if not offsets or any(offset is None for offset in offsets):
         return None
-    offsets = []
-    for index, (token, token_id) in enumerate(zip(trace, ids)):
-        offset = token.get('offset')
-        if (token.get('position') != index or token.get('token_id') != token_id
-                or not offset or len(offset) != 2 or not 0 <= offset[0] <= offset[1] <= len(text)
-                or not all(math.isfinite(token[channel]) for channel in CHANNELS.values())):
-            return None
-        offsets.append(list(offset))
 
     span = [len(prefix), len(prefix) + len(replacement)]
     score, scored = row['score'], row['scored_positions']
@@ -39,8 +32,7 @@ def _condition(result, measured, prefix, suffix):
         return None
     try:
         allowed = score_positions(text, offsets, span, score)
-        if (not scored or scored != sorted(set(scored)) or not set(scored).issubset(allowed)
-                or scored != result.get('scored_tokens')):
+        if not set(scored).issubset(allowed) or scored != result.get('scored_tokens'):
             return None
         selected = select_peak([trace[position] for position in scored], score['reduction'])
     except ValueError:
@@ -138,7 +130,7 @@ def select_anatomy_pair(figures, measured, *, preferred_figure_id=None):
         prefix, suffix = template.split('{slot}')
         rows = [_condition(result, measured, prefix, suffix) for result in figure['results']]
         for first, second in combinations((row for row in rows if row is not None), 2):
-            if first['text'] == second['text'] or first['score'] != second['score']:
+            if first['score'] != second['score']:
                 continue
             divergence = _first_divergent_token(first, second)
             if divergence is None:

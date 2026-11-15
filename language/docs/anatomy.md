@@ -22,6 +22,6 @@ python -m language \
   --output runs/task3-l15-n4898
 ```
 
-Open `report/index.html#anatomy`. The pair is saved in `anatomy-pair.json` and in the report data at `report/paper-data.json`. `anatomy-source.json` records the source and `status.json` records the render outcome.
+Open `report/index.html#anatomy`. The pair is saved in `anatomy-pair.json` and in the report data at `report/paper-data.json`. `anatomy-source.json` records the source directory and neuron; `status.json` records the render outcome. Repeating the command rebuilds the view from the current saved source, without source-file hashes, and rejects an output directory owned by another investigation.
 
 Check that both case IDs resolve to one saved sweep. Compare each token ID, offset, raw gate, up value and native product to the saved measurement. Verify the highlighted score position and confirm the caption uses the same token only when the saved positions correspond. For example, the L15_N4898 closing-parenthetical sweep provides different-length insertions followed by the same scored comma.

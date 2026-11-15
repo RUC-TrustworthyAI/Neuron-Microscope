@@ -31,6 +31,7 @@ The initial explanation and two revisions each receive blind labels. Among versi
 | Where it sits | Selected neighbours and joint responses on the same inputs | [paper_sections.py](../tools/paper_sections.py) |
 | Circuit | Local RelP contributions pooled over the selected attribution atlas | [relp.py](../tools/relp.py), [paper_sections.py](../tools/paper_sections.py) |
 | Blind maximum / minimum | Independent explanation-only writer produces probes; the target model scores full-input extrema | [run.py](../workflow/run.py), [prompts.py](../workflow/prompts.py) |
+| Route prediction | Training-derived route descriptions predict test-case routes, checked against the saved attribution assignments | [route_prediction.py](../workflow/route_prediction.py), [report.py](../tools/report.py) |
 | Criticism | Experimental support, contradictions and unresolved patterns with links to measured cases | [revision.py](../workflow/revision.py), [render.py](../workflow/render.py) |
 | Interpretation costs | Execution intervals, model operations and recorded API usage | [state.py](../workflow/state.py), [render.py](../workflow/render.py) |
 | An agent's read, in full | Independent LLM assessment of the frozen account and its experimental evidence | [revision.py](../workflow/revision.py) |
@@ -46,6 +47,8 @@ Exemplars and cluster examples preview the outlined anchor with up to 32 precedi
 The head figure comes from the controlled test with the highest positive response when positive rules exist, otherwise the strongest negative response; response range breaks ties. Each row uses the signed largest absolute native product within its saved scoring span. A contrast retains the same template and scoring rule across conditions. This display quantity is derived from retained traces; the original experiment reductions and results remain unchanged. Claim fields, section summaries and captions follow the output contracts and word targets in `language/workflow/contracts.py` and `language/workflow/prompts.py`.
 
 The Family heatmap displays the selected measured sentence, with rows for the target and attribution-linked upstream and downstream neurons. Steering inputs reuse native traces from completed graph measurements and show an expandable activation context. Attribution-axis labels prioritize positions carrying measured graph nodes; complete observed inputs and node/edge values remain in the saved measurements.
+
+Tests shows route-prediction accuracy, the training-majority baseline and the number of scored cases. The matrix uses actual routes as rows and predicted routes as columns; route names are shared with the per-example results. Expand a prediction to read its observed prefix and target token. The largest test-class fraction is a reference, not the fitted baseline; unassigned cases are reported separately. These predictions use the existing atlas split and saved attributions.
 
 ## Inspect an underlying result
 

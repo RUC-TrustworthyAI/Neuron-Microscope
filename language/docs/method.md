@@ -50,6 +50,8 @@ After measurements, the analysis request receives the frozen explanation, predic
 
 Semantic cluster memberships refer to measured atlas cases, including unresolved cases. Fixed code derives numerical summaries and keeps the underlying measurements. Numerical NMF routes remain separate: a shared numerical component alone does not establish a shared semantic topic or causal mechanism.
 
+Route prediction reuses the saved attribution atlas, its document-level train/test split and its fixed NMF assignments. Route names and descriptions are written from training cases. The predictor receives those descriptions and each test case's observed prefix through the target token, without its measured activations or attribution. Predictions are checked against the saved assignments; this stage performs no new attribution. Accuracy is compared with always predicting the most frequent training route. The largest test-class fraction is reported separately as a descriptive reference, together with unassigned test cases. This evaluates generalization across the atlas split, not across a newly collected corpus.
+
 An independent reader assesses the account, supported branches and remaining patterns. The renderer then combines this prose with the measured data. Static Promotes/Suppresses values come from the input report's measured logit effects.
 
 ## Independent inputs and records

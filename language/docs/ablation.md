@@ -41,7 +41,7 @@ python -m language \
   --output runs/qwen3-17b-l6-n1169-ablation
 ```
 
-The extension reuses the source investigation's model, settings, saved evidence and rendered report. It runs the new model interventions and updates Effect using the saved report. The command needs no explanation API credentials. Rerun the same command to reuse completed measurements and resume pending cases. Use a fresh output directory when changing the source or selection.
+The extension reuses the source investigation's model, settings, saved evidence and rendered report. It runs the new model interventions and updates Effect using the saved report. The command needs no explanation API credentials. Rerun the same command to reuse completed measurements and resume pending cases. Resume checks use the registered measurement plan and source directory, without hashing every source file again. Report-only edits can be rendered with cached measurements; changed model, settings or selected inputs require a fresh output directory.
 
 For existing runs that lack authored continuations, rerun the same command with the same output directory. The report recovers their probabilities from the saved baseline and ablated logits.
 
