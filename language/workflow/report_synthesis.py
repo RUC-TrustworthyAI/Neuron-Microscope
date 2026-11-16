@@ -225,8 +225,7 @@ def _prompt_case(case):
 
 
 def _assemble(cases, claim, section_prose):
-    passages = [*claim['findings'].values(), *section_prose.values()]
-    cited = dict.fromkeys(identity for passage in passages for identity in passage['evidence_ids'])
+    cited = dict.fromkeys(identity for finding in claim['findings'].values() for identity in finding['evidence_ids'])
     return {'claim': claim, 'section_prose': section_prose,
             'evidence': {identity: cases[identity] for identity in cited}}
 
@@ -288,21 +287,20 @@ def synthesize(client, bundle, stage):
         metrics = dict.fromkeys(key for section in section_names for key in SECTION_MEASUREMENTS.get(section, ()))
         packet = {**context, **content, 'measurements': {key: measurements[key] for key in metrics},
                   'cases': {key: _prompt_case(case) for key, case in references.items()}}
-        prose = client.request_text(f'report-synthesis/{slot}', prompt, packet, stage)
-        return prose, list(references)
+        return client.request_text(f'report-synthesis/{slot}', prompt, packet, stage)
 
     def section_slot(section):
-        prose, ids = fill((section,), f'sections/{section}', prompts.REPORT_SECTION_SLOT,
-                          references[section], section=section)
-        return {'summary': prose, 'evidence_ids': ids}
+        prose = fill((section,), f'sections/{section}', prompts.REPORT_SECTION_SLOT,
+                     references[section], section=section)
+        return {'summary': prose}
 
     def finding_slot(kind):
         scope = [section for section in FINDING_SECTIONS.get(kind, sections) if section in section_prose]
         selected = {key: case for section in scope for key, case in _contrasts(references[section]).items()}
-        prose, ids = fill(scope, f'findings/{kind}', prompts.REPORT_FINDING_SLOT, selected,
-                          focus=prompts.REPORT_FINDING_SLOTS[kind],
-                          section_summaries={section: section_prose[section]['summary'] for section in scope})
-        return {'text': prose, 'evidence_ids': ids}
+        prose = fill(scope, f'findings/{kind}', prompts.REPORT_FINDING_SLOT, selected,
+                     focus=prompts.REPORT_FINDING_SLOTS[kind],
+                     section_summaries={section: section_prose[section]['summary'] for section in scope})
+        return {'text': prose, 'evidence_ids': list(selected)}
 
     def overview_slot(key, prompt):
         return client.request_text(f'report-synthesis/overview/{key}', prompt, overview, stage)

@@ -102,6 +102,33 @@ def report_script(page, identity):
     return json.loads(match[1]) if match else None
 
 
+def replace_script_body(page, block, body):
+    return page[:block.start(1)] + body + page[block.end(1):]
+
+
+def script_json(value):
+    return json.dumps(value, ensure_ascii=False, allow_nan=False, separators=(',', ':')).replace(
+        '<', r'\u003c').replace('\u2028', r'\u2028').replace('\u2029', r'\u2029')
+
+
+def refresh_synthesis(page):
+    block = report_script_block(page, 'report-synthesis')
+    if block is None:
+        return page
+    synthesis = json.loads(block[1])
+    for summary in synthesis['section_prose'].values():
+        summary.pop('evidence_ids', None)
+    cited = dict.fromkeys(identity for finding in synthesis['claim']['findings'].values()
+                          for identity in finding['evidence_ids'])
+    synthesis['evidence'] = {identity: synthesis['evidence'][identity] for identity in cited}
+    page = replace_script_body(page, block, script_json(synthesis))
+    renderer = report_script_block(page, 'report-synthesis-render')
+    if renderer is not None:
+        source = Path(__file__).resolve().parents[1] / 'tools/report_synthesis.js'
+        page = replace_script_body(page, renderer, source.read_text(encoding='utf-8'))
+    return page
+
+
 def portable_path(value):
     if isinstance(value, str) and (value.startswith('/') or PureWindowsPath(value).is_absolute()):
         return value.replace('\\', '/').rstrip('/').rsplit('/', 1)[-1]
@@ -119,15 +146,13 @@ def portable_metadata(value):
 
 def portable_report(page):
     block = report_script_block(page, 'neuron-labels')
-    if block is None:
-        return page
-    labels = json.loads(block[1])
-    scope = portable_metadata(labels['scope'])
-    if scope == labels['scope']:
-        return page
-    labels['scope'] = scope
-    payload = json.dumps(labels, ensure_ascii=False, separators=(',', ':')).replace('<', r'\u003c')
-    return page[:block.start(1)] + payload + page[block.end(1):]
+    if block is not None:
+        labels = json.loads(block[1])
+        scope = portable_metadata(labels['scope'])
+        if scope != labels['scope']:
+            labels['scope'] = scope
+            page = replace_script_body(page, block, script_json(labels))
+    return refresh_synthesis(page)
 
 
 def report_replay(page, bundle):

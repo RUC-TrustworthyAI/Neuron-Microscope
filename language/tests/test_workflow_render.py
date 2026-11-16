@@ -11,12 +11,22 @@ from language.workflow.state import write
 
 class ReportSynthesisTest(unittest.TestCase):
     @unittest.skipUnless(shutil.which('node'), 'Node is needed to check report links')
-    def test_evidence_links_open_on_load_and_hash_changes(self):
-        from language.tests.test_ablation_report import DOM
-
+    def test_only_claim_links_to_evidence_and_opens_samples(self):
         renderer = Path(__file__).resolve().parents[1] / 'tools/report_synthesis.js'
         fixture = r"""
 const assert = require('node:assert/strict');
+class Element {
+  constructor(tag, text = '') {
+    this.tag = tag;
+    this.text = text;
+    this.attrs = {};
+    this.children = [];
+  }
+  append(child) { this.children.push(child); }
+  replaceChildren(...children) { this.children = children; }
+  remove() {}
+}
+const document = {};
 const B = {};
 const callbacks = {};
 const window = {addEventListener: (type, handler) => { callbacks[type] = handler; }};
@@ -28,6 +38,9 @@ const $ = (tag, attrs, ...children) => {
   for (const child of children.flat(Infinity)) node.append(child instanceof Element ? child : new Element('#text', child));
   return node;
 };
+const P = (...children) => $('p', null, ...children);
+const descendants = node => [node, ...node.children.flatMap(descendants)];
+const text = node => descendants(node).map(item => item.text).join('');
 const before = new Element('div');
 const claimFigures = $('div', null, before);
 claimFigures.querySelector = () => before;
@@ -41,19 +54,24 @@ sample.parentElement = folded;
 let focused;
 sample.focus = () => { focused = sample; };
 sample.scrollIntoView = () => {};
-Element.prototype.remove = function () {};
+const why = new Element('div');
+const criticism = {
+  querySelector: selector => selector === '.text' ? {querySelector: () => why} : null,
+  querySelectorAll: () => [{querySelector: () => ({children: [sample]})}],
+};
 const data = {
   claim: {title: 'Measured', lede: 'Summary', findings: {pattern: {text: 'Found', evidence_ids: ['criticism:example']}}},
-  section_prose: {},
+  section_prose: {criticism: {summary: 'Saved criticism summary', evidence_ids: ['criticism:section-only']}},
   evidence: {
     'criticism:example': {section: 'criticism', label: 'Case', locator: {row: 0, sample: 0},
       details: {position: 4, token: ' et', location: 'replacement_span', reduction: 'absmax'}},
+    'criticism:section-only': {section: 'criticism', label: 'Old section link'},
   },
 };
 Object.assign(document, {
   getElementById(id) { return {
     'report-synthesis': {textContent: JSON.stringify(data)},
-    'criticism': {querySelectorAll: () => [{querySelector: () => ({children: [sample]})}]},
+    'criticism': criticism,
   }[id]; },
   querySelector: selector => ({'#head h1': headline, '#head .lede': lede, '#claim .figs': claimFigures})[selector],
   querySelectorAll: () => [],
@@ -63,6 +81,8 @@ Object.assign(document, {
 assert.equal(folded.open, true);
 assert.equal(focused, sample);
 assert.match(text(sample), /Scored token " et" · position 4 \(0-based\) · replacement span/);
+assert.equal(text(why), 'Saved criticism summary');
+assert.equal(descendants(why).some(node => node.tag === 'a'), false);
 const link = descendants(claimFigures).find(node => node.tag === 'a');
 assert.equal(link.attrs.href, '#evidence-criticism%3Aexample');
 focused = null;
@@ -74,7 +94,7 @@ callbacks.hashchange();
 assert.equal(folded.open, true);
 assert.equal(focused, sample);
 """
-        script = DOM + fixture + renderer.read_text(encoding='utf-8') + checks
+        script = fixture + renderer.read_text(encoding='utf-8') + checks
         result = subprocess.run(['node', '-'], input=script, encoding='utf-8', capture_output=True)
         self.assertEqual(result.returncode, 0, result.stderr)
 
@@ -117,11 +137,17 @@ class WalkthroughExportTest(unittest.TestCase):
             public_labels = {**labels, 'scope': {'archive': 'corpus', 'archive_model': 'weights',
                             'measurement': {'model': {'path': 'served', 'metadata_before_load': {'path': 'base'}}},
                             'seed': 42}}
-            synthesis = {'claim': {'title': 'Fixture', 'findings': {'pattern': {'evidence_ids': ['C1']}}}}
-            (run / 'report/index.html').write_text(
+            synthesis = {'claim': {'title': 'Fixture', 'findings': {'pattern': {'evidence_ids': ['C1']}}},
+                         'section_prose': {'criticism': {'summary': 'Saved criticism summary', 'evidence_ids': ['C2']}},
+                         'evidence': {'C1': {'label': 'Claim case'}, 'C2': {'label': 'Old section case'}}}
+            claim_synthesis = {**synthesis, 'section_prose': {'criticism': {'summary': 'Saved criticism summary'}},
+                               'evidence': {'C1': synthesis['evidence']['C1']}}
+            legacy_html = (
                 f'<html><script id="bundle">{encode_bundle(bundle)}</script>'
                 f'<script id="neuron-labels">{json.dumps(labels)}</script>'
-                f'<script id="report-synthesis">{json.dumps(synthesis)}</script></html>')
+                f'<script id="report-synthesis" type="application/json">{json.dumps(synthesis)}</script>'
+                '<script id="report-synthesis-render">/* old section citations */</script></html>')
+            (run / 'report/index.html').write_text(legacy_html, encoding='utf-8')
             write(run / 'artifacts.json', {'all_measured': [], 'figures': [{'id': 'control', 'results': []}],
                 'corpus': {'min': -1., 'max': 1.}, 'tests': {}, 'atlas': [], 'graphs': [],
                 'review': {}, 'revision': {'criticism': []}})
@@ -168,7 +194,7 @@ class WalkthroughExportTest(unittest.TestCase):
             self.assertEqual(episode['route_prediction'], bundle['tests']['route_prediction'])
             self.assertEqual(episode['neuron_labels'], public_labels)
             self.assertEqual(episode['followup']['rounds'], followup['rounds'])
-            self.assertEqual(episode['synthesis'], synthesis)
+            self.assertEqual(episode['synthesis'], claim_synthesis)
             calls = {entry['id']: entry['file'] for entry in episode['calls']}
             self.assertEqual(calls, {'round-1/assessment': 'content/calls/round-1--assessment.json',
                                     'followup/round-1/assessment': 'content/calls/followup/round-1--assessment.json',
@@ -178,11 +204,21 @@ class WalkthroughExportTest(unittest.TestCase):
             section_call = read(output / calls['followup/report-synthesis/sections/criticism'])
             self.assertEqual(section_call['response_format'], 'text')
             self.assertEqual(section_call['output'], {'text': 'Measured result.'})
+            final_gzip = output / 'reports/final.html.gz'
+            renderer = Path(__file__).resolve().parents[1] / 'tools/report_synthesis.js'
+            html = gzip.decompress(final_gzip.read_bytes()).decode()
+            self.assertEqual(report_script(html, 'report-synthesis'), claim_synthesis)
+            self.assertIn(renderer.read_text(encoding='utf-8'), html)
+            # An archived walkthrough may still contain the old section links.
+            final_gzip.write_bytes(gzip.compress(legacy_html.encode('utf-8'), mtime=0))
+            write(output / 'content/episode.json', {**episode, 'synthesis': synthesis})
             export_archive(output, output)
             self.assertEqual(read(output / 'content/episode.json'), episode)
             self.assertEqual(read(output / calls['followup/round-1/assessment'])['output'], {'verdict': 'survived'})
             self.assertEqual(read(output / calls['followup/report-synthesis'])['correction_messages'], correction)
-            exported_html = gzip.decompress((output / 'reports/final.html.gz').read_bytes()).decode()
+            exported_html = gzip.decompress(final_gzip.read_bytes()).decode()
+            self.assertEqual(report_script(exported_html, 'report-synthesis'), claim_synthesis)
+            self.assertIn(renderer.read_text(encoding='utf-8'), exported_html)
             exported_bundle = json.loads(BUNDLE.search(exported_html)[2])
             self.assertEqual(report_script(exported_html, 'neuron-labels'), public_labels)
             for field in ('criticism', 'ablation', 'anatomy'):
