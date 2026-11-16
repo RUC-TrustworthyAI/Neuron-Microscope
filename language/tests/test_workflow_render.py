@@ -80,11 +80,12 @@ assert.equal(focused, sample);
 
 
 class WalkthroughExportTest(unittest.TestCase):
-    def test_export_uses_recorded_identity(self):
+    def test_export_preserves_recorded_stages(self):
         import contextlib
         import gzip
+        import hashlib
         import io
-        from language.examples.export_walkthrough import export
+        from language.examples.export_walkthrough import export, export_archive, report_script
         from language.tools.report import BUNDLE, encode_bundle
         from language.workflow.state import read
         with tempfile.TemporaryDirectory() as folder:
@@ -97,6 +98,7 @@ class WalkthroughExportTest(unittest.TestCase):
             html = '<html><script id="bundle">{"display_selection":{"headline_figure_id":"control"}}</script></html>'
             (report / 'index.html').write_text(html)
             bundle = {'display_selection': {'headline_figure_id': 'control'},
+                      'tests': {'route_prediction': {'summary': {'cases': 1}}},
                       'criticism': [{'attack': 'Original criticism', 'verdict': 'narrowed'},
                                     {'round': 1, 'investigation_id': 'R1_Q1', 'criticism_ids': ['C1'],
                                      'attack': 'Follow-up round 1: Does context distinguish the explanations?',
@@ -107,7 +109,19 @@ class WalkthroughExportTest(unittest.TestCase):
                           {'case_id': 'control:0', 'gate': [1.], 'up': [2.], 'act': [1.462]},
                           {'case_id': 'control:1', 'gate': [-1.], 'up': [2.], 'act': [-.538]}]}}}
             write(run / 'report/paper-data.json', {'bundle': bundle})
-            (run / 'report/index.html').write_text(f'<html><script id="bundle">{encode_bundle(bundle)}</script></html>')
+            labels = {'scope': {'archive': '/srv/private/corpus', 'archive_model': '/opt/private/weights',
+                                'measurement': {'model': {'path': r'C:\private\served',
+                                                          'metadata_before_load': {'path': '/home/user/base'}}},
+                                'seed': 42},
+                      'labels': {'L2_N5': {'label': 'Context'}}}
+            public_labels = {**labels, 'scope': {'archive': 'corpus', 'archive_model': 'weights',
+                            'measurement': {'model': {'path': 'served', 'metadata_before_load': {'path': 'base'}}},
+                            'seed': 42}}
+            synthesis = {'claim': {'title': 'Fixture', 'findings': {'pattern': {'evidence_ids': ['C1']}}}}
+            (run / 'report/index.html').write_text(
+                f'<html><script id="bundle">{encode_bundle(bundle)}</script>'
+                f'<script id="neuron-labels">{json.dumps(labels)}</script>'
+                f'<script id="report-synthesis">{json.dumps(synthesis)}</script></html>')
             write(run / 'artifacts.json', {'all_measured': [], 'figures': [{'id': 'control', 'results': []}],
                 'corpus': {'min': -1., 'max': 1.}, 'tests': {}, 'atlas': [], 'graphs': [],
                 'review': {}, 'revision': {'criticism': []}})
@@ -123,16 +137,74 @@ class WalkthroughExportTest(unittest.TestCase):
             write(run / 'search-progress.json', [])
             write(run / 'measurements/figures-initial.json', [])
             write(run / 'measurements/figures-revised.json', [])
+            followup = {'rounds': [{'round': 1, 'investigations': [{'assessment': {'verdict': 'survived'}}]}]}
+            write(run / 'followup/investigation.json', followup)
+            for directory in ('api/round-1/assessment', 'followup/api/round-1/assessment',
+                              'api/report-synthesis', 'followup/api/report-synthesis'):
+                call = run / directory
+                write(call / 'result.json', {'output': {'verdict': 'survived'}})
+                write(call / 'attempt-1/request.json', {'model': 'Fixture', 'messages': [
+                    {'content': 'Assess the evidence.'}, {'content': '{}'}]})
+            call = run / 'followup/api/report-synthesis'
+            messages = [{'role': 'system', 'content': 'Synthesize.'}, {'role': 'user', 'content': '{}'}]
+            correction = [{'role': 'assistant', 'content': 'Invalid response.'},
+                          {'role': 'user', 'content': 'Return JSON.'}]
+            fingerprint = hashlib.sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
+            write(call / 'result.json', {'input_id': fingerprint, 'output': {'verdict': 'survived'}})
+            write(call / 'attempt-2/request.json', {'model': 'Fixture', 'messages': messages + correction})
+            write(call / 'attempt-2/completion.json', {'finish_reason': 'stop'})
+            write(call / 'attempt-3/request.json', {'model': 'Fixture', 'messages': messages})
             with contextlib.redirect_stdout(io.StringIO()):
                 export(run, output)
             episode = read(output / 'content/episode.json')
             self.assertEqual(episode['subject_model'], identity['model'])
             self.assertEqual(episode['source_identity'], identity)
             self.assertEqual(episode['dataset'], 'Saved native activation corpus')
+            self.assertEqual(episode['route_prediction'], bundle['tests']['route_prediction'])
+            self.assertEqual(episode['neuron_labels'], public_labels)
+            self.assertEqual(episode['followup']['rounds'], followup['rounds'])
+            self.assertEqual(episode['synthesis'], synthesis)
+            calls = {entry['id']: entry['file'] for entry in episode['calls']}
+            self.assertEqual(calls, {'round-1/assessment': 'content/calls/round-1--assessment.json',
+                                    'followup/round-1/assessment': 'content/calls/followup/round-1--assessment.json',
+                                    'followup/report-synthesis': 'content/calls/followup/report-synthesis.json'})
+            export_archive(output, output)
+            self.assertEqual(read(output / 'content/episode.json'), episode)
+            self.assertEqual(read(output / calls['followup/round-1/assessment'])['output'], {'verdict': 'survived'})
+            self.assertEqual(read(output / calls['followup/report-synthesis'])['correction_messages'], correction)
             exported_html = gzip.decompress((output / 'reports/final.html.gz').read_bytes()).decode()
             exported_bundle = json.loads(BUNDLE.search(exported_html)[2])
+            self.assertEqual(report_script(exported_html, 'neuron-labels'), public_labels)
             for field in ('criticism', 'ablation', 'anatomy'):
                 self.assertEqual(exported_bundle[field], bundle[field])
+
+            bundle['criticism'] = bundle['criticism'][:1]
+            (run / 'report/index.html').write_text(
+                f'<script id="bundle">{encode_bundle(bundle)}</script>'
+                f'<script id="report-synthesis">{json.dumps(synthesis)}</script>')
+            write(run / 'status.json', {'phase': 'complete'})
+            with contextlib.redirect_stdout(io.StringIO()):
+                export(run, output)
+            episode = read(output / 'content/episode.json')
+            self.assertNotIn('followup', episode)
+            self.assertEqual({entry['id'] for entry in episode['calls']}, {'round-1/assessment', 'report-synthesis'})
+
+    def test_archive_rejects_escaped_calls_before_writes(self):
+        from language.examples.export_walkthrough import export_archive
+
+        with tempfile.TemporaryDirectory() as folder:
+            base = Path(folder)
+            archive, output = base / 'archive', base / 'export'
+            valid = 'content/calls/first.json'
+            write(archive / valid, {})
+            outside = base / 'outside.json'
+            write(outside, {})
+            for path in ('../outside.json', 'content/calls/../../../outside.json', str(outside)):
+                with self.subTest(path=path):
+                    write(archive / 'content/episode.json', {'calls': [{'file': valid}, {'file': path}]})
+                    with self.assertRaisesRegex(ValueError, 'Invalid archive path'):
+                        export_archive(archive, output)
+                    self.assertFalse(output.exists())
 
 
 @unittest.skipUnless(os.environ.get('WORKFLOW_TEST_REPORT'), 'Set an activation-only report fixture')

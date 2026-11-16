@@ -38,15 +38,15 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory runs/walkthrough
 
 将 `runs/example` 换成已完成运行的目录，然后打开 <http://127.0.0.1:8000/?lang=zh>。导出程序根据保存的产物重新生成 `content/` 和 `reports/`，并清除复制的 `screenshots/` 目录。复制的 HTML、JavaScript 和 CSS 会保留。导出的内容包括提示词与输入节选、结构化响应、各轮对比、测量和压缩报告。所需截图请单独截取。
 
-默认开启的追加调查完成后，同一导出命令会读取已更新的 `runs/example/report/index.html`，因此最终报告包含追加 Criticism。逐步回放仍展示基础调查过程；追加问题和结果在最终报告中查看，不会自动增加为新的回放步骤。
+报告步骤会展示存档中的路径预测和神经元命名。运行记录包含追加调查或报告综合解释时，回放会增加对应步骤，展示保存的模型调用并提供跳转到最终报告的链接。
 
-如需直接更新仓库已有的 website，执行：
+已有的 Colorado 网站可以直接用静态存档重新导出：
 
 ```bash
-python3 language/examples/export_walkthrough.py --run runs/example --output website/walkthrough/language
+python3 language/examples/export_walkthrough.py --archive website/walkthrough/language --output website/walkthrough/language
 ```
 
-该命令重建上述生成子目录，无需重跑实验。更新后的 website 仍需另行部署。
+该命令重新打包已保存的研究记录、模型调用和报告。Colorado 的存档包含原有六步。更新后的 website 仍需另行部署。
 
 ## 通过 GitHub Pages 发布
 
