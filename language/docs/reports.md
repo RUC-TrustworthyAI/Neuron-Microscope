@@ -2,7 +2,7 @@
 
 [Home](../../README.md) · [Method](method.md) · [Run guide](running.md) · [Data format](data.md)
 
-A full report presents a measured-evidence synthesis, with links from key conclusions to the supporting samples and counterexamples. The interpretation preview presents the explanation used to make blind predictions.
+The Claim links its synthesized conclusions to supporting samples and counterexamples. Section summaries present the conclusions for their own measurements. The interpretation preview presents the explanation used to make blind predictions.
 
 ## How to interpret the plots
 

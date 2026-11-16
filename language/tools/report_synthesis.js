@@ -143,7 +143,7 @@
     if (!host) continue;
     let why = host.querySelector('.why');
     if (!why) host.append(why = $('div', {class: 'why'}));
-    why.replaceChildren(P(prose.summary, citations(prose.evidence_ids)));
+    why.replaceChildren(P(prose.summary));
   }
 
   const assessment = 'Independent assessment of the frozen explanation';
