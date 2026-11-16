@@ -46,32 +46,37 @@ def recorded_request(folder, saved):
         if input_id is None:
             return request
         completion = path.with_name('completion.json')
-        if (not completion.is_file() or path.with_name('format-error.json').exists()
-                or read(completion).get('finish_reason') not in ('stop', 'end_turn')):
+        if not completion.is_file() or path.with_name('format-error.json').exists():
             continue
-        messages = json.dumps(request['messages'][:2], sort_keys=True).encode()
+        saved_completion = read(completion)
+        if saved_completion.get('status') == 'failed' or saved_completion.get('finish_reason') not in ('stop', 'end_turn'):
+            continue
+        messages = json.dumps(request.get('messages', request.get('input'))[:2], sort_keys=True).encode()
         if hashlib.sha256(messages).hexdigest() == input_id:
             return request
     return None
 
 
-def export_calls(source, output, scope='', omit=()):
+def export_calls(source, output, scope='', *, omit=(), omit_groups=()):
     calls = []
     for result_path in sorted(source.rglob('result.json')):
         folder = result_path.parent
         name = folder.relative_to(source).as_posix()
-        if name in omit:
+        if name in omit or name.partition('/')[0] in omit_groups:
             continue
         saved = read(result_path)
         request = recorded_request(folder, saved)
         if request is None:
             continue
-        messages = request['messages']
+        messages = request.get('messages', request.get('input'))
         payload = json.loads(messages[1]['content'])
         key = f'{scope}/{name}' if scope else name
-        item = {'id': key, 'model': request['model'], 'reasoning_effort': request.get('reasoning_effort'),
+        effort = request.get('reasoning_effort', request.get('reasoning', {}).get('effort'))
+        item = {'id': key, 'model': request['model'], 'reasoning_effort': effort,
                 'prompt': messages[0]['content'], 'input_keys': list(payload),
                 'input_excerpt': preview(payload), 'output': saved['output']}
+        if request.get('text', {}).get('format', {}).get('type') == 'text':
+            item['response_format'] = 'text'
         if messages[2:]:
             item['correction_messages'] = [{'role': row['role'], 'content': row['content']} for row in messages[2:]]
         if 'points' in payload:
@@ -217,11 +222,23 @@ def export(run, output):
     followup = followup_path.is_file() and (
         any(row.get('investigation_id') for row in bundle.get('criticism', ()))
         or (status_path.is_file() and read(status_path).get('stop_reason')))
+    replay = report_replay(final_html, bundle)
+    active_api = run / ('followup/api' if followup else 'api')
+    claim = replay.get('synthesis', {}).get('claim', {})
+    overview = active_api / 'report-synthesis/overview'
+    split_synthesis = all(
+        key in claim and (overview / key / 'result.json').is_file()
+        and read(overview / key / 'result.json')['output'].get('text') == claim[key]
+        for key in ('title', 'lede')
+    )
+    retired = ('report-synthesis',) if split_synthesis else ()
     for name in ('content', 'reports', 'screenshots'):
         shutil.rmtree(output / name, ignore_errors=True)
-    calls = export_calls(run / 'api', output, omit=('report-synthesis',) if followup else ())
     if followup:
-        calls.extend(export_calls(run / 'followup/api', output, 'followup'))
+        calls = export_calls(run / 'api', output, omit_groups=('report-synthesis',))
+        calls.extend(export_calls(active_api, output, 'followup', omit=retired))
+    else:
+        calls = export_calls(active_api, output, omit=retired)
 
     rounds = []
     for entry in history:
@@ -270,7 +287,7 @@ def export(run, output):
         'review': artifacts['review'], 'analysis': artifacts['revision'], 'costs': costs,
         'report': 'reports/final.html', 'initial_report': 'reports/evidence.html',
     }
-    episode.update(report_replay(final_html, bundle))
+    episode.update(replay)
     if followup:
         episode['followup'] = followup_replay(followup_path)
     write(output / 'content/episode.json', episode)

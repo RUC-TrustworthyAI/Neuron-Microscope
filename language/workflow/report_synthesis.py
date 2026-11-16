@@ -1,8 +1,8 @@
 """Synthesize measured results without changing the explanation used in blind tests."""
 from collections import Counter, defaultdict
+from concurrent.futures import ThreadPoolExecutor
 
 from . import prompts
-from .contracts import S, arr, obj
 
 
 def _fields(row, *names):
@@ -31,8 +31,9 @@ def _excerpt(row):
 
 def _group(rows, key):
     groups = defaultdict(list)
+    group_key = key if callable(key) else lambda row: row.get(key)
     for row in rows:
-        groups[row.get(key)].append(row)
+        groups[group_key(row)].append(row)
     return groups.values()
 
 
@@ -212,44 +213,106 @@ def _evidence(bundle):
     return cases, summary
 
 
+def _prompt_case(case):
+    fields = {key: value for key, value in case.items() if key not in ('locator', 'prefix_end')}
+    end = case['prefix_end']
+    if end is not None:
+        text = fields.pop('text')
+        fields['observed_prefix_excerpt'] = text[:end]
+        if text[end:]:
+            fields['following_text'] = text[end:]
+    return fields
+
+
+def _assemble(cases, claim, section_prose):
+    passages = [*claim['findings'].values(), *section_prose.values()]
+    cited = dict.fromkeys(identity for passage in passages for identity in passage['evidence_ids'])
+    return {'claim': claim, 'section_prose': section_prose,
+            'evidence': {identity: cases[identity] for identity in cited}}
+
+
+def _response_value(case):
+    details = case['details']
+    if case['section'] == 'ablation':
+        return details['kl']
+    return next((details[key] for key in ('activation', 'product', 'target_product', 'live_product')
+                 if type(details.get(key)) in (int, float)), None)
+
+
+def _contrasts(cases):
+    measured = [(key, value) for key, case in cases.items() if (value := _response_value(case)) is not None]
+    if not measured:
+        return dict(list(cases.items())[:1])
+    chosen = {min(measured, key=lambda row: row[1])[0], max(measured, key=lambda row: row[1])[0],
+              min(measured, key=lambda row: abs(row[1]))[0]}
+    return {key: case for key, case in cases.items() if key in chosen}
+
+
+def _section_cases(section, cases):
+    if section == 'spectrum':
+        groups = _group(cases.items(), lambda row: _projection_signs(row[1]['details']))
+    elif section == 'custom':
+        groups = _group(cases.items(), lambda row: row[1]['locator'].get('figure'))
+    elif section == 'criticism':
+        groups = _group(((key, case) for key, case in cases.items() if 'sample' in case['locator']),
+                        lambda row: row[1]['locator']['row'])
+        summaries = {key: case for key, case in cases.items() if 'sample' not in case['locator']}
+        return {**summaries, **{key: case for group in groups for key, case in _contrasts(dict(group)).items()}}
+    else:
+        return cases
+    return {key: case for group in groups for key, case in _contrasts(dict(group)).items()}
+
+
+SECTION_MEASUREMENTS = {
+    'spectrum': ('corpus', 'spectrum'), 'search': ('corpus',), 'custom': ('controlled_sweeps',),
+    'anatomy': ('anatomy_pair',), 'ablation': ('ablation',), 'tests': ('route_prediction',),
+    'circuit': ('circuit',),
+}
+FINDING_SECTIONS = {
+    'pattern': ('spectrum', 'search', 'custom', 'tests', 'criticism'),
+    'strength': ('spectrum', 'search', 'custom', 'anatomy', 'tests'),
+    'mechanism': ('spectrum', 'anatomy', 'ablation', 'circuit', 'family'),
+}
+
+
 def synthesize(client, bundle, stage):
     cases, measurements = _evidence(bundle)
     if not cases:
         return None
-
-    text = {**S, 'minLength': 1}
+    context = {'neuron': bundle.get('neuron'), 'frozen_claim': bundle.get('claim')}
     sections = sorted({case['section'] for case in cases.values()})
-    cited = obj(text=text, evidence_ids=arr(S, 1))
-    finding = obj(text=text, evidence_ids=arr(S))
-    pattern = cited if {'spectrum', 'custom', 'search'} & set(sections) else finding
-    mechanism = cited if {'anatomy', 'ablation'} & set(sections) else finding
-    schema = obj(claim=obj(title=text, lede=text,
-                           findings=obj(pattern=pattern, strength=pattern, mechanism=mechanism, open_questions=finding)),
-                 section_prose=obj(**{name: obj(summary=text, evidence_ids=arr(S, 1)) for name in sections}))
+    references = {section: _section_cases(section, {key: case for key, case in cases.items()
+                                                   if case['section'] == section}) for section in sections}
 
-    def citations(result):
-        items = [*result['claim']['findings'].values(), *result['section_prose'].values()]
-        return dict.fromkeys(identity for item in items for identity in item['evidence_ids'])
+    def fill(section_names, slot, prompt, references, **content):
+        metrics = dict.fromkeys(key for section in section_names for key in SECTION_MEASUREMENTS.get(section, ()))
+        packet = {**context, **content, 'measurements': {key: measurements[key] for key in metrics},
+                  'cases': {key: _prompt_case(case) for key, case in references.items()}}
+        prose = client.request_text(f'report-synthesis/{slot}', prompt, packet, stage)
+        return prose, list(references)
 
-    def check(result):
-        unknown = citations(result).keys() - cases.keys()
-        if unknown:
-            raise ValueError('Unknown report evidence IDs: ' + ', '.join(sorted(unknown)))
-        for section, prose in result['section_prose'].items():
-            if not any(cases[identity]['section'] == section for identity in prose['evidence_ids']):
-                raise ValueError(f'Section {section} must cite a case from that section')
+    def section_slot(section):
+        prose, ids = fill((section,), f'sections/{section}', prompts.REPORT_SECTION_SLOT,
+                          references[section], section=section)
+        return {'summary': prose, 'evidence_ids': ids}
 
-    def prompt_case(case):
-        fields = {key: value for key, value in case.items() if key not in ('locator', 'prefix_end')}
-        end = case['prefix_end']
-        if end is not None:
-            text = fields.pop('text')
-            fields['observed_prefix_excerpt'] = text[:end]
-            if text[end:]:
-                fields['following_text'] = text[end:]
-        return fields
+    def finding_slot(kind):
+        scope = [section for section in FINDING_SECTIONS.get(kind, sections) if section in section_prose]
+        selected = {key: case for section in scope for key, case in _contrasts(references[section]).items()}
+        prose, ids = fill(scope, f'findings/{kind}', prompts.REPORT_FINDING_SLOT, selected,
+                          focus=prompts.REPORT_FINDING_SLOTS[kind],
+                          section_summaries={section: section_prose[section]['summary'] for section in scope})
+        return {'text': prose, 'evidence_ids': ids}
 
-    packet = {'neuron': bundle.get('neuron'), 'frozen_claim': bundle.get('claim'), 'measurements': measurements,
-              'cases': {key: prompt_case(case) for key, case in cases.items()}}
-    result = client.request('report-synthesis', prompts.REPORT_SYNTHESIS, packet, schema, stage, check)
-    return {**result, 'evidence': {identity: cases[identity] for identity in citations(result)}}
+    def overview_slot(key, prompt):
+        return client.request_text(f'report-synthesis/overview/{key}', prompt, overview, stage)
+
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        section_prose = dict(zip(sections, pool.map(section_slot, sections)))
+        kinds = prompts.REPORT_FINDING_SLOTS
+        findings = dict(zip(kinds, pool.map(finding_slot, kinds)))
+        overview = {'neuron': context['neuron'], 'findings': {key: value['text'] for key, value in findings.items()}}
+        title = pool.submit(overview_slot, 'title', prompts.REPORT_TITLE_SLOT)
+        lede = pool.submit(overview_slot, 'lede', prompts.REPORT_LEDE_SLOT)
+        claim = {'title': title.result(), 'lede': lede.result(), 'findings': findings}
+    return _assemble(cases, claim, section_prose)

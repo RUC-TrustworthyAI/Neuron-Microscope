@@ -52,16 +52,30 @@ const callGroups={
   synthesis:['report-synthesis']
 };
 function callGroup(id){
-  return id==='followup/report-synthesis'?'report-synthesis':id.split('/',1)[0];
+  const [group,task]=id.split('/',2);
+  return group==='followup'&&task==='report-synthesis'?'report-synthesis':group;
+}
+function synthesisPart(id){
+  return id.replace(/^followup\//,'').split('/').slice(1);
 }
 function relevantCalls(step){
   const groups=callGroups[step]||[];
   const calls=groups.flatMap(group=>data.calls.filter(call=>callGroup(call.id)===group));
+  if(step==='synthesis'){
+    const order={sections:0,findings:1,overview:2};
+    const rank=call=>order[synthesisPart(call.id)[0]]??-1;
+    return calls.sort((a,b)=>rank(a)-rank(b));
+  }
   if(step!=='followup')return calls;
   // Within each round, show the plan before its investigations and design before assessment.
   const order=({id})=>id.replace(/\/round-(\d+)\//,'/r$1-i0/').replace(/\/specification$/,'/0');
   return calls.sort((a,b)=>order(a).localeCompare(order(b),undefined,{numeric:true}));
 }
+const findingTitles={pattern:t('核心响应','Core response'),strength:t('强弱响应','Strong and weak responses'),
+  mechanism:t('机制和输出效应','Mechanism and output effects'),open_questions:t('尚待回答的问题','Open questions')};
+const sectionTitles={ablation:t('点消融','Ablations'),anatomy:'Anatomy',circuit:t('归因回路','Circuit'),
+  criticism:t('质疑与追加调查','Criticisms and follow-ups'),custom:t('受控实验','Controlled tests'),family:'Family',
+  search:'Search',spectrum:t('激活频谱','Activation spectrum'),tests:t('实验检验','Tests')};
 function callName(call){
   const [group,identity,operation]=call.id.split('/');
   if(Object.hasOwn(blindLabelRounds,group)){
@@ -81,7 +95,13 @@ function callName(call){
     'report-synthesis':t('证据综合','Evidence synthesis')
   };
   if(group==='search')return 'Search · '+identity.split('-').pop();
-  if(callGroup(call.id)==='report-synthesis')return names['report-synthesis'];
+  if(callGroup(call.id)==='report-synthesis'){
+    const [part,field]=synthesisPart(call.id);
+    if(part==='sections')return t('章节摘要','Section summary')+' · '+(sectionTitles[field]||field);
+    if(part==='findings')return t('综合结论','Finding')+' · '+(findingTitles[field]||field);
+    if(part==='overview')return field==='title'?t('报告标题','Report title'):t('报告导语','Report lede');
+    return names['report-synthesis'];
+  }
   if(group==='followup'){
     const phases={plan:t('规划','Planning'),specification:t('实验设计','Test design'),
       assessment:t('结果判定','Assessment')};
@@ -98,7 +118,7 @@ async function promptView(host,step,token){
     }else p(host,t('这一步没有保存的模型调用。','No model calls were saved for this step.'));
     return;
   }
-  p(host,t('任务提示和JSON格式要求保留原文。输入展示实际节选；输出为这次任务保存的结构化结果。','Task instructions and JSON requirements are shown verbatim. Inputs show actual excerpts; outputs are the saved structured results.'));
+  p(host,t('任务提示保留原文。输入展示实际节选，输出展示本次保存的结果。','Task instructions are shown verbatim. Inputs show recorded excerpts and outputs show the saved results.'));
   const select=el('select','doc-select');
   calls.forEach((call,i)=>{
     const option=el('option','',`${i+1}. ${callName(call)}`);
@@ -111,7 +131,9 @@ async function promptView(host,step,token){
     const index=select.value,call=await get(calls[Number(index)].file);
     if(token!==revision||index!==select.value)return;
     body.replaceChildren();
-    code(body,t('完整任务提示与JSON schema','Complete task instructions and JSON schema'),call.prompt);
+    const plain=call.response_format==='text';
+    code(body,plain?t('完整任务提示','Complete task instructions'):
+      t('完整任务提示与JSON schema','Complete task instructions and JSON schema'),call.prompt);
     details(body,t('模型看见的输入节选','Input excerpts shown to the model'),d=>{
       p(d,t('部分长列表展示前3项，total为原列表长度。','Long lists show their first three entries; total records the original list length.'),'small');
       code(d,t('输入节选','Input excerpt'),call.input_excerpt);
@@ -122,7 +144,8 @@ async function promptView(host,step,token){
         code(d,title,message.content);
       }
     });
-    details(body,t('模型的完整结构化输出','Complete structured output'),d=>code(d,t('输出','Output'),call.output));
+    details(body,plain?t('通过校验的文本','Validated text'):
+      t('模型的完整结构化输出','Complete structured output'),d=>code(d,t('输出','Output'),plain?call.output.text:call.output));
   };
   select.onchange=draw;
   await draw();
@@ -190,9 +213,7 @@ function synthesisView(host){
   const {claim,evidence}=data.synthesis;
   host.append(el('h3','explanation-title',claim.title));
   p(host,claim.lede,'explanation-lede');
-  const headings={pattern:t('核心响应','Core response'),strength:t('强弱响应','Strong and weak responses'),
-    mechanism:t('机制和输出效应','Mechanism and output effects'),open_questions:t('尚待回答的问题','Open questions')};
-  for(const [key,title] of Object.entries(headings)){
+  for(const [key,title] of Object.entries(findingTitles)){
     const finding=claim.findings[key];
     host.append(el('h3','section-title',title));
     p(host,finding.text);

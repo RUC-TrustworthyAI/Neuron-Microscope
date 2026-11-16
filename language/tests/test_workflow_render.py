@@ -154,6 +154,11 @@ class WalkthroughExportTest(unittest.TestCase):
             write(call / 'attempt-2/request.json', {'model': 'Fixture', 'messages': messages + correction})
             write(call / 'attempt-2/completion.json', {'finish_reason': 'stop'})
             write(call / 'attempt-3/request.json', {'model': 'Fixture', 'messages': messages})
+            for directory in ('api/report-synthesis/overview/title', 'followup/api/report-synthesis/sections/criticism'):
+                part = run / directory
+                write(part / 'result.json', {'attempt': 'attempt-1', 'output': {'text': 'Measured result.'}})
+                write(part / 'attempt-1/request.json',
+                      {'model': 'Fixture', 'input': messages, 'text': {'format': {'type': 'text'}}})
             with contextlib.redirect_stdout(io.StringIO()):
                 export(run, output)
             episode = read(output / 'content/episode.json')
@@ -167,7 +172,12 @@ class WalkthroughExportTest(unittest.TestCase):
             calls = {entry['id']: entry['file'] for entry in episode['calls']}
             self.assertEqual(calls, {'round-1/assessment': 'content/calls/round-1--assessment.json',
                                     'followup/round-1/assessment': 'content/calls/followup/round-1--assessment.json',
-                                    'followup/report-synthesis': 'content/calls/followup/report-synthesis.json'})
+                                    'followup/report-synthesis': 'content/calls/followup/report-synthesis.json',
+                                    'followup/report-synthesis/sections/criticism':
+                                        'content/calls/followup/report-synthesis--sections--criticism.json'})
+            section_call = read(output / calls['followup/report-synthesis/sections/criticism'])
+            self.assertEqual(section_call['response_format'], 'text')
+            self.assertEqual(section_call['output'], {'text': 'Measured result.'})
             export_archive(output, output)
             self.assertEqual(read(output / 'content/episode.json'), episode)
             self.assertEqual(read(output / calls['followup/round-1/assessment'])['output'], {'verdict': 'survived'})
@@ -178,6 +188,26 @@ class WalkthroughExportTest(unittest.TestCase):
             for field in ('criticism', 'ablation', 'anatomy'):
                 self.assertEqual(exported_bundle[field], bundle[field])
 
+            for field, text in {'title': 'New title', 'lede': 'New lede'}.items():
+                part = call / 'overview' / field
+                write(part / 'result.json', {'attempt': 'attempt-1', 'output': {'text': text}})
+                write(part / 'attempt-1/request.json',
+                      {'model': 'Fixture', 'input': messages, 'text': {'format': {'type': 'text'}}})
+            with contextlib.redirect_stdout(io.StringIO()):
+                export(run, output)
+            self.assertIn('followup/report-synthesis',
+                          {entry['id'] for entry in read(output / 'content/episode.json')['calls']})
+            synthesis['claim'].update(title='New title', lede='New lede')
+            (run / 'report/index.html').write_text(
+                f'<script id="bundle">{encode_bundle(bundle)}</script>'
+                f'<script id="report-synthesis">{json.dumps(synthesis)}</script>')
+            with contextlib.redirect_stdout(io.StringIO()):
+                export(run, output)
+            call_ids = {entry['id'] for entry in read(output / 'content/episode.json')['calls']}
+            self.assertNotIn('followup/report-synthesis', call_ids)
+            self.assertIn('followup/report-synthesis/overview/lede', call_ids)
+            self.assertTrue((call / 'result.json').is_file())
+
             bundle['criticism'] = bundle['criticism'][:1]
             (run / 'report/index.html').write_text(
                 f'<script id="bundle">{encode_bundle(bundle)}</script>'
@@ -187,7 +217,8 @@ class WalkthroughExportTest(unittest.TestCase):
                 export(run, output)
             episode = read(output / 'content/episode.json')
             self.assertNotIn('followup', episode)
-            self.assertEqual({entry['id'] for entry in episode['calls']}, {'round-1/assessment', 'report-synthesis'})
+            self.assertEqual({entry['id'] for entry in episode['calls']},
+                             {'round-1/assessment', 'report-synthesis', 'report-synthesis/overview/title'})
 
     def test_archive_rejects_escaped_calls_before_writes(self):
         from language.examples.export_walkthrough import export_archive
