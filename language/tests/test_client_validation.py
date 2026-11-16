@@ -5,12 +5,49 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
+from language.examples.export_walkthrough import recorded_request
+from language.workflow import contracts, prompts
 from language.workflow.client import Client
 from language.workflow.followup_protocol import plan_schema
 from language.workflow.state import write
 
 
 class ClientValidationTests(unittest.TestCase):
+    def test_resume_repairs_unambiguous_json_and_preserves_the_accepted_attempt(self):
+        schema = contracts.obj(id=contracts.S)
+        expected = {'id': 'saved'}
+        answer = json.dumps(expected)
+        messages = [{'role': 'system', 'content': 'prompt' + prompts.SCHEMA_HEADER + json.dumps(schema)},
+                    {'role': 'user', 'content': '{}'}]
+        cases = ((answer + '}', False), (answer + answer, False),
+                 ('```json\n' + answer + '\n```', False),
+                 (answer + '{"id":"different"}', True), ('```json', True))
+        for raw, needs_retry in cases:
+            with self.subTest(raw=raw), tempfile.TemporaryDirectory() as folder:
+                client = Client({}, Path(folder) / 'api', Path(folder) / 'slots')
+                call = client.root / 'report-synthesis'
+                first = call / 'attempt-001'
+                request = {'messages': messages}
+                write(first / 'request.json', request)
+                write(first / 'completion.json', {'finish_reason': 'stop'})
+                (first / 'output.txt').write_text(raw)
+                write(first / 'format-error.json', {'error': 'Extra data'})
+
+                def stream(retry, destination, stage):
+                    write(destination / 'request.json', {'messages': retry})
+                    return answer
+
+                with patch.object(client, '_stream', side_effect=stream) as api:
+                    self.assertEqual(client.request('report-synthesis', 'prompt', {}, schema, 1), expected)
+                self.assertEqual(api.call_count, int(needs_retry))
+                saved = json.loads((call / 'result.json').read_text())
+                self.assertEqual(saved['attempt'], 'attempt-002' if needs_retry else first.name)
+                if needs_retry:
+                    self.assertIn('Return exactly one JSON value', recorded_request(call, saved)['messages'][-1]['content'])
+                else:
+                    self.assertEqual(recorded_request(call, saved), request)
+                self.assertTrue((first / 'format-error.json').is_file())
+
     def test_correction_reports_all_unknown_evidence_ids(self):
         plan = {'decision': 'continue', 'reason': 'Check the result', 'investigations': [{
             'question': 'Does the response generalize?', 'criticism_ids': ['C1'],

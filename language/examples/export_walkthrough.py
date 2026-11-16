@@ -33,6 +33,14 @@ def preview(value, limit=3):
     return value
 
 
+def recorded_request(folder, saved):
+    accepted = saved.get('attempt')
+    for path in sorted(folder.glob('attempt-*/request.json'), reverse=True):
+        if accepted is None or path.parent.name == accepted:
+            return read(path)
+    return None
+
+
 def export(run, output):
     config = read(run / 'config.json')
     initial_report = Path(config['report'])
@@ -49,17 +57,16 @@ def export(run, output):
     calls = []
     for result_path in sorted((run / 'api').rglob('result.json')):
         folder = result_path.parent
-        attempts = sorted(p for p in folder.glob('attempt-*') if (p / 'request.json').exists())
-        if not attempts:
+        saved = read(result_path)
+        request = recorded_request(folder, saved)
+        if request is None:
             continue
-        attempt = attempts[-1]
-        request = read(attempt / 'request.json')
         messages = request['messages']
         payload = json.loads(messages[1]['content'])
         key = str(folder.relative_to(run / 'api'))
         item = {'id': key, 'model': request['model'], 'reasoning_effort': request.get('reasoning_effort'),
                 'prompt': messages[0]['content'], 'input_keys': list(payload),
-                'input_excerpt': preview(payload), 'output': read(result_path)['output']}
+                'input_excerpt': preview(payload), 'output': saved['output']}
         if 'points' in payload:
             item['input_count'] = len(payload['points'])
         if 'documents' in payload:

@@ -19,8 +19,12 @@ from .contracts import validate
 def parse_output(answer, schema):
     answer = answer.strip()
     if answer.startswith('```'):
-        answer = answer.split('\n', 1)[1].rsplit('```', 1)[0]
-    output = json.loads(answer)
+        answer = answer.partition('\n')[2].lstrip()
+    output, end = json.JSONDecoder().raw_decode(answer)
+    tail = answer[end:].strip().removesuffix('```').strip()
+    # Recover redundant delimiters or an exact duplicate without selecting conflicting output.
+    if tail and (not isinstance(output, dict) or (tail != answer[:end] and tail.strip('}] \t\r\n'))):
+        raise json.JSONDecodeError('Extra data', answer, end)
     if (isinstance(output, dict) and schema['type'] == 'object' and
             'type' not in schema.get('properties', {}) and output.get('type') == 'json_object'):
         del output['type']
@@ -131,7 +135,7 @@ class Client:
                         feedback = str(error)
                     last_invalid = (answer, feedback)
                 continue
-            write(folder / 'result.json', {'input_id': fingerprint, 'output': output})
+            write(folder / 'result.json', {'input_id': fingerprint, 'attempt': attempt.name, 'output': output})
             return output
         # A single formatting correction preserves the original answer and request.
         # Transport failures are separate from scientific feedback or iteration.
@@ -155,7 +159,7 @@ class Client:
                     max_tokens = min(self.config['max_output_tokens'], available)
             try:
                 output = checked(parse_output(answer, schema))
-                write(folder / 'result.json', {'input_id': fingerprint, 'output': output})
+                write(folder / 'result.json', {'input_id': fingerprint, 'attempt': destination.name, 'output': output})
                 return output
             except (ValueError, KeyError, TypeError) as error:
                 try:

@@ -1,7 +1,8 @@
 """Prompt text for language-neuron investigations and JSON response repair."""
 
 SCHEMA_HEADER = '\nJSON schema:\n'
-JSON_CORRECTION = 'Correct the JSON contract error while preserving the scientific content: '
+JSON_CORRECTION = ('Correct the JSON contract error while preserving the scientific content. '
+                   'Return exactly one JSON value without Markdown fences or trailing text. Error: ')
 ENUM_CORRECTION = '. Use exact enum values from the schema; do not abbreviate or invent IDs.'
 CONDITION_LABEL_DESCRIPTION = 'A condition name: preferably one word, at most four words. The full input belongs in text.'
 
