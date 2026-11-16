@@ -2,41 +2,56 @@
 import collections
 import copy
 from pathlib import Path
-from .state import read, write, union_seconds
+from .state import Timeline, read, write, union_seconds
 from .labels import plot_fields
 
 
 def costs(root, neuron, cards):
     timeline = read(root / 'timeline.json')
-    names = ['Prepare saved evidence', 'Form an initial explanation', 'Design and measure experiments',
-             'Revise and independently review', 'Render the report']
-    rows = [{'step': i + 1, 'name': name, 'resource': ['CPU', 'LLM', 'LLM + target model', 'LLM', 'CPU'][i],
+    steps = [('Prepare saved evidence', 'CPU'), ('Form an initial explanation', 'LLM'),
+             ('Design and measure experiments', 'LLM + target model'),
+             ('Revise and independently review', 'LLM'), ('Render the report', 'CPU')]
+    sources = [(root, None)]
+    followup = root / 'followup'
+    if (followup / 'status.json').is_file() or (followup / 'api').is_dir():
+        steps.append(('Follow-up investigation', 'LLM + target model'))
+        sources.append((followup, 6))
+        if (followup / 'timeline.json').is_file():
+            # Child stages retain their checkpoint format; all contribute to the
+            # workflow's follow-up stage only when assembling the cost report.
+            timeline += [{**row, 'stage': 6} for row in read(followup / 'timeline.json')]
+    rows = [{'step': i, 'name': name, 'resource': resource,
              'detail': '', 'api_usd': 0., 'api_requests': 0, 'gpu_seconds': 0., 'gpu_card_hours': 0.,
-             'api_stream_seconds': 0., 'api_stream_time_estimated': False} for i, name in enumerate(names)]
+             'api_stream_seconds': 0., 'api_stream_time_estimated': False}
+            for i, (name, resource) in enumerate(steps, 1)]
     streams, api_intervals = [], []
     stage_streams = collections.defaultdict(list)
-    for path in (root / 'api').glob('**/timing.json'):
-        timing = read(path)
-        row = rows[timing['stage'] - 1]
-        row['api_requests'] += 1
-        row['api_usd'] += read(path.with_name('billing.json'))['estimated_usd']
-        if 'start' in timing:
-            api_intervals.append((timing['start'], timing['end']))
-        if 'first_chunk' in timing:
-            interval = (timing['first_chunk'], timing['last_chunk'])
-            streams.append(interval)
-            stage_streams[timing['stage']].append(interval)
+    for source, stage_override in sources:
+        for path in (source / 'api').glob('**/timing.json'):
+            timing = read(path)
+            stage = timing['stage'] if stage_override is None else stage_override
+            row = rows[stage - 1]
+            row['api_requests'] += 1
+            row['api_usd'] += read(path.with_name('billing.json'))['estimated_usd']
+            if 'start' in timing:
+                api_intervals.append((timing['start'], timing['end']))
+            if 'first_chunk' in timing:
+                interval = (timing['first_chunk'], timing['last_chunk'])
+                streams.append(interval)
+                stage_streams[stage].append(interval)
     gpu = [(r['start'], r['end']) for r in timeline if r['resource'] == 'gpu']
-    for i, row in enumerate(rows):
-        intervals = [(r['start'], r['end']) for r in timeline if r['resource'] == 'gpu' and r['stage'] == i + 1]
+    for row in rows:
+        stage = row['step']
+        intervals = [(r['start'], r['end']) for r in timeline if r['resource'] == 'gpu' and r['stage'] == stage]
         row['gpu_seconds'] = union_seconds(intervals)
         row['gpu_card_hours'] = row['gpu_seconds'] * cards / 3600
-        row['api_stream_seconds'] = union_seconds(stage_streams[i + 1])
+        row['api_stream_seconds'] = union_seconds(stage_streams[stage])
     execution = [(r['start'], r['end']) for r in timeline if r['resource'] == 'execution']
     execution_seconds = union_seconds(execution)
-    return {'title': 'Interpretation Costs', 'unit': neuron, 'completed_steps': 5, 'steps': rows,
+    gpu_seconds = union_seconds(gpu)
+    return {'title': 'Interpretation Costs', 'unit': neuron, 'completed_steps': len(rows), 'steps': rows,
             'total_api_usd': sum(r['api_usd'] for r in rows), 'total_api_requests': sum(r['api_requests'] for r in rows),
-            'total_gpu_seconds': union_seconds(gpu), 'total_gpu_card_hours': union_seconds(gpu) * cards / 3600,
+            'total_gpu_seconds': gpu_seconds, 'total_gpu_card_hours': gpu_seconds * cards / 3600,
             'total_api_stream_seconds': union_seconds(streams), 'total_api_request_seconds': union_seconds(api_intervals),
             'total_elapsed_seconds': execution_seconds, 'total_execution_seconds': execution_seconds,
             'api_stream_time_estimated': False,
@@ -178,15 +193,47 @@ def assemble(root, initial_report, neuron, artifacts, cards):
     return output
 
 
-def update_routes(root, result, config):
+def finalize_report(root, result, config, *, followup):
+    """Synthesize the completed evidence before saving the final report."""
+    from report import strip_report_synthesis
+    from .client import Client
+    from .neuron_labels import report_overlay
+    from .report_synthesis import synthesize
+
+    followup_root = root / 'followup'
+    foundation = followup_root / 'foundation.html'
+    current = strip_report_synthesis((root / 'report/index.html').read_text(encoding='utf-8'))
+    if followup:
+        page = (followup_root / 'report/index.html').read_text(encoding='utf-8')
+    else:
+        page = foundation.read_text(encoding='utf-8') if foundation.is_file() else current
+    page, bundle = report_overlay(page, root)
+    bundle['tests'] = {**(bundle.get('tests') or {}), 'route_prediction': result}
+    cache = followup_root if followup else root
+    client = Client(config['llm'], cache / 'api', config['api_slots'])
+    stage = 6 if followup else 4
+    timeline = Timeline(root)
+    timeline.status('report-synthesis')
+    with timeline.span('report-synthesis', 'execution', stage):
+        synthesis = synthesize(client, bundle, stage)
+    return update_routes(root, result, config, page=page, synthesis=synthesis)
+
+
+def update_routes(root, result, config, *, page=None, synthesis=None):
     """Add saved path predictions without rebuilding an investigated report."""
-    from report import update_route_prediction
+    from report import strip_report_synthesis, update_report_synthesis, update_route_prediction, with_neuron_labels
     from .neuron_labels import report_overlay
 
     output = root / 'report'
-    page, bundle = update_route_prediction((output / 'index.html').read_text(encoding='utf-8'), result,
+    if page is None:
+        page = strip_report_synthesis((output / 'index.html').read_text(encoding='utf-8'))
+        page, _ = report_overlay(page, root)
+    page, bundle = update_route_prediction(page, result,
         interpretation_costs=costs(root, config['neuron'], len(config['gpus'])))
-    page, bundle = report_overlay(page, root)
+    if synthesis is not None:
+        page, bundle = update_report_synthesis(page, synthesis)
+    else:
+        bundle = with_neuron_labels(page, bundle)
     write(output / 'paper-data.json', {'bundle': bundle})
     write(output / 'interpretation-costs.json', bundle['interpretation_costs'])
     temporary = output / 'index.html.tmp'

@@ -1,5 +1,7 @@
 """The model supplies text and references; measured values stay in Python."""
 
+from . import prompts
+
 
 def obj(**fields):
     return {'type': 'object', 'properties': fields, 'required': list(fields), 'additionalProperties': False}
@@ -38,7 +40,7 @@ def interpretation_schema(max_rules_per_pole=3):
 
 INTERPRETATION = interpretation_schema()
 SHORT_LABEL = {'type': 'string', 'minLength': 1, 'maxLength': 48,
-               'description': 'A condition name: preferably one word, at most four words. The full input belongs in text.'}
+               'description': prompts.CONDITION_LABEL_DESCRIPTION}
 CANDIDATE = obj(label=SHORT_LABEL, text=S)
 REGION = obj(id=S, name=S, pole=POLE, rationale=S, candidates=arr(CANDIDATE, 1))
 SEARCH = obj(regions=arr(REGION, 2, 8))

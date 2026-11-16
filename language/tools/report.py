@@ -16,28 +16,36 @@ NEURON_LABEL_SCRIPTS = re.compile(
     r'<style id="neuron-label-style">.*?</style>'
     r'<script id="neuron-label-render">.*?</script>', re.S)
 NEURON_LABEL_HOOK = re.compile(r'/\* neuron-labels:start \*/.*?/\* neuron-labels:end \*/', re.S)
+REPORT_SYNTHESIS = re.compile(
+    r'<script id="report-synthesis" type="application/json">(?P<data>.*?)</script>'
+    r'<script id="report-synthesis-render">.*?</script>', re.S)
+REPORT_TEMPLATE = Path(__file__).resolve().parents[1] / 'analysis/report.html'
+
+
+def _refresh_renderer(source, pattern, description):
+    block = pattern.search(REPORT_TEMPLATE.read_text(encoding='utf-8'))
+    if block is None or pattern.search(source) is None:
+        raise ValueError(f'Expected {description} renderer in both the saved report and template')
+    return pattern.sub(lambda _: block[0], source, count=1)
 
 
 def refresh_effect(source):
-    template = Path(__file__).resolve().parents[1] / 'analysis/report.html'
-    effect = EFFECT.search(template.read_text(encoding='utf-8'))
-    if effect is None or EFFECT.search(source) is None:
-        raise ValueError('Expected an Effect renderer in both the saved report and template')
-    return EFFECT.sub(lambda _: effect[0], source, count=1)
+    return _refresh_renderer(source, EFFECT, 'an Effect')
 
 
 def refresh_tests(source):
     """Refresh only the Tests renderer in a saved report."""
-    template = Path(__file__).resolve().parents[1] / 'analysis/report.html'
-    tests = TESTS.search(template.read_text(encoding='utf-8'))
-    if tests is None or TESTS.search(source) is None:
-        raise ValueError('Expected a Tests renderer in both the saved report and template')
-    return TESTS.sub(lambda _: tests[0], source, count=1)
+    return _refresh_renderer(source, TESTS, 'a Tests')
 
 
 def encode_bundle(bundle):
     return json.dumps(bundle, ensure_ascii=False, allow_nan=False, separators=(',', ':')).replace(
         '<', '\\u003c').replace('\u2028', '\\u2028').replace('\u2029', '\\u2029')
+
+
+def _replace_bundle(source, bundle):
+    match = BUNDLE.search(source)
+    return source[:match.start(2)] + encode_bundle(bundle) + source[match.end(2):]
 
 
 def neuron_labels_overlay(result, evidence):
@@ -109,8 +117,7 @@ svg .neuron-label-control:focus-visible{outline:2px solid currentColor;outline-o
 
 def refresh_anatomy_pair(source):
     """Insert the pair renderer without replacing saved Anatomy plots or layout adapters."""
-    template = Path(__file__).resolve().parents[1] / 'analysis/report.html'
-    canonical = template.read_text(encoding='utf-8')
+    canonical = REPORT_TEMPLATE.read_text(encoding='utf-8')
     block = ANATOMY_PAIR.search(canonical)
     intro = ANATOMY_INTRO.search(canonical)
     if block is None or intro is None:
@@ -130,19 +137,35 @@ def refresh_anatomy_pair(source):
                           '  if (!hasAnatomyPair && has(A.headline)) figs.push(', 1)
 
 
-def _replay_data(source, bundle):
-    """Include the independent label overlay in the replay's JSON export."""
+def with_neuron_labels(source, bundle):
+    """Include the label overlay in the report data."""
     labels = NEURON_LABEL_SCRIPTS.search(source)
     if labels is None:
         return bundle
     return {**bundle, 'neuron_labels': json.loads(labels['data'])}
 
 
+def strip_report_synthesis(source):
+    """Recover the report that was used to generate its synthesis."""
+    return REPORT_SYNTHESIS.sub('', source, count=1)
+
+
+def update_report_synthesis(source, synthesis):
+    """Display the measured synthesis as a reversible report overlay."""
+    renderer = Path(__file__).with_name('report_synthesis.js').read_text(encoding='utf-8')
+    scripts = (f'<script id="report-synthesis" type="application/json">{encode_bundle(synthesis)}</script>'
+               f'<script id="report-synthesis-render">{renderer}</script>')
+    head, closing, tail = strip_report_synthesis(source).partition('</body>')
+    page = head + scripts + closing + tail
+    return page, with_neuron_labels(page, source_bundle(page)[0])
+
+
 def replace_anatomy_pair(source, pair):
+    source = strip_report_synthesis(source)
     bundle, _ = source_bundle(source)
     bundle['anatomy'] = {**(bundle.get('anatomy') or {}), 'pair': pair}
-    source = BUNDLE.sub(lambda match: match[1] + encode_bundle(bundle) + match[3], source, count=1)
-    return refresh_anatomy_pair(source), _replay_data(source, bundle)
+    source = _replace_bundle(source, bundle)
+    return refresh_anatomy_pair(source), with_neuron_labels(source, bundle)
 
 
 def show_criticism_nav(source):
@@ -151,12 +174,13 @@ def show_criticism_nav(source):
 
 
 def replace_ablation(source, section):
+    source = strip_report_synthesis(source)
     bundle, _ = source_bundle(source)
     bundle['ablation'] = section
     # The original analysis predates the new measurements.
     (bundle.get('section_prose') or {}).pop('ablation', None)
-    source = BUNDLE.sub(lambda match: match[1] + encode_bundle(bundle) + match[3], source, count=1)
-    return show_criticism_nav(refresh_effect(source)), _replay_data(source, bundle)
+    source = _replace_bundle(source, bundle)
+    return show_criticism_nav(refresh_effect(source)), with_neuron_labels(source, bundle)
 
 
 def apply_route_descriptions(bundle, result):
@@ -197,9 +221,7 @@ def update_route_prediction(source_html, result, *, interpretation_costs=None):
     apply_route_descriptions(bundle, result)
     if interpretation_costs is not None:
         bundle['interpretation_costs'] = copy.deepcopy(interpretation_costs)
-    source_html = BUNDLE.sub(
-        lambda match: match[1] + encode_bundle(bundle) + match[3], source_html, count=1)
-    return refresh_tests(source_html), bundle
+    return refresh_tests(_replace_bundle(source_html, bundle)), bundle
 
 
 def source_bundle(source):
@@ -232,6 +254,16 @@ def source_bundle(source):
             bundle['headline']['strip']['caption'] = 'Natural-corpus context at the strongest saved document peak.'
     elif not re.search(r'const B = JSON.parse\(document.getElementById\(["\x27]bundle["\x27]\).textContent\);',bootstrap):
         raise ValueError('Unsupported report bootstrap')
+    synthesis = REPORT_SYNTHESIS.search(source)
+    if synthesis is not None:
+        data = json.loads(synthesis['data'])
+        bundle['claim'] = data['claim']
+        summaries = bundle.get('section_prose') or {}
+        bundle['section_prose'] = {**summaries, **{
+            key: {**(summaries[key] if isinstance(summaries.get(key), dict) else {}), **value}
+            for key, value in data['section_prose'].items()
+        }}
+        bundle['synthesis_evidence'] = data['evidence']
     return bundle, (start,stop)
 
 def strip_capture_table(source):
@@ -327,9 +359,7 @@ def merge(source, patches):
     start = source.find('const B =')
     stop = source.find('const POS =',start)
     source = source[:start]+"const B = JSON.parse(document.getElementById('bundle').textContent);\n\n"+source[stop:]
-    match = BUNDLE.search(source)
-    encoded = encode_bundle(bundle)
-    source = source[:match.start(2)]+encoded+source[match.end(2):]
+    source = _replace_bundle(source, bundle)
     if 'claim' in patches:
         source = re.sub(r'<title>.*?</title>','<title>'+html.escape(patches['claim']['title'])+'</title>',source,count=1,flags=re.S)
     # Remove embedded interpretation scripts after merging the final bundle.

@@ -6,6 +6,19 @@ from ..tools.report import BUNDLE, encode_bundle
 from .state import write
 
 
+def legacy_scoring_view(page):
+    """Reproduce the earlier display of contrast cases for checkpoint comparison."""
+    match = BUNDLE.search(page)
+    bundle = json.loads(match[2])
+    for row in bundle.get('criticism', []):
+        if row.get('investigation_id'):
+            row['evidence'] = [
+                {'text': sample['text'], 'activation': sample['activation']} if 'score' in sample else sample
+                for sample in row.get('evidence', [])
+            ]
+    return page[:match.start(2)] + encode_bundle(bundle) + page[match.end(2):]
+
+
 def criticism_row(investigation, round_number):
     question = investigation['question']
     row = {'round': round_number, 'investigation_id': investigation['id'],
@@ -24,7 +37,8 @@ def criticism_row(investigation, round_number):
     for identity in assessment['evidence_ids']:
         entry = evidence[identity]
         if 'trace' in entry:
-            entry = {'text': entry['text'], 'activation': entry['selected']['product']}
+            entry = {**{key: entry[key] for key in ('id', 'text', 'selected', 'score')},
+                     'activation': entry['selected']['product']}
         if 'text' in entry and 'activation' in entry:
             row['evidence'].append(entry)
     return {**row, 'verdict': assessment['verdict'], 'suggested_revision': revision,

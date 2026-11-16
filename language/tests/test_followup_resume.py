@@ -7,8 +7,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from language.tests.followup_fixtures import FakeClient, FakeExecutor, base_packet, plan, question
-from language.tools.report import BUNDLE
-from language.workflow.followups import SOURCE_FILES, run
+from language.tools.report import BUNDLE, encode_bundle
+from language.workflow.followups import SOURCE_FILES, route_overlay, run
 from language.workflow.state import read, write
 
 
@@ -31,7 +31,9 @@ class FollowupResumeTests(unittest.TestCase):
                 for name, value in values.items():
                     write(source / name, value)
                 write(source / 'report/paper-data.json', {'bundle': bundle})
-                (source / 'report/index.html').write_text('<script id="bundle">' + json.dumps(bundle) + '</script>')
+                (source / 'report/index.html').write_text(
+                    '<script id="bundle">' + json.dumps(bundle) + '</script><script>\n'
+                    '// 7. Tests.\n// 8. Criticism.</script>')
                 before = {name: (source / name).read_bytes() for name in (*SOURCE_FILES, 'status.json', 'report/paper-data.json')}
                 # A previous publication may hardlink both files. It must remain a baseline snapshot.
                 for name in ('index.html', 'paper-data.json'):
@@ -105,6 +107,30 @@ class FollowupResumeTests(unittest.TestCase):
                 with patch('language.workflow.followups.input_identity', return_value={'synthetic': 2}):
                     with self.assertRaises(ValueError):
                         run(source, root, **kwargs)
+                if in_place:
+                    write(source / 'route-prediction/result.json', {'rows': []})
+                    html = output / 'index.html'
+                    rendered = root / 'report/index.html'
+                    old_page = rendered.read_text(encoding='utf-8')
+                    html.write_text(route_overlay(old_page, source, costs={'total_execution_seconds': 1}),
+                                    encoding='utf-8')
+                    next_costs = {'total_execution_seconds': 2}
+                    write(output / 'interpretation-costs.json', next_costs)
+                    with patch('language.workflow.followups.input_identity', return_value={'synthetic': 1}):
+                        run(source, root, **kwargs)
+                        self.assertEqual(json.loads(BUNDLE.search(html.read_text(encoding='utf-8'))[2])
+                                         ['interpretation_costs'], next_costs)
+                        saved_bundle = json.loads(BUNDLE.search(old_page)[2])
+                        saved_bundle['criticism'][-1]['evidence'] = [{'text': 'a', 'activation': 2.0}]
+                        legacy_page = BUNDLE.sub(
+                            lambda match: match[1] + encode_bundle(saved_bundle) + match[3], old_page, count=1)
+                        html.write_text(route_overlay(legacy_page, source, costs=next_costs), encoding='utf-8')
+                        rendered.unlink()
+                        (root / 'report/paper-data.json').unlink()
+                        run(source, root, **kwargs)
+                    self.assertEqual(rendered.read_text(encoding='utf-8'), old_page)
+                    self.assertEqual(len(client.calls), calls_after)
+                    self.assertEqual(len(executor.calls), calls_before)
                 changed = read(source / 'evidence.json')
                 changed['documents'].append({'id': '1'})
                 write(source / 'evidence.json', changed)

@@ -14,7 +14,7 @@ The generation prompt includes the JSON schema before every call. The shared cli
 
 Round two receives the **entire original Criticism**, frozen explanation, **every round-one question, specification, case outcome, assessment and failure**, and the accumulated proposed revisions. Each case retains its selected response, scored-region summary, scoring positions (lossless ranges), and a labeled input excerpt. Complete token traces and inputs remain in the archive and are available through review by case ID. Baseline graphs are referenced rather than repeatedly embedded in the history. The immediate assessment sees complete case text. No case outcome is replaced by just a final verdict or a shortlist of unresolved items.
 
-Assessments record result, verdict, suggested revision and evidence IDs. Revisions remain a working ledger; they never overwrite the initial explanation or its blind labels. These adaptive investigations are development evidence, not held-out validation. The two reserved neurons remain separate and are not discovered or run by this command.
+Assessments record result, verdict, suggested revision and evidence IDs. Revisions remain a working ledger; they never overwrite the initial explanation or its blind labels. These adaptive investigations are development evidence, not held-out validation. Only the configured neuron is investigated.
 
 ## Run when authorized
 
@@ -24,7 +24,7 @@ Use the existing Linux environment and credentials supplied through `NEURON_PAPE
 python -u -m language --config workflow.local.json --output runs/example
 ```
 
-The command completes or resumes the foundation in `runs/example`, then saves follow-up records and status in `runs/example/followup/`. It retains a snapshot of the original report and updates `runs/example/report/index.html` and `paper-data.json` with the appended Criticism. Defaults are seed 42, 1,024 tokens per contrast input and up to 12 natural examples per query group. The frozen explanation, predictions, original Criticism and foundation completion status remain unchanged. The main report is updated only after the follow-up report has been rendered; a completed investigation with failed items includes those failures in the report and exits nonzero.
+The workflow completes or resumes its foundation in `runs/example`, then runs follow-ups under the same execution lock. This is also the default for Python calls to `language.workflow.run.run`. Follow-up records remain in `runs/example/followup/` so existing checkpoints remain reusable. The root `status.json` tracks follow-up progress (`phase=followup`, with step, round and investigation) and reaches `complete` only after the final report is ready. It retains a snapshot of the original report and updates `runs/example/report/index.html` and `paper-data.json` with appended Criticism and combined cost totals. Defaults are seed 42, 1,024 tokens per contrast input and up to 12 natural examples per query group. The frozen explanation, predictions and original Criticism remain unchanged. Item failures are retained in the report, set workflow status to `complete_with_failures` and exit nonzero; fatal errors set workflow status to `failed`.
 
 Follow-ups are enabled by default for full `--config` investigations; append `--no-followup` to disable them. Interpretation-only and replay modes skip them automatically. Explicit `--followup` cannot be combined with `--stop-after interpretation`, `--ablate-from` or `--anatomy-from`; `--checkpoint-attribution` can be used alongside it. When `publish` is configured, successful follow-ups export the updated report and replace any existing export. Failed follow-ups are not published.
 
@@ -47,7 +47,7 @@ Existing sibling directories such as `runs/example-followup` are not migrated au
 
 ## Artifacts and software checks
 
-Under `runs/example/followup/` (or the standalone output), `frozen.json` preserves the baseline; `r*-i*/preregistered.json`, `evidence.json` and `record.json` retain specifications, raw measurements and decisions. `round-*.json` and `investigation.json` retain the full outcome ledger. `api/` contains the shared client's requests, responses and usage; credentials are not recorded. `status.json` reports follow-up completion or failure. The final report appends compact Criticism rows, preserving every other baseline report field, including Task2 and Task3.
+Under `runs/example/followup/` (or the standalone output), `frozen.json` preserves the baseline. Each investigation saves its specification, measurements and decision. `round-*.json` and `investigation.json` retain all outcomes, and `status.json` reports follow-up completion or failure. The follow-up report appends compact Criticism rows. For full workflow runs, those rows and the foundation measurements feed the synthesized Claim in the final report.
 
 ```bash
 PYTHONPATH=language/tools python -m unittest language.tests.test_followups language.tests.test_followup_resume -v

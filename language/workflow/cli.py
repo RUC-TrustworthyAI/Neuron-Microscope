@@ -1,10 +1,9 @@
 """Command-line modes, follow-up integration and report publication."""
 import argparse
-import os
 import sys
 from pathlib import Path
 
-from .state import Timeline, lock, now, read, write
+from .state import lock, read
 
 
 def main():
@@ -44,29 +43,15 @@ def main():
         return
     config = read(args.config)
     source = args.output.resolve()
-    if args.followup:
-        followup_root = source / 'followup'
     if config.get('publish'):
         destination = (Path(config['publish']) / config['neuron']).resolve()
         if destination == source or destination in source.parents or source in destination.parents:
             parser.error('Publication must be outside the investigation directory and its ancestors')
-    os.environ['CUDA_VISIBLE_DEVICES'] = '' if args.stop_after == 'interpretation' else ','.join(map(str, config['gpus']))
-    os.environ['NEURON_MICROSCOPE_SETTINGS'] = str(args.output / 'backend-settings.json')
-    write(Path(os.environ['NEURON_MICROSCOPE_SETTINGS']), config['settings'])
-    try:
-        output = run(config, args.output, stop_after=args.stop_after,
-                     checkpoint_attribution=args.checkpoint_attribution)
-    except Exception as error:
-        import traceback
-        write(args.output / 'failure.json', {'at': now(), 'error': str(error), 'traceback': traceback.format_exc()})
-        Timeline(args.output).status('failed', error=str(error))
-        raise
-    if args.followup:
-        from .followups import run as run_followups
-        output = run_followups(source, followup_root, in_place=True)
-        print(output / 'index.html')
-        if read(followup_root / 'status.json')['phase'] != 'complete':
-            return 1
+    output = run(config, args.output, stop_after=args.stop_after,
+                 checkpoint_attribution=args.checkpoint_attribution, followup=args.followup)
+    print(output / 'index.html')
+    if read(args.output / 'status.json')['phase'] == 'complete_with_failures':
+        return 1
     if config.get('publish'):
         from comparison import publish
         destination = Path(config['publish']) / config['neuron']

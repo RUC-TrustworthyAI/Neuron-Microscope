@@ -11,6 +11,7 @@ import time
 import urllib.error
 import urllib.request
 from pathlib import Path
+from . import prompts
 from .state import read, write
 from .contracts import validate
 
@@ -53,7 +54,7 @@ def validation_feedback(output, schema, error):
         return str(error)
     if str(error) not in invalid:
         invalid.insert(0, str(error))
-    return '; '.join(invalid) + '. Use exact enum values from the schema; do not abbreviate or invent IDs.'
+    return '; '.join(invalid) + prompts.ENUM_CORRECTION
 
 
 class Client:
@@ -85,21 +86,32 @@ class Client:
 
     def request(self, name, prompt, packet, schema, stage, check=None):
         folder = self.root / name
-        messages = [{'role': 'system', 'content': prompt + '\nJSON schema:\n' + json.dumps(schema)},
+        messages = [{'role': 'system', 'content': prompt + prompts.SCHEMA_HEADER + json.dumps(schema)},
                     {'role': 'user', 'content': json.dumps(packet, ensure_ascii=False)}]
         fingerprint = hashlib.sha256(json.dumps(messages, sort_keys=True).encode()).hexdigest()
+
+        def checked(output):
+            validate(output, schema)
+            if check:
+                check(output)
+            return output
+
+        def add_correction(answer, feedback):
+            messages.extend([
+                {'role': 'assistant', 'content': answer},
+                {'role': 'user', 'content': prompts.JSON_CORRECTION + feedback},
+            ])
+
         if (folder / 'result.json').exists():
             saved = read(folder / 'result.json')
             if saved['input_id'] != fingerprint:
                 raise ValueError(f'Inputs changed for completed step {name}; choose a new output directory')
             try:
-                validate(saved['output'], schema)
-                if check:
-                    check(saved['output'])
+                output = checked(saved['output'])
             except (ValueError, KeyError, TypeError):
                 pass
             else:
-                return saved['output']
+                return output
         folder.mkdir(parents=True, exist_ok=True)
         last_invalid = None
         for attempt in sorted(folder.glob('attempt-*'), reverse=True):
@@ -110,10 +122,7 @@ class Client:
                 continue
             try:
                 answer = (attempt / 'output.txt').read_text().strip()
-                output = parse_output(answer, schema)
-                validate(output, schema)
-                if check:
-                    check(output)
+                output = checked(parse_output(answer, schema))
             except (ValueError, KeyError, TypeError) as error:
                 if last_invalid is None:
                     try:
@@ -128,8 +137,7 @@ class Client:
         # Transport failures are separate from scientific feedback or iteration.
         if last_invalid is not None:
             answer, error = last_invalid
-            messages += [{'role': 'assistant', 'content': answer},
-                         {'role': 'user', 'content': 'Correct the JSON contract error while preserving the scientific content: ' + error}]
+            add_correction(answer, error)
         attempts = 1 if last_invalid is not None else 2
         for correction in range(attempts):
             max_tokens = None
@@ -146,10 +154,7 @@ class Client:
                         raise
                     max_tokens = min(self.config['max_output_tokens'], available)
             try:
-                output = parse_output(answer, schema)
-                validate(output, schema)
-                if check:
-                    check(output)
+                output = checked(parse_output(answer, schema))
                 write(folder / 'result.json', {'input_id': fingerprint, 'output': output})
                 return output
             except (ValueError, KeyError, TypeError) as error:
@@ -160,8 +165,7 @@ class Client:
                 write(destination / 'format-error.json', {'error': feedback})
                 if correction == attempts - 1:
                     raise
-                messages += [{'role': 'assistant', 'content': answer},
-                             {'role': 'user', 'content': 'Correct the JSON contract error while preserving the scientific content: ' + feedback}]
+                add_correction(answer, feedback)
 
     def _stream(self, messages, folder, stage, max_tokens=None):
         folder.mkdir(parents=True)

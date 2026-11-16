@@ -1,10 +1,82 @@
 """Optional renderer integration test using an activation-only report fixture."""
 import json
 import os
+import shutil
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
 from language.workflow.state import write
+
+
+class ReportSynthesisTest(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('node'), 'Node is needed to check report links')
+    def test_evidence_links_open_on_load_and_hash_changes(self):
+        from language.tests.test_ablation_report import DOM
+
+        renderer = Path(__file__).resolve().parents[1] / 'tools/report_synthesis.js'
+        fixture = r"""
+const assert = require('node:assert/strict');
+const B = {};
+const callbacks = {};
+const window = {addEventListener: (type, handler) => { callbacks[type] = handler; }};
+const location = {hash: '#evidence-criticism%3Aexample'};
+const $ = (tag, attrs, ...children) => {
+  const node = new Element(tag);
+  node.attrs = {...attrs};
+  node.addEventListener = () => {};
+  for (const child of children.flat(Infinity)) node.append(child instanceof Element ? child : new Element('#text', child));
+  return node;
+};
+const before = new Element('div');
+const claimFigures = $('div', null, before);
+claimFigures.querySelector = () => before;
+before.replaceWith = node => claimFigures.append(node);
+const headline = new Element('h1');
+const lede = new Element('p');
+const sample = new Element('div');
+sample.querySelector = () => sample.children.find(node => node.attrs.class === 'cap scored-evidence');
+const folded = {tagName: 'DETAILS'};
+sample.parentElement = folded;
+let focused;
+sample.focus = () => { focused = sample; };
+sample.scrollIntoView = () => {};
+Element.prototype.remove = function () {};
+const data = {
+  claim: {title: 'Measured', lede: 'Summary', findings: {pattern: {text: 'Found', evidence_ids: ['criticism:example']}}},
+  section_prose: {},
+  evidence: {
+    'criticism:example': {section: 'criticism', label: 'Case', locator: {row: 0, sample: 0},
+      details: {position: 4, token: ' et', location: 'replacement_span', reduction: 'absmax'}},
+  },
+};
+Object.assign(document, {
+  getElementById(id) { return {
+    'report-synthesis': {textContent: JSON.stringify(data)},
+    'criticism': {querySelectorAll: () => [{querySelector: () => ({children: [sample]})}]},
+  }[id]; },
+  querySelector: selector => ({'#head h1': headline, '#head .lede': lede, '#claim .figs': claimFigures})[selector],
+  querySelectorAll: () => [],
+});
+"""
+        checks = r"""
+assert.equal(folded.open, true);
+assert.equal(focused, sample);
+assert.match(text(sample), /Scored token " et" · position 4 \(0-based\) · replacement span/);
+const link = descendants(claimFigures).find(node => node.tag === 'a');
+assert.equal(link.attrs.href, '#evidence-criticism%3Aexample');
+focused = null;
+folded.open = false;
+location.hash = '';
+callbacks.hashchange();
+location.hash = link.attrs.href;
+callbacks.hashchange();
+assert.equal(folded.open, true);
+assert.equal(focused, sample);
+"""
+        script = DOM + fixture + renderer.read_text(encoding='utf-8') + checks
+        result = subprocess.run(['node', '-'], input=script, encoding='utf-8', capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
 
 
 class WalkthroughExportTest(unittest.TestCase):

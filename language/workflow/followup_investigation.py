@@ -1,7 +1,7 @@
 """Plan and execute follow-up rounds while retaining all previous outcomes."""
 import re
 
-from . import followup_protocol as protocol
+from . import followup_protocol as protocol, prompts
 from .state import read, write
 
 
@@ -48,7 +48,7 @@ def investigate(client, executor, question, identity, folder, catalog, context, 
         if action == 'review':
             spec = {'evidence_ids': question['evidence_ids']}
         else:
-            spec = client.request(f'{identity}/specification', protocol.SPEC_PROMPT,
+            spec = client.request(f'{identity}/specification', prompts.FOLLOWUP_SPECIFICATION,
                 {**context, 'question': question, 'max_tokens': options['max_tokens'],
                  'referenced_evidence': [catalog[key] for key in question['evidence_ids']]},
                 protocol.SPECIFICATIONS[action], 1,
@@ -74,7 +74,7 @@ def investigate(client, executor, question, identity, folder, catalog, context, 
             if valid_ids and not output['evidence_ids']:
                 raise ValueError('Cite the evidence used for this assessment')
 
-        record['assessment'] = client.request(f'{identity}/assessment', protocol.ASSESS_PROMPT,
+        record['assessment'] = client.request(f'{identity}/assessment', prompts.FOLLOWUP_ASSESSMENT,
             {**context, 'question': question, 'specification': spec,
              'evidence': evidence if action == 'review' else evidence_packet(evidence, full_context=True)},
             protocol.assessment_schema(sorted(valid_ids)), 2, check=check_assessment)
@@ -98,7 +98,7 @@ def rounds(client, executor, base, root, options, timeline):
                     for key, row in catalog.items()]
         context = {'original_criticism': criticisms, 'frozen_interpretation': base['initial'],
                    'previous_rounds': history, 'working_interpretation': working}
-        plan = client.request(f'round-{number}/plan', protocol.PLAN_PROMPT,
+        plan = client.request(f'round-{number}/plan', prompts.FOLLOWUP_PLAN,
             {**context, 'round': number, 'maximum_investigations': protocol.MAX_INVESTIGATIONS,
              'evidence_catalog': previews}, protocol.plan_schema(criticism_ids, list(catalog)), 1,
             check=lambda output: protocol.check_plan(output, catalog))

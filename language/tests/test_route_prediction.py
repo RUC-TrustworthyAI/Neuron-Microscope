@@ -75,8 +75,8 @@ class RoutePredictionTests(unittest.TestCase):
             cached_read.assert_called_once_with(root / 'route-prediction/result.json')
 
     def test_completed_measurements_resume_without_model_and_preserve_followups(self):
-        from language.workflow.run import run
-        from language.workflow.followups import integrate_report, route_overlay
+        from language.workflow.run import _run_foundation
+        from language.workflow.followups import integrate_report
         from report import BUNDLE, encode_bundle
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -108,9 +108,9 @@ class RoutePredictionTests(unittest.TestCase):
                  patch('language.workflow.render.assemble', side_effect=assemble_saved) as assemble:
                 with patch('language.workflow.run.predict_routes', side_effect=RuntimeError('API interruption')):
                     with self.assertRaisesRegex(RuntimeError, 'API interruption'):
-                        run(config, root)
+                        _run_foundation(config, root)
                 self.assertNotIn('interpretation-view', (root / 'report/index.html').read_text())
-                run(config, root)
+                _run_foundation(config, root)
             assemble.assert_called_once()
             updated = read(root / 'report/paper-data.json')['bundle']
             for key in ('criticism', 'clusters', 'anatomy', 'ablation'):
@@ -119,10 +119,9 @@ class RoutePredictionTests(unittest.TestCase):
             self.assertEqual(updated['tests']['route_prediction']['accuracy'], .5)
             self.assertEqual(updated['routes'][0]['name'], 'Name p1')
             self.assertEqual(read(root / 'artifacts.json'), {'frozen_followup_source': True})
-            self.assertEqual(read(root / 'status.json')['phase'], 'complete')
+            self.assertEqual(read(root / 'status.json')['phase'], 'foundation_complete')
             (root / 'followup/report').mkdir(parents=True)
             (root / 'followup/report/index.html').write_text(source)
-            self.assertEqual(route_overlay(source, root), (root / 'report/index.html').read_text())
             integrate_report(root / 'followup/report', root)
             overlaid = json.loads(BUNDLE.search((root / 'report/index.html').read_text())[2])
             self.assertEqual(overlaid, updated)

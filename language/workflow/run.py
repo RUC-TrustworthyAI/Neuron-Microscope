@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 from . import contracts, prompts
 from .client import Client
-from .state import read, write, lock, Timeline
+from .state import read, write, lock, now, Timeline
 from .evidence import initial_packet, spectrum_packet, prediction_feedback, evidence_catalog
 from .interpretation import explain
 from .measure import Measurements, summarized
@@ -19,7 +19,40 @@ from .route_prediction import run as predict_routes
 from . import neuron_labels
 
 
-def run(config, root, stop_after=None, *, checkpoint_attribution=False):
+def run(config, root, stop_after=None, *, checkpoint_attribution=False, followup=None):
+    """Run all enabled stages under one lock and report their final status."""
+    from .followups import run as investigate
+    from .render import finalize_report
+
+    if followup is None:
+        followup = stop_after is None
+    if followup and stop_after is not None:
+        raise ValueError('Follow-ups require a full investigation')
+    root = Path(root)
+    with lock(root / 'execution.lock', blocking=False):
+        try:
+            output = _run_foundation(config, root, stop_after=stop_after,
+                                     checkpoint_attribution=checkpoint_attribution)
+            if stop_after is not None:
+                return output
+            timeline = Timeline(root)
+            final_status = {'phase': 'complete'}
+            if followup:
+                with timeline.span('followup', 'execution', 6):
+                    investigate(root, root / 'followup', in_place=True, workflow_timeline=timeline)
+                saved = read(root / 'followup/status.json')
+                final_status = {key: saved[key] for key in ('phase', 'failures', 'stop_reason') if key in saved}
+            output = finalize_report(root, read(root / 'route-prediction/result.json'), config, followup=followup)
+            timeline.status(**final_status, html=str(output / 'index.html'))
+            return output
+        except Exception as error:
+            import traceback
+            write(root / 'failure.json', {'at': now(), 'error': str(error), 'traceback': traceback.format_exc()})
+            Timeline(root).status('failed', error=str(error))
+            raise
+
+
+def _run_foundation(config, root, stop_after=None, *, checkpoint_attribution=False):
     from .render import assemble, assemble_interpretation, costs, update_routes
     root, report = Path(root), Path(config['report'])
     root.mkdir(parents=True, exist_ok=True)
@@ -34,24 +67,31 @@ def run(config, root, stop_after=None, *, checkpoint_attribution=False):
     if old_config.exists() and read(old_config) != config:
         raise ValueError('Configuration changed; use a separate run directory')
     write(old_config, config)
+    os.environ['CUDA_VISIBLE_DEVICES'] = '' if stop_after == 'interpretation' else ','.join(map(str, config['gpus']))
+    os.environ['NEURON_MICROSCOPE_SETTINGS'] = str(root / 'backend-settings.json')
+    write(Path(os.environ['NEURON_MICROSCOPE_SETTINGS']), config['settings'])
     if stop_after is None and (root / 'artifacts.json').exists():
         # Resume report additions without repeating the completed investigation.
-        with lock(root / 'execution.lock', blocking=False):
-            artifacts = read(root / 'artifacts.json')
-            with timeline.span('resume-report', 'execution', 0):
-                html = root / 'report/index.html'
-                if not html.exists() or '<script id="interpretation-view">' in html.read_text(encoding='utf-8'):
-                    with timeline.span('render', 'cpu', 5):
-                        assemble(root, report, config['neuron'], artifacts, len(config['gpus']))
-                result = predict_routes(client, root, timeline)
-                neuron_labels.complete(config, root, artifacts.get('atlas_sections', {}), client, timeline)
+        from ..tools.report import REPORT_SYNTHESIS
+        artifacts = read(root / 'artifacts.json')
+        output = root / 'report'
+        html = output / 'index.html'
+        previous = html.read_text(encoding='utf-8') if html.exists() else ''
+        with timeline.span('resume-report', 'execution', 0):
+            if not previous or '<script id="interpretation-view">' in previous:
+                with timeline.span('render', 'cpu', 5):
+                    assemble(root, report, config['neuron'], artifacts, len(config['gpus']))
+            result = predict_routes(client, root, timeline)
+            neuron_labels.complete(config, root, artifacts.get('atlas_sections', {}), client, timeline)
+        if not REPORT_SYNTHESIS.search(previous):
             output = update_routes(root, result, config)
-            timeline.status('complete', html=str(output / 'index.html'))
+        timeline.status('foundation_complete', html=str(output / 'index.html'))
         return output
-    if stop_after == 'interpretation' and (root / 'status.json').exists() and read(root / 'status.json')['phase'] in (
-            'complete', 'interpretation_complete'):
+    if stop_after == 'interpretation' and (root / 'report/index.html').exists() and (
+            (root / 'artifacts.json').exists() or ((root / 'status.json').exists() and
+            read(root / 'status.json')['phase'] in ('complete', 'interpretation_complete', 'complete_with_failures'))):
         return root / 'report'
-    with lock(root / 'execution.lock', blocking=False), timeline.span('workflow', 'execution', 0):
+    with timeline.span('workflow', 'execution', 0):
         timeline.status('prepare')
         with timeline.span('saved-evidence', 'cpu', 1):
             if config.get('saved_sample'):
@@ -81,7 +121,7 @@ def run(config, root, stop_after=None, *, checkpoint_attribution=False):
     from common import Runtime
     from paper_sections import exemplar
     from .ablation_run import prepare as prepare_ablation, measure as measure_ablation
-    with lock(root / 'execution.lock', blocking=False), timeline.span('workflow-experiments', 'execution', 0):
+    with timeline.span('workflow-experiments', 'execution', 0):
         packet = initial_packet(report)
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
             blind_future = pool.submit(client.request, 'blind-writer', prompts.BLIND,
@@ -91,7 +131,7 @@ def run(config, root, stop_after=None, *, checkpoint_attribution=False):
             search_proposal = client.request('search/round-1', prompts.SEARCH,
                 {'initial': initial, 'evidence': packet, 'regions_requested': config['search_regions'],
                  'candidates_per_region': config['candidates_per_region'],
-                 'instruction': 'Prioritize the strongest supported patterns; allocate regions according to evidence.'},
+                 'instruction': prompts.INITIAL_SEARCH_INSTRUCTION},
                 contracts.SEARCH, 3, check=validate_candidates)
             timeline.status('gpu-queue')
             queued = time.time()
@@ -187,7 +227,7 @@ def run(config, root, stop_after=None, *, checkpoint_attribution=False):
         write(root / 'artifacts.json', artifacts)
         neuron_labels.complete(config, root, atlas_sections, client, timeline, label_evidence)
     output = update_routes(root, tests['route_prediction'], config)
-    timeline.status('complete', html=str(output / 'index.html'))
+    timeline.status('foundation_complete', html=str(output / 'index.html'))
     return output
 
 
