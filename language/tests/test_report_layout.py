@@ -35,11 +35,13 @@ class LayoutTests(unittest.TestCase):
 
     def test_combined_peak_census_keeps_both_tails_and_inputs(self):
         import subprocess
-        script=(Path(__file__).resolve().parents[1]/'tools/peak_census_display.js').read_text()
+        template = (Path(__file__).resolve().parents[1] / 'analysis/report.html').read_text(encoding='utf-8')
+        script = template[template.index('function combinedPeakCensus('):template.index('function peakCensusFigure(')]
         script+="\nconst p={n:30,kinds:[{kind:'word',n:30}],tokens:[{token:' a',n:30}]},n={n:30,kinds:[{kind:'word',n:10},{kind:'digit',n:20}],tokens:[{token:' a',n:10},{token:'1',n:20}]}; const before=JSON.stringify([p,n]);const c=combinedPeakCensus(p,n);console.log(JSON.stringify({c,unchanged:before===JSON.stringify([p,n])}));"
         out=json.loads(subprocess.run(['node','-e',script],check=True,capture_output=True,text=True).stdout)
         self.assertTrue(out['unchanged'])
         self.assertEqual(out['c']['n'],60)
+        self.assertEqual(out['c']['caption'], '60 corpus peak positions · 30 positive and 30 negative.')
         self.assertEqual({x['kind']:x['n'] for x in out['c']['kinds']},{'word':40,'digit':20})
         self.assertEqual({x['token']:x['n'] for x in out['c']['tokens']},{' a':40,'1':20})
 

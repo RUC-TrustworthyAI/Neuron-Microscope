@@ -268,9 +268,9 @@ SECTION_MEASUREMENTS = {
     'circuit': ('circuit',),
 }
 FINDING_SECTIONS = {
-    'pattern': ('spectrum', 'search', 'custom', 'tests', 'criticism'),
-    'strength': ('spectrum', 'search', 'custom', 'anatomy', 'tests'),
-    'mechanism': ('spectrum', 'anatomy', 'ablation', 'circuit', 'family'),
+    'main_response': ('spectrum', 'search', 'custom', 'tests', 'criticism'),
+    'negative_pole': ('spectrum', 'search', 'custom', 'tests', 'criticism'),
+    'what_would_change_my_mind': ('spectrum', 'search', 'custom', 'anatomy', 'ablation', 'criticism'),
 }
 
 
@@ -295,7 +295,7 @@ def synthesize(client, bundle, stage):
         return {'summary': prose}
 
     def finding_slot(kind):
-        scope = [section for section in FINDING_SECTIONS.get(kind, sections) if section in section_prose]
+        scope = [section for section in FINDING_SECTIONS[kind] if section in section_prose]
         selected = {key: case for section in scope for key, case in _contrasts(references[section]).items()}
         prose = fill(scope, f'findings/{kind}', prompts.REPORT_FINDING_SLOT, selected,
                      focus=prompts.REPORT_FINDING_SLOTS[kind],
@@ -303,7 +303,7 @@ def synthesize(client, bundle, stage):
         return {'text': prose, 'evidence_ids': list(selected)}
 
     def overview_slot(key, prompt):
-        return client.request_text(f'report-synthesis/overview/{key}', prompt, overview, stage)
+        return client.request_text(f'report-synthesis/claim-overview/{key}', prompt, overview, stage)
 
     with ThreadPoolExecutor(max_workers=5) as pool:
         section_prose = dict(zip(sections, pool.map(section_slot, sections)))

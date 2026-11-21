@@ -318,13 +318,18 @@ REPORT_SECTION_SLOT = '''Write the short interpretive paragraph for the named re
 Describe the measured result and the most important qualification, in at most three sentences.''' + REPORT_SLOT_RULES
 
 REPORT_FINDING_SLOTS = {
-    'pattern': 'State the best-supported response pattern and its conditions. Narrow it using matching contexts and counterexamples.',
-    'strength': 'Compare strong positive, negative and weak responses. Use the sampled gate/up regimes where available.',
-    'mechanism': 'Summarize the measured evidence on mechanism and downstream effect. Native product is SiLU(gate) times up.',
-    'open_questions': 'State the most important unresolved alternative and name an observation that could distinguish it.',
+    'main_response': ('State what the neuron primarily responds to and the conditions for strong activation. '
+                      'Focus on the strongest supported pattern. Use matched controls and counterexamples to bound it. '
+                      'Leave the negative pole and proposed tests to their own paragraphs.'),
+    'negative_pole': ('Describe the inputs that reliably produce strong negative activation. Distinguish them from '
+                      'weak or near-zero responses. If no stable pattern is supported, state the limits of the evidence.'),
+    'what_would_change_my_mind': ('Name one concrete observation that would overturn or narrow the current explanation. '
+                                  'State what to vary, what to hold fixed, and which measured outcome would favor a rival. '
+                                  'Describe this as a future result unless it is already observed.'),
 }
-REPORT_FINDING_SLOT = '''Write one short paragraph for this finding in at most three sentences.
-Use the earlier summaries for orientation. Ground concrete claims in the cases and aggregates supplied for this slot.''' + REPORT_SLOT_RULES
+REPORT_FINDING_SLOT = '''Write one short paragraph for The claim in detail in at most three sentences.
+Answer only the supplied focus. Use the earlier summaries for orientation and ground claims in the supplied evidence.
+Keep exact response values and detailed mechanism comparisons in their own sections. Return no heading or list.''' + REPORT_SLOT_RULES
 REPORT_TITLE_SLOT = ('Write a short report title as a single line based on the supplied findings. '
                      'Return only the title as plain text.')
 REPORT_LEDE_SLOT = ('Summarize the supplied findings in one or two plain English sentences. '

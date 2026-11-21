@@ -62,7 +62,7 @@ function relevantCalls(step){
   const groups=callGroups[step]||[];
   const calls=groups.flatMap(group=>data.calls.filter(call=>callGroup(call.id)===group));
   if(step==='synthesis'){
-    const order={sections:0,findings:1,overview:2};
+    const order={sections:0,findings:1,overview:2,'claim-overview':2};
     const rank=call=>order[synthesisPart(call.id)[0]]??-1;
     return calls.sort((a,b)=>rank(a)-rank(b));
   }
@@ -72,7 +72,9 @@ function relevantCalls(step){
   return calls.sort((a,b)=>order(a).localeCompare(order(b),undefined,{numeric:true}));
 }
 const findingTitles={pattern:t('核心响应','Core response'),strength:t('强弱响应','Strong and weak responses'),
-  mechanism:t('机制和输出效应','Mechanism and output effects'),open_questions:t('尚待回答的问题','Open questions')};
+  mechanism:t('机制和输出效应','Mechanism and output effects'),open_questions:t('尚待回答的问题','Open questions'),
+  main_response:t('主要响应','Main response'),negative_pole:t('负极响应','Negative pole'),
+  what_would_change_my_mind:t('什么证据会改变判断','What would change my mind')};
 const sectionTitles={ablation:t('点消融','Ablations'),anatomy:'Anatomy',circuit:t('归因回路','Circuit'),
   criticism:t('质疑与追加调查','Criticisms and follow-ups'),custom:t('受控实验','Controlled tests'),family:'Family',
   search:'Search',spectrum:t('激活频谱','Activation spectrum'),tests:t('实验检验','Tests')};
@@ -99,7 +101,7 @@ function callName(call){
     const [part,field]=synthesisPart(call.id);
     if(part==='sections')return t('章节摘要','Section summary')+' · '+(sectionTitles[field]||field);
     if(part==='findings')return t('综合结论','Finding')+' · '+(findingTitles[field]||field);
-    if(part==='overview')return field==='title'?t('报告标题','Report title'):t('报告导语','Report lede');
+    if(part==='overview'||part==='claim-overview')return field==='title'?t('报告标题','Report title'):t('报告导语','Report lede');
     return names['report-synthesis'];
   }
   if(group==='followup'){
@@ -215,6 +217,7 @@ function synthesisView(host){
   p(host,claim.lede,'explanation-lede');
   for(const [key,title] of Object.entries(findingTitles)){
     const finding=claim.findings[key];
+    if(!finding)continue;
     host.append(el('h3','section-title',title));
     p(host,finding.text);
     const list=el('ul','review-list');

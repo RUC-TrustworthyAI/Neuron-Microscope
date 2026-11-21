@@ -125,7 +125,10 @@ def refresh_synthesis(page):
     renderer = report_script_block(page, 'report-synthesis-render')
     if renderer is not None:
         source = Path(__file__).resolve().parents[1] / 'tools/report_synthesis.js'
-        page = replace_script_body(page, renderer, source.read_text(encoding='utf-8'))
+        # Older base pages carry the peak helpers in the overlay itself.
+        prefix, separator, _ = renderer[1].partition('\n(() => {')
+        helpers = prefix + '\n' if separator and prefix.startswith('function combinedPeakCensus(') else ''
+        page = replace_script_body(page, renderer, helpers + source.read_text(encoding='utf-8'))
     return page
 
 
@@ -250,13 +253,19 @@ def export(run, output):
     replay = report_replay(final_html, bundle)
     active_api = run / ('followup/api' if followup else 'api')
     claim = replay.get('synthesis', {}).get('claim', {})
-    overview = active_api / 'report-synthesis/overview'
+    findings = claim.get('findings', {})
+    revised_claim = 'main_response' in findings
+    overview = active_api / 'report-synthesis' / ('claim-overview' if revised_claim else 'overview')
     split_synthesis = all(
         key in claim and (overview / key / 'result.json').is_file()
         and read(overview / key / 'result.json')['output'].get('text') == claim[key]
         for key in ('title', 'lede')
     )
     retired = ('report-synthesis',) if split_synthesis else ()
+    if split_synthesis and revised_claim:
+        retired += tuple(f'report-synthesis/findings/{name}'
+                         for name in ('pattern', 'strength', 'mechanism', 'open_questions'))
+        retired += ('report-synthesis/overview/title', 'report-synthesis/overview/lede')
     for name in ('content', 'reports', 'screenshots'):
         shutil.rmtree(output / name, ignore_errors=True)
     if followup:

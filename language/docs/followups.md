@@ -45,12 +45,6 @@ Repeat the identical command after interruption to reuse completed API and measu
 
 Existing sibling directories such as `runs/example-followup` are not migrated automatically. The default layout keeps all new records inside `runs/example`. The [walkthrough exporter](walkthrough.md#export-another-completed-run) reads its updated report directly, so no separate report replacement is needed.
 
-## Artifacts and software checks
+## Artifacts
 
 Under `runs/example/followup/` (or the standalone output), `frozen.json` preserves the baseline. Each investigation saves its specification, measurements and decision. `round-*.json` and `investigation.json` retain all outcomes, and `status.json` reports follow-up completion or failure. The follow-up report appends compact Criticism rows. For full workflow runs, those rows and the foundation measurements feed the synthesized Claim in the final report.
-
-```bash
-PYTHONPATH=language/tools python -m unittest language.tests.test_followups language.tests.test_followup_resume -v
-```
-
-The tests use synthetic archives and fake API/model objects. They verify software behavior and are not scientific experiments or evidence of improved interpretation quality.

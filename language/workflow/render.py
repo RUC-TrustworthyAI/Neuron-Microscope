@@ -108,6 +108,9 @@ def assemble_interpretation(root, initial_report, interpretation, sample, predic
              'routes': [], 'custom': None, 'graphs_curated': None, 'family': None,
              'circuit': None, 'tests': None, 'criticism': [], 'interpretation_costs': None}
     patch.update(plot_fields(sample, predictions, None))
+    data = initial_report / 'report.json'
+    if data.is_file():
+        patch.update(corpus_peak_fields(initial_report, read(data)))
     page, bundle = merge(source, patch)
     scope = '''<script id="interpretation-view">
 (() => {
@@ -128,11 +131,17 @@ def assemble_interpretation(root, initial_report, interpretation, sample, predic
     return output
 
 
+def corpus_peak_fields(report, data):
+    from ..analysis.peak_census import CENSUS_FILES, load_peak_censuses
+
+    return {CENSUS_FILES[pole][1]: census for pole, census in load_peak_censuses(report, data).items()}
+
+
 def assemble(root, initial_report, neuron, artifacts, cards):
     from report import merge, source_bundle
     from paper_sections import exemplar, search_patch
     from report_layout import headline
-    from saved_display import peak_fields, default_anatomy
+    from saved_display import default_anatomy
     from .anatomy_pairs import select_anatomy_pair
     source = (initial_report / 'index.html').read_text()
     bundle, _ = source_bundle(source)
@@ -144,11 +153,7 @@ def assemble(root, initial_report, neuron, artifacts, cards):
     patch.update(artifacts['atlas_sections'])
     patch.update(plot_fields(artifacts['sample'], artifacts['predictions'], bundle.get('anatomy')))
     data = read(initial_report / 'report.json')
-    census = {name: read(initial_report / filename) for name, filename in
-              [('positive', 'peak-census.json'), ('negative', 'peak-census-negative.json'),
-               ('absolute_appendix', 'peak-census-absolute.json')]
-              if (initial_report / filename).is_file()}
-    patch.update(peak_fields({'peak_census_json': census}))
+    patch.update(corpus_peak_fields(initial_report, data))
     anatomy = default_anatomy({**bundle, **patch}, data)
     if anatomy is not None:
         patch['anatomy'] = anatomy
@@ -216,6 +221,16 @@ def finalize_report(root, result, config, *, followup):
     timeline.status('report-synthesis')
     with timeline.span('report-synthesis', 'execution', stage):
         synthesis = synthesize(client, bundle, stage)
+    # A completed run may still render from its frozen, pre-census report.
+    signed_fields = ('peak_census', 'peak_census_negative')
+    census = {key: bundle[key] for key in signed_fields if bundle.get(key)}
+    if synthesis is not None and len(census) < len(signed_fields) and config.get('report'):
+        initial = Path(config['report']) / 'report.json'
+        if initial.is_file():
+            recovered = corpus_peak_fields(initial.parent, read(initial))
+            missing = {key: recovered[key] for key in signed_fields if key not in census and key in recovered}
+            if missing:
+                synthesis['peak_census'] = {**census, **missing}
     return update_routes(root, result, config, page=page, synthesis=synthesis)
 
 

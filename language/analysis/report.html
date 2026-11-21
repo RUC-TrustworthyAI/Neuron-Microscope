@@ -289,15 +289,50 @@ const headlineFigure = () => { const Hd = B.headline; if (!has(Hd)) return null;
   if (N.autointerp_label) meta.append($('span', null, 'Original autointerp label: ', $('b', null, N.autointerp_label))); if (meta.children.length) h.append(meta); })();
 
 // 0. The claim in detail.
-(() => { const parts = []; if (C.one_paragraph) parts.push(P(C.one_paragraph)); if (C.negative_pole) parts.push(P($('b', null, 'Negative pole. '), C.negative_pole)); if (C.what_would_change_my_mind) parts.push(P($('b', null, 'What would change my mind. '), C.what_would_change_my_mind));
-  // Peak census: which token carries the peak in the strongest corpus firings. Compact two-column figure.
-  let census = null; const PC = B.peak_census; if (has(PC) && (has(PC.kinds) || has(PC.tokens))) { const kinds = [...(PC.kinds || [])].sort((x, y) => (y.n || 0) - (x.n || 0)), km = Math.max(...kinds.map(k => k.n || 0), 1);
-    const bars = $('div', { class: 'kbars' }, kinds.slice(0, 7).map(k => $('div', { class: 'kb' }, $('span', { class: 'kl' }, k.kind), $('span', { class: 'kt' }, $('i', { style: `width:${100 * (k.n || 0) / km}%` })), $('span', { class: 'kn' }, k.n))));
-    const toksC = [...(PC.tokens || [])].sort((x, y) => (y.n || 0) - (x.n || 0)).slice(0, 14);
-    const chips = $('div', { class: 'chips', style: 'margin:0' }, toksC.map(t => $('span', { class: 'tokchip' }, JSON.stringify(t.token), ' ', $('b', { style: 'color:var(--ink);font-weight:500' }, t.n))));
-    census = fig($('div', { class: 'census' }, has(kinds) ? $('div', null, $('div', { class: 'sub' }, 'Token kind at the peak'), bars) : null, has(toksC) ? $('div', null, $('div', { class: 'sub' }, 'Most common peak tokens'), chips) : null),
-      `Which token carries the peak in the ${PC.n != null ? PC.n : ''} strongest corpus firings.`); if (PC.note) census.title = PC.note; }
-  if (!parts.length && !census) return; sec('claim', 'The claim in detail', null, parts.length ? $('div', { class: 'detail' }, parts) : null, census); })();
+function combinedPeakCensus(positive, negative) {
+  const sources = [positive, negative].filter(census => census?.n);
+  if (!sources.length) return null;
+  const combine = (field, key) => {
+    const counts = new Map();
+    for (const source of sources) {
+      for (const row of source[field] || []) {
+        counts.set(row[key], (counts.get(row[key]) || 0) + row.n);
+      }
+    }
+    return [...counts].map(([label, n]) => ({[key]: label, n}));
+  };
+  const poles = [positive?.n && `${positive.n} positive`, negative?.n && `${negative.n} negative`].filter(Boolean);
+  const n = sources.reduce((total, census) => total + census.n, 0);
+  return {n, kinds: combine('kinds', 'kind'), tokens: combine('tokens', 'token'),
+    caption: `${n} corpus peak positions · ${poles.join(' and ')}.`};
+}
+
+function peakCensusFigure(census, label) {
+  if (!census || (!has(census.kinds) && !has(census.tokens))) return null;
+  const kinds = [...(census.kinds || [])].sort((a, b) => b.n - a.n);
+  const maximum = Math.max(1, ...kinds.map(kind => kind.n));
+  const bars = $('div', {class: 'kbars'}, kinds.map(kind => $('div', {class: 'kb'},
+    $('span', {class: 'kl'}, kind.kind), $('span', {class: 'kt'},
+      $('i', {style: `width:${100 * kind.n / maximum}%`})), $('span', {class: 'kn'}, kind.n))));
+  const tokens = [...(census.tokens || [])].sort((a, b) => b.n - a.n).slice(0, 14);
+  const chips = $('div', {class: 'chips', style: 'margin:0'}, tokens.map(token => $('span', {class: 'tokchip'},
+    JSON.stringify(token.token), ' ', $('b', {style: 'color:var(--ink);font-weight:500'}, token.n))));
+  const figure = fig($('div', null, label ? $('div', {class: 'sub'}, label) : null, $('div', {class: 'census'},
+    $('div', null, $('div', {class: 'sub'}, 'Token kind at the peak'), bars),
+    $('div', null, $('div', {class: 'sub'}, 'Most common peak tokens'), chips))),
+    census.caption || `${census.n} token positions · ${census.distinct_documents} distinct documents.`);
+  if (census.note) figure.title = census.note;
+  return figure;
+}
+
+(() => {
+  const parts = [];
+  if (C.one_paragraph) parts.push(P(C.one_paragraph));
+  if (C.negative_pole) parts.push(P($('b', null, 'Negative pole. '), C.negative_pole));
+  if (C.what_would_change_my_mind) parts.push(P($('b', null, 'What would change my mind. '), C.what_would_change_my_mind));
+  const census = peakCensusFigure(combinedPeakCensus(B.peak_census, B.peak_census_negative));
+  if (parts.length || census) sec('claim', 'The claim in detail', null, parts.length ? $('div', {class: 'detail'}, parts) : null, census);
+})();
 
 // 0b. Figures for this neuron: Fable-proposed figures rendered by kind (choropleth_us, sweep, ladder, choropleth_world).
 (() => { const CU = B.custom; const figsIn = Array.isArray(CU) ? CU : (CU || {}).figures; if (!has(figsIn)) return; const assets = (CU || {}).assets || {}; const blocks = [];
@@ -853,6 +888,8 @@ let SPEC_COLOUR = {};
 
 // 9. Appendix.
 (() => { const A = B.appendix || {}; const parts = [];
+  const absolute = peakCensusFigure(B.peak_census_absolute, 'Absolute peak census');
+  if (absolute) parts.push($('details', null, $('summary', null, 'Absolute peak census'), absolute));
   if (has(A.notes)) parts.push($('details', null, $('summary', null, 'Notes'), $('ul', null, A.notes.map(n => $('li', null, n)))));
   if (has(V.history)) parts.push($('details', null, $('summary', null, 'Version history'), $('ul', null, V.history.map(h => $('li', null, `v${h.n} · ${(h.ts || '').slice(0, 16).replace('T', ' ')} · ${h.note || ''}`)))));
   if (has(A.provenance)) parts.push($('details', null, $('summary', null, 'Provenance'), $('ul', null, A.provenance.map(n => $('li', null, n)))));

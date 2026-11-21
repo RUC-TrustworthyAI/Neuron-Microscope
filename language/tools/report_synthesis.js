@@ -1,7 +1,10 @@
 (() => {
-  const {claim, section_prose: summaries, evidence} =
+  const {claim, section_prose: summaries, evidence, peak_census: savedCensus} =
     JSON.parse(document.getElementById('report-synthesis').textContent);
-  const headings = {
+  const headings = Object.hasOwn(claim.findings, 'main_response') ? {
+    main_response: '', negative_pole: 'Negative pole',
+    what_would_change_my_mind: 'What would change my mind',
+  } : {
     pattern: 'Core response', strength: 'Strong and weak responses',
     mechanism: 'Mechanism and output effects', open_questions: 'Open questions',
   };
@@ -102,18 +105,20 @@
   }
 
   function citations(ids) {
-    return ids.map(id => {
+    if (!ids.length) return null;
+    const links = ids.flatMap((id, index) => {
       const entry = evidence[id];
       const href = evidencePrefix + encodeURIComponent(id);
-      const link = $('a', {href}, entry.label);
+      const link = $('a', {href, title: entry.label, 'aria-label': entry.label}, String(index + 1));
       link.addEventListener('click', event => {
         if (location.hash === href && !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey) {
           event.preventDefault();
           openEvidence(entry);
         }
       });
-      return [' ', link];
+      return index ? [', ', link] : [link];
     });
+    return [' ', $('sup', null, '[', links, ']')];
   }
 
   const headline = document.querySelector('#head h1');
@@ -126,7 +131,7 @@
 
   const findingBlocks = Object.entries(headings).flatMap(([key, title]) => {
     const finding = claim.findings[key];
-    return finding ? [P($('b', null, title + '. '), finding.text, citations(finding.evidence_ids))] : [];
+    return finding ? [P(title ? $('b', null, title + '. ') : null, finding.text, citations(finding.evidence_ids))] : [];
   });
   const findings = $('div', {class: 'detail'}, findingBlocks);
   const claimFigures = document.querySelector('#claim .figs');
@@ -136,6 +141,13 @@
   else {
     sec('claim', 'The claim in detail', null, findings);
     document.getElementById('main').prepend(document.getElementById('claim'));
+  }
+  if (savedCensus) {
+    const figures = document.querySelector('#claim .figs');
+    const previousCensus = figures.querySelector('figure:has(.census)');
+    const census = peakCensusFigure(combinedPeakCensus(savedCensus.peak_census, savedCensus.peak_census_negative));
+    if (census && previousCensus) previousCensus.replaceWith(census);
+    else if (census) figures.append(census);
   }
 
   for (const [id, prose] of Object.entries(summaries)) {

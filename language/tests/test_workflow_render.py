@@ -42,9 +42,10 @@ const P = (...children) => $('p', null, ...children);
 const descendants = node => [node, ...node.children.flatMap(descendants)];
 const text = node => descendants(node).map(item => item.text).join('');
 const before = new Element('div');
-const claimFigures = $('div', null, before);
+const census = $('figure', {class: 'census'}, 'Peak census');
+const claimFigures = $('div', null, before, census);
 claimFigures.querySelector = () => before;
-before.replaceWith = node => claimFigures.append(node);
+before.replaceWith = node => claimFigures.children.splice(0, 1, node);
 const headline = new Element('h1');
 const lede = new Element('p');
 const sample = new Element('div');
@@ -60,7 +61,11 @@ const criticism = {
   querySelectorAll: () => [{querySelector: () => ({children: [sample]})}],
 };
 const data = {
-  claim: {title: 'Measured', lede: 'Summary', findings: {pattern: {text: 'Found', evidence_ids: ['criticism:example']}}},
+  claim: {title: 'Measured', lede: 'Summary', findings: {
+    main_response: {text: 'Found', evidence_ids: ['criticism:example']},
+    negative_pole: {text: 'Negative case', evidence_ids: []},
+    what_would_change_my_mind: {text: 'Repeat the matched comparison', evidence_ids: []},
+  }},
   section_prose: {criticism: {summary: 'Saved criticism summary', evidence_ids: ['criticism:section-only']}},
   evidence: {
     'criticism:example': {section: 'criticism', label: 'Case', locator: {row: 0, sample: 0},
@@ -83,8 +88,13 @@ assert.equal(focused, sample);
 assert.match(text(sample), /Scored token " et" · position 4 \(0-based\) · replacement span/);
 assert.equal(text(why), 'Saved criticism summary');
 assert.equal(descendants(why).some(node => node.tag === 'a'), false);
+assert.deepEqual(claimFigures.children[0].children.map(text), [
+  'Found [1]', 'Negative pole. Negative case', 'What would change my mind. Repeat the matched comparison',
+]);
+assert.equal(claimFigures.children[1], census);
 const link = descendants(claimFigures).find(node => node.tag === 'a');
 assert.equal(link.attrs.href, '#evidence-criticism%3Aexample');
+assert.equal(link.attrs.title, 'Case');
 focused = null;
 folded.open = false;
 location.hash = '';
@@ -100,6 +110,21 @@ assert.equal(focused, sample);
 
 
 class WalkthroughExportTest(unittest.TestCase):
+    def test_refresh_keeps_peak_helpers_for_a_legacy_report(self):
+        from language.examples.export_walkthrough import refresh_synthesis, report_script_block
+        from language.tools.report import update_report_synthesis
+
+        source = ('<html><body><script id="bundle">{}</script><script>'
+                  'const B = JSON.parse(document.getElementById(\'bundle\').textContent);\n'
+                  'const POS = "#d9480f";</script></body></html>')
+        synthesis = {'claim': {'findings': {}}, 'section_prose': {}, 'evidence': {},
+                     'peak_census': {'peak_census': {'n': 1}}}
+        report, _ = update_report_synthesis(source, synthesis)
+        rendered = report_script_block(refresh_synthesis(report), 'report-synthesis-render')[1]
+        self.assertEqual(rendered.count('function combinedPeakCensus('), 1)
+        self.assertEqual(rendered.count('function peakCensusFigure('), 1)
+        self.assertIn('combinedPeakCensus(savedCensus.', rendered)
+
     def test_export_preserves_recorded_stages(self):
         import contextlib
         import gzip

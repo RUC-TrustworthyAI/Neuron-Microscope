@@ -203,8 +203,10 @@ def main():
     args.output.mkdir(parents=True,exist_ok=False);(args.output/"jobs").mkdir()
     lock=(args.output/".build.lock").open("w");fcntl.flock(lock,fcntl.LOCK_EX|fcntl.LOCK_NB)
     began=time.monotonic()
-    sources=("build_dataset_reports.py","build_report.py","build_reports.py","basic_adapter.js","report.html","report_token_fields.py","add_token_tables.py","token_tables.js","token_tables.css")
-    hashes={n:hashlib.sha256(Path(__file__).with_name(n).read_bytes()).hexdigest() for n in sources}
+    sources=("build_dataset_reports.py","build_report.py","build_reports.py","basic_adapter.js","report.html",
+             "report_token_fields.py","add_token_tables.py","token_tables.js","token_tables.css",
+             "peak_census.py","../tools/peak-token-classes.json")
+    hashes={n:hashlib.sha256((Path(__file__).parent/n).read_bytes()).hexdigest() for n in sources}
     core.write(args.output/"manifest.json",dict(complete=False,expected_neurons=expected,
         dataset=str(args.dataset),existing=str(args.existing),code_sha256=hashes,
         workers=args.workers,seed=args.seed,new_model_forwards=0,llm_calls=0))
@@ -245,7 +247,7 @@ def main():
                 raise
         assert len(entries)==expected and {e["id"] for e in entries}=={u["id"] for u in units}
         for path,signature in signatures.items():assert core.signature(path)==signature,"Saved source changed: "+path
-        for name,digest in hashes.items():assert hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()==digest
+        for name,digest in hashes.items():assert hashlib.sha256((Path(__file__).parent/name).read_bytes()).hexdigest()==digest
         for e in entries:
             folder=args.output/e["id"];done=core.read(folder/"complete.json")
             assert done["complete"] and done["tokens"]==manifest["tokens"] and (folder/"index.html").is_file()

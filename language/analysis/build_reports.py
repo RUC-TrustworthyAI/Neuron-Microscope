@@ -5,6 +5,7 @@ from functools import lru_cache
 import argparse, hashlib, html, json, os, re, time, threading
 import numpy as np
 import build_report as core
+from peak_census import CENSUS_FILES, load_peak_censuses
 
 K = 30
 PROFILE = {
@@ -240,6 +241,12 @@ def render_report(data,out):
     data["_histogram_path"]=str(out/"histograms.npz")
     blocks=core.paper_blocks(data,PROFILE)
     b=blocks["bundle"];identity=data["identity"]
+    for pole, census in load_peak_censuses(out, data).items():
+        filename, field = CENSUS_FILES[pole]
+        b[field] = census
+        path = out / filename
+        if not path.is_file():
+            path.write_text(json.dumps(census, ensure_ascii=False, allow_nan=False) + '\n', encoding='utf-8')
     b["claim"]["title"]=("SOFTWARE FIXTURE · " if all(doc["source"].get("source_file")=="software-fixture" for doc in data["documents"].values()) else "")+identity["id"]+" · "+str(data["n_tokens"])+" saved tokens"
     b["claim"]["lede"]=f'{data["n_tokens"]:,} tokens · {data["n_documents"]:,} documents · saved native gate/value/product. Interpretation: —.'
     b["neuron"]["model"]=identity["model"]
@@ -330,8 +337,9 @@ def main():
         signatures[str(args.tokenizer)]=core.signature(args.tokenizer)
         plan=core.read(args.run/"plan.json")
         core.write(args.output/"sources.json",{"records":records,"signatures":signatures,"targets":[{k:n[k] for k in ("id","layer","neuron")} for n in targets]})
-        source_files=["build_reports.py","build_report.py","basic_adapter.js","report.html"]
-        code_hashes={name:hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest() for name in source_files}
+        source_files=["build_reports.py","build_report.py","basic_adapter.js","report.html",
+                      "peak_census.py","../tools/peak-token-classes.json"]
+        code_hashes={name:hashlib.sha256((Path(__file__).parent/name).read_bytes()).hexdigest() for name in source_files}
         core.write(args.output/"manifest.json",{"tokens":sum(r["n"] for r in records),"documents":n_docs,"neurons":len(targets),"records":len(records),"seed":args.seed,"workers":args.workers,"counting_backend":"CUDA integer arrays" if DEVICES else "NumPy CPU","physical_gpu_ids":args.devices,"code_sha256":code_hashes,"new_model_forwards":0,"llm_calls":0})
         hist,quad,indices,scores=first_pass(records,len(targets),args.output,args.workers)
         bands=second_pass(records,len(targets),hist,args.output,args.workers,args.seed)
@@ -359,7 +367,7 @@ def main():
         for path,sig in signatures.items():
             if core.signature(path)!=sig:raise ValueError("Source metadata changed: "+path)
         for name,expected in code_hashes.items():
-            if hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()!=expected:
+            if hashlib.sha256((Path(__file__).parent/name).read_bytes()).hexdigest()!=expected:
                 raise ValueError("Report implementation changed during the run: "+name)
         catalog(args.output,entries,True)
         core.write(args.output/"complete.json",{"complete":True,"neurons":len(entries),"tokens_per_neuron":sum(r["n"] for r in records),"documents":n_docs,"source_metadata_unchanged":True,"full_source_content_rehash":False,"new_model_forwards":0,"llm_calls":0,"elapsed_s":time.monotonic()-began})

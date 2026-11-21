@@ -152,10 +152,15 @@ def strip_report_synthesis(source):
 
 def update_report_synthesis(source, synthesis):
     """Display the measured synthesis as a reversible report overlay."""
+    head, closing, tail = strip_report_synthesis(source).partition('</body>')
     renderer = Path(__file__).with_name('report_synthesis.js').read_text(encoding='utf-8')
+    if synthesis.get('peak_census') and not re.search(r'^function combinedPeakCensus\(', head, re.M):
+        template = REPORT_TEMPLATE.read_text(encoding='utf-8')
+        start = template.index('function combinedPeakCensus(')
+        end = template.index('\n(() => {', start)
+        renderer = template[start:end] + '\n' + renderer
     scripts = (f'<script id="report-synthesis" type="application/json">{encode_bundle(synthesis)}</script>'
                f'<script id="report-synthesis-render">{renderer}</script>')
-    head, closing, tail = strip_report_synthesis(source).partition('</body>')
     page = head + scripts + closing + tail
     return page, with_neuron_labels(page, source_bundle(page)[0])
 
@@ -258,6 +263,7 @@ def source_bundle(source):
     if synthesis is not None:
         data = json.loads(synthesis['data'])
         bundle['claim'] = data['claim']
+        bundle.update(data.get('peak_census', {}))
         summaries = bundle.get('section_prose') or {}
         bundle['section_prose'] = {**summaries, **{
             key: {**(summaries[key] if isinstance(summaries.get(key), dict) else {}), **value}

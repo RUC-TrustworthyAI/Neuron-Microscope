@@ -190,6 +190,13 @@ _BYTE_LEVEL_INVERSE.update({chr(256 + i): b for i, b in enumerate(
     x for x in range(256) if x not in _BYTE_LEVEL_CHARS)})
 
 
+def byte_level_bytes(fragment):
+    try:
+        return bytes(_BYTE_LEVEL_INVERSE[char] for char in fragment)
+    except KeyError:
+        return None
+
+
 def token_pieces(tokenizer, ids):
     """Decode one ByteLevel stream, retaining token boundaries and incomplete characters."""
     decoder = codecs.getincrementaldecoder('utf-8')(errors='replace')
@@ -197,8 +204,8 @@ def token_pieces(tokenizer, ids):
     for token in ids:
         fragment = tokenizer.id_to_token(int(token))
         raw.append(fragment)
-        if all(char in _BYTE_LEVEL_INVERSE for char in fragment):
-            data = bytes(_BYTE_LEVEL_INVERSE[char] for char in fragment)
+        data = byte_level_bytes(fragment)
+        if data is not None:
             pieces.append(decoder.decode(data, final=False))
         else:
             pieces.append(decoder.decode(b'', final=True) + fragment)
