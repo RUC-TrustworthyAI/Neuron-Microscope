@@ -10,8 +10,8 @@ from language.workflow.state import write
 
 
 class ReportSynthesisTest(unittest.TestCase):
-    @unittest.skipUnless(shutil.which('node'), 'Node is needed to check report links')
-    def test_only_claim_links_to_evidence_and_opens_samples(self):
+    @unittest.skipUnless(shutil.which('node'), 'Node is needed to check report rendering')
+    def test_short_guides_figure_readouts_and_claim_links(self):
         renderer = Path(__file__).resolve().parents[1] / 'tools/report_synthesis.js'
         fixture = r"""
 const assert = require('node:assert/strict');
@@ -23,11 +23,33 @@ class Element {
     this.children = [];
   }
   append(child) { this.children.push(child); }
+  prepend(child) { this.children.unshift(child); }
   replaceChildren(...children) { this.children = children; }
+  querySelector(selector) { return this.children.find(node => node.tag === selector); }
   remove() {}
 }
 const document = {};
-const B = {};
+const B = {
+  search: {source_kind: 'saved_replacement_sweeps'},
+  tests: {blind_max: {achieved: 1}, reused_measurement: true},
+  custom: {figures: [
+    {id: 'positive', results: [
+      {tag: 'Lowercase', expected: 'positive', activation: 382},
+      {tag: 'No of', expected: 'neutral', activation: 342},
+      {tag: 'Zero control', expected: 'neutral', activation: 0},
+      {tag: 'Weaker control', expected: 'neutral', activation: 1},
+    ]},
+    {id: 'legacy', results: [
+      {filler: 'Old negative', activation: -12.5},
+      {filler: 'Old zero', activation: 0},
+    ]},
+    {id: 'invalid', results: [
+      {tag: 'Missing', activation: null},
+      {tag: 'Unbounded', activation: Infinity},
+    ]},
+  ]},
+};
+const fmt = String;
 const callbacks = {};
 const window = {addEventListener: (type, handler) => { callbacks[type] = handler; }};
 const location = {hash: '#evidence-criticism%3Aexample'};
@@ -60,6 +82,15 @@ const criticism = {
   querySelector: selector => selector === '.text' ? {querySelector: () => why} : null,
   querySelectorAll: () => [{querySelector: () => ({children: [sample]})}],
 };
+const testsWhy = $('div', null, 'Old tests introduction');
+const tests = {querySelector: selector => selector === '.text' ? {querySelector: () => testsWhy} : null};
+const searchWhy = $('div', null, 'Old search introduction');
+const search = {querySelector: selector => selector === '.text' ? {querySelector: () => searchWhy} : null};
+const positiveCaption = $('figcaption', null, 'Signed product in replacement span.');
+const positiveFigure = $('div', null, $('figure', null, positiveCaption));
+const legacyFigure = $('div', null, $('figure', null));
+const invalidCaption = $('figcaption', null, 'Method only.');
+const invalidFigure = $('div', null, $('figure', null, invalidCaption));
 const data = {
   claim: {title: 'Measured', lede: 'Summary', findings: {
     main_response: {text: 'Found', evidence_ids: ['criticism:example']},
@@ -77,6 +108,11 @@ Object.assign(document, {
   getElementById(id) { return {
     'report-synthesis': {textContent: JSON.stringify(data)},
     'criticism': criticism,
+    'search': search,
+    'tests': tests,
+    'custom-positive': positiveFigure,
+    'custom-legacy': legacyFigure,
+    'custom-invalid': invalidFigure,
   }[id]; },
   querySelector: selector => ({'#head h1': headline, '#head .lede': lede, '#claim .figs': claimFigures})[selector],
   querySelectorAll: () => [],
@@ -86,8 +122,24 @@ Object.assign(document, {
 assert.equal(folded.open, true);
 assert.equal(focused, sample);
 assert.match(text(sample), /Scored token " et" · position 4 \(0-based\) · replacement span/);
-assert.equal(text(why), 'Saved criticism summary');
+assert.equal(text(why), 'Read the verdicts and evidence to see how counterexamples affect the explanation.');
 assert.equal(descendants(why).some(node => node.tag === 'a'), false);
+assert.match(text(searchWhy), /original scoring rule/);
+assert.match(text(testsWhy), /reused/i);
+assert.doesNotMatch(text(testsWhy), /Old tests introduction/);
+const positiveReadout = positiveCaption.children[0];
+assert.equal(positiveReadout.attrs.class, 'figure-readout');
+assert.match(text(positiveReadout), /Lowercase.*\+382/);
+assert.match(text(positiveReadout), /No of.*\+342/);
+assert.match(text(positiveReadout), /Zero control.*\b0\b/);
+assert.doesNotMatch(text(positiveReadout), /Old negative|Weaker control/);
+assert.equal(text(positiveCaption.children[1]), 'Signed product in replacement span.');
+const legacyReadout = legacyFigure.querySelector('figure').querySelector('figcaption').children[0];
+assert.equal(legacyReadout.attrs.class, 'figure-readout');
+assert.match(text(legacyReadout), /Old negative.*[−-]12\.5/);
+assert.match(text(legacyReadout), /Old zero.*\b0\b/);
+assert.doesNotMatch(text(legacyReadout), /Lowercase/);
+assert.equal(text(invalidCaption), 'Method only.');
 assert.deepEqual(claimFigures.children[0].children.map(text), [
   'Found [1]', 'Negative pole. Negative case', 'What would change my mind. Repeat the matched comparison',
 ]);

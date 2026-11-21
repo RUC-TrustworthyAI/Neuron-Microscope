@@ -1,5 +1,5 @@
 (() => {
-  const {claim, section_prose: summaries, evidence, peak_census: savedCensus} =
+  const {claim, evidence, peak_census: savedCensus} =
     JSON.parse(document.getElementById('report-synthesis').textContent);
   const headings = Object.hasOwn(claim.findings, 'main_response') ? {
     main_response: '', negative_pole: 'Negative pole',
@@ -150,20 +150,65 @@
     else if (census) figures.append(census);
   }
 
-  for (const [id, prose] of Object.entries(summaries)) {
+  const guides = {
+    custom: 'Compare the conditions within each controlled experiment to see which inputs elicit a response.',
+    graphs: 'Switch between inputs to see how attribution flows into the highlighted target.',
+    distribution: 'Use the signed activation quantiles to compare typical corpus responses with the extremes.',
+    spectrum: 'Compare the contexts and their assigned groups across activation bins.',
+    exemplars: 'Compare corpus examples across activation strengths. Start at the outlined token and read its prefix.',
+    search: B.search?.source_kind === 'saved_replacement_sweeps'
+      ? 'Compare the scored replacements within each saved sweep. Each sweep keeps its original scoring rule.'
+      : 'Compare the best measured probe for each hypothesis with the corpus extremes.',
+    clusters: 'Compare grouped attribution graphs to see which patterns recur across inputs.',
+    anatomy: 'Compare gate, up, and the resulting activation at the highlighted token positions.',
+    ablation: 'Read direct logit effects as weight-based scores and ablations as measured changes to the next-token distribution.',
+    family: 'Compare the target with related units to see where their activations align on the same inputs.',
+    circuit: 'Use the attribution weights to see which units feed the target and which read from it.',
+    tests: B.tests?.reused_measurement
+      ? 'Read the reused tests against the explanation that originally produced their predictions.'
+      : B.tests?.blind_max || B.tests?.blind_min
+        ? 'Compare predictions with the saved measurements. Blind tests use the frozen explanation.'
+        : 'Compare the tested predictions or interventions with their saved measurements.',
+    criticism: 'Read the verdicts and evidence to see how counterexamples affect the explanation.',
+    'interpretation-costs': 'Compare measured time and estimated API charges across workflow stages.',
+  };
+  for (const [id, guide] of Object.entries(guides)) {
     const host = document.getElementById(id)?.querySelector('.text');
     if (!host) continue;
     let why = host.querySelector('.why');
     if (!why) host.append(why = $('div', {class: 'why'}));
-    why.replaceChildren(P(prose.summary));
+    why.replaceChildren(P(guide));
+  }
+
+  const figureInputs = Array.isArray(B.custom) ? B.custom : B.custom?.figures || [];
+  const conditionName = row => row.tag || row.filler || row.country;
+  const score = row => `${conditionName(row)} (${row.activation > 0 ? '+' : ''}${fmt(row.activation)})`;
+  for (const figure of figureInputs) {
+    if (!figure.id) continue;
+    const chart = document.getElementById('custom-' + figure.id)?.querySelector('figure');
+    if (!chart) continue;
+    const measured = (figure.results || []).filter(row => Number.isFinite(row.activation) && conditionName(row))
+      .sort((a, b) => Math.abs(b.activation) - Math.abs(a.activation));
+    if (!measured.length) continue;
+    const target = measured.find(row => row.expected === 'positive' || row.expected === 'negative');
+    const controls = measured.filter(row => row.expected === 'neutral');
+    const [control] = controls;
+    let note;
+    if (target && control) {
+      note = `The largest absolute responses among the targeted conditions and planned controls were ${score(target)} and ${score(control)}, respectively.`;
+      if (controls.length > 1) note += ` The control closest to zero was ${score(controls.at(-1))}.`;
+    } else {
+      note = `${score(measured[0])} had the largest absolute response.`;
+      if (measured.length > 1) note += ` ${score(measured.at(-1))} was closest to zero.`;
+    }
+    let caption = chart.querySelector('figcaption');
+    if (!caption) chart.append(caption = $('figcaption', {class: 'cap'}));
+    caption.prepend($('div', {class: 'figure-readout'}, note));
   }
 
   const assessment = 'Independent assessment of the frozen explanation';
   for (const item of document.querySelectorAll('#head .pr-k, #agents-read .prf-k')) {
     item.textContent = assessment;
-  }
-  if (B.tests?.blind_max || B.tests?.blind_min) {
-    document.querySelector('#tests .why')?.append(P('Blind activation tests evaluate the explanation frozen before the experiments.'));
   }
   window.addEventListener('hashchange', openEvidenceFromHash);
   openEvidenceFromHash();
