@@ -55,7 +55,6 @@
     "candidates_per_pole": 6,
     "max_written_tokens": 512
   },
-  "route_prediction": false,
   "paths": {
     "reports": "data/reports",
     "activations": "data/activations",

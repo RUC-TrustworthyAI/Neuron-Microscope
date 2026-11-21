@@ -1,35 +1,59 @@
 """Run an independent, schema-directed investigation from saved native activations."""
-import argparse
 import concurrent.futures
-import copy
 import gc
 import os
 import shutil
-import sys
 import time
 from pathlib import Path
 from . import contracts, prompts
 from .client import Client
-from .state import read, write, lock, Timeline, now
-from .evidence import initial_packet, spectrum_packet, natural_cases, prediction_feedback, evidence_catalog
+from .state import read, write, lock, now, Timeline
+from .evidence import initial_packet, spectrum_packet, prediction_feedback, evidence_catalog
 from .interpretation import explain
-from .measure import Measurements, summarized, search_regions, batch_comparison
-from .revision import finalize
+from .measure import Measurements, summarized
+from .revision import ablation_analysis_packet, finalize, resume_graph_ablation_packet
 from .controls import run as run_controls
+from .search import run as run_search, validate_candidates
+from .attribution import run as run_attribution
+from .route_prediction import run as predict_routes
+from . import neuron_labels
 
 
-def validate_candidates(output):
-    ids = [r['id'] for r in output['regions']]
-    if len(set(ids)) != len(ids):
-        raise ValueError('Region IDs must be unique')
-    for region in output['regions']:
-        for candidate in region['candidates']:
-            if len(candidate['label'].split()) > 4 or len(candidate['label']) > 48:
-                raise ValueError('Candidate labels must be one word or a phrase of at most four words and 48 characters')
+def run(config, root, stop_after=None, *, checkpoint_attribution=False, followup=None):
+    """Run all enabled stages under one lock and report their final status."""
+    from .followups import run as investigate
+    from .render import finalize_report
+
+    if followup is None:
+        followup = stop_after is None
+    if followup and stop_after is not None:
+        raise ValueError('Follow-ups require a full investigation')
+    root = Path(root)
+    with lock(root / 'execution.lock', blocking=False):
+        try:
+            output = _run_foundation(config, root, stop_after=stop_after,
+                                     checkpoint_attribution=checkpoint_attribution)
+            if stop_after is not None:
+                return output
+            timeline = Timeline(root)
+            final_status = {'phase': 'complete'}
+            if followup:
+                with timeline.span('followup', 'execution', 6):
+                    investigate(root, root / 'followup', in_place=True, workflow_timeline=timeline)
+                saved = read(root / 'followup/status.json')
+                final_status = {key: saved[key] for key in ('phase', 'failures', 'stop_reason') if key in saved}
+            output = finalize_report(root, read(root / 'route-prediction/result.json'), config, followup=followup)
+            timeline.status(**final_status, html=str(output / 'index.html'))
+            return output
+        except Exception as error:
+            import traceback
+            write(root / 'failure.json', {'at': now(), 'error': str(error), 'traceback': traceback.format_exc()})
+            Timeline(root).status('failed', error=str(error))
+            raise
 
 
-def run(config, root, stop_after=None):
-    from .render import assemble, assemble_interpretation, costs
+def _run_foundation(config, root, stop_after=None, *, checkpoint_attribution=False):
+    from .render import assemble, assemble_interpretation, costs, update_routes
     root, report = Path(root), Path(config['report'])
     root.mkdir(parents=True, exist_ok=True)
     timeline = Timeline(root)
@@ -37,14 +61,37 @@ def run(config, root, stop_after=None):
     data = read(report / 'report.json')
     neuron = {'layer': data['identity']['layer'], 'index': data['identity']['neuron']}
     request_base = {'model': config['model'], 'neuron': neuron, 'settings': config['settings']}
+    runtime_request = ({**request_base, 'runtime': {'activation_offload': 'checkpoint'}}
+                       if checkpoint_attribution else request_base)
     old_config = root / 'config.json'
     if old_config.exists() and read(old_config) != config:
         raise ValueError('Configuration changed; use a separate run directory')
     write(old_config, config)
-    if (root / 'status.json').exists() and read(root / 'status.json')['phase'] in (
-            ('complete', 'interpretation_complete') if stop_after == 'interpretation' else ('complete',)):
+    os.environ['CUDA_VISIBLE_DEVICES'] = '' if stop_after == 'interpretation' else ','.join(map(str, config['gpus']))
+    os.environ['NEURON_MICROSCOPE_SETTINGS'] = str(root / 'backend-settings.json')
+    write(Path(os.environ['NEURON_MICROSCOPE_SETTINGS']), config['settings'])
+    if stop_after is None and (root / 'artifacts.json').exists():
+        # Resume report additions without repeating the completed investigation.
+        from ..tools.report import REPORT_SYNTHESIS
+        artifacts = read(root / 'artifacts.json')
+        output = root / 'report'
+        html = output / 'index.html'
+        previous = html.read_text(encoding='utf-8') if html.exists() else ''
+        with timeline.span('resume-report', 'execution', 0):
+            if not previous or '<script id="interpretation-view">' in previous:
+                with timeline.span('render', 'cpu', 5):
+                    assemble(root, report, config['neuron'], artifacts, len(config['gpus']))
+            result = predict_routes(client, root, timeline)
+            neuron_labels.complete(config, root, artifacts.get('atlas_sections', {}), client, timeline)
+        if not REPORT_SYNTHESIS.search(previous):
+            output = update_routes(root, result, config)
+        timeline.status('foundation_complete', html=str(output / 'index.html'))
+        return output
+    if stop_after == 'interpretation' and (root / 'report/index.html').exists() and (
+            (root / 'artifacts.json').exists() or ((root / 'status.json').exists() and
+            read(root / 'status.json')['phase'] in ('complete', 'interpretation_complete', 'complete_with_failures'))):
         return root / 'report'
-    with lock(root / 'execution.lock', blocking=False), timeline.span('workflow', 'execution', 0):
+    with timeline.span('workflow', 'execution', 0):
         timeline.status('prepare')
         with timeline.span('saved-evidence', 'cpu', 1):
             if config.get('saved_sample'):
@@ -72,10 +119,9 @@ def run(config, root, stop_after=None):
         timeline.status('interpretation_complete', html=str(output / 'index.html'))
         return output
     from common import Runtime
-    from paper_sections import prepare as prepare_sections, run as run_sections
-    from model_tools import attribute
-    from .interventions import matched_ablation
-    with lock(root / 'execution.lock', blocking=False), timeline.span('workflow-experiments', 'execution', 0):
+    from paper_sections import exemplar
+    from .ablation_run import prepare as prepare_ablation, measure as measure_ablation
+    with timeline.span('workflow-experiments', 'execution', 0):
         packet = initial_packet(report)
         with concurrent.futures.ThreadPoolExecutor(max_workers=3) as pool:
             blind_future = pool.submit(client.request, 'blind-writer', prompts.BLIND,
@@ -85,12 +131,12 @@ def run(config, root, stop_after=None):
             search_proposal = client.request('search/round-1', prompts.SEARCH,
                 {'initial': initial, 'evidence': packet, 'regions_requested': config['search_regions'],
                  'candidates_per_region': config['candidates_per_region'],
-                 'instruction': 'Prioritize the strongest supported patterns; allocate regions according to evidence.'},
+                 'instruction': prompts.INITIAL_SEARCH_INSTRUCTION},
                 contracts.SEARCH, 3, check=validate_candidates)
             timeline.status('gpu-queue')
             queued = time.time()
             from .gpu_worker import GPUClient
-            remote = GPUClient(config, root, timeline, request_base) if os.environ.get('NEURON_MICROSCOPE_GPU_WORKER') == '1' else None
+            remote = GPUClient(config, root, timeline, runtime_request) if os.environ.get('NEURON_MICROSCOPE_GPU_WORKER') == '1' else None
             with remote if remote is not None else lock(config['gpu_lock']):
                 if remote is not None:
                     runtime = remote
@@ -98,47 +144,12 @@ def run(config, root, stop_after=None):
                     write(root / 'gpu-queue.json', {'seconds': time.time() - queued, 'devices': config['gpus']})
                     timeline.status('loading-model')
                     with timeline.span('model-load', 'gpu', 3):
-                        runtime = Runtime.load(request_base)
+                        runtime = Runtime.load(runtime_request)
                 gpu_span = remote.span if remote is not None else lambda name: timeline.span(name, 'gpu', 3)
                 measure = Measurements(runtime, root / 'measurements', timeline,
                                        config['batch_size'], config['batch_tokens'])
-                if not (root / 'batch-comparison.json').exists():
-                    candidates = [c['text'] for r in search_proposal['regions'] for c in r['candidates']]
-                    pair = sorted(candidates, key=len)
-                    token_lists = [runtime.tokenizer.encode(s, add_special_tokens=False) for s in (pair[0], pair[-1])]
-                    with gpu_span('batch-comparison'):
-                        differences = batch_comparison(runtime, token_lists)
-                    write(root / 'batch-comparison.json', differences)
-                search_rows, region_records, round_summaries = [], {}, []
-                for round_index in range(1, config['search_rounds'] + 1):
-                    timeline.status('activation-search', round=round_index)
-                    items = []
-                    for region in search_proposal['regions']:
-                        for i, candidate in enumerate(region['candidates']):
-                            identity = f'search-{round_index}-{region["id"]}-{i}'
-                            candidate['id'] = identity
-                            items.append({**candidate, 'score': {'location': 'input',
-                                'reduction': 'max' if region['pole'] == 'positive' else 'min'}})
-                    rows = measure.texts(items, f'search-round-{round_index}')
-                    search_rows.extend(rows)
-                    for region in search_regions(search_proposal['regions'], rows):
-                        key = (region['id'], region['pole'])
-                        if key in region_records:
-                            region_records[key]['candidates'].extend(region['candidates'])
-                        else:
-                            region_records[key] = region
-                    round_summaries.append({'round': round_index, 'candidates': len(rows),
-                        'maximum': max(x['product'] for r in rows for x in r['trace']),
-                        'minimum': min(x['product'] for r in rows for x in r['trace'])})
-                    write(root / 'search-progress.json', round_summaries)
-                    if round_index < config['search_rounds']:
-                        # Feedback is bounded by the requested batch, not a growing tool conversation.
-                        search_proposal = client.request(f'search/round-{round_index + 1}', prompts.SEARCH,
-                            {'initial': initial, 'natural_extremes': packet['statistics']['product'],
-                             'previous_round': [summarized(r) for r in rows], 'progress': round_summaries,
-                             'regions_requested': config['search_regions'],
-                             'candidates_per_region': config['candidates_per_region']},
-                            contracts.SEARCH, 3, check=validate_candidates)
+                search_rows, region_records, round_summaries = run_search(
+                    client, measure, initial, packet, search_proposal, config, root, timeline, gpu_span)
                 plan, control_rows, figures = run_controls(client, measure, initial, packet, search_rows,
                                                           root, timeline)
                 blind = blind_future.result()
@@ -152,69 +163,22 @@ def run(config, root, stop_after=None):
                     if not candidates:
                         continue
                     winner = max(candidates, key=lambda r: sign * r['selected']['product'])
-                    from paper_sections import exemplar
                     tests[field] = {'target': data['statistics']['product']['max' if sign == 1 else 'min'],
                                     'achieved': winner['selected']['product'], **exemplar(winner)}
                 tests['explanation_version'] = predictions['version']
-                tests['route_prediction'] = None
-                # Balanced natural and authored cases are retained even when they contradict a hypothesis.
-                natural = natural_cases(data, config['atlas_natural'] // 2)
-                synthetic, seen_texts = [], set()
-                for sign in (1, -1):
-                    ordered = sorted(search_rows, key=lambda r: sign * r['selected']['product'], reverse=True)
-                    chosen = []
-                    for row in ordered:
-                        if row['text'] not in seen_texts:
-                            chosen.append(row)
-                            seen_texts.add(row['text'])
-                        if len(chosen) >= config['atlas_written'] // 2:
-                            break
-                    synthetic.extend(chosen)
-                scientific_plan = prepare_sections({
-                    'atlas': {'cases': [{'case_id': case} for case in natural] +
-                                       [{'text': r['text'], 'position': r['selected']['position']} for r in synthetic]},
-                    'family': {'cases': [{'text': text} for text in plan['family_sentences']]}}, report)
-                atlas_dir = root / 'atlas'
-                atlas_dir.mkdir(exist_ok=True)
-                atlas_request = {**request_base, 'id': 'atlas', 'plan': scientific_plan,
-                                 'limits': {'max_input_tokens': config['settings']['inputs']['max_written_tokens']}}
-                write(atlas_dir / 'tool-request.json', atlas_request)
-                timeline.status('attribution-and-family')
-                with gpu_span('atlas-and-family'):
-                    atlas_result = (remote.call('sections', request=atlas_request, folder=str(atlas_dir))
-                                    if remote is not None else run_sections(atlas_request, atlas_dir, runtime))
-                    write(atlas_dir / 'result.json', atlas_result)
-                if atlas_result['status'] != 'complete':
-                    raise RuntimeError('Attribution measurements incomplete; inspect atlas/result.json before resuming')
-                atlas_sections = read(atlas_dir / 'sections.json')
-                atlas = read(atlas_dir / 'atlas-raw.json')
-                graph_rows = []
-                # Different measured contexts: strongest positive, strongest negative, strongest control counterexample.
-                graph_sources = [max(search_rows, key=lambda r: r['selected']['product']),
-                                 min(search_rows, key=lambda r: r['selected']['product']),
-                                 max(control_rows, key=lambda r: abs(r['selected']['product']))]
-                graph_results = []
-                for i, row in enumerate(graph_sources):
-                    timeline.status('three-graphs', graph=i + 1)
-                    folder = root / 'graphs' / str(i + 1)
-                    folder.mkdir(parents=True, exist_ok=True)
-                    graph_request = {**request_base, 'id': f'graph-{i + 1}', 'title': row['label'],
-                        'text': row['text'], 'root': {'kind': 'neuron_product', 'position': row['selected']['position']}}
-                    write(folder / 'request.json', graph_request)
-                    if (folder / 'result.json').exists() and read(folder / 'result.json')['status'] == 'complete':
-                        result = read(folder / 'result.json')
-                    else:
-                        with gpu_span(f'graph-{i + 1}'):
-                            result = (remote.call('attribute', request=graph_request, folder=str(folder))
-                                      if remote is not None else attribute(graph_request, folder, runtime))
-                    graph_rows.append(read(folder / 'graph.json'))
-                    graph_results.append(result)
-                with gpu_span('matched-ablations'):
-                    ablation_section = (remote.call('matched-ablation', results=graph_results,
-                        folder=str(root / 'graphs'), settings=config['settings']) if remote is not None else
-                        matched_ablation(runtime, graph_results, root / 'graphs', config['settings']))
-                for result, row in zip(graph_results, graph_sources):
-                    result['steering']['activation_context'] = exemplar(row)
+                atlas_sections, atlas, graph_rows, graph_results = run_attribution(
+                    config, root, report, data, request_base, plan, search_rows, control_rows,
+                    runtime, remote, timeline, gpu_span)
+                timeline.status('point-ablations')
+                ablation_folder = root / 'ablation'
+                ablation_plan = prepare_ablation(config, request_base, sample_data, contexts, control_rows,
+                    figures, data, predictions, initial, ablation_folder)
+                with gpu_span('point-ablations'):
+                    ablation_section = (remote.call('measure-ablations', plan=ablation_plan,
+                        folder=str(ablation_folder.resolve())) if remote is not None else
+                        measure_ablation(runtime, ablation_plan, ablation_folder))
+                label_evidence = neuron_labels.prepare(config, root, atlas_sections, timeline, runtime,
+                                                       gpu_span=gpu_span)
                 measure.runtime = None
                 if remote is None:
                     torch = runtime.torch
@@ -233,9 +197,12 @@ def run(config, root, stop_after=None):
             'circuit': atlas_sections['circuit'],
             'graphs': [{'id': g['id'], 'text': g['graph']['text'], 'meta': g['graph']['meta']} for g in graph_rows],
             'interventions': [{k: r.get(k) for k in ('ablation', 'steering')} for r in graph_results],
-            'matched_ablations': ablation_section}
+            'matched_ablations': ablation_analysis_packet(ablation_section, evidence)}
+        legacy_analysis = resume_graph_ablation_packet(root, revision_packet)
         revision, predictions, review = finalize(client, initial, predictions, revision_packet,
             evidence, sample_data, contexts, root, timeline)
+        if legacy_analysis:
+            revision['section_prose'].pop('ablation', None)
         for result in graph_results:
             tests.setdefault('steering', []).append(result['steering'])
             ablation = result.get('ablation') or {}
@@ -251,43 +218,23 @@ def run(config, root, stop_after=None):
             'ablation': ablation_section,
             'corpus': {key: data['statistics']['product'][key] for key in ('max', 'min')}}
         write(root / 'artifacts.json', artifacts)
+        # Finish the base report before API-only prediction so interrupted runs
+        # cannot retain an earlier interpretation-only preview.
         timeline.status('rendering')
         with timeline.span('render', 'cpu', 5):
             assemble(root, report, config['neuron'], artifacts, len(config['gpus']))
-    # Final costs include the completed execution interval and render operation.
-    output = assemble(root, report, config['neuron'], artifacts, len(config['gpus']))
-    timeline.status('complete', html=str(output / 'index.html'))
+        tests['route_prediction'] = predict_routes(client, root, timeline)
+        write(root / 'artifacts.json', artifacts)
+        neuron_labels.complete(config, root, atlas_sections, client, timeline, label_evidence)
+    output = update_routes(root, tests['route_prediction'], config)
+    timeline.status('foundation_complete', html=str(output / 'index.html'))
     return output
 
 
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--config', required=True, type=Path)
-    parser.add_argument('--output', required=True, type=Path)
-    parser.add_argument('--backend-tools', type=Path, default=Path(__file__).resolve().parents[1] / 'tools')
-    parser.add_argument('--stop-after', choices=['interpretation'])
-    args = parser.parse_args()
-    sys.path.insert(0, str(args.backend_tools.resolve()))
-    config = read(args.config)
-    os.environ['CUDA_VISIBLE_DEVICES'] = '' if args.stop_after == 'interpretation' else ','.join(map(str, config['gpus']))
-    os.environ['NEURON_MICROSCOPE_SETTINGS'] = str(args.output / 'backend-settings.json')
-    write(Path(os.environ['NEURON_MICROSCOPE_SETTINGS']), config['settings'])
-    try:
-        output = run(config, args.output, stop_after=args.stop_after)
-        if config.get('publish'):
-            from comparison import publish
-            destination = Path(config['publish']) / config['neuron']
-            if not destination.exists():
-                publish(output, destination, config['neuron'], config['references'])
-            from .render import directory
-            with lock(Path(config['publish']) / '.directory.lock'):
-                directory(config['publish'], config.get('publish_neurons', [config['neuron']]), config['references'])
-    except Exception as error:
-        import traceback
-        write(args.output / 'failure.json', {'at': now(), 'error': str(error), 'traceback': traceback.format_exc()})
-        Timeline(args.output).status('failed', error=str(error))
-        raise
+    from .cli import main as cli_main
+    return cli_main()
 
 
 if __name__ == '__main__':
-    main()
+    raise SystemExit(main())

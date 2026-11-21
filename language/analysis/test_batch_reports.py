@@ -109,6 +109,14 @@ class BatchTests(unittest.TestCase):
                 page=(out/"index.html").read_text()
                 blocks=core.read(out/"paper-data.json")
                 b=blocks["bundle"]
+                for high, slot, field in ((True, 0, 'peak_census'), (False, 1, 'peak_census_negative')):
+                    ranked = [i for i in indices[col, slot] if (decoded[i, 2] > 0 if high else decoded[i, 2] < 0)]
+                    if ranked:
+                        census = b[field]
+                        self.assertEqual([int(row['case_id']) for row in census['peaks']], ranked)
+                        self.assertEqual(census['tokens'], [{'token': ' hello', 'n': len(ranked)}])
+                    else:
+                        self.assertNotIn(field, b)
                 self.assertNotIn("FORBIDDEN_SEMANTIC_LABEL",page)
                 if data["statistics"]["product"]["min"]==data["statistics"]["product"]["max"]:
                     self.assertIn("data-constant-frequency",page)

@@ -79,7 +79,6 @@
 
   foldExtra([...document.querySelectorAll('#custom > .figs > .cfig')], 3, 'Additional figures');
   foldExtra([...document.querySelectorAll('#clusters .card')], 8, 'Additional clusters');
-  foldExtra([...document.querySelectorAll('#criticism .crow')], 8, 'Additional criticism rounds');
 
   document.querySelectorAll('#ablation table,#tests table').forEach(scrollBox);
   document.querySelectorAll('#circuit table tr td:nth-child(2)').forEach(cell => {

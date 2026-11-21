@@ -38,6 +38,16 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory runs/walkthrough
 
 Replace `runs/example` with the completed run's directory, then open <http://127.0.0.1:8000/?lang=en>. The exporter rebuilds `content/` and `reports/` from saved artifacts and clears the copied `screenshots/` directory. The copied HTML, JavaScript and CSS remain in place. Exported content includes prompt and input excerpts, structured responses, round comparisons, measurements and compressed reports. Capture any screenshots separately.
 
+The report step includes saved path predictions and neuron labels when available. Runs with follow-up investigations or report synthesis get additional steps for those records, along with their saved model calls and links into the final report.
+
+To refresh the existing Colorado website from its static archive, use:
+
+```bash
+python3 language/examples/export_walkthrough.py --archive website/walkthrough/language --output website/walkthrough/language
+```
+
+This repackages the saved episode, model calls, and reports. Colorado's archive contains the six original steps. Deploy the updated website separately.
+
 ## Publish with GitHub Pages
 
 For a repository with GitHub Pages available:

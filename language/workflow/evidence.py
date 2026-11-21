@@ -1,5 +1,6 @@
 """Build bounded research packets from saved measurements, without reference explanations."""
 import collections
+from . import prompts
 from .state import read
 
 
@@ -51,11 +52,10 @@ def initial_packet(report, data=None):
             'samples': samples, 'logit_effect': effects,
             'quantile_bands': [{**{k: v for k, v in band.items() if k != 'points'},
                                 'case_ids': [str(x) for x in band['points'][:1]]} for band in data['bands']],
-            'token_selectivity': {'definition': 'Thresholds are fractions of the signed corpus extreme, not percentiles. '
-                                  'hit_fraction is hits / occurrences of that token type. mean_product averages all its occurrences.',
+            'token_selectivity': {'definition': prompts.TOKEN_SELECTIVITY_DEFINITION,
                                   'tables': tables},
             'peak_census': census,
-            'activation_definition': 'Product is the measured signed activation; observed_prefix ends at the measured anchor.'}
+            'activation_definition': prompts.ANCHOR_ACTIVATION_DEFINITION}
 
 
 def spectrum_packet(report, sample, contexts):
@@ -91,8 +91,8 @@ def spectrum_packet(report, sample, contexts):
                 'edges': sample['edges'], 'corpus_hist': sample['corpus_hist'],
                 'sample_hist': sample['sample_hist'], 'n_points': len(sample['points'])},
             'documents': documents,
-            'activation_definition': 'Product and activation denote the measured signed response.',
-            'context_definition': 'Character offsets index the document text. At each marked position, the causal prefix ends at character_end. Later text provides linguistic context only.'}
+            'activation_definition': prompts.SPECTRUM_ACTIVATION_DEFINITION,
+            'context_definition': prompts.SPECTRUM_CONTEXT_DEFINITION}
 
 
 def prediction_feedback(predictions):
@@ -108,7 +108,7 @@ def prediction_feedback(predictions):
                        'signs': dict(collections.Counter(r['true_pole'] for r in rows)),
                        'examples': examples})
     return {'summary': predictions['summary'], 'groups': groups,
-            'evaluation': 'Feedback on predictions from this frozen explanation version; not a held-out test of a revision.'}
+            'evaluation': prompts.PREDICTION_FEEDBACK_DEFINITION}
 
 
 def refinement_feedback(predictions, statistics):

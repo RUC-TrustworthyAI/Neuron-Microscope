@@ -113,7 +113,10 @@ class RuntimePool:
         from settings import request_settings
         request = job['request']
         cfg = request_settings(request)
-        signature = (request['model'], json.dumps(cfg['runtime'], sort_keys=True),
+        runtime_settings = {**cfg['runtime'], **request.get('runtime', {})}
+        # Offload is a forward policy, so jobs with different modes can share the weights.
+        activation_offload = runtime_settings.pop('activation_offload', None)
+        signature = (request['model'], json.dumps(runtime_settings, sort_keys=True),
                      tuple(cfg['gpu_groups'][0]), request.get('torch_seed', cfg['torch_seed']))
         loaded = None
         if self.base is None:
@@ -135,6 +138,10 @@ class RuntimePool:
         runtime, rng = self.contexts[key]
         if runtime.neuron != request['neuron']:
             raise ValueError('Neuron changed within a GPU session')
+        if activation_offload is None:
+            runtime.settings.pop('activation_offload', None)
+        else:
+            runtime.settings['activation_offload'] = activation_offload
         self.restore(rng)
         return runtime, loaded
 
@@ -166,9 +173,12 @@ def dispatch(runtime, job):
     if operation == 'attribute':
         from model_tools import attribute
         return attribute(payload['request'], Path(payload['folder']), runtime)
-    if operation == 'matched-ablation':
-        from .interventions import matched_ablation
-        return matched_ablation(runtime, payload['results'], Path(payload['folder']), payload['settings'])
+    if operation == 'measure-ablations':
+        from .ablation_run import measure
+        return measure(runtime, payload['plan'], Path(payload['folder']))
+    if operation == 'neuron-label-evidence':
+        from .neuron_label_evidence import collect
+        return collect(payload['config'], payload['candidates'], runtime, token_budget=payload['token_budget'])
     raise ValueError('Unknown GPU operation: ' + operation)
 
 

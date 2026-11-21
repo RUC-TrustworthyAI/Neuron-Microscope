@@ -4,22 +4,6 @@ from pathlib import Path
 from common import read
 
 
-def peak_fields(evidence):
-    fields = {}
-    names = {'positive': 'peak_census', 'negative': 'peak_census_negative',
-             'absolute_appendix': 'peak_census_absolute'}
-    for name, field in names.items():
-        value = (evidence.get('peak_census_json') or {}).get(name)
-        if not value:
-            continue
-        value = copy.deepcopy(value)
-        for key, label in [('kinds', 'kind'), ('tokens', 'token')]:
-            if isinstance(value.get(key), dict):
-                value[key] = [{label: k, 'n': n} for k, n in value[key].items()]
-        fields[field] = value
-    return fields
-
-
 def default_anatomy(bundle, data):
     """Keep the saved strip and recover its identity; otherwise use the top document."""
     claim = (bundle.get('claim') or {}).get('one_paragraph')
@@ -107,27 +91,13 @@ def render(source):
     if "B.cluster_source==='saved_semantic_groups'?" not in source:
         source=source.replace("'Share of attribution mass per cluster.'",
             "(B.cluster_source==='saved_semantic_groups'?'Share of saved sample positions per semantic group.':'Share of attribution mass per cluster.')")
-    if 'function peakCensusFigure(' not in source:
-        source = source.replace('// Header: eyebrow, title, short lede, headline figure, quiet meta row.',
-                                "// Saved signed peak census; absolute ranking stays in the appendix.\nfunction peakCensusFigure(PC, label) {\n  if (!has(PC) || (!has(PC.kinds) && !has(PC.tokens))) return null;\n  const kinds = [...(PC.kinds || [])].sort((a,b)=>(b.n||0)-(a.n||0)), km = Math.max(...kinds.map(k=>k.n||0),1);\n  const bars = $('div',{class:'kbars'},kinds.slice(0,7).map(k=>$('div',{class:'kb'},$('span',{class:'kl'},k.kind),$('span',{class:'kt'},$('i',{style:`width:${100*(k.n||0)/km}%`})),$('span',{class:'kn'},k.n))));\n  const tokens = [...(PC.tokens || [])].sort((a,b)=>(b.n||0)-(a.n||0)).slice(0,14);\n  const chips = $('div',{class:'chips',style:'margin:0'},tokens.map(t=>$('span',{class:'tokchip'},JSON.stringify(t.token),' ',$('b',{style:'color:var(--ink);font-weight:500'},t.n))));\n  const node = fig($('div',null,$('div',{class:'sub'},label),$('div',{class:'census'},$('div',null,$('div',{class:'sub'},'Token kind at the peak'),bars),$('div',null,$('div',{class:'sub'},'Most common peak tokens'),chips))),`${PC.n} token positions · ${PC.distinct_documents} distinct documents.`);\n  if (PC.note) node.title=PC.note;\n  return node;\n}" + '\n\n// Header: eyebrow, title, short lede, headline figure, quiet meta row.')
-        source = re.sub(r'  let census = null; const PC = B\.peak_census;.*?  if \(!parts\.length && !census\) return; sec\(\x27claim\x27, \x27The claim in detail\x27, null, parts\.length \? \$\(\x27div\x27, \{ class: \x27detail\x27 \}, parts\) : null, census\);',
-            "  const census = peakCensusFigure(B.peak_census, 'Positive Top' + (B.peak_census?.n || ''));\n"
-            "  const negative = peakCensusFigure(B.peak_census_negative, 'Negative Top' + (B.peak_census_negative?.n || ''));\n"
-            "  if (!parts.length && !census && !negative) return; sec('claim', 'The claim in detail', null, parts.length ? $('div', {class:'detail'}, parts) : null, census, negative);",
-            source, count=1, flags=re.S)
-        source = source.replace("(() => { const A = B.appendix || {}; const parts = [];",
-            "(() => { const A = B.appendix || {}; const parts = [];\n"
-            "  const absolute = peakCensusFigure(B.peak_census_absolute, 'Absolute Top' + (B.peak_census_absolute?.n || ''));\n"
-            "  if(absolute)parts.push($('details',null,$('summary',null,'Absolute peak census'),absolute));")
-    # One publication panel pools both saved tails; the source fields remain separate.
-    source=re.sub(r'(?:function combinedPeakCensus\(.*?|function peakCensusFigure\(.*?)' +
-                  r'(?=\n\n// Header:)',
-                  lambda m:Path(__file__).with_name('peak_census_display.js').read_text().rstrip(),
-                  source,count=1,flags=re.S)
-    source=re.sub(r"  const census = peakCensusFigure\(B\.peak_census,.*?null, census, negative\);",
-                  "  const census = peakCensusFigure(combinedPeakCensus(B.peak_census,B.peak_census_negative));\n"
-                  "  if (!parts.length && !census) return; sec('claim', 'The claim in detail', null, parts.length ? $('div', {class:'detail'}, parts) : null, census);",
-                  source,count=1,flags=re.S)
+    if 'corpus peak positions ·' not in source:
+        template = (Path(__file__).resolve().parents[1] / 'analysis/report.html').read_text(encoding='utf-8')
+        for block in (r'// 0\. The claim in detail\..*?(?=// 0b\. Figures)',
+                      r'// 9\. Appendix\..*?(?=</script>)'):
+            source = re.sub(block, lambda _: re.search(block, template, re.S)[0], source, count=1, flags=re.S)
+        source = re.sub(r'(?:// Saved signed peak census;[^\n]*\n)?function (?:combinedPeakCensus|peakCensusFigure)\('
+                        r'.*?(?=\n\n// Header:)', '', source, count=1, flags=re.S)
     source = source.replace("return $('div', { class: 'region' }, $('h4', null, r.name), $('div', { class: 'best' }, r.n != null ? `${r.n} probes · best ` : 'best ', tile(r.best, { signed: true, scale: G })), (r.frontier || []).slice(0, 3).map(e => exRow(e, s, (e.activation || 0) < 0, G)));", "const best = r.source_kind === 'saved_replacement_sweep'\n      ? $('div',{class:'best'},`${r.n} scored conditions · max `,tile(r.maximum,{signed:true,scale:G}),' · min ',tile(r.minimum,{signed:true,scale:G}))\n      : $('div',{class:'best'},r.n != null ? `${r.n} probes · best ` : 'best ',tile(r.best,{signed:true,scale:G}));\n    return $('div',{class:'region'},$('h4',null,r.name),best,(r.frontier||[]).slice(0,3).map(e=>exRow(e,s,(e.activation||0)<0,G)));")
     source = source.replace("[P(`Written probes, region by region. Each region is a hypothesis about what drives the unit; the frontier is the best text found there. ${S.n_regions ? S.n_regions + ' regions, ' : ''}${S.n_texts ? S.n_texts.toLocaleString() + ' texts scored. ' : ''}A region whose best value stays far below the corpus maximum is not where the unit lives.`)]", "[P(S.source_kind==='saved_replacement_sweeps' ? `${S.n_regions} saved replacement sweeps · ${S.n_texts} scored conditions. Values retain each sweep’s original scoring rule.` : `Written probes, region by region. Each region is a hypothesis about what drives the unit; the frontier is the best text found there. ${S.n_regions ? S.n_regions + ' regions, ' : ''}${S.n_texts ? S.n_texts.toLocaleString() + ' texts scored. ' : ''}A region whose best value stays far below the corpus maximum is not where the unit lives.`)]")
     source = source.replace("...S.regions.map(r => Math.abs(r.best || 0))",

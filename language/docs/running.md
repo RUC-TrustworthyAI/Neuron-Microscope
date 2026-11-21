@@ -14,6 +14,20 @@ python -m pip install -r language/requirements/gpu.txt
 
 The measurement adapter shards complete dense-Qwen3 layers over the configured GPU group. Required memory depends on model size, captured prefixes and backward storage.
 
+## RelP activation checkpointing
+
+Use `--checkpoint-attribution` when CPU saved-tensor offload puts the host under memory pressure during RelP attribution.
+
+```bash
+python -m language --config workflow.local.json --output runs/example --checkpoint-attribution
+```
+
+The default, `"cpu"`, moves eligible tensors saved for backward to host memory. Checkpoint mode uses decoder block recomputation in place of CPU saved-tensor offload. The atlas and local graph edges rebuild the forward graph for each gradient query to bound the lifetime of recomputed tensors. This costs additional compute and can shift memory use from the host to the GPU. Weight placement, input prefixes and the RelP rules stay the same.
+
+To resume after a host out-of-memory failure during RelP attribution, add the flag to the original command and keep the same configuration and output directory. The flag affects pending attribution passes, and completed rows and graphs are reused. Newly computed atlas rows record their mode in `activation_offload`, and graph results record it in runtime telemetry. Pass the flag again when resuming in checkpoint mode. After upgrading the code, let any already-running shared GPU worker exit before using the flag.
+
+For a new investigation you can also set `settings.runtime.activation_offload` to `"checkpoint"` in the workflow configuration.
+
 ## Configure and run
 
 Create `workflow.local.json` from the [configuration example](workflow.md#run). Supply a local model, a canonical activation archive and a target activation-only report package as described in [Input data](data.md). The report package must contain measured static logit effects in `effects.json`.

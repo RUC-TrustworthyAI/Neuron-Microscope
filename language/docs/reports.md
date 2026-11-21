@@ -2,7 +2,7 @@
 
 [Home](../../README.md) · [Method](method.md) · [Run guide](running.md) · [Data format](data.md)
 
-A report presents the frozen explanation, its supporting measurements, counterexamples and remaining uncertainty. Code assembles the HTML from measured data and structured LLM outputs.
+The Claim links its synthesized conclusions to supporting samples and counterexamples. Section summaries present the conclusions for their own measurements. The interpretation preview presents the explanation used to make blind predictions.
 
 ## How to interpret the plots
 
@@ -18,7 +18,7 @@ The initial explanation and two revisions each receive blind labels. Among versi
 
 | Report section | Evidence and computation | Main implementation |
 |---|---|---|
-| The claim in detail | Explanation refined using sampled measurements and prediction feedback, then frozen before experiments | [interpretation.py](../workflow/interpretation.py) |
+| The claim in detail | Core response pattern, strength and polarity, mechanism and output effects, and open questions synthesized from the completed evidence | [report_synthesis.py](../workflow/report_synthesis.py) |
 | Figures for this neuron | Controlled contrasts with complete input texts, short condition labels and native response traces | [measure.py](../workflow/measure.py), [report_layout.py](../tools/report_layout.py) |
 | Three graphs | RelP graphs at the strongest positive search case, strongest negative search case and strongest absolute control case | [run.py](../workflow/run.py), [relp.py](../tools/relp.py) |
 | Activation distribution, exemplars and Peak census | Saved token and document extrema, corpus statistics and sampled quantile bands | [build_reports.py](../analysis/build_reports.py), [saved_display.py](../tools/saved_display.py) |
@@ -31,13 +31,14 @@ The initial explanation and two revisions each receive blind labels. Among versi
 | Where it sits | Selected neighbours and joint responses on the same inputs | [paper_sections.py](../tools/paper_sections.py) |
 | Circuit | Local RelP contributions pooled over the selected attribution atlas | [relp.py](../tools/relp.py), [paper_sections.py](../tools/paper_sections.py) |
 | Blind maximum / minimum | Independent explanation-only writer produces probes; the target model scores full-input extrema | [run.py](../workflow/run.py), [prompts.py](../workflow/prompts.py) |
+| Route prediction | Training-derived route descriptions predict test-case routes, checked against the saved attribution assignments | [route_prediction.py](../workflow/route_prediction.py), [report.py](../tools/report.py) |
 | Criticism | Experimental support, contradictions and unresolved patterns with links to measured cases | [revision.py](../workflow/revision.py), [render.py](../workflow/render.py) |
 | Interpretation costs | Execution intervals, model operations and recorded API usage | [state.py](../workflow/state.py), [render.py](../workflow/render.py) |
 | An agent's read, in full | Independent LLM assessment of the frozen account and its experimental evidence | [revision.py](../workflow/revision.py) |
 
 Appendix remains unfilled. The final layout places Criticism before Interpretation costs, then Appendix, with the full independent reading last.
 
-Publication adds a local original/report comparison through [comparison.py](../tools/comparison.py) when a reference snapshot is available. It opens in side-by-side mode by default, with the published reference on the left and the reproduction on the right. Scrolling either pane synchronizes both reports. Close the comparison, or use `?compare=0`, to read the reproduction alone. The headline, independent reading, Peak census column headings, Top/Bottom examples, quantile samples and other matching sections have independent alignment anchors. The [shared display helper](../tools/exemplar_display.py) limits preceding context for exemplars and cluster examples without changing measured prefixes. Reference pages are supplied separately and used only in the published export.
+Publication adds a local original/report comparison through [comparison.py](../tools/comparison.py) when a reference snapshot is available. It opens in side-by-side mode by default, with the published reference on the left and the reproduction on the right. A direct evidence link opens the referenced sample in a single pane, with comparison available from the toolbar. Scrolling either comparison pane synchronizes both reports. Close the comparison, or use `?compare=0`, to read the reproduction alone. The headline, independent reading, Peak census column headings, Top/Bottom examples, quantile samples and other matching sections have independent alignment anchors. The [shared display helper](../tools/exemplar_display.py) limits preceding context for exemplars and cluster examples without changing measured prefixes. Reference pages are supplied separately and used only in the published export.
 
 The [display helper](../tools/report_density.js) initially shows three custom figures, eight cluster cards and eight Criticism rounds, with additional entries expandable. Quadrant tables initially show eight groups. Circuit and Family tables display up to thirty upstream and thirty downstream units selected from attribution results. Top, Bottom and quantile examples initially show five, four and five examples respectively; each cluster displays up to three selected examples. Full saved records remain available in the report artifacts.
 
@@ -46,6 +47,10 @@ Exemplars and cluster examples preview the outlined anchor with up to 32 precedi
 The head figure comes from the controlled test with the highest positive response when positive rules exist, otherwise the strongest negative response; response range breaks ties. Each row uses the signed largest absolute native product within its saved scoring span. A contrast retains the same template and scoring rule across conditions. This display quantity is derived from retained traces; the original experiment reductions and results remain unchanged. Claim fields, section summaries and captions follow the output contracts and word targets in `language/workflow/contracts.py` and `language/workflow/prompts.py`.
 
 The Family heatmap displays the selected measured sentence, with rows for the target and attribution-linked upstream and downstream neurons. Steering inputs reuse native traces from completed graph measurements and show an expandable activation context. Attribution-axis labels prioritize positions carrying measured graph nodes; complete observed inputs and node/edge values remain in the saved measurements.
+
+Related neurons use the same short name in Family, Circuit and the attribution graph inspector. Select a name to see the description and the measured examples it cites. The evidence panel shows the measured token ID, position and signed native product. When the tokenizer splits a Unicode character across tokens, the highlight includes the complete character. Units with no supported description are marked as having insufficient evidence.
+
+Tests shows route-prediction accuracy, the training-majority baseline and the number of scored cases. The matrix uses actual routes as rows and predicted routes as columns; route names are shared with the per-example results. Expand a prediction to read its observed prefix and target token. The largest test-class fraction is a reference, not the fitted baseline; unassigned cases are reported separately. These predictions use the existing atlas split and saved attributions.
 
 ## Inspect an underlying result
 
@@ -63,6 +68,7 @@ predictions.json                    Selected version’s predictions shared by b
 api/                                Requests, responses, usage, cost and timing
 measurements/                       Search, controls and blind-test measurements
 atlas/, graphs/                     Attribution, family and intervention data
+neuron-labels/                      Measured discovery and holdout samples, label records
 artifacts.json                      Structured data passed to the renderer
 report/                             Final HTML and report data
 status.json                         Current phase and output path

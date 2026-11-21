@@ -144,7 +144,8 @@ def local_graph(runtime,item,reader_units,limit=None,top_units=None):
         runtime.forward(ids)
     cache=getattr(runtime,'_local_graph_cache',None)
     if cache is None:cache=runtime._local_graph_cache={}
-    key=(tuple(ids),pos,layer,unit,tuple(coord(u) for u in reader_units),top_units)
+    activation_offload=runtime.settings.get('activation_offload')
+    key=(tuple(ids),pos,layer,unit,tuple(coord(u) for u in reader_units),top_units,activation_offload)
     if key in cache:upstream,downstream=cache[key]
     else:
         upstream,downstream=direct(runtime,ids,pos,layer,unit,reader_units,top_units)
@@ -152,6 +153,7 @@ def local_graph(runtime,item,reader_units,limit=None,top_units=None):
     trace=record_trace(runtime,ids,offsets,state)
     return {'text':text,'token_ids':ids,'trace':trace,'selected':trace[pos],
         'upstream':upstream,'downstream':downstream,'method':LOCAL_METHOD,
+        'activation_offload':activation_offload,
         'source_positions':[0,pos],'retained_upstream_units':top_units,
         'readers_examined':reader_units,'downstream_coverage':'nominated readers, same token position',
         'observed_prefix':runtime.tokenizer.decode(ids[:pos+1],skip_special_tokens=False),

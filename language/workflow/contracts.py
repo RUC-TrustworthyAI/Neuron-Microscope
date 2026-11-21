@@ -1,5 +1,7 @@
 """The model supplies text and references; measured values stay in Python."""
 
+from . import prompts
+
 
 def obj(**fields):
     return {'type': 'object', 'properties': fields, 'required': list(fields), 'additionalProperties': False}
@@ -38,7 +40,7 @@ def interpretation_schema(max_rules_per_pole=3):
 
 INTERPRETATION = interpretation_schema()
 SHORT_LABEL = {'type': 'string', 'minLength': 1, 'maxLength': 48,
-               'description': 'A condition name: preferably one word, at most four words. The full input belongs in text.'}
+               'description': prompts.CONDITION_LABEL_DESCRIPTION}
 CANDIDATE = obj(label=SHORT_LABEL, text=S)
 REGION = obj(id=S, name=S, pole=POLE, rationale=S, candidates=arr(CANDIDATE, 1))
 SEARCH = obj(regions=arr(REGION, 2, 8))
@@ -49,6 +51,8 @@ CONTROL = obj(id=S, title=S, rationale=S, template=S,
 PLAN = obj(controls=arr(CONTROL, 4, 4), family_sentences=arr(S, 3, 5))
 PREDICTIONS = obj(predictions=arr(obj(id=S, group=S, predicted_pole=string('positive', 'negative', 'uncertain'), reason=S)))
 BLIND = obj(positive=arr(CANDIDATE, 0, 6), negative=arr(CANDIDATE, 0, 6))
+ROUTE_DESCRIPTIONS = obj(routes=arr(obj(id=S, name=S, description=S), 1))
+ROUTE_PREDICTIONS = obj(predictions=arr(obj(id=S, predicted_route=S), 1))
 REVISION = obj(claim=CLAIM, response_rules=arr(RULE, 2, 6),
     criticism=arr(obj(attack=S, prediction=S, result=S,
                      verdict=string('survived', 'narrowed', 'rejected', 'inconclusive'), evidence_ids=arr(S)), 3, 5),

@@ -156,7 +156,7 @@ svg text{font-family:var(--sans)}
 .stk .tk{font-size:13.5px;line-height:1.5;padding:1px 3px;white-space:pre;border-radius:3px}.stk .tk.peak{outline:1.5px solid var(--pos);outline-offset:1px}.stk .tk.peak.n{outline-color:var(--neg)}
 @media (max-width:820px){.headline,.card,.route,.cols2,.neigh,.census,.gwrap{grid-template-columns:1fr}.headline .panel+.panel{margin-top:28px}.crow .bodyc{padding-left:0}}
 @media (max-width:1280px){.topnav{gap:16px}.topnav a[href='#custom'],.topnav a[href='#graphs'],.topnav a[href='#circuit'],.topnav a[href='#appendix']{display:none}}
-@media (max-width:1000px){.topnav a[href='#anatomy'],.topnav a[href='#family'],.topnav a[href='#criticism']{display:none}}
+@media (max-width:1000px){.topnav a[href='#family']{display:none}}
 @media print{.topnav{display:none}.wrap{padding:0}.sec{break-inside:avoid-page}details{display:block}details>*{display:block}.bands{display:none}.pane{display:block!important;margin:0 0 18px}.more{display:none}}
 </style></head>
 <body>
@@ -289,15 +289,50 @@ const headlineFigure = () => { const Hd = B.headline; if (!has(Hd)) return null;
   if (N.autointerp_label) meta.append($('span', null, 'Original autointerp label: ', $('b', null, N.autointerp_label))); if (meta.children.length) h.append(meta); })();
 
 // 0. The claim in detail.
-(() => { const parts = []; if (C.one_paragraph) parts.push(P(C.one_paragraph)); if (C.negative_pole) parts.push(P($('b', null, 'Negative pole. '), C.negative_pole)); if (C.what_would_change_my_mind) parts.push(P($('b', null, 'What would change my mind. '), C.what_would_change_my_mind));
-  // Peak census: which token carries the peak in the strongest corpus firings. Compact two-column figure.
-  let census = null; const PC = B.peak_census; if (has(PC) && (has(PC.kinds) || has(PC.tokens))) { const kinds = [...(PC.kinds || [])].sort((x, y) => (y.n || 0) - (x.n || 0)), km = Math.max(...kinds.map(k => k.n || 0), 1);
-    const bars = $('div', { class: 'kbars' }, kinds.slice(0, 7).map(k => $('div', { class: 'kb' }, $('span', { class: 'kl' }, k.kind), $('span', { class: 'kt' }, $('i', { style: `width:${100 * (k.n || 0) / km}%` })), $('span', { class: 'kn' }, k.n))));
-    const toksC = [...(PC.tokens || [])].sort((x, y) => (y.n || 0) - (x.n || 0)).slice(0, 14);
-    const chips = $('div', { class: 'chips', style: 'margin:0' }, toksC.map(t => $('span', { class: 'tokchip' }, JSON.stringify(t.token), ' ', $('b', { style: 'color:var(--ink);font-weight:500' }, t.n))));
-    census = fig($('div', { class: 'census' }, has(kinds) ? $('div', null, $('div', { class: 'sub' }, 'Token kind at the peak'), bars) : null, has(toksC) ? $('div', null, $('div', { class: 'sub' }, 'Most common peak tokens'), chips) : null),
-      `Which token carries the peak in the ${PC.n != null ? PC.n : ''} strongest corpus firings.`); if (PC.note) census.title = PC.note; }
-  if (!parts.length && !census) return; sec('claim', 'The claim in detail', null, parts.length ? $('div', { class: 'detail' }, parts) : null, census); })();
+function combinedPeakCensus(positive, negative) {
+  const sources = [positive, negative].filter(census => census?.n);
+  if (!sources.length) return null;
+  const combine = (field, key) => {
+    const counts = new Map();
+    for (const source of sources) {
+      for (const row of source[field] || []) {
+        counts.set(row[key], (counts.get(row[key]) || 0) + row.n);
+      }
+    }
+    return [...counts].map(([label, n]) => ({[key]: label, n}));
+  };
+  const poles = [positive?.n && `${positive.n} positive`, negative?.n && `${negative.n} negative`].filter(Boolean);
+  const n = sources.reduce((total, census) => total + census.n, 0);
+  return {n, kinds: combine('kinds', 'kind'), tokens: combine('tokens', 'token'),
+    caption: `${n} corpus peak positions · ${poles.join(' and ')}.`};
+}
+
+function peakCensusFigure(census, label) {
+  if (!census || (!has(census.kinds) && !has(census.tokens))) return null;
+  const kinds = [...(census.kinds || [])].sort((a, b) => b.n - a.n);
+  const maximum = Math.max(1, ...kinds.map(kind => kind.n));
+  const bars = $('div', {class: 'kbars'}, kinds.map(kind => $('div', {class: 'kb'},
+    $('span', {class: 'kl'}, kind.kind), $('span', {class: 'kt'},
+      $('i', {style: `width:${100 * kind.n / maximum}%`})), $('span', {class: 'kn'}, kind.n))));
+  const tokens = [...(census.tokens || [])].sort((a, b) => b.n - a.n).slice(0, 14);
+  const chips = $('div', {class: 'chips', style: 'margin:0'}, tokens.map(token => $('span', {class: 'tokchip'},
+    JSON.stringify(token.token), ' ', $('b', {style: 'color:var(--ink);font-weight:500'}, token.n))));
+  const figure = fig($('div', null, label ? $('div', {class: 'sub'}, label) : null, $('div', {class: 'census'},
+    $('div', null, $('div', {class: 'sub'}, 'Token kind at the peak'), bars),
+    $('div', null, $('div', {class: 'sub'}, 'Most common peak tokens'), chips))),
+    census.caption || `${census.n} token positions · ${census.distinct_documents} distinct documents.`);
+  if (census.note) figure.title = census.note;
+  return figure;
+}
+
+(() => {
+  const parts = [];
+  if (C.one_paragraph) parts.push(P(C.one_paragraph));
+  if (C.negative_pole) parts.push(P($('b', null, 'Negative pole. '), C.negative_pole));
+  if (C.what_would_change_my_mind) parts.push(P($('b', null, 'What would change my mind. '), C.what_would_change_my_mind));
+  const census = peakCensusFigure(combinedPeakCensus(B.peak_census, B.peak_census_negative));
+  if (parts.length || census) sec('claim', 'The claim in detail', null, parts.length ? $('div', {class: 'detail'}, parts) : null, census);
+})();
 
 // 0b. Figures for this neuron: Fable-proposed figures rendered by kind (choropleth_us, sweep, ladder, choropleth_world).
 (() => { const CU = B.custom; const figsIn = Array.isArray(CU) ? CU : (CU || {}).figures; if (!has(figsIn)) return; const assets = (CU || {}).assets || {}; const blocks = [];
@@ -564,27 +599,189 @@ let SPEC_COLOUR = {};
     figs.push(fig($('div', { class: 'cols2' }, $('div', null, svg, legend), $('div', null, $('div', { class: 'sub' }, 'Quadrant counts per cluster'), qtab)),
       `${(A.n || pts.length).toLocaleString()} points, one per labeled token. ${pct(on.length / Math.max(1, pts.length))} have the gate open; of those, ${pct(onPos.length / Math.max(1, on.length))} have positive up and so a positive activation. Points in the shaded left band are off whatever up says.`)); }
   if (has(A.strip) && has(A.strip.tokens)) figs.push(fig($('div', null, $('div', { class: 'sub' }, 'One sentence, three signals'), bars3(A.strip)), 'Gate (grey), up (warm or cool by sign) and the resulting activation for each token of the strip sentence. Each row is scaled to its own largest value.'));
-  if (has(A.headline)) figs.push(fig($('div', { class: 'cols' }, A.headline.slice(0, 2).map(s => $('div', null, bars3(s)))), 'Short minimal pairs read the same way.'));
+  // Task 3 paired Anatomy renderer.
+  const hasAnatomyPair = A.pair?.rows?.length === 2;
+  if (hasAnatomyPair) {
+    const pair = A.pair;
+    const channels = [['gate', 'Raw gate'], ['up', 'Up'], ['act', 'Product']];
+    const scales = Object.fromEntries(channels.map(([key]) =>
+      [key, Math.max(...pair.rows.flatMap(row => row[key].map(Math.abs))) || 1]));
+    const track = row => {
+      const replacement = new Set(row.replacement_positions);
+      const scored = new Set(row.scored_positions);
+      const columns = row.tokens.map((token, index) => {
+        const isAnchor = index === row.anchor_index;
+        const isReplacement = replacement.has(index);
+        const isScored = scored.has(index);
+        const tooltip = [`Token ${index} · ${JSON.stringify(token)} · ID ${row.token_ids[index]}`,
+          ...channels.map(([key, label]) => `${label} ${row[key][index]}`),
+          isReplacement ? 'Replacement' : null, isScored ? 'Scored span' : null,
+          isAnchor ? 'Selected anchor' : null].filter(Boolean).join('\n');
+        const bars = channels.map(([key]) => {
+          const value = row[key][index];
+          const color = key === 'gate' ? '#8a8a90' : value >= 0 ? POS : NEG;
+          const side = value >= 0 ? 'bottom' : 'top';
+          const height = 22 * Math.abs(value) / scales[key];
+          return $('div', { class: 'bb' }, $('i', { style: `height:${height}px;background:${color};${side}:50%` }));
+        });
+        const style = [isReplacement ? 'background:var(--tile)' : null,
+          isAnchor ? 'outline:1px solid var(--ink2);outline-offset:-1px' : null].filter(Boolean).join(';');
+        return $('div', { class: 'tc', style, title: tooltip, tabindex: isAnchor ? '0' : null,
+          'aria-label': isAnchor ? tooltip : null,
+          'data-token-index': index, 'data-replacement': isReplacement ? 'true' : null,
+          'data-scored': isScored ? 'true' : null, 'data-anchor': isAnchor ? 'true' : null }, bars,
+          $('div', { class: 'tk', style: isScored ? 'text-decoration:underline dotted;text-underline-offset:3px' : null },
+            token.trim() ? token : JSON.stringify(token)));
+      });
+      const labels = $('div', { class: 'lbls', style: 'position:sticky;left:0;z-index:1;background:var(--bg)' },
+        channels.map(([, label]) => $('div', null, label)), $('div'));
+      const scroller = $('div', { class: 'bars3', tabindex: '0', role: 'region', 'aria-label': `${row.label} token traces` },
+        labels, $('div', { class: 'cols3' }, columns));
+      const anchor = row.anchor_index;
+      const jump = $('button', { type: 'button', class: 'more', style: 'margin:0',
+        'aria-label': `Show scored token for ${row.label}` }, 'Show scored token');
+      jump.onclick = () => {
+        const trackBounds = scroller.getBoundingClientRect();
+        const anchorBounds = columns[anchor].getBoundingClientRect();
+        scroller.scrollLeft += anchorBounds.left - trackBounds.left - (trackBounds.width - anchorBounds.width) / 2;
+      };
+      return $('div', { 'data-case-id': row.case_id, style: 'min-width:0' },
+        $('div', { class: 'sub' }, row.label),
+        $('div', { style: 'font-size:14px;white-space:pre-wrap;overflow-wrap:anywhere' }, row.text),
+        $('div', { class: 'cap' },
+          $('span', { class: 'tokchip' }, row.case_id), ' · Anchor ', JSON.stringify(row.tokens[anchor]), ` at ${anchor} · `, jump),
+        scroller,
+        $('div', { class: 'cap' }, channels.map(([key, label]) => `${label} ${row[key][anchor]}`).join(' · ')));
+    };
+    const sides = $('div', { style: 'display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,360px),1fr));gap:16px 24px' },
+      pair.rows.map(track));
+    figs.push(fig($('div', { id: 'anatomy-comparison', 'data-figure-id': pair.figure_id },
+      $('div', { class: 'sub' }, 'Paired conditions'),
+      $('div', { style: 'font-weight:600' }, pair.title),
+      $('div', { class: 'cap', style: 'white-space:pre-wrap;margin-bottom:12px' }, pair.template),
+      sides, $('p', null, $('b', null, pair.comparison), pair.explanation ? ['. ', pair.explanation] : null)),
+      'Each channel uses the same symmetric scale across both conditions. Shading marks replacement tokens, dotted underlines mark the scored span, and outlines mark the selected anchors. Scroll each trace to view the full token sequence. Product is SiLU(raw gate) × up and is negative when the two inputs have opposite signs.'));
+  }
+  // End paired Anatomy renderer.
+  if (!hasAnatomyPair && has(A.headline)) figs.push(fig($('div', { class: 'cols' }, A.headline.slice(0, 2).map(s => $('div', null, bars3(s)))), 'Short minimal pairs read the same way.'));
   if (!figs.length) return;
-  sec({ id: 'anatomy', wide: true }, 'Inside the neuron', [P('The activation is SiLU(gate)·up. The gate says whether the neuron is switched on; up says what it measures, and with what sign. A negative activation therefore means the gate was open and up pointed the other way, not that the gate was closed.')], figs); })();
+  sec({ id: 'anatomy', wide: true }, 'Inside the neuron', [P('Activation is SiLU(raw gate) × up. SiLU preserves the sign of the raw gate. The product is negative when the raw gate and up have opposite signs.')], figs); })();
 
 // 5b. What it does: direct logit effect and ablation at the peak token.
 (() => { const AB = B.ablation, LE = B.logit_effect; if (!has(AB) && !has(LE)) return; const figs = []; const tk = t => $('span', { class: 'tokchip' }, JSON.stringify(t));
   if (has(LE) && (has(LE.promote) || has(LE.suppress))) { const s = Math.max(...[...(LE.promote || []), ...(LE.suppress || [])].map(u => Math.abs(u.weight || 0)), 1e-9);
     const col = (items, title) => has(items) ? $('div', null, $('div', { class: 'sub' }, title), $('table', null, items.slice(0, 12).map(u => $('tr', null, $('td', null, tk(u.token)), $('td', { class: 'num' }, tile(u.weight, { signed: true, scale: s, d: 2 })))))) : null;
     figs.push(fig($('div', { class: 'cols' }, col(LE.promote, 'Promotes'), col(LE.suppress, 'Suppresses')), `Direct effect of the unit's output vector on the logits${LE.norm != null ? `; vector norm ${fmt(LE.norm)}` : ''}.`)); }
-  if (has(AB) && has(AB.rows)) { const rows = [...AB.rows].sort((a, b) => (b.kl || 0) - (a.kl || 0)); const kmax = Math.max(...rows.flatMap(r => [r.kl || 0, ...(r.kl_controls || [])]), 1e-9); const sm = AB.summary || {};
-    const tiles = $('div', { class: 'tiles', style: 'margin:0 0 16px' }); if (sm.median_kl != null) tiles.append(kTile('median KL', sm.median_kl)); if (sm.median_kl_controls != null) tiles.append(kTile('median control KL', sm.median_kl_controls)); if (sm.n != null) tiles.append(kTile('texts', sm.n));
-    const tbl = $('table', null, $('tr', null, $('th', null, 'Text'), $('th', { style: 'text-align:right' }, 'KL'), $('th', { style: 'text-align:right' }, 'Max control'), $('th', null, 'Next token, before → after'), $('th', null, 'Top losses')));
-    const row = r => { const ctl = has(r.kl_controls) ? Math.max(...r.kl_controls) : null; const pb = r.next_logprob_base != null ? Math.exp(r.next_logprob_base) : null, pa = r.next_logprob_ablated != null ? Math.exp(r.next_logprob_ablated) : null; const txt = r.text || '';
-      return $('tr', null, $('td', null, r.kind ? [$('span', { class: 'pill' }, r.kind), ' '] : null, $('span', { class: 'tail' }, (txt.length > 120 ? '…' : '') + txt.slice(-120)), r.peak_token != null ? [' ', tk(r.peak_token)] : null),
-        $('td', { class: 'num' }, tile(r.kl, { signed: true, scale: kmax, d: 2 })), $('td', { class: 'num' }, ctl != null ? tile(ctl, { d: 2 }) : '–'),
-        $('td', { style: 'white-space:nowrap' }, r.next_token != null ? [tk(r.next_token), ' ', pb != null ? `${pct(pb)} → ${pct(pa)}` : ''] : ''),
-        $('td', null, (r.losses || []).slice(0, 3).map(l => $('span', { class: 'tokchip loss' }, JSON.stringify(l.token), ' ', fmt(l.dp))))); };
-    rows.slice(0, 12).forEach(r => tbl.append(row(r))); let btn = null; if (rows.length > 12) { btn = $('button', { class: 'more' }, `Show ${rows.length - 12} more`); btn.onclick = () => { rows.slice(12).forEach(r => tbl.append(row(r))); btn.remove(); }; }
-    figs.push(fig($('div', null, tiles, $('div', { class: 'sub' }, 'Ablation at the peak token'), tbl, btn), 'Zeroing the unit at the peak token. KL is between the base and ablated next-token distributions; controls zero three random other neurons of the same layer instead. Losses are the tokens whose probability fell most.')); }
+  const sm = AB?.summary || {};
+  const coverage = sm.coverage || {};
+  const hasCoverage = has(coverage);
+  if (has(AB?.rows) || hasCoverage) {
+    const rows = [...(AB.rows || [])].sort((a, b) => (b.kl ?? 0) - (a.kl ?? 0));
+    const scale = Math.max(...rows.map(r => Math.max(r.kl ?? 0, ...(r.kl_controls || []))), 1e-9);
+    const n = sm.n ?? rows.length;
+    const count = value => value == null ? '–' : value.toLocaleString();
+    const tiles = $('div', { class: 'tiles', style: 'margin:0 0 16px' },
+      sm.median_kl != null ? kTile('median KL', sm.median_kl) : null,
+      sm.median_kl_controls != null ? kTile('median control KL', sm.median_kl_controls) : null,
+      kTile('texts', null, { text: n < sm.expected ? `${count(n)} / ${count(sm.expected)}` : count(n) }));
+    const cohortNames = {
+      'strong-positive': 'Positive tail', 'strong-negative': 'Negative tail',
+      medium: 'Moderate', weak: 'Weak', controlled: 'Controlled', graph: 'Graph examples',
+    };
+    const cohortName = kind => Object.hasOwn(cohortNames, kind) ? cohortNames[kind] : kind;
+    const headers = (labels, rightAligned) => $('thead', null, $('tr', null,
+      labels.map((label, i) => $('th', { scope: 'col', style: rightAligned(i) ? 'text-align:right' : null }, label))));
+    const scroll = child => $('div', { style: 'overflow-x:auto' }, child);
+    const numeric = value => $('td', { class: 'num' }, value);
+    let coverageFigure = null;
+    if (hasCoverage) {
+      const bands = Object.entries(coverage);
+      const hasSelected = bands.some(([, cohort]) => cohort.selected != null);
+      const headings = ['Cohort', 'Requested', ...(hasSelected ? ['Selected'] : []),
+        'Measured', 'Median KL', 'Median control KL'];
+      const coverageRows = bands.map(([kind, cohort]) => $('tr', null,
+        $('th', { scope: 'row' }, cohortName(kind)), numeric(count(cohort.requested)),
+        hasSelected ? numeric(count(cohort.selected)) : null,
+        numeric(count(cohort.completed)), numeric(fmt(cohort.median_kl)), numeric(fmt(cohort.median_kl_controls))));
+      const coverageTable = $('table', { 'aria-label': 'Coverage by cohort' }, headers(headings, i => i > 0),
+        $('tbody', null, coverageRows));
+      coverageFigure = $('div', { style: 'margin:0 0 16px' },
+        $('div', { class: 'sub' }, 'Coverage by cohort'), scroll(coverageTable));
+    }
+    const probability = new Intl.NumberFormat(undefined, { style: 'percent', maximumSignificantDigits: 3 });
+    const tinyProbability = new Intl.NumberFormat(undefined,
+      { style: 'percent', notation: 'scientific', maximumSignificantDigits: 3 });
+    const showProbability = p => p == null ? '–' : (p > 0 && p < 1e-5 ? tinyProbability : probability).format(p);
+    const fromLog = logprob => logprob == null ? null : Math.exp(logprob);
+    const transition = r => {
+      if (r.next_token != null) {
+        const label = r.kind === 'controlled' ? 'Controlled next token' : 'Observed next token';
+        return [r.next_token, fromLog(r.next_logprob_base), fromLog(r.next_logprob_ablated), label];
+      }
+      const top = r.top_base?.[0];
+      if (!top) return null;
+      const match = (r.top_ablated || []).find(item => top.token_id != null && item.token_id != null
+        ? item.token_id === top.token_id : item.token === top.token);
+      return [top.token, top.p, fromLog(r.baseline_top_logprob_ablated) ?? match?.p, 'Baseline top prediction'];
+    };
+    const changes = (items, loss = false) => (items || []).map(item =>
+      $('span', { class: 'tokchip' + (loss ? ' loss' : '') }, JSON.stringify(item.token), ' ', fmt(item.dp)));
+    const predictions = items => (items || []).map(item => [tk(item.token), ' ', showProbability(item.p), ' ']);
+    const detailField = (label, data) => has(data) ? $('div', { style: 'margin:5px 0' }, $('b', null, label), ' ', data) : null;
+    const details = (r, label, controls) => {
+      const ids = r.control_neurons || (sm.controls?.length === controls.length ? sm.controls : []);
+      const layer = B.neuron?.layer;
+      const controlResults = controls.map((kl, i) => {
+        const id = ids[i] == null ? `#${i + 1}` : `${layer != null ? `L${layer}/` : ''}N${ids[i]}`;
+        return $('span', { class: 'tokchip' }, `${id} · ${fmt(kl)}`);
+      });
+      return $('details', { style: 'padding:0;border:0' }, label,
+        $('div', { style: 'margin:8px 0;white-space:pre-wrap;overflow-wrap:anywhere' }, r.text),
+        detailField('Case ID', r.case_id),
+        r.peak_index != null ? detailField('Scored position', r.peak_index) : null,
+        r.saved_product != null ? detailField('Saved activation (product)', fmt(r.saved_product)) : null,
+        r.live_product != null ? detailField('Measured activation (product)', fmt(r.live_product)) : null,
+        r.relative_product_magnitude != null ? detailField('Saved magnitude relative to same-sign extreme',
+          showProbability(r.relative_product_magnitude)) : null,
+        detailField('Group', r.semantic_group ?? r.group),
+        detailField('Condition', r.condition_label),
+        detailField('Top predictions before ablation', predictions(r.top_base)),
+        detailField('Top predictions after ablation', predictions(r.top_ablated)),
+        detailField('Probability gains', changes(r.gains)),
+        detailField('Probability losses', changes(r.losses, true)),
+        detailField('Same-layer control KL', controlResults));
+    };
+    const row = r => {
+      const controls = r.kl_controls || [];
+      const comparison = transition(r);
+      const txt = r.text || '';
+      const label = $('summary', { style: 'letter-spacing:normal' },
+        r.kind ? [$('span', { class: 'pill' }, cohortName(r.kind)), ' '] : null,
+        $('span', { class: 'tail' }, (txt.length > 120 ? '…' : '') + txt.slice(-120)),
+        r.peak_token != null ? [' ', tk(r.peak_token)] : null);
+      return $('tr', null, $('td', null, details(r, label, controls)),
+        numeric(tile(r.kl, { signed: true, scale })),
+        numeric(controls.length ? tile(Math.max(...controls)) : '–'),
+        $('td', null, comparison ? [tk(comparison[0]), ' ',
+          $('span', { style: 'white-space:nowrap' }, `${showProbability(comparison[1])} → ${showProbability(comparison[2])}`),
+          $('div', { class: 'cap', style: 'margin:0' }, comparison[3])] : '–'),
+        $('td', null, changes((r.losses || []).slice(0, 3), true)));
+    };
+    const body = $('tbody', null, rows.slice(0, 12).map(row));
+    const table = $('table', { 'aria-label': 'Per-example ablations' },
+      headers(['Text', 'KL', 'Max control', 'Next token, before → after', 'Top losses'], i => i === 1 || i === 2), body);
+    let more = null;
+    if (rows.length > 12) {
+      more = $('button', { class: 'more', type: 'button' }, `Show ${count(rows.length - 12)} more`);
+      more.onclick = () => { rows.slice(12).forEach(r => body.append(row(r))); more.remove(); };
+    }
+    const location = hasCoverage ? 'scored token' : 'peak token';
+    figs.push(fig($('div', null, tiles, coverageFigure, $('div', { class: 'sub' }, `Ablation at the ${location}`),
+      rows.length ? scroll(table) : P('No ablations completed.'), more),
+      `The target neuron is zeroed at the ${location}. KL compares the base and ablated next-token distributions. Each control zeros one random neuron from the same layer at the same position. Open an example to inspect the full context and measured changes.`));
+  }
   if (!figs.length) return;
-  sec({ id: 'ablation', wide: true }, 'What it does', [P('Two readings of the unit’s effect on the output. The direct logit effect is what its output vector alone adds to each token. Ablation removes the unit at the peak token and measures how much the next-token distribution moves, against controls that zero random other neurons of the same layer.')], figs); })();
+  sec({ id: 'ablation', wide: true }, 'What it does', [P('The direct logit effect measures what the unit’s output vector adds to each token. Ablation measures how the next-token distribution changes when the unit is zeroed at a single position.')], figs); })();
 
 // 5c. Where it sits: family heatmap over one sentence and the upstream/downstream neighbourhood.
 (() => { const F = B.family; if (!has(F)) return; const figs = []; const fam = [...(F.family || [])].sort((a, b) => (a.layer - b.layer) || (a.neuron - b.neuron)); const isSelf = u => u.layer === N.layer && u.neuron === N.neuron; const Ms = F.measurements || [];
@@ -633,17 +830,54 @@ let SPEC_COLOUR = {};
     return $('div', { class: 'pair' }, $('div', { class: 'tiles' }, kTile('target', b.target, { signed: true, scale: s }), kTile('achieved', b.achieved, { signed: true, scale: s, big: true })), $('div', null, $('div', { class: 'sub' }, name), has(b.token_activations) ? toks(b.token_activations, b.peak_index, null, neg, { left: b.cut_left, right: b.cut_right }) : $('span', { class: 'toks' }, b.text || ''))); };
   const bm = blind(T.blind_max, 'Blind max: write a text that reaches the corpus peak'), bn = blind(T.blind_min, 'Blind min: write a text that reaches the corpus trough', true);
   if (bm || bn) figs.push(fig($('div', null, bm, bn), 'The explanation is used to write text without looking at the corpus. Achieved is the model’s measured activation on that text.'));
-  const rp = T.route_prediction; if (has(rp)) { const box = $('div', { class: 'pair' }, $('div', { class: 'tiles' }, kTile('accuracy', null, { text: pct(rp.accuracy), big: true }), rp.baseline != null ? kTile('baseline', null, { text: pct(rp.baseline) }) : null, rp.n != null ? kTile('n', rp.n) : null), $('div', null, $('div', { class: 'sub' }, 'Route prediction'), $('p', { style: 'font-size:15px;color:var(--ink2);margin:0' }, 'Given only the text, predict which route the graph will use, then run the graph and check.')));
-    if (has(rp.confusion)) { const R = B.routes || [], k = rp.confusion.length, cs = 26, L = 210, mx = Math.max(...rp.confusion.flat(), 1), W = Math.max(L + cs * k + 8, L + 300); const svg = svgEl('svg', { viewBox: `0 0 ${W} ${cs * k + 40}`, width: W, style: 'display:block;margin-top:10px;max-width:100%' });
-      rp.confusion.forEach((row, i) => { svg.append(svgEl('text', { x: L - 8, y: 30 + i * cs + cs / 2 + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#1d1d1f' }, (rp.route_names && rp.route_names[i]) || (R[i] || {}).name || `route ${i + 1}`)); row.forEach((v, j) => { svg.append(svgEl('rect', { x: L + j * cs, y: 30 + i * cs, width: cs - 1.5, height: cs - 1.5, rx: 2, fill: hexA('#1d1d1f', 0.04 + 0.7 * v / mx) })); svg.append(svgEl('text', { x: L + j * cs + cs / 2 - 0.75, y: 30 + i * cs + cs / 2 + 4, 'text-anchor': 'middle', 'font-size': 11, fill: v / mx > 0.5 ? '#fff' : '#1d1d1f' }, v)); }); });
-      svg.append(svgEl('text', { x: L, y: 18, 'font-size': 11, fill: '#8a8a90' }, 'columns: predicted route · rows: actual route')); box.lastChild.append(svg); }
-    figs.push(fig(box)); }
+  const rp = T.route_prediction; if (has(rp)) {
+    const routes = B.routes || [], ids = rp.route_ids || routes.map(r => r.id);
+    const names = Object.fromEntries(routes.map(r => [r.id, r.name || r.id]));
+    if (Array.isArray(rp.route_names)) rp.route_names.forEach((name, i) => { names[ids[i]] = name; });
+    else Object.assign(names, rp.route_names || {});
+    (rp.descriptions || []).forEach(r => { if (r.name) names[r.id] = r.name; });
+    const routeLabel = id => id == null ? 'Unassigned' : names[id] && names[id] !== id ? `${id} · ${names[id]}` : String(id);
+    const detail = $('div', null, $('div', { class: 'sub' }, 'Route prediction'), $('p', { style: 'font-size:15px;color:var(--ink2);margin:0' }, 'Given only the observed text through the target token, predict its route and compare it with the saved attribution.'));
+    if (rp.n === 0 && rp.reason) detail.append(P(rp.reason));
+    const accuracy = rp.n > 0 && Array.isArray(rp.rows) ? `${pct(rp.accuracy)} (${rp.rows.filter(row => row.correct === true).length}/${rp.n})` : pct(rp.accuracy);
+    const box = $('div', { class: 'pair' }, $('div', { class: 'tiles' }, kTile('accuracy', null, { text: accuracy, big: true }), rp.baseline != null ? kTile('baseline', null, { text: pct(rp.baseline) }) : null, rp.n != null ? kTile('n', rp.n) : null), detail);
+    if (has(rp.confusion)) {
+      const matrixIds = rp.confusion.map((_, i) => ids[i] || `route ${i + 1}`), k = matrixIds.length, cs = 26, L = 270, top = 44;
+      const mx = Math.max(...rp.confusion.flat(), 1), W = Math.max(L + cs * k + 8, L + 300);
+      const svg = svgEl('svg', { viewBox: `0 0 ${W} ${top + cs * k + 8}`, width: W, role: 'img', 'aria-label': 'Route prediction confusion matrix', style: 'display:block;margin-top:10px;max-width:100%' });
+      svg.append(svgEl('text', { x: L, y: 12, 'font-size': 11, fill: '#8a8a90' }, 'columns: predicted route · rows: actual route'));
+      matrixIds.forEach((id, j) => svg.append(svgEl('text', { x: L + j * cs + cs / 2, y: 32, 'text-anchor': 'middle', 'font-size': 11, fill: '#8a8a90' }, id)));
+      rp.confusion.forEach((row, i) => {
+        const label = routeLabel(matrixIds[i]);
+        const name = svgEl('text', { x: L - 8, y: top + i * cs + cs / 2 + 4, 'text-anchor': 'end', 'font-size': 12, fill: '#1d1d1f' }, label.length > 43 ? label.slice(0, 40) + '…' : label);
+        name.append(svgEl('title', {}, label)); svg.append(name);
+        row.forEach((v, j) => {
+          const cell = svgEl('rect', { x: L + j * cs, y: top + i * cs, width: cs - 1.5, height: cs - 1.5, rx: 2, 'data-actual': matrixIds[i], 'data-predicted': matrixIds[j], fill: hexA('#1d1d1f', 0.04 + 0.7 * v / mx) });
+          cell.append(svgEl('title', {}, `${routeLabel(matrixIds[i])} → ${routeLabel(matrixIds[j])}: ${v}`)); svg.append(cell);
+          svg.append(svgEl('text', { x: L + j * cs + cs / 2 - 0.75, y: top + i * cs + cs / 2 + 4, 'text-anchor': 'middle', 'font-size': 11, 'pointer-events': 'none', fill: v / mx > 0.5 ? '#fff' : '#1d1d1f' }, v));
+        });
+      });
+      detail.append(svg);
+    }
+    const notes = [];
+    if (rp.baseline != null) notes.push(`Baseline always predicts ${routeLabel(rp.baseline_route_id)}, the most frequent training route.`);
+    if (rp.test_majority_fraction != null) notes.push(`Largest test class: ${pct(rp.test_majority_fraction)} (reference only).`);
+    if (rp.unassigned_n != null) notes.push(`Unassigned test cases: ${rp.unassigned_n}.`);
+    const samples = has(rp.rows) ? $('details', { style: 'margin-top:16px' }, $('summary', null, `Inspect ${rp.rows.length} predictions`),
+      $('div', { style: 'overflow-x:auto' }, $('table', { 'aria-label': 'Individual route predictions', style: 'font-size:13px' },
+        $('thead', null, $('tr', null, ['Example / observed text', 'Target token', 'Predicted', 'Actual', 'Result'].map(label => $('th', { scope: 'col' }, label)))),
+        $('tbody', null, rp.rows.map(row => $('tr', null,
+          $('td', null, $('details', null, $('summary', null, row.id), $('div', { class: 'toks', style: 'display:block;max-width:38em;max-height:240px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:8px' }, row.text || ''))),
+          $('td', null, $('code', null, JSON.stringify(row.token ?? '')), $('div', { class: 'dim' }, row.position == null ? '' : `position ${row.position} (0-based)`)),
+          $('td', null, row.predicted_route == null ? 'Not predicted' : routeLabel(row.predicted_route)), $('td', null, routeLabel(row.actual_route)),
+          $('td', null, row.correct === true ? 'Correct' : row.correct === false ? 'Incorrect' : 'Unscored'))))))) : null;
+    figs.push(fig($('div', null, box, samples), notes.join(' '))); }
   if (has(T.steering)) { const s = Math.max(...T.steering.flatMap(x => [Math.abs(x.baseline || 0), Math.abs(x.steered || 0)]), 1e-9);
     figs.push(fig($('div', null, $('div', { class: 'sub' }, 'Steering'), $('table', null, $('tr', null, $('th', null, 'Prompt'), $('th', { style: 'text-align:right' }, 'Strength'), $('th', { style: 'text-align:right' }, 'Baseline'), $('th', { style: 'text-align:right' }, 'Steered'), $('th', null, 'Note')),
       T.steering.map(x => $('tr', null, $('td', null, $('span', { class: 'toks' }, x.prompt)), $('td', { class: 'num' }, fmt(x.strength)), $('td', { class: 'num' }, tile(x.baseline, { signed: true, scale: s })), $('td', { class: 'num' }, tile(x.steered, { signed: true, scale: s })), $('td', { style: 'color:var(--ink2);font-size:13.5px' }, x.note || ''))))), 'Baseline and steered values are the measured quantity named in each note.')); }
   if (has(T.ablation)) { const s = Math.max(...T.ablation.map(x => Math.abs(x.effect || 0)), 1e-9);
     figs.push(fig($('div', null, $('div', { class: 'sub' }, 'Ablation'), $('table', null, $('tr', null, $('th', null, 'Graph'), $('th', { style: 'text-align:right' }, 'Effect'), $('th', null, 'Note')), T.ablation.map(x => $('tr', null, $('td', { class: 'id' }, x.graph_id), $('td', { class: 'num' }, tile(x.effect, { signed: true, scale: s, d: 2 })), $('td', { style: 'color:var(--ink2);font-size:13.5px' }, x.note || ''))))), 'Effect of zeroing the unit on each graph’s target, as measured.')); }
-  if (!figs.length) return; sec({ id: 'tests', wide: true }, 'Tests', [P('Predictions made from the explanation and then checked against the model. Blind max and min are the sharpest: if the explanation is right, a text written from it alone should reach the corpus extremes.')], figs); })();
+  if (!figs.length) return; sec({ id: 'tests', wide: true }, 'Tests', [P('Predictions checked against measured responses and saved attributions. Blind max and min ask whether text written from the explanation alone can reach the corpus extremes.')], figs); })();
 
 // 8. Criticism: compact table, each row expands to the result and evidence.
 (() => { const K = B.criticism; if (!has(K)) return;
@@ -654,6 +888,8 @@ let SPEC_COLOUR = {};
 
 // 9. Appendix.
 (() => { const A = B.appendix || {}; const parts = [];
+  const absolute = peakCensusFigure(B.peak_census_absolute, 'Absolute peak census');
+  if (absolute) parts.push($('details', null, $('summary', null, 'Absolute peak census'), absolute));
   if (has(A.notes)) parts.push($('details', null, $('summary', null, 'Notes'), $('ul', null, A.notes.map(n => $('li', null, n)))));
   if (has(V.history)) parts.push($('details', null, $('summary', null, 'Version history'), $('ul', null, V.history.map(h => $('li', null, `v${h.n} · ${(h.ts || '').slice(0, 16).replace('T', ' ')} · ${h.note || ''}`)))));
   if (has(A.provenance)) parts.push($('details', null, $('summary', null, 'Provenance'), $('ul', null, A.provenance.map(n => $('li', null, n)))));

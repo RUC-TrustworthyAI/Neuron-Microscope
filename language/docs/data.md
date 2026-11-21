@@ -39,9 +39,11 @@ The workflow configuration’s `report` path points to a target package containi
 | `token-rankings.json` | Six token-selectivity tables, generated from saved activations |
 | `dataset-index.json` | Opaque report case IDs mapped to canonical document/token positions |
 | `effects.json` | Measured static logit effects used by Promotes/Suppresses |
-| `peak-census.json`, `peak-census-negative.json` | Optional saved censuses for the corresponding report sections |
+| `peak-census.json`, `peak-census-negative.json` | Token kind and exact token counts at each available signed activation tail |
 
 `report.json` includes `identity` (`id`, `layer`, `neuron`, `model`), `statistics`, `methods`, `examples`, `bands`, `scatter`, `points` and `documents`. Each point identifies its document, token position, and `[gate, value, product]`. Each document contains exact `token_ids`, decoded `tokens`, and aligned `gate`, `value`, `product` arrays. Cases are report-local identifiers; their names are not global token offsets.
+
+The report builder counts token kinds and exact token text at up to 30 strongest positive and 30 strongest negative positions in the corpus. The rankings use saved native product values and break ties by corpus position. Multiple positions can come from one document. Individual UTF-8 byte fragments are counted under their vocabulary token ID. Saved reports without the census files can recover these counts from the retained token extrema in `report.json`.
 
 The explanation model receives sampled contexts with measured product values, together with extreme tokens, document exemplars, quantile cases, token selectivity, peak statistics and direct logit effects. Gate and up channels remain saved but are excluded from explanation requests. Blind labeling hides all measured activations. Two explanation revisions and three labeling passes precede version selection and freezing. Official explanations and previous investigation conclusions are excluded from research inputs.
 

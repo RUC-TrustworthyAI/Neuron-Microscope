@@ -184,30 +184,43 @@ def band_samples(cache, hist, seed, per_band=8):
                  count=int(counts[i]), indices=positions[i], upper_inclusive=i==len(counts)-1)
             for i in range(len(counts))]
 
+_BYTE_LEVEL_CHARS = list(range(33, 127)) + list(range(161, 173)) + list(range(174, 256))
+_BYTE_LEVEL_INVERSE = {chr(c): c for c in _BYTE_LEVEL_CHARS}
+_BYTE_LEVEL_INVERSE.update({chr(256 + i): b for i, b in enumerate(
+    x for x in range(256) if x not in _BYTE_LEVEL_CHARS)})
+
+
+def byte_level_bytes(fragment):
+    try:
+        return bytes(_BYTE_LEVEL_INVERSE[char] for char in fragment)
+    except KeyError:
+        return None
+
+
+def token_pieces(tokenizer, ids):
+    """Decode one ByteLevel stream, retaining token boundaries and incomplete characters."""
+    decoder = codecs.getincrementaldecoder('utf-8')(errors='replace')
+    pieces, raw, pending = [], [], []
+    for token in ids:
+        fragment = tokenizer.id_to_token(int(token))
+        raw.append(fragment)
+        data = byte_level_bytes(fragment)
+        if data is not None:
+            pieces.append(decoder.decode(data, final=False))
+        else:
+            pieces.append(decoder.decode(b'', final=True) + fragment)
+            decoder.reset()
+        pending.append(bool(decoder.getstate()[0]))
+    if pieces:
+        pieces[-1] += decoder.decode(b'', final=True)
+    if ''.join(pieces) != tokenizer.decode(list(map(int, ids)), skip_special_tokens=False):
+        raise ValueError('Tokenizer text reconstruction mismatch')
+    return pieces, raw, pending
+
+
 def package(records, cache, hist, quadrants, extremes, bands, inputs, tokenizer_path, identity, plan, seed, n_docs):
     from tokenizers import Tokenizer
     tokenizer = Tokenizer.from_file(str(tokenizer_path))
-    # ByteLevel BPE fragments are streamed through one UTF-8 decoder, preserving split multibyte characters.
-    byte_chars = list(range(33,127)) + list(range(161,173)) + list(range(174,256))
-    extra = [x for x in range(256) if x not in byte_chars]
-    inverse = {chr(c): c for c in byte_chars}
-    inverse.update({chr(256+i): b for i,b in enumerate(extra)})
-    def tokens_text(ids):
-        decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
-        pieces, raw = [], []
-        for token in ids:
-            s = tokenizer.id_to_token(int(token))
-            raw.append(s)
-            if all(c in inverse for c in s):
-                pieces.append(decoder.decode(bytes(inverse[c] for c in s), final=False))
-            else:
-                pieces.append(decoder.decode(b"", final=True) + s)
-                decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
-        if pieces:
-            pieces[-1] += decoder.decode(b"", final=True)
-        if "".join(pieces) != tokenizer.decode(list(map(int,ids)), skip_special_tokens=False):
-            raise ValueError("Tokenizer text reconstruction mismatch")
-        return pieces, raw
     @lru_cache(maxsize=8)
     def block(b):
         prefix = inputs / ("block-%06d" % b)
@@ -231,7 +244,7 @@ def package(records, cache, hist, quadrants, extremes, bands, inputs, tokenizer_
         if doc_id not in documents:
             a,b = map(int,io[row:row+2])
             tokens = ids[a:b]
-            texts, raw = tokens_text(tokens)
+            texts, raw, _ = token_pieces(tokenizer, tokens)
             act_start, act_stop = int(r["start"]+off[j]),int(r["start"]+off[j+1])
             values = floats(cache[act_start:act_stop])
             if len(tokens) != len(values):

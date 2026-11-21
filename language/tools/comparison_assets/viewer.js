@@ -291,7 +291,7 @@
     if(event.key==='ArrowLeft'||event.key==='ArrowRight'){event.preventDefault();resizeAt(Number(divider.getAttribute('aria-valuenow'))+(event.key==='ArrowLeft'?-2:2));}
     if(event.key==='Home'){event.preventDefault();resizeAt(50);}
   });
-  if (new URLSearchParams(location.search).get('compare') !== '0') {
+  if (!location.hash.startsWith('#evidence-') && new URLSearchParams(location.search).get('compare') !== '0') {
     if (document.readyState === 'complete') show();
     else window.addEventListener('load',show,{once:true});
   }

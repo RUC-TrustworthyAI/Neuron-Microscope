@@ -1,15 +1,20 @@
 """Repository-root entry points and shared GPU worker startup."""
+import io
+import os
+import runpy
 import subprocess
 import sys
 import tempfile
 import unittest
+from contextlib import redirect_stderr, redirect_stdout
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
 from language.examples.configure import configuration
 from language.workflow.gpu_worker import GPUClient
-from language.workflow.state import read
+from language.workflow.run import main
+from language.workflow.state import read, write
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -17,7 +22,8 @@ ROOT = Path(__file__).resolve().parents[2]
 
 class EntrypointTests(unittest.TestCase):
     def test_repository_root_commands_load_without_model_or_credentials(self):
-        for module in ('language', 'language.collection', 'language.workflow.run', 'language.workflow.gpu_worker'):
+        for module in ('language', 'language.collection', 'language.workflow.run',
+                       'language.workflow.gpu_worker', 'language.workflow.followups'):
             result = subprocess.run([sys.executable, '-m', module, '--help'],
                                     cwd=ROOT, capture_output=True, text=True, check=True)
             self.assertIn('usage:', result.stdout)
@@ -35,6 +41,156 @@ class EntrypointTests(unittest.TestCase):
         self.assertTrue(config['gpu_lock'].endswith('gpu-4-5-6-7.lock'))
         self.assertEqual(config['settings']['runtime']['dtype'], 'bfloat16')
         self.assertEqual(config['settings']['runtime']['attention'], 'sdpa')
+
+    def test_followup_defaults_on_with_opt_out_and_publishes_the_final_report(self):
+        cases = ((None, True, False, False), ('--followup', True, True, False),
+                 ('--no-followup', False, True, False), (None, False, True, True))
+        for flag, enabled, exported, partial in cases:
+            with self.subTest(flag=flag, exported=exported, partial=partial), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                foundation = root / 'example'
+                destination = root / 'published' / 'L1_N2'
+                config = {'gpus': [0], 'settings': {}, 'neuron': 'L1_N2',
+                          'publish': str(destination.parent), 'references': str(root / 'references')}
+                config_path = root / 'config.json'
+                write(config_path, config)
+                if exported:
+                    destination.mkdir(parents=True)
+                    (destination / 'index.html').write_text('Previously exported foundation report')
+                events = []
+
+                def complete_workflow(*args, **kwargs):
+                    events.append('workflow')
+                    write(foundation / 'status.json', {'phase': 'interpretation_complete' if partial else 'complete'})
+                    return foundation / 'report'
+
+                argv = ['language', '--config', str(config_path), '--output', str(foundation)]
+                if flag:
+                    argv.append(flag)
+                if flag == '--followup':
+                    argv.append('--checkpoint-attribution')
+                if partial:
+                    argv += ['--stop-after', 'interpretation']
+                with patch.object(sys, 'argv', argv), \
+                     patch.object(sys, 'path', [str(ROOT / 'language/tools'), *sys.path]), \
+                     patch.dict(os.environ), redirect_stdout(io.StringIO()) as stdout, \
+                     patch('language.workflow.run.run', side_effect=complete_workflow) as workflow_run, \
+                     patch('language.workflow.followups.run') as followup_run, \
+                     patch('comparison.publish', side_effect=lambda *a, **kw: events.append('publish')) as publish, \
+                     patch('language.workflow.render.directory') as directory:
+                    self.assertEqual(main(), 0)
+                workflow_run.assert_called_once_with(config, foundation,
+                    stop_after='interpretation' if partial else None,
+                    checkpoint_attribution=flag == '--followup', followup=enabled)
+                followup_run.assert_not_called()
+                report = foundation / 'report'
+                self.assertEqual(stdout.getvalue().strip(), str(report / 'index.html'))
+                if partial and exported:
+                    publish.assert_not_called()
+                else:
+                    publish.assert_called_once_with(report, destination, 'L1_N2', config['references'], replace=exported)
+                directory.assert_called_once()
+                expected = ['workflow'] + ([] if partial and exported else ['publish'])
+                self.assertEqual(events, expected)
+                self.assertEqual(read(config_path), config)
+                self.assertEqual(read(foundation / 'status.json')['phase'], 'interpretation_complete' if partial else 'complete')
+
+    def test_workflow_failure_exits_unsuccessfully_without_publication(self):
+        for fatal in (False, True):
+            with self.subTest(fatal=fatal), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                foundation = root / 'example'
+                followup = foundation / 'followup'
+                config_path = root / 'config.json'
+                write(config_path, {'gpus': [0], 'settings': {}, 'neuron': 'L1_N2',
+                                    'publish': str(root / 'published'), 'references': str(root / 'references')})
+
+                failure = {'error': 'synthetic follow-up failure', 'source': 'workflow'}
+
+                def fail_workflow(*args, **kwargs):
+                    phase = 'failed' if fatal else 'complete_with_failures'
+                    write(foundation / 'status.json', {'phase': phase})
+                    write(followup / 'status.json', {'phase': phase})
+                    if fatal:
+                        write(foundation / 'failure.json', failure)
+                        raise RuntimeError('synthetic follow-up failure')
+                    return foundation / 'report'
+
+                argv = ['language', '--config', str(config_path), '--output', str(foundation)]
+                with patch.object(sys, 'argv', argv), \
+                     patch.object(sys, 'path', [str(ROOT / 'language/tools'), *sys.path]), \
+                     patch.dict(os.environ), redirect_stdout(io.StringIO()), \
+                     patch('language.workflow.run.run', side_effect=fail_workflow), \
+                     patch('language.workflow.followups.run') as followup_run, \
+                     patch('comparison.publish') as publish:
+                    if fatal:
+                        with self.assertRaisesRegex(RuntimeError, 'synthetic follow-up failure'):
+                            runpy.run_module('language', run_name='__main__')
+                    else:
+                        with self.assertRaises(SystemExit) as stopped:
+                            runpy.run_module('language', run_name='__main__')
+                        self.assertEqual(stopped.exception.code, 1)
+                publish.assert_not_called()
+                followup_run.assert_not_called()
+                self.assertEqual(read(foundation / 'status.json')['phase'],
+                                 'failed' if fatal else 'complete_with_failures')
+                if fatal:
+                    self.assertEqual(read(foundation / 'failure.json'), failure)
+                else:
+                    self.assertFalse((foundation / 'failure.json').exists())
+                self.assertEqual(read(followup / 'status.json')['phase'],
+                                 'failed' if fatal else 'complete_with_failures')
+
+    def test_followup_rejects_partial_and_replay_modes_before_writing(self):
+        modes = (['--config', 'absent.json', '--stop-after', 'interpretation'],
+                 ['--ablate-from', 'absent'], ['--anatomy-from', 'absent'])
+        for mode in modes:
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as folder:
+                output = Path(folder) / 'must-not-exist'
+                argv = ['language', *mode, '--output', str(output), '--followup']
+                with patch.object(sys, 'argv', argv), redirect_stderr(io.StringIO()), \
+                     patch('language.workflow.run.run') as base_run, \
+                     patch('language.workflow.followups.run') as followup_run:
+                    with self.assertRaises(SystemExit) as stopped:
+                        main()
+                self.assertEqual(stopped.exception.code, 2)
+                base_run.assert_not_called()
+                followup_run.assert_not_called()
+                self.assertFalse(output.exists())
+
+    def test_publication_cannot_overlap_research_directories(self):
+        for location, enabled in ((location, enabled) for location in ('foundation', 'followup', 'ancestor')
+                                  for enabled in (False, True)):
+            with self.subTest(location=location, followup=enabled), tempfile.TemporaryDirectory() as folder:
+                root = Path(folder)
+                foundation = root / 'L1_N2' / 'example'
+                followup = foundation / 'followup'
+                for research in (foundation, followup):
+                    write(research / 'status.json', {'phase': 'complete'})
+                    write(research / 'backend-settings.json', {'preserve': str(research)})
+                publications = {'foundation': foundation / 'report',
+                                'followup': followup / 'report', 'ancestor': root}
+                config_path = root / 'config.json'
+                write(config_path, {'gpus': [0], 'settings': {}, 'neuron': 'L1_N2',
+                                    'publish': str(publications[location]), 'references': str(root / 'references')})
+                before = {path.relative_to(root): path.read_bytes() for path in root.rglob('*') if path.is_file()}
+                argv = ['language', '--config', str(config_path), '--output', str(foundation)]
+                if not enabled:
+                    argv.append('--no-followup')
+                with patch.object(sys, 'argv', argv), \
+                     patch.object(sys, 'path', [str(ROOT / 'language/tools'), *sys.path]), \
+                     patch.dict(os.environ), redirect_stderr(io.StringIO()), \
+                     patch('language.workflow.run.run') as base_run, \
+                     patch('language.workflow.followups.run') as followup_run, \
+                     patch('comparison.publish') as publish:
+                    with self.assertRaises(SystemExit) as stopped:
+                        main()
+                self.assertEqual(stopped.exception.code, 2)
+                base_run.assert_not_called()
+                followup_run.assert_not_called()
+                publish.assert_not_called()
+                after = {path.relative_to(root): path.read_bytes() for path in root.rglob('*') if path.is_file()}
+                self.assertEqual(after, before)
 
     def test_shared_worker_starts_the_relocated_module(self):
         with tempfile.TemporaryDirectory() as folder:
